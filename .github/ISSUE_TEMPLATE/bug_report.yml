@@ -1,0 +1,40 @@
+name: 🐛 缺陷或报错报告 (Bug Report)
+description: 提交客户端汉化运行报错、界面异常或崩溃问题
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢提交缺陷报告！请提供详细信息以便快速定位和修复。
+  - type: input
+    id: version
+    attributes:
+      label: Antigravity 客户端版本
+      description: 请提供当前 Antigravity 客户端版本（例如 v2.8.1）
+      placeholder: "v2.8.1"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: 操作系统
+      options:
+        - Windows 11 / 10 (x64)
+        - macOS (Apple Silicon M系列)
+        - macOS (Intel)
+        - Linux (x64 / ARM64)
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: 异常现象描述
+      description: 发生了什么错误？
+      placeholder: "例如：点击设置面板某项时出现卡顿或未汉化..."
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: 截图或控制台日志
+      description: 请粘贴异常截图或 DevTools 控制台错误信息

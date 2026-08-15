@@ -1,0 +1,29 @@
+name: 🌐 词条补充或翻译建议 (Translation Request)
+description: 提交尚未汉化的界面英文短语、或对现有中文翻译提出润色优化建议
+labels: ["translation", "enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        感谢协助完善 Antigravity 中文词库！
+  - type: textarea
+    id: original-english
+    attributes:
+      label: 原始英文文本 (Original English)
+      description: 界面中显示的原版英文内容
+      placeholder: "例如：Manage application settings."
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-chinese
+    attributes:
+      label: 建议的中文翻译 (Suggested Translation)
+      description: 准确、通顺的中文翻译
+      placeholder: "例如：管理应用程序设置。"
+    validations:
+      required: true
+  - type: input
+    id: location
+    attributes:
+      label: 出现位置 / 面板路径
+      placeholder: "例如：设置 -> 应用设置"
