@@ -17,6 +17,22 @@
 - **复合段落智能拆分 (Multi-Sentence Parsing)**：自动识别并拆解多句子复合段落，动态时间与用量百分比级联翻译，彻底告别“中英混合半生不熟”。
 - **100% 安全备份与秒级还原**：首次安装自动生成 `app.asar.bak` 安全备份，随时一键还原官方纯英文初始状态。
 
+## 📋 前置环境与要求 (Prerequisites)
+
+在开始使用或安装汉化补丁前，请确保满足以下条件：
+
+1. **操作系统支持**：
+   - **Windows**：Windows 10 / 11 (x64)
+   - **macOS**：macOS 12+（原生支持 Apple Silicon M系列及 Intel 芯片，首次注入自动完成 `codesign` 代码重签）
+   - **Linux**：各大主流发行版（Ubuntu, Debian, Fedora, Arch 等 x64 / ARM64）
+2. **Node.js 基础运行环境**：
+   - 系统中需安装 **Node.js (>= 16.x)** 及随附的 **npm / npx** 工具（用于执行 ASAR 资源包的安全解构与重构）。
+   - 验证方式：在终端运行 `node -v` 和 `npx -v` 确认输出版本号。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
+3. **已安装 Antigravity 客户端**：
+   - 确保本机已安装官方 **Google Antigravity 2.0** 客户端。
+4. **⚠️ 关键操作须知（避免占用报错）**：
+   - **在执行安装、还原或更新补丁前，请务必完全退出 Antigravity 客户端**（在系统右下角托盘图标右键选择“Quit / 退出”）。若程序在后台运行，操作系统会锁定核心文件导致报 `EPERM / EBUSY` 文件占用错误。
+
 ---
 
 ## 🚀 快速开始

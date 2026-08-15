@@ -17,6 +17,22 @@ A high-performance, non-invasive, self-healing Chinese localization patch and li
 - **Multi-Sentence Compound Parsing**: Seamlessly breaks down multi-sentence paragraphs and translates cascading dynamic time/quota values.
 - **100% Safe Backup & Instant Restore**: Automatically creates `app.asar.bak` on initial installation and restores official English status with one click.
 
+## 📋 Prerequisites
+
+Before installing the patch, make sure your environment meets the following requirements:
+
+1. **Supported Operating Systems**:
+   - **Windows**: Windows 10 / 11 (x64)
+   - **macOS**: macOS 12+ (Apple Silicon M-series & Intel chips; automated `codesign` ad-hoc signing included)
+   - **Linux**: Major distributions (Ubuntu, Debian, Fedora, Arch, etc., x64/ARM64)
+2. **Node.js Runtime Environment**:
+   - **Node.js (>= 16.x)** with `npx` / `npm` (required for unpacking and repacking the ASAR package).
+   - Run `node -v` and `npx -v` in your terminal to verify. If not installed, download the LTS release from [Node.js Official Website](https://nodejs.org/).
+3. **Google Antigravity Installed**:
+   - Official **Google Antigravity 2.0** desktop client installed.
+4. **⚠️ Critical Notice (Prevent File Lock Errors)**:
+   - **Completely quit the Antigravity client before installing, updating, or restoring the patch** (right-click the system tray icon and select "Quit"). Otherwise, the OS will lock `app.asar`, causing `EPERM / EBUSY` errors.
+
 ---
 
 ## 🚀 Quick Start
