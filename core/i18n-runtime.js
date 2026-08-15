@@ -168,12 +168,13 @@
       }
     }
 
-    // 5. 子短语全量贪婪替换（处理未被句号拆开但包含子短语的复合文本）
+    // 5. 多词复合子短语全量替换（仅对包含空格的多词短语或超长固定短语生效，杜绝单个单词误伤用户自定义标题）
     var processed = normalized;
     var modified = false;
     for (var j = 0; j < sortedExactKeys.length; j++) {
       var key = sortedExactKeys[j];
-      if (key.length >= 4 && processed.indexOf(key) !== -1) {
+      // 只有多词固定词组（含空格）或长度 >= 15 的复合句才允许子串替换，防止单个单词如 "Project" 误伤 "Localization Project Setup"
+      if ((key.indexOf(' ') !== -1 || key.length >= 15) && processed.indexOf(key) !== -1) {
         processed = processed.split(key).join(exactDict[key]);
         modified = true;
       }

@@ -118,11 +118,29 @@ function patchMenuFile(menuFilePath) {
     { from: '"New Window"', to: '"新建窗口"' },
     { from: "'Docs'", to: "'官方文档'" },
     { from: '"Docs"', to: '"官方文档"' },
+    { from: "'Command Palette'", to: "'命令面板'" },
+    { from: '"Command Palette"', to: '"命令面板"' },
+    { from: "'Maximize'", to: "'最大化'" },
+    { from: '"Maximize"', to: '"最大化"' },
+    { from: "'Minimize'", to: "'最小化'" },
+    { from: '"Minimize"', to: '"最小化"' },
+    { from: "'Close Window'", to: "'关闭窗口'" },
+    { from: '"Close Window"', to: '"关闭窗口"' },
+    { from: "'Toggle Full Screen'", to: "'切换全屏'" },
+    { from: '"Toggle Full Screen"', to: '"切换全屏"' },
+    { from: "'Zoom In'", to: "'放大'" },
+    { from: '"Zoom In"', to: '"放大"' },
+    { from: "'Zoom Out'", to: "'缩小'" },
+    { from: '"Zoom Out"', to: '"缩小"' },
+    { from: "'Reset Zoom'", to: "'重置缩放'" },
+    { from: '"Reset Zoom"', to: '"重置缩放"' },
+    { from: "'Toggle Developer Tools'", to: "'切换开发者工具'" },
+    { from: '"Toggle Developer Tools"', to: '"切换开发者工具"' },
     { from: 'updater_1.MenuUpdateStep.CheckForUpdates', to: '"检查更新"' },
   ];
 
   for (const r of replacements) {
-    content = content.replace(r.from, r.to);
+    content = content.split(r.from).join(r.to);
   }
 
   fs.writeFileSync(menuFilePath, content, 'utf-8');
