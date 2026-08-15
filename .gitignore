@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build & ASAR unpacking temporary files
+*.asar
+*.asar.bak
+*.asar.new
+__asar_temp_unpack__/
+preload.js
+
+# Internal analysis artifacts (contains Google proprietary bundle extracts)
+tools/main.js
+tools/prism_bundle.js
+tools/*.txt
+tools/all_normalized_strings.json
+tools/all_ui_candidates.json
+tools/settings_candidates.json
+tools/missing_ui_strings.json
+tools/uncovered-output.txt
+tools/uncovered-ui-strings.json
+tools/to-translate.json
+tools/gap-result.txt
+
+# OS & IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log

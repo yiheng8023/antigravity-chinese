@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+  <head>
+<script>window.__APP_CONFIG__ = {"productName":"antigravity","csrfToken":"64fde001-9e78-483b-9077-cf18420f997e","appVersion":"2.8.1","devMode":false};</script>
+    <meta charset="UTF-8" />
+    <title>Antigravity</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0" />
+    <!-- Preconnect secondary CDNs for dynamic UI icons (Drive, Docs, Colab) -->
+    <link rel="preconnect" href="https://www.gstatic.com" />
+    <link rel="preconnect" href="https://ssl.gstatic.com" />
+    <!-- Preconnect to font origins for dynamic Google Symbols loading -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <script>
+      // Polyfill Node process global for third-party libraries (e.g. TanStack Virtual)
+      window.process = window.process || {};
+      window.process.env = window.process.env || {};
+      if (!window.process.env.NODE_ENV) {
+        window.process.env.NODE_ENV = window.__APP_CONFIG__?.devMode ? "development" : "production";
+      }
+      // Set process.platform from the user agent. This MUST happen here, before
+      // any bundle (and therefore vscode-uri) loads. Since we are forced to set
+      // windows.process, we must also set process.platform because vscode-uri
+      // uses process.platform to determine if the OS is Windows.
+      if (!window.process.platform) {
+        const ua = navigator.userAgent || "";
+        window.process.platform =
+          ua.indexOf("Windows") >= 0
+            ? "win32"
+            : ua.indexOf("Macintosh") >= 0 || ua.indexOf("Mac OS") >= 0
+              ? "darwin"
+              : "linux";
+      }
+
+      // Workaround for mce-autosize-textarea re-definition error from overlay_bundle.js.
+      if (window.customElements) {
+        const originalDefine = window.customElements.define;
+        window.customElements.define = (name, constructor, options) => {
+          if (!window.customElements.get(name)) {
+            originalDefine.call(window.customElements, name, constructor, options);
+          }
+        };
+      }
+    </script>
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎁</text></svg>"
+    />
+    <!-- Legacy precompiled v3 Tailwind + hand-authored CSS. Superseded by
+         compiled_tailwind.css (v4); removed at runtime when the cleaned-styles
+         Mendel flag is ON. Deleted entirely once the flag reaches 100%. -->
+    <link id="jetbox-legacy-styles" rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/jetbox.css" />
+    <link rel="stylesheet" href="/compiled_tailwind.css" />
+    <!-- Inline styles to prevent flash before app loads -->
+    <style>
+      html,
+      body {
+        height: 100%;
+        background-color: transparent;
+        overscroll-behavior: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script defer src="/prism_bundle.js"></script>
+    <script src="/main.js"></script>
+  </body>
+</html>
