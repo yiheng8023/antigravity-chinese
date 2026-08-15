@@ -4,18 +4,20 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, non-invasive, self-healing Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux).
+A high-performance, non-invasive Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux).
 
 ---
 
-## 🌟 Key Features
+## 🌟 Key Features & Engineering Design
 
 - **Non-invasive Runtime Engine**: Injects a responsive DOM translation engine at Electron's `preload` phase without modifying official core binaries.
-- **Zero-FOUC Experience**: Synchronously mounts at 0ms of DOM rendering, completely preventing English-to-Chinese visual flicker.
+- **Preload Synchronization (Minimizing FOUC)**: Early mount during the renderer initialization phase to minimize English-to-Chinese visual flicker.
 - **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), preserving user code and terminal commands.
-- **Self-Healing & Auto-Persistence**: Built-in self-healing launcher and file watcher that automatically re-injects the patch in 0.5s after official upstream updates.
+- **Self-Healing & File Watcher**: Built-in self-healing launcher (`launch.bat`) and file watcher to automatically detect upstream update overrides.
 - **Multi-Sentence Compound Parsing**: Seamlessly breaks down multi-sentence paragraphs and translates cascading dynamic time/quota values.
-- **100% Safe Backup & Instant Restore**: Automatically creates `app.asar.bak` on initial installation and restores official English status with one click.
+- **Automated Backup & Reversible Restore**: Automatically creates `app.asar.bak` on initial installation and restores official English status with one click.
+
+---
 
 ## 📋 Prerequisites
 
@@ -68,6 +70,34 @@ node cli.js watch
 # Restore official English version
 node cli.js restore
 ```
+
+---
+
+## 🧪 Testing & Verification
+
+This project uses comprehensive automated regression test suites and cross-platform CI to ensure stability:
+
+```bash
+# Run complete test suite
+npm test
+```
+
+- **Core Injection Tests (`test/verify.js`)**: Uses JSDOM to simulate actual DOM rendering and verify 34+ assertion checkpoints.
+- **Screenshot Regressions (`test/test-screenshots.js`)**: Covers 54+ real UI test cases.
+- **Title Collision Protection (`test/test-menu-and-titles.js`)**: Prevents single-word substring collisions from corrupting user-generated session titles.
+- **Cross-platform CI**: Automated GitHub Actions testing across Windows, macOS, and Ubuntu.
+
+---
+
+## 🔄 Self-Evolving Localization Architecture
+
+Rather than relying entirely on manual screenshot gathering, the project focuses on an automated evolution pipeline:
+
+1. **Upstream Release Detection**: Monitor new Antigravity desktop updates.
+2. **Text & DOM Drift Detection**: Run `npm run scan:drift` to extract diffs between versions.
+3. **Rule Decay Prevention**: Automatically flag stale or refactored UI strings.
+4. **Automated Regressions**: Verify translation integrity via `npm test`.
+5. **Human-in-the-Loop**: Maintainers only review final key terminology differences.
 
 ---
 

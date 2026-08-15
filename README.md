@@ -4,18 +4,20 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、非侵入式、全自动自愈中文本地化补丁与生命周期管理器。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、非侵入式中文本地化补丁与生命周期管理器。
 
 ---
 
 ## 🌟 核心特性与设计哲学
 
-- **无侵入运行时注入 (Non-invasive Runtime Engine)**：通过 Electron `Preload` 挂载 DOM 级响应式汉化引擎，不破坏、不修改官方主程序核心二进制逻辑。
-- **零闪烁体验 (Zero-FOUC)**：在页面 DOM 渲染第 0 毫秒同步挂载，杜绝从英文闪烁成中文。
-- **保护用户代码与终端**：智能过滤并严格保护代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码和终端指令原汁原味，绝不误伤。
-- **自愈与全自动持久化 (Self-Healing & Auto-Persistence)**：内置自愈启动器与文件守护机制，官方升级覆盖后 0.5 秒内自动重新注入，摆脱重复人工维护。
-- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动识别并拆解多句子复合段落，动态时间与用量百分比级联翻译，彻底告别“中英混合半生不熟”。
-- **100% 安全备份与秒级还原**：首次安装自动生成 `app.asar.bak` 安全备份，随时一键还原官方纯英文初始状态。
+- **非侵入式运行时注入 (Non-invasive Runtime Engine)**：通过 Electron `preload` 阶段挂载响应式 DOM 翻译引擎，不修改主程序核心二进制文件。
+- **预加载同步挂载 (Preload Hook)**：在渲染进程初始化阶段尽早介入，最大程度减少英文向中文的界面跳变。
+- **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
+- **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
+- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换。
+- **自动备份与可逆还原**：首次注入时自动创建 `app.asar.bak` 原生备份，随时可一键还原至官方纯英文初始状态。
+
+---
 
 ## 📋 前置环境与要求 (Prerequisites)
 
@@ -23,15 +25,15 @@
 
 1. **操作系统支持**：
    - **Windows**：Windows 10 / 11 (x64)
-   - **macOS**：macOS 12+（原生支持 Apple Silicon M系列及 Intel 芯片，首次注入自动完成 `codesign` 代码重签）
-   - **Linux**：各大主流发行版（Ubuntu, Debian, Fedora, Arch 等 x64 / ARM64）
+   - **macOS**：macOS 12+（支持 Apple Silicon M系列及 Intel 芯片，首次注入自动处理 `codesign` 签名）
+   - **Linux**：主流发行版（Ubuntu, Debian, Fedora, Arch 等 x64 / ARM64）
 2. **Node.js 基础运行环境**：
-   - 系统中需安装 **Node.js (>= 16.x)** 及随附的 **npm / npx** 工具（用于执行 ASAR 资源包的安全解构与重构）。
-   - 验证方式：在终端运行 `node -v` 和 `npx -v` 确认输出版本号。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
+   - 系统中需安装 **Node.js (>= 16.x)** 及附带的 **npm / npx** 工具（用于 ASAR 资源包解构与打包）。
+   - 验证方式：在终端运行 `node -v` 和 `npx -v`。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
 3. **已安装 Antigravity 客户端**：
-   - 确保本机已安装官方 **Google Antigravity 2.0** 客户端。
+   - 确保本机已安装官方 **Google Antigravity 2.0** 桌面客户端。
 4. **⚠️ 关键操作须知（避免占用报错）**：
-   - **在执行安装、还原或更新补丁前，请务必完全退出 Antigravity 客户端**（在系统右下角托盘图标右键选择“Quit / 退出”）。若程序在后台运行，操作系统会锁定核心文件导致报 `EPERM / EBUSY` 文件占用错误。
+   - **在执行安装、还原或更新补丁前，请务必完全退出 Antigravity 客户端**（在系统右下角托盘图标右键选择“Quit / 退出”），以防止操作系统因文件锁定报 `EPERM / EBUSY` 占用错误。
 
 ---
 
@@ -41,7 +43,7 @@
 
 #### Windows
 - **安装汉化**：双击运行 [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)
-- **自愈启动**：双击运行 [`launch.bat`](file:///C:/Projects/antigravity-chinese/launch.bat)（自动检测版本覆盖并重打补丁后拉起客户端）
+- **自愈启动**：双击运行 [`launch.bat`](file:///C:/Projects/antigravity-chinese/launch.bat)（自动检测版本覆盖并重新注入后启动）
 - **恢复英文**：双击运行 [`uninstall.bat`](file:///C:/Projects/antigravity-chinese/uninstall.bat)
 
 #### macOS / Linux
@@ -74,34 +76,60 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 
 ---
 
+## 🧪 自动化测试与质量保证 (Testing & Verification)
+
+本项目引入严格的端到端自动化回归测试与跨平台 CI，避免人工凭经验验证带来的遗漏：
+
+```bash
+# 运行全套自动化测试（包含核心功能、真实截图用例及菜单防误伤）
+npm test
+```
+
+- **核心注入自查 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，验证 34+ 项关键 DOM 路径的翻译准确性与 Monaco Editor 代码保护。
+- **真实截图用例集 (`test/test-screenshots.js`)**：覆盖 54+ 项来自真实界面截图的复合句子、动态限额与时间解析。
+- **菜单与会话标题防误伤 (`test/test-menu-and-titles.js`)**：确保单字词不破坏用户自定义会话名称。
+- **跨平台 CI 流水线**：在 GitHub Actions 中覆盖 Windows、macOS 与 Ubuntu 环境的持续自动化测试。
+
+---
+
+## 🔄 自动化演进：从“维护汉化”到“自我演化本地化系统”
+
+面对 Antigravity 频繁的版本迭代，本项目演进的核心方向是**建立自动跟随上游演进的工程闭环**：
+
+```mermaid
+flowchart LR
+    A[上游版本更新] -->|tools/drift-detector.js| B[自动检测 DOM / 文本漂移]
+    B --> C[识别未翻译文本与失效规则]
+    C -->|AI 上下文自动翻译| D[生成候选词典 Diff PR]
+    D -->|npm test| E[自动化 DOM 与回归测试]
+    E --> F[人工仅审查最终差异]
+```
+
+* **文本与 DOM 漂移检测**：通过 `npm run scan:drift` 自动扫描新旧版本之间的字符串差异。
+* **规则防衰减 (Rule Decay Prevention)**：自动识别失效或被上游重构的旧规则。
+* **人机协同维护**：日常由自动化管线完成 95% 的探测、翻译与测试，维护者只需把控最终关键术语差异。
+
+---
+
 ## 📁 仓库结构
 
 ```text
 antigravity-chinese/
 ├── dict/
-│   └── zh-CN.json            # 汉化词典库（900+ 精确词条 + 级联正则规则）
+│   └── zh-CN.json            # 汉化词典库（1000+ 精确词条 + 级联正则规则）
 ├── core/
 │   └── i18n-runtime.js       # 前端运行时注入引擎（Preload 挂载、防抖、代码区保护、多句拆分）
 ├── cli.js                    # 跨平台管理工具（路径探测、解包、注入、打包、还原、自愈启动、守护）
 ├── install.bat / install.sh  # 一键安装脚本
 ├── launch.bat                # 自愈启动脚本
 ├── uninstall.bat / uninstall.sh # 一键还原脚本
-├── test/                     # 自动化端到端测试套件（JSDOM Mock / 54 项真实截图测试集）
+├── test/                     # 自动化回归测试套件（JSDOM 模拟、截图用例、防误伤断言）
+├── tools/                    # 文本提取、差量比对与漂移检测工具链
 ├── docs/assets/sponsoring/   # 赞助与支持相关资产
 ├── package.json              # 项目配置
 ├── LICENSE                   # MIT 开源许可证
 └── README.md                 # 说明文档
 ```
-
----
-
-## 🛠️ 自定义词库扩展
-
-如果你需要增加自定义翻译或修正词条，只需直接编辑 [`dict/zh-CN.json`](file:///C:/Projects/antigravity-chinese/dict/zh-CN.json)：
-- `exact`：添加键值对 `"English": "中文"` 进行精准匹配。
-- `patterns`：添加正则表达式规则应对动态时间、用量比例等文本。
-
-编辑保存后，重新运行 `node cli.js install` 或双击 `install.bat` 即可立即生效。
 
 ---
 
