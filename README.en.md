@@ -91,13 +91,20 @@ npm test
 
 ## 🔄 Self-Evolving Localization Architecture
 
-Rather than relying entirely on manual screenshot gathering, the project focuses on an automated evolution pipeline:
+Rather than relying entirely on manual screenshot gathering, the project is incrementally building an automated evolution pipeline:
 
-1. **Upstream Release Detection**: Monitor new Antigravity desktop updates.
-2. **Text & DOM Drift Detection**: Run `npm run scan:drift` to extract diffs between versions.
-3. **Rule Decay Prevention**: Automatically flag stale or refactored UI strings.
-4. **Automated Regressions**: Verify translation integrity via `npm test`.
-5. **Human-in-the-Loop**: Maintainers only review final key terminology differences.
+```mermaid
+flowchart LR
+    A[Upstream Release] -->|tools/drift-detector.js| B[Detect Text & Candidate Drift]
+    B --> C[Flag New Strings & Stale Rules]
+    C -->|AI-Assisted Candidate Diff| D[Generate Candidate Diff PR]
+    D -->|npm test| E[Automated DOM Regressions]
+    E --> F[Human Review for Key Diffs]
+```
+
+- **Three-Tier Coverage Metrics**: Run `npm run scan:drift` to report Observed Candidates, Exact Match Coverage, and Rule-Assisted Effective Translation Coverage.
+- **Stale Rule Discovery**: Bi-directionally analyzes `exactKeys - observed` to surface dictionary entries that might have been deprecated or refactored upstream.
+- **Progressively Reduced Maintenance Cost**: Transitions repetitive manual verification to automated difference extraction and regression suites, leaving only key terminology decisions to human maintainers.
 
 ---
 
