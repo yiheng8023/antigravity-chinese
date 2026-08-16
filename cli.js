@@ -410,6 +410,46 @@ function watch(customPath) {
   });
 }
 
+function getGlobalPluginTargetDir() {
+  const homedir = os.homedir();
+  return path.join(homedir, '.gemini', 'config', 'plugins', 'chinese-toolkit');
+}
+
+function installPlugin() {
+  console.log('🔌 正在安装 Antigravity 官方中文智能体插件...');
+  const srcPluginDir = path.join(PROJECT_ROOT, 'plugins', 'chinese-toolkit');
+  const targetDir = getGlobalPluginTargetDir();
+  
+  if (!fs.existsSync(srcPluginDir)) {
+    console.error('❌ 未找到插件源目录:', srcPluginDir);
+    return;
+  }
+  
+  const parentDir = path.dirname(targetDir);
+  if (!fs.existsSync(parentDir)) {
+    fs.mkdirSync(parentDir, { recursive: true });
+  }
+  
+  if (fs.existsSync(targetDir)) {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+  }
+  
+  fs.cpSync(srcPluginDir, targetDir, { recursive: true });
+  console.log(`✅ 插件已成功安装至全局目录: ${targetDir}`);
+  console.log('🎉 智能体中文交互规则 (Rules) 与 本地化诊断技能 (Skills) 已就绪！\n');
+}
+
+function uninstallPlugin() {
+  console.log('🔌 正在卸载 Antigravity 官方中文智能体插件...');
+  const targetDir = getGlobalPluginTargetDir();
+  if (fs.existsSync(targetDir)) {
+    fs.rmSync(targetDir, { recursive: true, force: true });
+    console.log(`✅ 已从全局目录移除插件: ${targetDir}\n`);
+  } else {
+    console.log('ℹ️ 全局插件目录中未发现该插件。\n');
+  }
+}
+
 // CLI Routing
 const args = process.argv.slice(2);
 const command = args[0] || 'help';
@@ -424,6 +464,17 @@ switch (command) {
   case 'install':
   case 'patch':
     install(customPath);
+    if (args.includes('--with-plugin')) {
+      installPlugin();
+    }
+    break;
+  case 'install-plugin':
+  case 'plugin:install':
+    installPlugin();
+    break;
+  case 'uninstall-plugin':
+  case 'plugin:uninstall':
+    uninstallPlugin();
     break;
   case 'restore':
   case 'uninstall':
@@ -447,15 +498,18 @@ switch (command) {
 Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
 
 用法:
-  node cli.js install      # 一键安装汉化（自动备份并注入）
-  node cli.js restore      # 一键还原（恢复官方英文原版）
-  node cli.js status       # 检测当前客户端与汉化状态
-  node cli.js launch       # 自愈启动（自动检测版本覆盖并重打补丁后启动）
-  node cli.js watch        # 守护模式（后台监听官方更新，发现覆盖自动重新汉化）
-  node cli.js --path <dir> # 指定自定义客户端路径
+  node cli.js install              # 一键安装客户端 UI 汉化（自动备份并注入）
+  node cli.js install-plugin       # 一键安装 Antigravity 官方中文智能体插件
+  node cli.js uninstall-plugin     # 卸载官方中文智能体插件
+  node cli.js restore              # 一键还原客户端（恢复官方英文原版）
+  node cli.js status               # 检测当前客户端与汉化状态
+  node cli.js launch               # 自愈启动（自动检测版本覆盖并重打补丁后启动）
+  node cli.js watch                # 守护模式（后台监听官方更新，发现覆盖自动重新汉化）
+  node cli.js --path <dir>         # 指定自定义客户端路径
 
 选项:
-  --path <path>  指定 Antigravity 的安装目录或 app.asar 路径
+  --path <path>    指定 Antigravity 的安装目录或 app.asar 路径
+  --with-plugin    在执行 install 时同步安装官方插件
 `);
     break;
 }

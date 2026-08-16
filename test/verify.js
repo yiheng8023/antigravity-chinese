@@ -196,6 +196,20 @@ console.log('\n--- 4. 验证代码保护机制（确保不误伤代码与终端�
 const codeContent = win.document.querySelector('.monaco-editor code').textContent;
 assert(codeContent === 'const isPending = false; // Queue and Send Immediately', 'Monaco Editor 与代码区内容被严格保护，未被误翻译！');
 
+console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');
+const pluginJsonPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'plugin.json');
+assert(fs.existsSync(pluginJsonPath), '插件清单 plugins/chinese-toolkit/plugin.json 存在');
+const pluginData = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
+assert(pluginData.name === 'antigravity-chinese-toolkit', '插件名称规范对齐 antigravity-chinese-toolkit');
+
+const rulesPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'rules', 'chinese-interaction-rules.md');
+assert(fs.existsSync(rulesPath), '插件规则 rules/chinese-interaction-rules.md 存在且非空');
+
+const skillPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'skills', 'i18n-diagnostics', 'SKILL.md');
+assert(fs.existsSync(skillPath), '插件技能 skills/i18n-diagnostics/SKILL.md 存在');
+const skillContent = fs.readFileSync(skillPath, 'utf-8');
+assert(skillContent.includes('name: i18n-diagnostics'), '插件技能包含合法 YAML frontmatter 定义');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

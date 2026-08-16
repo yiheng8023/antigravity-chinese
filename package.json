@@ -14,6 +14,8 @@
     "scan:drift": "node tools/drift-detector.js",
     "status": "node cli.js status",
     "install-patch": "node cli.js install",
+    "install:plugin": "node cli.js install-plugin",
+    "uninstall:plugin": "node cli.js uninstall-plugin",
     "launch": "node cli.js launch",
     "restore": "node cli.js restore"
   },
