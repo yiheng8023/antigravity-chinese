@@ -106,6 +106,44 @@ flowchart LR
 - **Stale Rule Discovery**: Bi-directionally analyzes `exactKeys - observed` to surface dictionary entries that might have been deprecated or refactored upstream.
 - **Progressively Reduced Maintenance Cost**: Transitions repetitive manual verification to automated difference extraction and regression suites, leaving only key terminology decisions to human maintainers.
 
+## 🔌 Dual-Mode Ecosystem: Official Antigravity Plugin Suite
+
+In addition to running as a client host UI localization patch, this project ships with an **official Antigravity Agent Plugin** located in [`plugins/chinese-toolkit/`](file:///C:/Projects/antigravity-chinese/plugins/chinese-toolkit/):
+
+### Plugin Capabilities
+- **Chinese Interaction & Engineering Rules (`rules/chinese-interaction-rules.md`)**: Enforces end-to-end Simplified Chinese thinking/replies, Chinese code commenting, and strict preservation of technical terms/brand names.
+- **Localization Diagnostics Skill (`skills/i18n-diagnostics/`)**: Equips the agent with built-in status diagnostics, upstream drift analysis (`scan:drift`), and automated testing workflows.
+
+### How to Enable the Plugin
+- **Global Installation (Recommended)**: Copy or symlink `plugins/chinese-toolkit` to your global plugin directory:
+  - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
+  - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
+- **Workspace-level**: Place `chinese-toolkit` inside `.agents/plugins/` in any project root to share with your team.
+
+---
+
+## 📁 Repository Structure
+
+```text
+antigravity-chinese/
+├── dict/
+│   └── zh-CN.json            # Localization dictionary (1040+ exact entries + regex cascade)
+├── core/
+│   └── i18n-runtime.js       # Runtime engine (Preload hook, debounce, Monaco protection)
+├── plugins/
+│   └── chinese-toolkit/      # Official Antigravity plugin (Rules + Diagnostics Skill)
+├── cli.js                    # Cross-platform CLI manager
+├── install.bat / install.sh  # One-click installation scripts
+├── launch.bat                # Self-healing launcher script
+├── uninstall.bat / uninstall.sh # One-click restore scripts
+├── test/                     # Automated E2E test suites (JSDOM, screenshot regressions)
+├── tools/                    # Text extraction, drift detection, and gap analysis tools
+├── docs/assets/sponsoring/   # Donation and sponsorship assets
+├── package.json              # Project configuration
+├── LICENSE                   # MIT License
+└── README.md                 # Documentation
+```
+
 ---
 
 ## 💖 Sponsoring & Donation

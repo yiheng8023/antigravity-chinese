@@ -111,14 +111,32 @@ flowchart LR
 
 ---
 
+## 🔌 双模生态：Antigravity 官方插件形态 (Plugin Suite)
+
+除了作为客户端宿主 UI 汉化补丁运行外，本项目还内置了完全符合 Antigravity 官方规范的**全栈中文智能体增强插件**（位于 [`plugins/chinese-toolkit/`](file:///C:/Projects/antigravity-chinese/plugins/chinese-toolkit/)）：
+
+### 插件功能特性
+- **中文交互与工程规则 (`rules/chinese-interaction-rules.md`)**：规范智能体全流程简体中文思考、代码中文注释及严格的技术术语保留准则。
+- **本地化诊断技能 (`skills/i18n-diagnostics/`)**：为智能体赋能一键状态诊断、版本漂移分析（`scan:drift`）与自动化测试能力。
+
+### 启用插件方式
+- **全局启用（推荐）**：将 `plugins/chinese-toolkit` 目录复制或软链接至本地全局插件目录：
+  - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
+  - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
+- **项目级启用**：在任意工程根目录下的 `.agents/plugins/` 放入 `chinese-toolkit` 即可随仓库团队共享。
+
+---
+
 ## 📁 仓库结构
 
 ```text
 antigravity-chinese/
 ├── dict/
-│   └── zh-CN.json            # 汉化词典库（1000+ 精确词条 + 级联正则规则）
+│   └── zh-CN.json            # 汉化词典库（1040+ 精确词条 + 级联正则规则）
 ├── core/
 │   └── i18n-runtime.js       # 前端运行时注入引擎（Preload 挂载、防抖、代码区保护、多句拆分）
+├── plugins/
+│   └── chinese-toolkit/      # Antigravity 官方智能体插件（中文规则 Rules + 诊断技能 Skills）
 ├── cli.js                    # 跨平台管理工具（路径探测、解包、注入、打包、还原、自愈启动、守护）
 ├── install.bat / install.sh  # 一键安装脚本
 ├── launch.bat                # 自愈启动脚本
