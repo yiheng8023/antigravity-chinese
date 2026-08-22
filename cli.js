@@ -146,6 +146,38 @@ function patchMenuFile(menuFilePath) {
   fs.writeFileSync(menuFilePath, content, 'utf-8');
 }
 
+function patchIpcHandlersFile(ipcFilePath) {
+  if (!fs.existsSync(ipcFilePath)) return;
+  let content = fs.readFileSync(ipcFilePath, 'utf-8');
+  const replacements = [
+    { from: "'Open workspace'", to: "'打开工作区'" },
+    { from: '"Open workspace"', to: '"打开工作区"' },
+    { from: "'Open workspaces'", to: "'打开多个工作区'" },
+    { from: '"Open workspaces"', to: '"打开多个工作区"' }
+  ];
+  for (const r of replacements) {
+    content = content.split(r.from).join(r.to);
+  }
+  fs.writeFileSync(ipcFilePath, content, 'utf-8');
+}
+
+function patchIdeWizardFile(wizardFilePath) {
+  if (!fs.existsSync(wizardFilePath)) return;
+  let content = fs.readFileSync(wizardFilePath, 'utf-8');
+  const replacements = [
+    { from: 'Welcome to Antigravity', to: '欢迎使用 Antigravity' },
+    { from: 'Setting up…', to: '正在准备…' },
+    { from: 'Welcome to the new Antigravity!', to: '欢迎体验全新的 Antigravity！' },
+    { from: "Antigravity has been redesigned to put agents first with new capabilities. If you'd still like a code editor, you can download it as a separate app named <b>Antigravity IDE</b>.", to: 'Antigravity 经过全面重构，以强大的智能体为核心。如果您仍需要代码编辑器，可下载独立的 <b>Antigravity IDE</b> 应用。' },
+    { from: 'Download the Antigravity IDE', to: '下载 Antigravity IDE' },
+    { from: 'Explore the new Antigravity', to: '开始探索全新 Antigravity' }
+  ];
+  for (const r of replacements) {
+    content = content.split(r.from).join(r.to);
+  }
+  fs.writeFileSync(wizardFilePath, content, 'utf-8');
+}
+
 function install(customPath) {
   console.log('🚀 [1/5] 正在定位 Antigravity 客户端路径...');
   const asarPath = findAsarPath(customPath);
@@ -213,25 +245,13 @@ function install(customPath) {
   preloadContent += '\n' + bundleScript;
   fs.writeFileSync(preloadPath, preloadContent, 'utf-8');
 
-function patchIdeWizardFile(wizardFilePath) {
-  if (!fs.existsSync(wizardFilePath)) return;
-  let content = fs.readFileSync(wizardFilePath, 'utf-8');
-  const replacements = [
-    { from: 'Welcome to Antigravity', to: '欢迎使用 Antigravity' },
-    { from: 'Setting up…', to: '正在准备…' },
-    { from: 'Welcome to the new Antigravity!', to: '欢迎体验全新的 Antigravity！' },
-    { from: "Antigravity has been redesigned to put agents first with new capabilities. If you'd still like a code editor, you can download it as a separate app named <b>Antigravity IDE</b>.", to: 'Antigravity 经过全面重构，以强大的智能体为核心。如果您仍需要代码编辑器，可下载独立的 <b>Antigravity IDE</b> 应用。' },
-    { from: 'Download the Antigravity IDE', to: '下载 Antigravity IDE' },
-    { from: 'Explore the new Antigravity', to: '开始探索全新 Antigravity' }
-  ];
-  for (const r of replacements) {
-    content = content.split(r.from).join(r.to);
-  }
-  fs.writeFileSync(wizardFilePath, content, 'utf-8');
-}
-
   if (fs.existsSync(menuPath)) {
     patchMenuFile(menuPath);
+  }
+
+  const ipcPath = path.join(tempExtractDir, 'dist', 'ipcHandlers.js');
+  if (fs.existsSync(ipcPath)) {
+    patchIpcHandlersFile(ipcPath);
   }
 
   const wizardHtmlPath = path.join(tempExtractDir, 'dist', 'ideInstall', 'wizardHtml.js');
