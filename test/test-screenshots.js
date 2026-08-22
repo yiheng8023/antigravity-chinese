@@ -156,7 +156,19 @@ const testCases = [
   "Default Dark",
   "Background",
   "Foreground",
-  "Accent"
+  "Accent",
+
+  // Screenshot 6: New Application & Remote Control & Sandbox Settings
+  "Application",
+  "Manage Antigravity app settings.",
+  "Work with local agents from another device.",
+  "Device Name",
+  "Scan the code to open this device in Remote Control, or copy link.",
+  "Configure allowed commands outside the sandbox.",
+  "Configure external tools via Model Context Protocol.",
+  "No MCP servers installed",
+  "Build With Google Plugins",
+  "Browse and enable plugins from the Build With Google catalog."
 ];
 
 console.log('Testing', testCases.length, 'cases from screenshots:');

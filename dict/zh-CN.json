@@ -1051,7 +1051,26 @@
     "companion website": "配套网页端",
     "Manage remote sessions": "管理远程会话",
     "Remote session": "远程会话",
-    "Remote sessions": "远程会话列表"
+    "Remote sessions": "远程会话列表",
+    "Application": "应用设置",
+    "Manage Antigravity app settings.": "管理 Antigravity 应用设置。",
+    "Work with local agents from another device.": "从其他设备与本地智能体协同工作。",
+    "Device Name": "设备名称",
+    "copy link": "复制链接",
+    "Scan the code to open this device in": "扫描二维码在此设备中打开",
+    "Scan the code to open this device in ": "扫描二维码在此设备中打开 ",
+    "Scan the code to open this device in Remote Control, or copy link.": "扫描二维码在远程控制中打开此设备，或复制链接。",
+    ", or ": "，或 ",
+    "or copy link.": "或复制链接。",
+    "or copy link": "或复制链接",
+    "Configure allowed commands outside the sandbox.": "配置沙箱外允许执行的命令。",
+    "Configure external tools via Model Context Protocol.": "通过模型上下文协议 (Model Context Protocol) 配置外部工具。",
+    "No MCP servers installed": "未安装 MCP 服务",
+    "Use Add MCP to browse the store, or add a custom server via the MCP config.": "使用“添加 MCP”浏览应用商店，或通过 MCP 配置文件添加自定义服务。",
+    "to browse the store, or add a custom server via the MCP config.": "浏览应用商店，或通过 MCP 配置文件添加自定义服务。",
+    "to browse the store, or add a custom server via the MCP config": "浏览应用商店，或通过 MCP 配置文件添加自定义服务",
+    "Build With Google Plugins": "Build With Google 插件目录",
+    "Browse and enable plugins from the Build With Google catalog.": "浏览并启用 Build With Google 目录中的插件。"
   },
   "patterns": [
     {
@@ -1145,6 +1164,14 @@
     {
       "regex": "^Stopped after (\\d+) steps?$",
       "replacement": "已在 $1 步后停止"
+    },
+    {
+      "regex": "Scan the code to open this device in\\s*",
+      "replacement": "扫描二维码在此设备中打开 "
+    },
+    {
+      "regex": "to browse the store, or add a custom server via the MCP config\\.?",
+      "replacement": "浏览应用商店，或通过 MCP 配置文件添加自定义服务。"
     }
   ]
 }
