@@ -1043,7 +1043,15 @@
     "Tab to Import": "按 Tab 导入",
     "Tab to Jump": "按 Tab 跳转",
     "Tab Gitignore Access": "Tab 访问 Gitignore 文件",
-    "Highlight After Accept": "接受建议后高亮显示"
+    "Highlight After Accept": "接受建议后高亮显示",
+    "Remote Control": "远程控制",
+    "You cannot modify Remote Control settings from Remote Control. Please modify these settings on your local application.": "您无法在远程控制端修改远程控制设置。请在本地客户端应用中修改这些设置。",
+    "You cannot sign out from Remote Control. Please sign out on your local application.": "您无法在远程控制端退出登录。请在本地客户端应用中退出登录。",
+    "Companion Website": "配套网页端",
+    "companion website": "配套网页端",
+    "Manage remote sessions": "管理远程会话",
+    "Remote session": "远程会话",
+    "Remote sessions": "远程会话列表"
   },
   "patterns": [
     {
