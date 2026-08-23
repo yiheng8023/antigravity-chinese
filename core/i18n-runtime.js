@@ -107,6 +107,14 @@
     // 如果文本已经是翻译结果，直接跳过
     if (translatedValues[normalized]) return null;
 
+    // 官方原生已汉化文本探测与优雅让位：如果文本已包含中文且无精确英文匹配，优雅让位，绝不破坏官方中文
+    var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
+    if (cjkChars && cjkChars.length >= 1 && !exactDict[normalized]) {
+      if (cjkChars.length >= normalized.length * 0.25 || !/[a-zA-Z]{3,}/.test(normalized)) {
+        return null;
+      }
+    }
+
     // 1. 直接精确匹配
     if (exactDict[normalized]) {
       return exactDict[normalized];
