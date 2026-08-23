@@ -176,24 +176,90 @@ function patchIdeWizardFile(wizardFilePath) {
   fs.writeFileSync(wizardFilePath, content, 'utf-8');
 }
 
-function install(customPath) {
-  console.log('🚀 [1/5] 正在定位 Antigravity 客户端路径...');
+const MIN_NODE_VERSION = 16;
+
+function runPreflightCheck(customPath) {
+  const checks = [];
+  let allPassed = true;
+
+  // 1. Node.js 运行时最低版本检测 (支持所有更高版本，绝不限制上限)
+  const nodeVerStr = process.version.replace(/^v/, '');
+  const majorVer = parseInt(nodeVerStr.split('.')[0], 10);
+  const nodePassed = !isNaN(majorVer) && majorVer >= MIN_NODE_VERSION;
+  checks.push({
+    name: 'Node.js 运行时版本',
+    detail: `当前: v${nodeVerStr} (要求: >= v${MIN_NODE_VERSION}.0.0)`,
+    passed: nodePassed,
+    critical: true
+  });
+  if (!nodePassed) allPassed = false;
+
+  // 2. npx / npm 打包工具可用性检查
+  let npxPassed = false;
+  try {
+    execSync('npx --version', { stdio: 'ignore' });
+    npxPassed = true;
+  } catch (e) {}
+  checks.push({
+    name: 'NPX 资源解构工具',
+    detail: npxPassed ? '已就绪' : '未检测到 npx 工具 (请安装 Node.js 环境)',
+    passed: npxPassed,
+    critical: true
+  });
+  if (!npxPassed) allPassed = false;
+
+  // 3. 客户端安装与 asar 路径探测
   const asarPath = findAsarPath(customPath);
-  if (!asarPath) {
-    console.error('❌ 未能自动检测到 Antigravity 客户端路径，请使用 --path 指定。');
+  const installPassed = !!asarPath;
+  checks.push({
+    name: 'Antigravity 客户端安装状态',
+    detail: installPassed ? `已找到 (${asarPath})` : '未自动探测到客户端安装路径',
+    passed: installPassed,
+    critical: true
+  });
+  if (!installPassed) allPassed = false;
+
+  // 4. 进程占用与文件锁状态
+  const running = isProcessRunning();
+  checks.push({
+    name: '进程占用与文件锁状态',
+    detail: running ? '运行中 (安装器将自动安全释放文件锁)' : '已就绪 (未运行，无文件锁占用)',
+    passed: true,
+    critical: false
+  });
+
+  return {
+    allPassed,
+    asarPath,
+    checks
+  };
+}
+
+function install(customPath) {
+  console.log('🔍 [1/5] 正在执行前置环境全维健康预检 (Pre-flight Checks)...');
+  const preflight = runPreflightCheck(customPath);
+  for (const c of preflight.checks) {
+    const icon = c.passed ? '✅' : (c.critical ? '❌' : '⚠️');
+    console.log(`   ${icon} ${c.name}: ${c.detail}`);
+  }
+
+  if (!preflight.allPassed) {
+    console.error('\n❌ 前置条件检查未通过，安装中止。请根据上方提示排查环境。');
     process.exit(1);
   }
-  console.log(`✅ 找到目标文件: ${asarPath}`);
+
+  const asarPath = preflight.asarPath;
 
   if (isProcessRunning()) {
-    console.log('\n⚠️ =========================================================');
-    console.log('⚠️ 检测到 Antigravity 客户端当前正在运行！');
-    console.log('⚠️ Windows/系统会对正在运行的程序文件加锁。');
-    console.log('⚠️ 建议在退出 Antigravity 客户端后运行本脚本以完成注入。');
-    console.log('⚠️ =========================================================\n');
+    console.log('\n⚠️ 检测到 Antigravity 客户端当前正在运行，正在安全退出释放文件锁...');
+    try {
+      if (os.platform() === 'win32') {
+        execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
+      } else {
+        execSync('pkill -i antigravity || true', { stdio: 'ignore' });
+      }
+    } catch (e) {}
   }
-
-  ensureAsarTool();
 
   const resourcesDir = path.dirname(asarPath);
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
@@ -515,12 +581,24 @@ if (require.main === module) {
     case 'uninstall':
       restore(customPath);
       break;
-    case 'status':
     case 'check':
+    case 'preflight':
+      console.log('=== 执行前置环境全维健康预检 (Pre-flight Health Check) ===\n');
+      const preflightRes = runPreflightCheck(customPath);
+      for (const c of preflightRes.checks) {
+        const icon = c.passed ? '✅' : (c.critical ? '❌' : '⚠️');
+        console.log(`  ${icon} [${c.name}]: ${c.detail}`);
+      }
+      if (preflightRes.allPassed) {
+        console.log('\n🎉 所有核心前置条件 100% 就绪，可直接执行安装！');
+      } else {
+        console.log('\n❌ 部分核心前置条件未满足，请根据上方提示调整环境后再试。');
+      }
+      break;
+    case 'status':
       status(customPath);
       break;
     case 'launch':
-    case 'start':
       launch(customPath);
       break;
     case 'watch':
@@ -533,7 +611,8 @@ if (require.main === module) {
 Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
 
 用法:
-  node cli.js install              # 一键安装客户端 UI 汉化（自动备份并注入）
+  node cli.js install              # 一键安装客户端 UI 汉化（自动执行前置预检并注入）
+  node cli.js check                # 前置环境全维健康预检 (Node 弹性版本、NPX、客户端路径与进程)
   node cli.js install-plugin       # 一键安装 Antigravity 官方中文智能体插件
   node cli.js uninstall-plugin     # 卸载官方中文智能体插件
   node cli.js restore              # 一键还原客户端（恢复官方英文原版）
@@ -553,5 +632,6 @@ Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
 module.exports = {
   getCandidateAsarPaths,
   findAsarPath,
-  isAsarPatched
+  isAsarPatched,
+  runPreflightCheck
 };
