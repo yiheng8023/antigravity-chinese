@@ -395,9 +395,10 @@ function install(customPath) {
       }
     }
 
-    // 写入汉化元数据指纹
+    // 写入汉化元数据指纹 (Hash/Manifest 根治架构)
     const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
-    fs.writeFileSync(metaPath, JSON.stringify({ patched: true, timestamp: Date.now() }, null, 2), 'utf8');
+    const newAsarFp = getAsarFingerprint(asarPath);
+    fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newAsarFp, timestamp: Date.now() }, null, 2), 'utf8');
 
     // Clean temp
     if (fs.existsSync(tempExtractDir)) {
@@ -534,12 +535,19 @@ function isAsarPatched(asarPath) {
     if (!asarPath || !fs.existsSync(asarPath)) return false;
     const resourcesDir = path.dirname(asarPath);
     const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+    const currentFp = getAsarFingerprint(asarPath);
+
+    // 1. 【权威判据】优先匹配持久化 Hash/Manifest 清单
     if (fs.existsSync(metaPath)) {
       try {
         const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-        if (meta && meta.patched) return true;
+        if (meta && meta.patchedFingerprint && meta.patchedFingerprint === currentFp) {
+          return true;
+        }
       } catch (e) {}
     }
+
+    // 2. 【兜底判据】全量 30MB 预加载标记签名检索
     const fd = fs.openSync(asarPath, 'r');
     const stat = fs.fstatSync(fd);
     const readLen = Math.min(stat.size, 30 * 1024 * 1024);
@@ -569,22 +577,36 @@ function launch(customPath) {
   }
 
   console.log('🚀 正在启动 Antigravity 客户端...');
+  const { spawn } = require('child_process');
+
   if (process.platform === 'win32') {
     const appDir = path.dirname(path.dirname(asarPath));
     const exePath = path.join(appDir, 'Antigravity.exe');
     if (fs.existsSync(exePath)) {
-      const { spawn } = require('child_process');
       const child = spawn(exePath, [], { detached: true, stdio: 'ignore' });
       child.unref();
       console.log('✨ 客户端已启动。');
     }
   } else if (process.platform === 'darwin') {
-    execSync('open -a "Antigravity" || open -a "/Applications/Antigravity.app"', { stdio: 'ignore' });
-    console.log('✨ 客户端已启动。');
+    const appIndex = asarPath.indexOf('.app');
+    const appPath = appIndex !== -1 ? asarPath.substring(0, appIndex + 4) : '/Applications/Antigravity.app';
+    try {
+      const child = spawn('open', ['-a', appPath], { detached: true, stdio: 'ignore' });
+      child.on('error', () => {
+        spawn('open', ['-a', 'Antigravity'], { detached: true, stdio: 'ignore' }).unref();
+      });
+      child.unref();
+      console.log('✨ 客户端已启动。');
+    } catch (e) {
+      try { execSync(`open -a "${appPath}" || open -a "Antigravity" || true`, { stdio: 'ignore' }); } catch (_) {}
+      console.log('✨ 客户端已启动。');
+    }
   } else {
     try {
-      const { spawn } = require('child_process');
       const child = spawn('antigravity', [], { detached: true, stdio: 'ignore' });
+      child.on('error', () => {
+        spawn('google-antigravity', [], { detached: true, stdio: 'ignore' }).unref();
+      });
       child.unref();
       console.log('✨ 客户端已启动。');
     } catch (e) {}
