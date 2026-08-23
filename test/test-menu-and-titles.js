@@ -67,4 +67,5 @@ if (!allPassed) {
   process.exit(1);
 } else {
   console.log('\n🎉 所有菜单项与会话标题防误伤测试 100% 全部通过！');
+  process.exit(0);
 }
