@@ -37,6 +37,7 @@
   "author": "Antigravity Open Source Community",
   "license": "MIT",
   "devDependencies": {
+    "@electron/asar": "^3.2.14",
     "jsdom": "^22.1.0"
   }
 }

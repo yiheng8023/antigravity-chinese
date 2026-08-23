@@ -8,6 +8,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 const { execSync } = require('child_process');
 
 const PROJECT_ROOT = __dirname;
@@ -76,6 +77,17 @@ function isProcessRunning() {
     }
   } catch (e) {
     return false;
+  }
+}
+
+// 计算 ASAR 内容指纹，用于版本化纯净备份（官方升级后指纹变化即重建基线）
+function getAsarFingerprint(asarPath) {
+  try {
+    if (!asarPath || !fs.existsSync(asarPath)) return null;
+    const buf = fs.readFileSync(asarPath);
+    return crypto.createHash('sha1').update(buf).digest('hex').slice(0, 16);
+  } catch (e) {
+    return null;
   }
 }
 
@@ -263,15 +275,23 @@ function install(customPath) {
 
   const resourcesDir = path.dirname(asarPath);
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
+  const backupFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
   const tempExtractDir = path.join(resourcesDir, '__asar_temp_unpack__');
 
-  // 1. Backup
+  // 1. Backup (版本化：指纹变化即重建纯净基线，restore 始终还原"当前官方版本"而非旧版本)
   console.log('📦 [2/5] 检查安全备份...');
-  if (!fs.existsSync(backupPath)) {
+  const currentFp = getAsarFingerprint(asarPath);
+  let prevFp = null;
+  if (fs.existsSync(backupFpPath)) {
+    try { prevFp = fs.readFileSync(backupFpPath, 'utf8').trim(); } catch (e) {}
+  }
+  if (!fs.existsSync(backupPath) || currentFp !== prevFp) {
+    if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
     fs.copyFileSync(asarPath, backupPath);
-    console.log(`✅ 已创建原始备份: ${backupPath}`);
+    fs.writeFileSync(backupFpPath, String(currentFp), 'utf8');
+    console.log(`✅ 已创建当前版本纯净备份: ${backupPath} (fingerprint ${currentFp})`);
   } else {
-    console.log(`ℹ️ 已存在安全备份: ${backupPath} (跳过重复备份)`);
+    console.log(`ℹ️ 备份已是最新版本 (fingerprint ${currentFp})，跳过重复备份`);
   }
 
   // 2. Extract
@@ -465,15 +485,24 @@ function launch(customPath) {
     console.log('🟢 汉化补丁完好有效。');
   }
 
-  // 启动 Antigravity.exe
-  const appDir = path.dirname(path.dirname(asarPath));
-  const exePath = path.join(appDir, 'Antigravity.exe');
-  if (fs.existsSync(exePath)) {
-    console.log(`🚀 正在启动 Antigravity: ${exePath}`);
-    const { spawn } = require('child_process');
-    const child = spawn(exePath, [], { detached: true, stdio: 'ignore' });
-    child.unref();
+  console.log('🚀 正在启动 Antigravity 客户端...');
+  if (process.platform === 'win32') {
+    const appDir = path.dirname(path.dirname(asarPath));
+    const exePath = path.join(appDir, 'Antigravity.exe');
+    if (fs.existsSync(exePath)) {
+      const { spawn } = require('child_process');
+      const child = spawn(exePath, [], { detached: true, stdio: 'ignore' });
+      child.unref();
+      console.log('✨ 客户端已启动。');
+    }
+  } else if (process.platform === 'darwin') {
+    execSync('open -a "Antigravity" || open -a "/Applications/Antigravity.app"', { stdio: 'ignore' });
     console.log('✨ 客户端已启动。');
+  } else {
+    try {
+      execSync('antigravity || true', { stdio: 'ignore' });
+      console.log('✨ 客户端已启动。');
+    } catch (e) {}
   }
 }
 
