@@ -278,20 +278,32 @@ function install(customPath) {
   const backupFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
   const tempExtractDir = path.join(resourcesDir, '__asar_temp_unpack__');
 
-  // 1. Backup (版本化：指纹变化即重建纯净基线，restore 始终还原"当前官方版本"而非旧版本)
+  // 1. Backup (严格判据：只有当当前 ASAR 确认为官方原生未打补丁时，才允许建立或更新 upstream pristine 备份)
   console.log('📦 [2/5] 检查安全备份...');
+  const isPatched = isAsarPatched(asarPath);
   const currentFp = getAsarFingerprint(asarPath);
   let prevFp = null;
   if (fs.existsSync(backupFpPath)) {
     try { prevFp = fs.readFileSync(backupFpPath, 'utf8').trim(); } catch (e) {}
   }
-  if (!fs.existsSync(backupPath) || currentFp !== prevFp) {
-    if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
-    fs.copyFileSync(asarPath, backupPath);
-    fs.writeFileSync(backupFpPath, String(currentFp), 'utf8');
-    console.log(`✅ 已创建当前版本纯净备份: ${backupPath} (fingerprint ${currentFp})`);
+
+  if (!isPatched) {
+    // 当前确认为官方原生未打补丁版本：指纹变动即代表官方发版更新，立即刷新纯净基准备份
+    if (!fs.existsSync(backupPath) || currentFp !== prevFp) {
+      if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
+      fs.copyFileSync(asarPath, backupPath);
+      fs.writeFileSync(backupFpPath, String(currentFp), 'utf8');
+      console.log(`✅ 已创建当前官方纯净版本基准备份: ${backupPath} (fingerprint ${currentFp})`);
+    } else {
+      console.log(`ℹ️ 官方基准备份已是最新 (fingerprint ${currentFp})，跳过重复备份`);
+    }
   } else {
-    console.log(`ℹ️ 备份已是最新版本 (fingerprint ${currentFp})，跳过重复备份`);
+    // 当前已打补丁：绝对禁止用已打补丁的文件覆盖/破坏纯净基准备份
+    if (fs.existsSync(backupPath)) {
+      console.log(`ℹ️ 检测到当前已处于汉化状态，安全保留既有官方纯净基准备份 (${backupPath})`);
+    } else {
+      console.log(`⚠️ 警告: 当前 ASAR 已包含补丁且无历史纯净备份，跳过基线覆盖以防二次污染`);
+    }
   }
 
   // 2. Extract
@@ -301,7 +313,11 @@ function install(customPath) {
   }
 
   try {
-    execSync(`npx -y @electron/asar extract "${asarPath}" "${tempExtractDir}"`, { stdio: 'inherit' });
+    const asarBin = path.join(__dirname, 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
+    const extractCmd = fs.existsSync(asarBin)
+      ? `"${asarBin}" extract "${asarPath}" "${tempExtractDir}"`
+      : `npx -y @electron/asar@3.2.14 extract "${asarPath}" "${tempExtractDir}"`;
+    execSync(extractCmd, { stdio: 'inherit' });
   } catch (err) {
     console.error('❌ 解包 app.asar 失败:', err.message);
     process.exit(1);
@@ -345,9 +361,12 @@ function install(customPath) {
 
   // 4. Pack back
   console.log('🔄 [5/5] 正在重构并应用补丁...');
-  const tempNewAsar = path.join(resourcesDir, 'app.asar.new');
   try {
-    execSync(`npx -y @electron/asar pack "${tempExtractDir}" "${tempNewAsar}"`, { stdio: 'inherit' });
+    const asarBin = path.join(__dirname, 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
+    const packCmd = fs.existsSync(asarBin)
+      ? `"${asarBin}" pack "${tempExtractDir}" "${tempNewAsar}"`
+      : `npx -y @electron/asar@3.2.14 pack "${tempExtractDir}" "${tempNewAsar}"`;
+    execSync(packCmd, { stdio: 'inherit' });
     
     // Replace old asar
     try {
@@ -402,24 +421,57 @@ function restore(customPath) {
     process.exit(1);
   }
 
+  // 1. 自动同步卸载智能体扩展插件
+  uninstallPlugin();
+
   const resourcesDir = path.dirname(asarPath);
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
+  const backupFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
 
   if (!fs.existsSync(backupPath)) {
     console.error(`❌ 未找到安全备份文件: ${backupPath}，无法自动还原。`);
     process.exit(1);
   }
 
+  // 2. 进程占用检测与文件锁释放
+  if (isProcessRunning()) {
+    console.log('⚠️ 检测到 Antigravity 客户端正在运行，正在安全释放文件锁...');
+    try {
+      if (os.platform() === 'win32') {
+        execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
+      } else {
+        execSync('pkill -i antigravity || true', { stdio: 'ignore' });
+      }
+    } catch (e) {}
+  }
+
   console.log(`📦 正在从备份还原原始文件: ${backupPath}`);
+  // taskkill 后 Windows 文件锁可能延迟释放，对 EPERM/EBUSY 做跨平台重试
   try {
-    fs.copyFileSync(backupPath, asarPath);
+    let copyErr = null;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        fs.copyFileSync(backupPath, asarPath);
+        copyErr = null;
+        break;
+      } catch (e) {
+        copyErr = e;
+        if (e.code !== 'EPERM' && e.code !== 'EBUSY') throw e;
+        if (attempt < 4) {
+          try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 400); } catch (_) {}
+        }
+      }
+    }
+    if (copyErr) throw copyErr;
+
     console.log('\n✅ ==============================================');
     console.log('✅ 已成功还原为官方原生英文版本！');
+    console.log('✅ 插件与宿主 UI 汉化已全部干净清除。');
     console.log('✅ 重启 Antigravity 客户端即可生效。');
     console.log('✅ ==============================================\n');
   } catch (err) {
     if (err.code === 'EPERM' || err.code === 'EBUSY') {
-      console.error('\n❌ 文件被占用 (EPERM): 请先退出 Antigravity 客户端再执行还原操作。\n');
+      console.error('\n❌ 文件被占用 (EPERM): 请确保 Antigravity 客户端已完全退出后再执行还原。\n');
     } else {
       console.error('❌ 还原失败:', err.message);
     }
@@ -500,7 +552,9 @@ function launch(customPath) {
     console.log('✨ 客户端已启动。');
   } else {
     try {
-      execSync('antigravity || true', { stdio: 'ignore' });
+      const { spawn } = require('child_process');
+      const child = spawn('antigravity', [], { detached: true, stdio: 'ignore' });
+      child.unref();
       console.log('✨ 客户端已启动。');
     } catch (e) {}
   }

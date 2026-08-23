@@ -5,7 +5,7 @@ const { execSync } = require('child_process');
 const { isAsarPatched } = require('../cli');
 
 console.log('🧪 ============================================================');
-console.log('🧪 开始执行真实 ASAR 生命周期注入与原子回滚端到端全真测试');
+console.log('🧪 开始执行真实 ASAR 生命周期注入、二次安装幂等与上游升级回归测试');
 console.log('🧪 ============================================================\n');
 
 let passed = 0;
@@ -26,17 +26,18 @@ const resourcesDir = path.join(testDir, 'resources');
 const mockSrcDir = path.join(testDir, 'src_mock');
 const asarPath = path.join(resourcesDir, 'app.asar');
 const backupPath = path.join(resourcesDir, 'app.asar.bak');
+const cliPath = path.join(__dirname, '..', 'cli.js');
 
 fs.mkdirSync(resourcesDir, { recursive: true });
 fs.mkdirSync(path.join(mockSrcDir, 'dist', 'ideInstall'), { recursive: true });
 
-// 1. 创建逼真的 Electron 宿主源码 Mock
-const origPreload = `"use strict";
+// 1. 创建逼真的 Electron 宿主源码 Mock (官方版本 A)
+const origPreloadA = `"use strict";
 const { contextBridge, ipcRenderer } = require('electron');
-contextBridge.exposeInMainWorld('api', { test: true });
+contextBridge.exposeInMainWorld('api', { version: 'A' });
 `;
 
-const origMenu = `"use strict";
+const origMenuA = `"use strict";
 const template = [
   { label: 'Command Palette', accelerator: 'CmdOrCtrl+Shift+P' },
   { label: 'Maximize', role: 'maximize' },
@@ -44,62 +45,82 @@ const template = [
 ];
 `;
 
-const origIpc = `"use strict";
+const origIpcA = `"use strict";
 dialog.showOpenDialog({ title: 'Open workspace' });
 `;
 
-const origWizard = `"use strict";
+const origWizardA = `"use strict";
 function getWizardHtml() {
   return '<title>Welcome to Antigravity</title><div>Setting up…</div>';
 }
 `;
 
-fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreload, 'utf-8');
-fs.writeFileSync(path.join(mockSrcDir, 'dist', 'menu.js'), origMenu, 'utf-8');
-fs.writeFileSync(path.join(mockSrcDir, 'dist', 'ipcHandlers.js'), origIpc, 'utf-8');
-fs.writeFileSync(path.join(mockSrcDir, 'dist', 'ideInstall', 'wizardHtml.js'), origWizard, 'utf-8');
+fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadA, 'utf-8');
+fs.writeFileSync(path.join(mockSrcDir, 'dist', 'menu.js'), origMenuA, 'utf-8');
+fs.writeFileSync(path.join(mockSrcDir, 'dist', 'ipcHandlers.js'), origIpcA, 'utf-8');
+fs.writeFileSync(path.join(mockSrcDir, 'dist', 'ideInstall', 'wizardHtml.js'), origWizardA, 'utf-8');
 
-// 2. 打包出真实的初始 app.asar
-execSync(`npx -y @electron/asar pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
-assert(fs.existsSync(asarPath), '初始真实 app.asar 二进制包构建成功');
-assert(!isAsarPatched(asarPath), '初始 app.asar 确认为原生未修改状态 (isAsarPatched == false)');
+try {
+  // 2. 打包出真实的初始 app.asar (版本 A)
+  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  assert(fs.existsSync(asarPath), '【阶段 1】初始版本 A app.asar 构建成功');
+  assert(!isAsarPatched(asarPath), '初始版本 A 确认为原生未修改状态');
 
-// 3. 执行真正的 CLI 注入逻辑 (调用 cli.js install --path)
-const cliPath = path.join(__dirname, '..', 'cli.js');
-execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  // 3. 首次执行 install
+  execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  assert(fs.existsSync(backupPath), '首次安装成功生成纯净备份 app.asar.bak (版本 A)');
+  assert(isAsarPatched(asarPath), '首次安装后当前 ASAR 处于汉化状态');
 
-assert(fs.existsSync(backupPath), '安装时成功生成物理级安全备份 app.asar.bak');
-assert(isAsarPatched(asarPath), '打入补丁后 isAsarPatched 状态精准返回 true');
+  // 4. 【P0 关键用例】二次重复执行 install (验证绝不把已打补丁的 ASAR 存为备份)
+  console.log('🔄 执行二次重复 install...');
+  execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  assert(isAsarPatched(asarPath), '二次安装后仍然处于汉化状态');
 
-// 4. 解包验证注入后的文件真实内容
-const verifyUnpackDir = path.join(testDir, 'verify_unpack');
-execSync(`npx -y @electron/asar extract "${asarPath}" "${verifyUnpackDir}"`, { stdio: 'ignore' });
+  // 执行 restore 并验证是否 100% 回滚为纯净版本 A
+  execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(asarPath), '二次安装后执行 restore，成功恢复为未打补丁状态');
 
-const patchedPreload = fs.readFileSync(path.join(verifyUnpackDir, 'dist', 'preload.js'), 'utf-8');
-const patchedMenu = fs.readFileSync(path.join(verifyUnpackDir, 'dist', 'menu.js'), 'utf-8');
-const patchedIpc = fs.readFileSync(path.join(verifyUnpackDir, 'dist', 'ipcHandlers.js'), 'utf-8');
-const patchedWizard = fs.readFileSync(path.join(verifyUnpackDir, 'dist', 'ideInstall', 'wizardHtml.js'), 'utf-8');
+  const unpackDirA = path.join(testDir, 'unpack_A');
+  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirA}"`, { stdio: 'ignore' });
+  const restoredPreloadA = fs.readFileSync(path.join(unpackDirA, 'dist', 'preload.js'), 'utf-8');
+  assert(restoredPreloadA === origPreloadA, '【P0 验证通过】二次安装后 restore 仍 100% 等于官方原版 A (未被已打补丁副本污染)');
 
-assert(patchedPreload.includes('Antigravity Chinese Localization Injection'), 'preload.js 成功注入汉化运行时');
-assert(patchedMenu.includes("'命令面板'") && patchedMenu.includes("'最大化'"), 'menu.js 成功替换原生顶栏菜单');
-assert(patchedIpc.includes("'打开工作区'"), 'ipcHandlers.js 成功替换原生对话框标题');
-assert(patchedWizard.includes('欢迎使用 Antigravity') && patchedWizard.includes('正在准备…'), 'wizardHtml.js 成功替换向导文本');
+  // 5. 【P0 关键用例】模拟官方静默发版升级为版本 B
+  console.log('\n📦 【阶段 2】模拟上游官方升级为全新版本 B...');
+  const origPreloadB = `"use strict";
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('api', { version: 'B_UPSTREAM_NEW' });
+`;
+  fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadB, 'utf-8');
+  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(asarPath), '官方新版本 B 已覆盖为原生未打补丁状态');
 
-// 5. 执行真正的 CLI 还原逻辑 (调用 cli.js restore --path)
-execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });
+  // 在版本 B 上执行 install
+  execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  assert(isAsarPatched(asarPath), '版本 B 注入汉化成功');
 
-assert(!isAsarPatched(asarPath), '执行 restore 后 isAsarPatched 精准返回 false (已完全还原)');
+  // 再次在版本 B 上重复执行 install
+  execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  assert(isAsarPatched(asarPath), '版本 B 重复安装保持有效');
 
-const restoredUnpackDir = path.join(testDir, 'restored_unpack');
-execSync(`npx -y @electron/asar extract "${asarPath}" "${restoredUnpackDir}"`, { stdio: 'ignore' });
-const restoredPreload = fs.readFileSync(path.join(restoredUnpackDir, 'dist', 'preload.js'), 'utf-8');
-assert(restoredPreload === origPreload, 'restore 后 preload.js 100% 恢复为出厂原始源码');
+  // 执行 restore，必须 100% 还原为官方版本 B（绝不能退回历史旧版本 A！）
+  execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(asarPath), '版本 B restore 后恢复为未修改状态');
 
-// 6. 清理测试临时目录
-fs.rmSync(testDir, { recursive: true, force: true });
+  const unpackDirB = path.join(testDir, 'unpack_B');
+  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirB}"`, { stdio: 'ignore' });
+  const restoredPreloadB = fs.readFileSync(path.join(unpackDirB, 'dist', 'preload.js'), 'utf-8');
+  assert(restoredPreloadB === origPreloadB, '【P0 验证通过】版本 B 上打补丁并 restore 后 100% 等于新版本 B (绝未回退老版本 A)');
+
+} finally {
+  // 清理测试临时目录
+  if (fs.existsSync(testDir)) {
+    fs.rmSync(testDir, { recursive: true, force: true });
+  }
+}
 
 console.log('\n============================================================');
-console.log(`📊 ASAR 真实注入测试完成: 共 ${passed + failed} 项, 通过 ${passed} 项, 失败 ${failed} 项`);
+console.log(`📊 ASAR 真实注入与上游升级演进测试完成: 共 ${passed + failed} 项, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');
 
 if (failed > 0) {

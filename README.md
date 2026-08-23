@@ -51,9 +51,9 @@
 ### 方式一：一键脚本（推荐日常使用）
 
 #### Windows
-- **安装汉化**：双击运行 [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)（自动执行前置健康预检、安全释放文件占用并一键双装客户端 UI 汉化 + 官方智能体插件）
-- **自愈启动**：双击运行 [`launch.bat`](file:///C:/Projects/antigravity-chinese/launch.bat)（自动检测版本覆盖并重新注入后启动）
-- **恢复英文**：双击运行 [`uninstall.bat`](file:///C:/Projects/antigravity-chinese/uninstall.bat)
+- **安装汉化**：双击运行 [`install.bat`](install.bat)（自动执行前置健康预检、安全释放文件占用并一键双装客户端 UI 汉化 + 社区智能体插件）
+- **自愈启动**：双击运行 [`launch.bat`](launch.bat)（自动检测版本覆盖并重新注入后启动）
+- **恢复英文**：双击运行 [`uninstall.bat`](uninstall.bat)
 
 #### macOS / Linux
 - **安装汉化**：在终端运行 `./install.sh`
@@ -128,9 +128,9 @@ flowchart LR
 
 ---
 
-## 🔌 双模生态：Antigravity 官方插件形态 (Plugin Suite)
+## 🔌 双模生态：Antigravity 社区智能体插件 (Community Plugin Suite)
 
-除了作为客户端宿主 UI 汉化补丁运行外，本项目还内置了完全符合 Antigravity 官方规范的**全栈中文智能体增强插件**（位于 [`plugins/chinese-toolkit/`](file:///C:/Projects/antigravity-chinese/plugins/chinese-toolkit/)）：
+除了作为客户端宿主 UI 汉化补丁运行外，本项目还内置了完全符合 Antigravity 插件规范的**全栈中文智能体增强插件**（位于 [`plugins/chinese-toolkit/`](plugins/chinese-toolkit/)）：
 
 ### 插件功能特性
 - **中文交互与工程规则 (`rules/chinese-interaction-rules.md`)**：规范智能体全流程简体中文思考、代码中文注释及严格的技术术语保留准则。
