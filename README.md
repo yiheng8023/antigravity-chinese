@@ -1,6 +1,14 @@
 # Google Antigravity 中文汉化工具包 (Antigravity Chinese Toolkit)
 
 <p align="center">
+  <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&label=CI&logo=github" alt="CI Status"></a>
+  <a href="https://github.com/yiheng8023/antigravity-chinese/releases/latest"><img src="https://img.shields.io/github/v/release/yiheng8023/antigravity-chinese?color=blue&label=Release" alt="Latest Release"></a>
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18.x-brightgreen?logo=node.js" alt="Node Version">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="Platform Support">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/yiheng8023/antigravity-chinese?color=green" alt="License"></a>
+</p>
+
+<p align="center">
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
@@ -16,6 +24,7 @@
 - **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
 - **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换。
 - **自动备份与可逆还原**：首次注入时自动创建 `app.asar.bak` 原生备份，随时可一键还原至官方纯英文初始状态。
+- **官方中文优雅让位 (Graceful Yield)**：内置 CJK 字符与官方语言环境自动探针，上游一旦上线官方中文自动主动让位，杜绝破坏。
 
 ---
 
@@ -28,7 +37,7 @@
    - **macOS**：macOS 12+（支持 Apple Silicon M系列及 Intel 芯片，首次注入自动处理 `codesign` 签名）
    - **Linux**：主流发行版（Ubuntu, Debian, Fedora, Arch 等 x64 / ARM64）
 2. **Node.js 基础运行环境**：
-   - 系统中需安装 **Node.js (>= 16.x)** 及附带的 **npm / npx** 工具（用于 ASAR 资源包解构与打包）。
+   - 系统中需安装 **Node.js (>= 18.x)** 及附带的 **npm / npx** 工具。
    - 验证方式：在终端运行 `node -v` 和 `npx -v`。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
 3. **已安装 Antigravity 客户端**：
    - 确保本机已安装官方 **Google Antigravity 2.0** 桌面客户端。
@@ -42,7 +51,7 @@
 ### 方式一：一键脚本（推荐日常使用）
 
 #### Windows
-- **安装汉化**：双击运行 [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)
+- **安装汉化**：双击运行 [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)（默认一键双装客户端 UI 汉化 + 官方智能体插件）
 - **自愈启动**：双击运行 [`launch.bat`](file:///C:/Projects/antigravity-chinese/launch.bat)（自动检测版本覆盖并重新注入后启动）
 - **恢复英文**：双击运行 [`uninstall.bat`](file:///C:/Projects/antigravity-chinese/uninstall.bat)
 
@@ -61,16 +70,19 @@ node cli.js status
 # 2. 一键安装汉化（自动备份并注入）
 node cli.js install
 
-# 3. 自愈启动（自动检测版本覆盖并重新注入后拉起客户端）
+# 3. 安装 Antigravity 官方中文智能体插件
+node cli.js install-plugin
+
+# 4. 自愈启动（自动检测版本覆盖并重新注入后拉起客户端）
 node cli.js launch
 
-# 4. 后台守护模式（监听官方更新并自动完成重新汉化）
+# 5. 后台守护模式（监听官方更新并自动完成重新汉化）
 node cli.js watch
 
-# 5. 一键还原回官方英文原版
+# 6. 一键还原回官方英文原版
 node cli.js restore
 
-# 6. 指定自定义客户端路径安装
+# 7. 指定自定义客户端路径安装
 node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 ```
 
@@ -78,17 +90,18 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 
 ## 🧪 自动化测试与质量保证 (Testing & Verification)
 
-本项目引入严格的端到端自动化回归测试与跨平台 CI，避免人工凭经验验证带来的遗漏：
+本项目引入严格的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（包含核心功能、真实截图用例及菜单防误伤）
+# 运行全套自动化测试（包含 5 大测试套件，共 134+ 项断言）
 npm test
 ```
 
-- **核心注入自查 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，验证 34+ 项关键 DOM 路径的翻译准确性与 Monaco Editor 代码保护。
-- **真实截图用例集 (`test/test-screenshots.js`)**：覆盖 54+ 项来自真实界面截图的复合句子、动态限额与时间解析。
+- **核心 DOM 注入与代码保护 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，验证 50 项关键 DOM 路径的翻译准确性、Monaco Editor 保护及跨平台路径解析。
+- **真实截图用例集 (`test/test-screenshots.js`)**：覆盖 64 项来自真实界面截图的复合句子、动态限额与时间解析。
 - **菜单与会话标题防误伤 (`test/test-menu-and-titles.js`)**：确保单字词不破坏用户自定义会话名称。
-- **跨平台 CI 流水线**：在 GitHub Actions 中覆盖 Windows、macOS 与 Ubuntu 环境的持续自动化测试。
+- **ASAR 全真生命周期测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，验证解包、注入、签名校验与出厂原子回滚。
+- **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
 
 ---
 
@@ -120,10 +133,10 @@ flowchart LR
 - **本地化诊断技能 (`skills/i18n-diagnostics/`)**：为智能体赋能一键状态诊断、版本漂移分析（`scan:drift`）与自动化测试能力。
 
 ### 启用插件方式
-- **全局启用（推荐）**：将 `plugins/chinese-toolkit` 目录复制或软链接至本地全局插件目录：
+- **全局一键安装（推荐）**：运行 `node cli.js install-plugin`
+- **手动启用**：将 `plugins/chinese-toolkit` 目录复制至本地全局插件目录：
   - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
   - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
-- **项目级启用**：在任意工程根目录下的 `.agents/plugins/` 放入 `chinese-toolkit` 即可随仓库团队共享。
 
 ---
 
@@ -132,16 +145,16 @@ flowchart LR
 ```text
 antigravity-chinese/
 ├── dict/
-│   └── zh-CN.json            # 汉化词典库（1040+ 精确词条 + 级联正则规则）
+│   └── zh-CN.json            # 汉化词典库（1070+ 精确词条 + 25 组级联正则）
 ├── core/
-│   └── i18n-runtime.js       # 前端运行时注入引擎（Preload 挂载、防抖、代码区保护、多句拆分）
+│   └── i18n-runtime.js       # 前端运行时注入引擎（Preload 挂载、防抖、代码区保护、优雅让位）
 ├── plugins/
 │   └── chinese-toolkit/      # Antigravity 官方智能体插件（中文规则 Rules + 诊断技能 Skills）
-├── cli.js                    # 跨平台管理工具（路径探测、解包、注入、打包、还原、自愈启动、守护）
-├── install.bat / install.sh  # 一键安装脚本
+├── cli.js                    # 跨平台管理工具（Buffer 签名探测、解包、注入、打包、还原、自愈启动）
+├── install.bat / install.sh  # 一键安装脚本（默认双装 UI 补丁 + 官方插件）
 ├── launch.bat                # 自愈启动脚本
 ├── uninstall.bat / uninstall.sh # 一键还原脚本
-├── test/                     # 自动化回归测试套件（JSDOM 模拟、截图用例、防误伤断言）
+├── test/                     # 自动化全真回归测试套件（DOM 模拟、截图用例、ASAR 生命周期、无参探测）
 ├── tools/                    # 文本提取、差量比对与漂移检测工具链
 ├── docs/assets/sponsoring/   # 赞助与支持相关资产
 ├── package.json              # 项目配置

@@ -1,6 +1,14 @@
 # Google Antigravity Chinese Localization Toolkit
 
 <p align="center">
+  <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&label=CI&logo=github" alt="CI Status"></a>
+  <a href="https://github.com/yiheng8023/antigravity-chinese/releases/latest"><img src="https://img.shields.io/github/v/release/yiheng8023/antigravity-chinese?color=blue&label=Release" alt="Latest Release"></a>
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18.x-brightgreen?logo=node.js" alt="Node Version">
+  <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="Platform Support">
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/yiheng8023/antigravity-chinese?color=green" alt="License"></a>
+</p>
+
+<p align="center">
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
@@ -11,11 +19,12 @@ A high-performance, non-invasive Chinese localization patch and lifecycle manage
 ## 🌟 Key Features & Engineering Design
 
 - **Non-invasive Runtime Engine**: Injects a responsive DOM translation engine at Electron's `preload` phase without modifying official core binaries.
-- **Preload Synchronization (Minimizing FOUC)**: Early mount during the renderer initialization phase to minimize English-to-Chinese visual flicker.
+- **Preload Synchronization (Minimizing FOUC)**: Early mount during renderer initialization to minimize English-to-Chinese visual flicker.
 - **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), preserving user code and terminal commands.
-- **Self-Healing & File Watcher**: Built-in self-healing launcher (`launch.bat`) and file watcher to automatically detect upstream update overrides.
+- **Self-Healing & File Watcher**: Built-in self-healing launcher (`launch.bat`) and file watcher to automatically detect and reapply patches after upstream updates.
 - **Multi-Sentence Compound Parsing**: Seamlessly breaks down multi-sentence paragraphs and translates cascading dynamic time/quota values.
 - **Automated Backup & Reversible Restore**: Automatically creates `app.asar.bak` on initial installation and restores official English status with one click.
+- **Graceful Yield to Upstream Chinese**: Built-in CJK character and native locale probes to automatically yield when official upstream Chinese lands.
 
 ---
 
@@ -28,7 +37,7 @@ Before installing the patch, make sure your environment meets the following requ
    - **macOS**: macOS 12+ (Apple Silicon M-series & Intel chips; automated `codesign` ad-hoc signing included)
    - **Linux**: Major distributions (Ubuntu, Debian, Fedora, Arch, etc., x64/ARM64)
 2. **Node.js Runtime Environment**:
-   - **Node.js (>= 16.x)** with `npx` / `npm` (required for unpacking and repacking the ASAR package).
+   - **Node.js (>= 18.x)** with `npm` / `npx`.
    - Run `node -v` and `npx -v` in your terminal to verify. If not installed, download the LTS release from [Node.js Official Website](https://nodejs.org/).
 3. **Google Antigravity Installed**:
    - Official **Google Antigravity 2.0** desktop client installed.
@@ -42,7 +51,7 @@ Before installing the patch, make sure your environment meets the following requ
 ### Method 1: Scripts (Recommended)
 
 #### Windows
-- **Install Patch**: Double-click [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)
+- **Install Patch**: Double-click [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat) (Installs both UI patch + Official Agent Plugin by default)
 - **Self-Healing Launch**: Double-click [`launch.bat`](file:///C:/Projects/antigravity-chinese/launch.bat)
 - **Restore English**: Double-click [`uninstall.bat`](file:///C:/Projects/antigravity-chinese/uninstall.bat)
 
@@ -55,43 +64,50 @@ Before installing the patch, make sure your environment meets the following requ
 ### Method 2: CLI Manager
 
 ```bash
-# Check client status
+# 1. Check client status
 node cli.js status
 
-# Install localization patch
+# 2. Install localization patch
 node cli.js install
 
-# Launch with automatic healing
+# 3. Install official agent plugin
+node cli.js install-plugin
+
+# 4. Launch with automatic healing
 node cli.js launch
 
-# Background daemon watcher
+# 5. Background daemon watcher
 node cli.js watch
 
-# Restore official English version
+# 6. Restore official English version
 node cli.js restore
+
+# 7. Specify custom client path
+node cli.js install --path "/path/to/antigravity/app.asar"
 ```
 
 ---
 
 ## 🧪 Testing & Verification
 
-This project uses comprehensive automated regression test suites and cross-platform CI to ensure stability:
+This project uses comprehensive automated regression test suites and cross-platform CI (Windows / macOS / Ubuntu x Node 18/20) to ensure stability:
 
 ```bash
-# Run complete test suite
+# Run complete test suite (5 test suites, 134+ assertions)
 npm test
 ```
 
-- **Core Injection Tests (`test/verify.js`)**: Uses JSDOM to simulate actual DOM rendering and verify 34+ assertion checkpoints.
-- **Screenshot Regressions (`test/test-screenshots.js`)**: Covers 54+ real UI test cases.
+- **Core DOM & Code Protection (`test/verify.js`)**: Uses JSDOM to simulate actual DOM rendering and verify 50 assertion checkpoints.
+- **Screenshot Regressions (`test/test-screenshots.js`)**: Covers 64 real UI test cases.
 - **Title Collision Protection (`test/test-menu-and-titles.js`)**: Prevents single-word substring collisions from corrupting user-generated session titles.
-- **Cross-platform CI**: Automated GitHub Actions testing across Windows, macOS, and Ubuntu.
+- **Real ASAR Lifecycle (`test/test-asar-lifecycle.js`)**: Packs, patches, verifies Buffer signatures, and restores real binary ASAR packages end-to-end.
+- **Live System Path Detection (`test/test-detector-live.js`)**: Verifies 0-argument automatic path detection on physical platform runners.
 
 ---
 
 ## 🔄 Self-Evolving Localization Architecture
 
-Rather than relying entirely on manual screenshot gathering, the project is incrementally building an automated evolution pipeline:
+Rather than relying entirely on manual screenshot gathering, the project implements an automated evolution pipeline:
 
 ```mermaid
 flowchart LR
@@ -102,9 +118,11 @@ flowchart LR
     E --> F[Human Review for Key Diffs]
 ```
 
-- **Three-Tier Coverage Metrics**: Run `npm run scan:drift` to report Observed Candidates, Exact Match Coverage, and Rule-Assisted Effective Translation Coverage.
-- **Stale Rule Discovery**: Bi-directionally analyzes `exactKeys - observed` to surface dictionary entries that might have been deprecated or refactored upstream.
-- **Progressively Reduced Maintenance Cost**: Transitions repetitive manual verification to automated difference extraction and regression suites, leaving only key terminology decisions to human maintainers.
+* **Three-Tier Coverage Metrics**: Run `npm run scan:drift` to report Observed Candidates, Exact Match Coverage, and Rule-Assisted Effective Translation Coverage.
+* **Stale Rule Discovery**: Bi-directionally analyzes `exactKeys - observed` to surface dictionary entries that might have been deprecated or refactored upstream.
+* **Progressively Reduced Maintenance Cost**: Transitions repetitive manual verification to automated difference extraction and regression suites, leaving only key terminology decisions to human maintainers.
+
+---
 
 ## 🔌 Dual-Mode Ecosystem: Official Antigravity Plugin Suite
 
@@ -115,10 +133,10 @@ In addition to running as a client host UI localization patch, this project ship
 - **Localization Diagnostics Skill (`skills/i18n-diagnostics/`)**: Equips the agent with built-in status diagnostics, upstream drift analysis (`scan:drift`), and automated testing workflows.
 
 ### How to Enable the Plugin
-- **Global Installation (Recommended)**: Copy or symlink `plugins/chinese-toolkit` to your global plugin directory:
+- **One-Click Installation (Recommended)**: Run `node cli.js install-plugin`
+- **Manual Setup**: Copy `plugins/chinese-toolkit` to your global plugin directory:
   - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
   - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
-- **Workspace-level**: Place `chinese-toolkit` inside `.agents/plugins/` in any project root to share with your team.
 
 ---
 
@@ -127,16 +145,16 @@ In addition to running as a client host UI localization patch, this project ship
 ```text
 antigravity-chinese/
 ├── dict/
-│   └── zh-CN.json            # Localization dictionary (1040+ exact entries + regex cascade)
+│   └── zh-CN.json            # Localization dictionary (1070+ exact entries + 25 regex cascade)
 ├── core/
-│   └── i18n-runtime.js       # Runtime engine (Preload hook, debounce, Monaco protection)
+│   └── i18n-runtime.js       # Runtime engine (Preload hook, debounce, Monaco protection, graceful yield)
 ├── plugins/
 │   └── chinese-toolkit/      # Official Antigravity plugin (Rules + Diagnostics Skill)
-├── cli.js                    # Cross-platform CLI manager
+├── cli.js                    # Cross-platform CLI manager (Buffer-level signature scan, unpack, patch, restore)
 ├── install.bat / install.sh  # One-click installation scripts
 ├── launch.bat                # Self-healing launcher script
 ├── uninstall.bat / uninstall.sh # One-click restore scripts
-├── test/                     # Automated E2E test suites (JSDOM, screenshot regressions)
+├── test/                     # Automated E2E test suites (DOM, screenshots, ASAR lifecycle, live detector)
 ├── tools/                    # Text extraction, drift detection, and gap analysis tools
 ├── docs/assets/sponsoring/   # Donation and sponsorship assets
 ├── package.json              # Project configuration
