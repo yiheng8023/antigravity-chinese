@@ -3,7 +3,7 @@
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&label=CI&logo=github" alt="CI Status"></a>
   <a href="https://github.com/yiheng8023/antigravity-chinese/releases/latest"><img src="https://img.shields.io/github/v/release/yiheng8023/antigravity-chinese?color=blue&label=Release" alt="Latest Release"></a>
-  <img src="https://img.shields.io/badge/Node.js-%3E%3D18.x-brightgreen?logo=node.js" alt="Node Version">
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D16.x-brightgreen?logo=node.js" alt="Node Version">
   <img src="https://img.shields.io/badge/Platform-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="Platform Support">
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yiheng8023/antigravity-chinese?color=green" alt="License"></a>
 </p>
@@ -37,12 +37,12 @@
    - **macOS**：macOS 12+（支持 Apple Silicon M系列及 Intel 芯片，首次注入自动处理 `codesign` 签名）
    - **Linux**：主流发行版（Ubuntu, Debian, Fedora, Arch 等 x64 / ARM64）
 2. **Node.js 基础运行环境**：
-   - 系统中需安装 **Node.js (>= 18.x)** 及附带的 **npm / npx** 工具。
+   - 系统中需安装 **Node.js (>= 16.x)** 及附带的 **npm / npx** 工具（向下完全兼容 Node 18/20/22/24 等所有更高版本）。
    - 验证方式：在终端运行 `node -v` 和 `npx -v`。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
 3. **已安装 Antigravity 客户端**：
    - 确保本机已安装官方 **Google Antigravity 2.0** 桌面客户端。
-4. **⚠️ 关键操作须知（避免占用报错）**：
-   - **在执行安装、还原或更新补丁前，请务必完全退出 Antigravity 客户端**（在系统右下角托盘图标右键选择“Quit / 退出”），以防止操作系统因文件锁定报 `EPERM / EBUSY` 占用错误。
+4. **进程占用与文件锁守护**：
+   - 安装器内置跨平台进程守护，执行安装时将自动检测并安全释放客户端文件锁。
 
 ---
 
@@ -51,7 +51,7 @@
 ### 方式一：一键脚本（推荐日常使用）
 
 #### Windows
-- **安装汉化**：双击运行 [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)（默认一键双装客户端 UI 汉化 + 官方智能体插件）
+- **安装汉化**：双击运行 [`install.bat`](file:///C:/Projects/antigravity-chinese/install.bat)（自动执行前置健康预检、安全释放文件占用并一键双装客户端 UI 汉化 + 官方智能体插件）
 - **自愈启动**：双击运行 [`launch.bat`](file:///C:/Projects/antigravity-chinese/launch.bat)（自动检测版本覆盖并重新注入后启动）
 - **恢复英文**：双击运行 [`uninstall.bat`](file:///C:/Projects/antigravity-chinese/uninstall.bat)
 
@@ -67,22 +67,25 @@
 # 1. 查看当前客户端及汉化状态
 node cli.js status
 
-# 2. 一键安装汉化（自动备份并注入）
+# 2. 执行前置环境全维健康预检 (Node 弹性版本、NPX 工具、客户端路径与进程锁)
+node cli.js check
+
+# 3. 一键安装汉化（自动备份并注入）
 node cli.js install
 
-# 3. 安装 Antigravity 官方中文智能体插件
+# 4. 安装 Antigravity 官方中文智能体插件
 node cli.js install-plugin
 
-# 4. 自愈启动（自动检测版本覆盖并重新注入后拉起客户端）
+# 5. 自愈启动（自动检测版本覆盖并重新注入后拉起客户端）
 node cli.js launch
 
-# 5. 后台守护模式（监听官方更新并自动完成重新汉化）
+# 6. 后台守护模式（监听官方更新并自动完成重新汉化）
 node cli.js watch
 
-# 6. 一键还原回官方英文原版
+# 7. 一键还原回官方英文原版
 node cli.js restore
 
-# 7. 指定自定义客户端路径安装
+# 8. 指定自定义客户端路径安装
 node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 ```
 

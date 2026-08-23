@@ -67,22 +67,25 @@ Before installing the patch, make sure your environment meets the following requ
 # 1. Check client status
 node cli.js status
 
-# 2. Install localization patch
+# 2. Run preflight health check (Node version, NPX tool, client paths, process locks)
+node cli.js check
+
+# 3. Install localization patch with automatic preflight
 node cli.js install
 
-# 3. Install official agent plugin
+# 4. Install official agent plugin
 node cli.js install-plugin
 
-# 4. Launch with automatic healing
+# 5. Launch with automatic healing
 node cli.js launch
 
-# 5. Background daemon watcher
+# 6. Background daemon watcher
 node cli.js watch
 
-# 6. Restore official English version
+# 7. Restore official English version
 node cli.js restore
 
-# 7. Specify custom client path
+# 8. Specify custom client path
 node cli.js install --path "/path/to/antigravity/app.asar"
 ```
 
