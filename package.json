@@ -31,6 +31,6 @@
   "author": "Antigravity Open Source Community",
   "license": "MIT",
   "devDependencies": {
-    "jsdom": "^30.0.1"
+    "jsdom": "^22.1.0"
   }
 }
