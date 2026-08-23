@@ -93,7 +93,7 @@ node cli.js install --path "/path/to/antigravity/app.asar"
 This project uses comprehensive automated regression test suites and cross-platform CI (Windows / macOS / Ubuntu x Node 18/20) to ensure stability:
 
 ```bash
-# Run complete test suite (5 test suites, 134+ assertions)
+# Run complete test suite (6 test suites, 145+ assertions)
 npm test
 ```
 
@@ -102,6 +102,7 @@ npm test
 - **Title Collision Protection (`test/test-menu-and-titles.js`)**: Prevents single-word substring collisions from corrupting user-generated session titles.
 - **Real ASAR Lifecycle (`test/test-asar-lifecycle.js`)**: Packs, patches, verifies Buffer signatures, and restores real binary ASAR packages end-to-end.
 - **Live System Path Detection (`test/test-detector-live.js`)**: Verifies 0-argument automatic path detection on physical platform runners.
+- **Publishing & Academic Integrity Audit (`test/test-proofread-integrity.js`)**: 11 assertions validating 0 typos, full-width punctuation, and CCF AI terminology preservation.
 
 ---
 

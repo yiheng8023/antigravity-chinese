@@ -93,7 +93,7 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 本项目引入严格的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（包含 5 大测试套件，共 134+ 项断言）
+# 运行全套自动化测试（包含 6 大全真测试套件，共 145+ 项断言）
 npm test
 ```
 
@@ -102,6 +102,7 @@ npm test
 - **菜单与会话标题防误伤 (`test/test-menu-and-titles.js`)**：确保单字词不破坏用户自定义会话名称。
 - **ASAR 全真生命周期测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，验证解包、注入、签名校验与出厂原子回滚。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言自动扫描 0 错别字（登录/账号/其他等）、全角标点排版、CCF 核心学术术语与正则安全。
 
 ---
 

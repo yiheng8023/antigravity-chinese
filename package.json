@@ -7,12 +7,13 @@
     "antigravity-cn": "./cli.js"
   },
   "scripts": {
-    "test": "node test/verify.js && node test/test-screenshots.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js",
+    "test": "node test/verify.js && node test/test-screenshots.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js",
     "test:verify": "node test/verify.js",
     "test:screenshots": "node test/test-screenshots.js",
     "test:menus": "node test/test-menu-and-titles.js",
     "test:asar": "node test/test-asar-lifecycle.js",
     "test:detector": "node test/test-detector-live.js",
+    "test:proofread": "node test/test-proofread-integrity.js",
     "scan:drift": "node tools/drift-detector.js",
     "status": "node cli.js status",
     "install-patch": "node cli.js install",

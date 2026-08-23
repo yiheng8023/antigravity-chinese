@@ -41,12 +41,13 @@ npm run scan:drift
 ```bash
 npm test
 ```
-必须确保以下 5 大测试套件（共 134+ 项断言）100% 全部 PASS：
+必须确保以下 6 大测试套件（共 145+ 项断言）100% 全部 PASS：
 1. `test/verify.js`（50 项核心 DOM 渲染、代码保护与跨平台候选路径断言）
 2. `test/test-screenshots.js`（64 项真实界面截图用例）
 3. `test/test-menu-and-titles.js`（8 项窗口菜单与用户自定义会话标题防误伤断言）
 4. `test/test-asar-lifecycle.js`（10 项真实 ASAR 二进制包打包、注入与原子还原全真测试）
 5. `test/test-detector-live.js`（真实宿主环境无参路径探测实测）
+6. `test/test-proofread-integrity.js`（11 项出版级规范字、全角标点、CCF 学术名词与正则安全性断言）
 
 ---
 
