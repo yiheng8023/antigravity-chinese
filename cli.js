@@ -370,16 +370,17 @@ function status(customPath) {
 
 function isAsarPatched(asarPath) {
   try {
-    const tempCheck = path.join(os.tmpdir(), `check_preload_${Date.now()}.js`);
-    execSync(`npx -y @electron/asar extract-file "${asarPath}" "dist/preload.js" "${tempCheck}"`, { stdio: 'ignore' });
-    if (fs.existsSync(tempCheck)) {
-      const content = fs.readFileSync(tempCheck, 'utf-8');
-      const isPatched = content.includes('Antigravity Chinese Localization Injection');
-      fs.rmSync(tempCheck, { force: true });
-      return isPatched;
-    }
-  } catch (e) {}
-  return false;
+    if (!asarPath || !fs.existsSync(asarPath)) return false;
+    const fd = fs.openSync(asarPath, 'r');
+    const stat = fs.fstatSync(fd);
+    const readLen = Math.min(stat.size, 10 * 1024 * 1024);
+    const buf = Buffer.alloc(readLen);
+    fs.readSync(fd, buf, 0, readLen, 0);
+    fs.closeSync(fd);
+    return buf.includes(Buffer.from('Antigravity Chinese Localization Injection'));
+  } catch (e) {
+    return false;
+  }
 }
 
 function launch(customPath) {
