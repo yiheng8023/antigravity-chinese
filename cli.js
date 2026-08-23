@@ -361,19 +361,12 @@ function status(customPath) {
   console.log(`• 资源路径:     ${asarPath}`);
   console.log(`• 安全备份:     ${hasBackup ? '✅ 存在 (' + backupPath + ')' : '⚠️ 无备份'}`);
   
-  // Test if patched
-  try {
-    execSync(`npx -y @electron/asar extract-file "${asarPath}" "dist/preload.js"`, { stdio: 'ignore' });
-    const preloadCheck = path.join(process.cwd(), 'preload.js');
-    if (fs.existsSync(preloadCheck)) {
-      const content = fs.readFileSync(preloadCheck, 'utf-8');
-      const isPatched = content.includes('Antigravity Chinese Localization Injection');
-      fs.rmSync(preloadCheck, { force: true });
-      console.log(`• 汉化状态:     ${isPatched ? '🟢 已安装汉化补丁' : '⚪ 原生未修改状态'}`);
-    }
-  } catch (e) {
-    console.log('• 汉化状态:     ⚪ 待检测');
-  }
+  const patched = isAsarPatched(asarPath);
+  console.log(`• 汉化状态:     ${patched ? '🟢 已安装宿主汉化补丁' : '⚪ 原生未修改状态'}`);
+
+  const pluginDir = path.join(os.homedir(), '.gemini', 'config', 'plugins', 'chinese-toolkit');
+  const hasPlugin = fs.existsSync(path.join(pluginDir, 'plugin.json'));
+  console.log(`• 官方插件:     ${hasPlugin ? '🟢 已就绪 (Rules & Skills 激活)' : '⚪ 未安装'}`);
   console.log('');
 }
 
