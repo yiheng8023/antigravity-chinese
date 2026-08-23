@@ -210,6 +210,29 @@ assert(fs.existsSync(skillPath), '插件技能 skills/i18n-diagnostics/SKILL.md 
 const skillContent = fs.readFileSync(skillPath, 'utf-8');
 assert(skillContent.includes('name: i18n-diagnostics'), '插件技能包含合法 YAML frontmatter 定义');
 
+console.log('\n--- 6. 验证跨平台路径探测器 (macOS / Linux / Windows) ---');
+const { getCandidateAsarPaths } = require('../cli');
+
+// 1. Windows 候选路径校验
+const winPaths = getCandidateAsarPaths('win32', 'C:\\Users\\TestUser');
+assert(winPaths.length >= 3, 'Windows 包含至少 3 组候选路径');
+assert(winPaths.some(p => p.includes('AppData') && p.includes('antigravity')), 'Windows 包含 LocalAppData 路径');
+assert(winPaths.some(p => p.includes('Program Files') && p.includes('antigravity')), 'Windows 包含 ProgramFiles 路径');
+
+// 2. macOS 候选路径校验
+const macPaths = getCandidateAsarPaths('darwin', '/Users/TestUser').map(p => p.replace(/\\/g, '/'));
+assert(macPaths.length >= 2, 'macOS 包含系统与用户级 2 组候选路径');
+assert(macPaths.includes('/Applications/Antigravity.app/Contents/Resources/app.asar'), 'macOS 包含全局 /Applications 路径');
+assert(macPaths.includes('/Users/TestUser/Applications/Antigravity.app/Contents/Resources/app.asar'), 'macOS 包含用户级 Applications 路径');
+
+// 3. Linux 候选路径校验
+const linuxPaths = getCandidateAsarPaths('linux', '/home/testuser').map(p => p.replace(/\\/g, '/'));
+assert(linuxPaths.length >= 4, 'Linux 包含 /opt, /usr/lib, /usr/share, ~/.local 4 组候选路径');
+assert(linuxPaths.includes('/opt/antigravity/resources/app.asar'), 'Linux 包含 /opt 路径');
+assert(linuxPaths.includes('/usr/lib/antigravity/resources/app.asar'), 'Linux 包含 /usr/lib 路径');
+assert(linuxPaths.includes('/usr/share/antigravity/resources/app.asar'), 'Linux 包含 /usr/share 路径');
+assert(linuxPaths.includes('/home/testuser/.local/share/antigravity/resources/app.asar'), 'Linux 包含 ~/.local/share 路径');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

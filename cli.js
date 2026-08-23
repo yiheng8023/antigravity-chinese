@@ -15,9 +15,7 @@ const DICT_PATH = path.join(PROJECT_ROOT, 'dict', 'zh-CN.json');
 const RUNTIME_PATH = path.join(PROJECT_ROOT, 'core', 'i18n-runtime.js');
 
 // Platform paths
-function getCandidateAsarPaths() {
-  const platform = os.platform();
-  const homedir = os.homedir();
+function getCandidateAsarPaths(platform = os.platform(), homedir = os.homedir()) {
 
   if (platform === 'win32') {
     const localAppData = process.env.LOCALAPPDATA || path.join(homedir, 'AppData', 'Local');
@@ -486,50 +484,51 @@ function uninstallPlugin() {
 }
 
 // CLI Routing
-const args = process.argv.slice(2);
-const command = args[0] || 'help';
+if (require.main === module) {
+  const args = process.argv.slice(2);
+  const command = args[0] || 'help';
 
-let customPath = null;
-const pathArgIdx = args.indexOf('--path');
-if (pathArgIdx !== -1 && args[pathArgIdx + 1]) {
-  customPath = args[pathArgIdx + 1];
-}
+  let customPath = null;
+  const pathArgIdx = args.indexOf('--path');
+  if (pathArgIdx !== -1 && args[pathArgIdx + 1]) {
+    customPath = args[pathArgIdx + 1];
+  }
 
-switch (command) {
-  case 'install':
-  case 'patch':
-    install(customPath);
-    if (args.includes('--with-plugin')) {
+  switch (command) {
+    case 'install':
+    case 'patch':
+      install(customPath);
+      if (args.includes('--with-plugin')) {
+        installPlugin();
+      }
+      break;
+    case 'install-plugin':
+    case 'plugin:install':
       installPlugin();
-    }
-    break;
-  case 'install-plugin':
-  case 'plugin:install':
-    installPlugin();
-    break;
-  case 'uninstall-plugin':
-  case 'plugin:uninstall':
-    uninstallPlugin();
-    break;
-  case 'restore':
-  case 'uninstall':
-    restore(customPath);
-    break;
-  case 'status':
-  case 'check':
-    status(customPath);
-    break;
-  case 'launch':
-  case 'start':
-    launch(customPath);
-    break;
-  case 'watch':
-  case 'daemon':
-    watch(customPath);
-    break;
-  case 'help':
-  default:
-    console.log(`
+      break;
+    case 'uninstall-plugin':
+    case 'plugin:uninstall':
+      uninstallPlugin();
+      break;
+    case 'restore':
+    case 'uninstall':
+      restore(customPath);
+      break;
+    case 'status':
+    case 'check':
+      status(customPath);
+      break;
+    case 'launch':
+    case 'start':
+      launch(customPath);
+      break;
+    case 'watch':
+    case 'daemon':
+      watch(customPath);
+      break;
+    case 'help':
+    default:
+      console.log(`
 Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
 
 用法:
@@ -546,5 +545,12 @@ Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
   --path <path>    指定 Antigravity 的安装目录或 app.asar 路径
   --with-plugin    在执行 install 时同步安装官方插件
 `);
-    break;
+      break;
+  }
 }
+
+module.exports = {
+  getCandidateAsarPaths,
+  findAsarPath,
+  isAsarPatched
+};
