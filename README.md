@@ -12,18 +12,18 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、非侵入式中文本地化补丁与生命周期管理器。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器。
 
 ---
 
 ## 🌟 核心特性与设计哲学
 
-- **非侵入式运行时注入 (Non-invasive Runtime Engine)**：通过 Electron `preload` 阶段挂载响应式 DOM 翻译引擎，不修改主程序核心二进制文件。
+- **可逆式运行时注入 (Reversible Runtime Engine)**：通过 Electron `preload` 阶段挂载响应式 DOM 翻译引擎，兼顾轻量与深度本地化。
 - **预加载同步挂载 (Preload Hook)**：在渲染进程初始化阶段尽早介入，最大程度减少英文向中文的界面跳变。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
 - **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
 - **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换。
-- **自动备份与可逆还原**：首次注入时自动创建 `app.asar.bak` 原生备份，随时可一键还原至官方纯英文初始状态。
+- **版本化指纹基线备份与可逆还原**：首次注入时自动创建 `app.asar.bak` 原生备份，上游版本更新自动刷新纯净基线，随时可一键还原至官方纯英文初始状态。
 - **官方中文优雅让位 (Graceful Yield)**：内置 CJK 字符与官方语言环境自动探针，上游一旦上线官方中文自动主动让位，杜绝破坏。
 
 ---
