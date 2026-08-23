@@ -262,7 +262,8 @@ function install(customPath) {
 
   const asarPath = preflight.asarPath;
 
-  if (isProcessRunning()) {
+  // 只有在未指定 customPath（即针对当前本机默认宿主安装）时，才执行全局进程释放
+  if (!customPath && isProcessRunning()) {
     console.log('\n⚠️ 检测到 Antigravity 客户端当前正在运行，正在安全退出释放文件锁...');
     try {
       if (os.platform() === 'win32') {
@@ -361,6 +362,9 @@ function install(customPath) {
 
   // 4. Pack back
   console.log('🔄 [5/5] 正在重构并应用补丁...');
+  const tempNewAsar = path.join(resourcesDir, 'app.asar.new');
+  if (fs.existsSync(tempNewAsar)) fs.rmSync(tempNewAsar, { force: true });
+
   try {
     const asarBin = path.join(__dirname, 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
     const packCmd = fs.existsSync(asarBin)
@@ -368,24 +372,37 @@ function install(customPath) {
       : `npx -y @electron/asar@3.2.14 pack "${tempExtractDir}" "${tempNewAsar}"`;
     execSync(packCmd, { stdio: 'inherit' });
     
-    // Replace old asar
-    try {
-      fs.rmSync(asarPath, { force: true });
-      fs.renameSync(tempNewAsar, asarPath);
-    } catch (permErr) {
-      if (permErr.code === 'EPERM' || permErr.code === 'EBUSY') {
-        console.error('\n❌ 文件被占用错误 (EPERM / EBUSY):');
-        console.error('   Antigravity 客户端正在运行并锁定了 app.asar 文件。');
-        console.error('👉 解决方法:');
-        console.error('   1. 请在任务栏或托盘中完全退出 Antigravity 客户端；');
-        console.error('   2. 重新运行本安装命令: node cli.js install (或双击 install.bat)。\n');
-        process.exit(1);
+    // Replace old asar (带重试的安全原子替换)
+    let replaceSuccess = false;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        fs.rmSync(asarPath, { force: true });
+        fs.renameSync(tempNewAsar, asarPath);
+        replaceSuccess = true;
+        break;
+      } catch (permErr) {
+        if (permErr.code === 'EPERM' || permErr.code === 'EBUSY') {
+          if (attempt < 4) {
+            try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 400); } catch (_) {}
+          } else {
+            console.error('\n❌ 文件被占用错误 (EPERM / EBUSY):');
+            console.error('   Antigravity 客户端正在运行并锁定了 app.asar 文件。');
+            process.exit(1);
+          }
+        } else {
+          throw permErr;
+        }
       }
-      throw permErr;
     }
 
+    // 写入汉化元数据指纹
+    const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+    fs.writeFileSync(metaPath, JSON.stringify({ patched: true, timestamp: Date.now() }, null, 2), 'utf8');
+
     // Clean temp
-    fs.rmSync(tempExtractDir, { recursive: true, force: true });
+    if (fs.existsSync(tempExtractDir)) {
+      fs.rmSync(tempExtractDir, { recursive: true, force: true });
+    }
 
     // macOS codesign
     if (os.platform() === 'darwin') {
@@ -409,6 +426,9 @@ function install(customPath) {
     if (fs.existsSync(tempExtractDir)) {
       fs.rmSync(tempExtractDir, { recursive: true, force: true });
     }
+    if (fs.existsSync(tempNewAsar)) {
+      fs.rmSync(tempNewAsar, { force: true });
+    }
     process.exit(1);
   }
 }
@@ -421,20 +441,17 @@ function restore(customPath) {
     process.exit(1);
   }
 
-  // 1. 自动同步卸载智能体扩展插件
-  uninstallPlugin();
-
   const resourcesDir = path.dirname(asarPath);
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
-  const backupFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
+  const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
 
   if (!fs.existsSync(backupPath)) {
     console.error(`❌ 未找到安全备份文件: ${backupPath}，无法自动还原。`);
     process.exit(1);
   }
 
-  // 2. 进程占用检测与文件锁释放
-  if (isProcessRunning()) {
+  // 1. 进程占用检测与文件锁释放 (仅在针对原生默认宿主路径时生效)
+  if (!customPath && isProcessRunning()) {
     console.log('⚠️ 检测到 Antigravity 客户端正在运行，正在安全释放文件锁...');
     try {
       if (os.platform() === 'win32') {
@@ -463,6 +480,12 @@ function restore(customPath) {
       }
     }
     if (copyErr) throw copyErr;
+
+    // 清除元数据
+    if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
+
+    // 2. ASAR 成功还原后，安全同步卸载社区插件
+    uninstallPlugin();
 
     console.log('\n✅ ==============================================');
     console.log('✅ 已成功还原为官方原生英文版本！');
@@ -500,18 +523,26 @@ function status(customPath) {
   const patched = isAsarPatched(asarPath);
   console.log(`• 汉化状态:     ${patched ? '🟢 已安装宿主汉化补丁' : '⚪ 原生未修改状态'}`);
 
-  const pluginDir = path.join(os.homedir(), '.gemini', 'config', 'plugins', 'chinese-toolkit');
+  const pluginDir = getGlobalPluginTargetDir();
   const hasPlugin = fs.existsSync(path.join(pluginDir, 'plugin.json'));
-  console.log(`• 官方插件:     ${hasPlugin ? '🟢 已就绪 (Rules & Skills 激活)' : '⚪ 未安装'}`);
+  console.log(`• 社区插件:     ${hasPlugin ? '🟢 已就绪 (Rules & Skills 激活)' : '⚪ 未安装'}`);
   console.log('');
 }
 
 function isAsarPatched(asarPath) {
   try {
     if (!asarPath || !fs.existsSync(asarPath)) return false;
+    const resourcesDir = path.dirname(asarPath);
+    const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+    if (fs.existsSync(metaPath)) {
+      try {
+        const meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+        if (meta && meta.patched) return true;
+      } catch (e) {}
+    }
     const fd = fs.openSync(asarPath, 'r');
     const stat = fs.fstatSync(fd);
-    const readLen = Math.min(stat.size, 10 * 1024 * 1024);
+    const readLen = Math.min(stat.size, 30 * 1024 * 1024);
     const buf = Buffer.alloc(readLen);
     fs.readSync(fd, buf, 0, readLen, 0);
     fs.closeSync(fd);
@@ -594,6 +625,9 @@ function watch(customPath) {
 }
 
 function getGlobalPluginTargetDir() {
+  if (process.env.AGY_PLUGIN_DIR) {
+    return process.env.AGY_PLUGIN_DIR;
+  }
   const homedir = os.homedir();
   return path.join(homedir, '.gemini', 'config', 'plugins', 'chinese-toolkit');
 }

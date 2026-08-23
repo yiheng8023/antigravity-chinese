@@ -1,6 +1,6 @@
 {
   "name": "antigravity-chinese",
-  "version": "3.2.1",
+  "version": "3.2.2",
   "description": "Google Antigravity 2.0 桌面客户端轻量级中文汉化工具包 (Cross-Platform Localization Tool for Google Antigravity)",
   "main": "cli.js",
   "engines": {
@@ -10,7 +10,7 @@
     "antigravity-cn": "./cli.js"
   },
   "scripts": {
-    "test": "node test/verify.js && node test/test-screenshots.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js",
+    "test": "node test/test-lint.js && node test/verify.js && node test/test-screenshots.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js",
     "test:verify": "node test/verify.js",
     "test:screenshots": "node test/test-screenshots.js",
     "test:menus": "node test/test-menu-and-titles.js",

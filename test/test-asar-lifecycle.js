@@ -28,6 +28,9 @@ const asarPath = path.join(resourcesDir, 'app.asar');
 const backupPath = path.join(resourcesDir, 'app.asar.bak');
 const cliPath = path.join(__dirname, '..', 'cli.js');
 
+const mockPluginDir = path.join(testDir, 'mock_plugins', 'chinese-toolkit');
+process.env.AGY_PLUGIN_DIR = mockPluginDir;
+
 fs.mkdirSync(resourcesDir, { recursive: true });
 fs.mkdirSync(path.join(mockSrcDir, 'dist', 'ideInstall'), { recursive: true });
 
