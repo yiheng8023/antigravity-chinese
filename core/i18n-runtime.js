@@ -107,12 +107,10 @@
     // 如果文本已经是翻译结果，直接跳过
     if (translatedValues[normalized]) return null;
 
-    // 官方原生已汉化文本探测与优雅让位：如果文本已包含中文且无精确英文匹配，优雅让位，绝不破坏官方中文
+    // 官方原生已汉化文本探测与优雅让位：如果文本纯属中文无英文单词，优雅让位，绝不破坏官方中文
     var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
-    if (cjkChars && cjkChars.length >= 1 && !exactDict[normalized]) {
-      if (cjkChars.length >= normalized.length * 0.25 || !/[a-zA-Z]{3,}/.test(normalized)) {
-        return null;
-      }
+    if (cjkChars && cjkChars.length >= 1 && !exactDict[normalized] && !/[a-zA-Z]{2,}/.test(normalized)) {
+      return null;
     }
 
     // 1. 直接精确匹配
@@ -145,19 +143,27 @@
       }
     }
 
-    // 4. 多句子拆分与复合段落翻译（按句号、感叹号、问号分隔）
-    if (normalized.indexOf('. ') !== -1 || normalized.indexOf('! ') !== -1 || normalized.indexOf('? ') !== -1) {
-      var sentences = normalized.split(/([.!?]\s+)/);
+    // 4. 多句子拆分与复合段落翻译（按中英文句号、感叹号、问号分隔）
+    if (normalized.indexOf('. ') !== -1 || normalized.indexOf('! ') !== -1 || normalized.indexOf('? ') !== -1 || normalized.indexOf('。') !== -1) {
+      var sentences = normalized.split(/([.!?]\s+|[。！？]\s*)/);
       var anyTranslated = false;
       var translatedParts = [];
       for (var sIdx = 0; sIdx < sentences.length; sIdx++) {
         var part = sentences[sIdx];
         var trimmedPart = part.trim();
-        if (!trimmedPart) {
-          translatedParts.push(part);
+        if (!trimmedPart || /^[.!?。！？\s]+$/.test(part)) {
+          translatedParts.push(part.replace(/\.\s*/g, '。 '));
           continue;
         }
         var transPart = exactDict[trimmedPart];
+        if (!transPart) {
+          for (var pIdx = 0; pIdx < patterns.length; pIdx++) {
+            if (patterns[pIdx].regex.test(trimmedPart)) {
+              transPart = trimmedPart.replace(patterns[pIdx].regex, patterns[pIdx].replacement);
+              break;
+            }
+          }
+        }
         if (!transPart) {
           var pMatch = trimmedPart.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
           if (pMatch && exactDict[pMatch[1].trim()]) {
@@ -172,7 +178,7 @@
         }
       }
       if (anyTranslated) {
-        return translatedParts.join(' ');
+        return translatedParts.join('').replace(/([。！？])\s*/g, '$1 ');
       }
     }
 
@@ -181,7 +187,6 @@
     var modified = false;
     for (var j = 0; j < sortedExactKeys.length; j++) {
       var key = sortedExactKeys[j];
-      // 只有多词固定词组（含空格）或长度 >= 15 的复合句才允许子串替换，防止单个单词如 "Project" 误伤 "Localization Project Setup"
       if ((key.indexOf(' ') !== -1 || key.length >= 15) && processed.indexOf(key) !== -1) {
         processed = processed.split(key).join(exactDict[key]);
         modified = true;
