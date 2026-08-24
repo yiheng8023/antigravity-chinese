@@ -1120,7 +1120,16 @@
     "No project folders added yet": "暂未添加任何项目文件夹",
     "Add Project Folder": "添加项目文件夹",
     "+ Add Project Folder": "+ 添加项目文件夹",
-    "Add project folder": "添加项目文件夹"
+    "Add project folder": "添加项目文件夹",
+    "Danger Zone": "危险区域",
+    "Delete Project": "删除项目",
+    "Permanently delete": "永久删除",
+    "Permanently delete this project": "永久删除此项目",
+    "Permanently delete this project.": "永久删除此项目。",
+    "Delete this project": "删除此项目",
+    "Delete this project.": "删除此项目。",
+    "Are you sure you want to delete this project?": "您确定要删除此项目吗？",
+    "This action cannot be undone.": "此操作不可撤销。"
   },
   "patterns": [
     {
@@ -1270,6 +1279,38 @@
     {
       "regex": "^\\+\\s*Add Folder$",
       "replacement": "+ 添加文件夹"
+    },
+    {
+      "regex": "You have used some of your 5-?hour limit,?\\s*it will fully refresh in (.*?)\\.?$",
+      "replacement": "您已消耗了部分 5 小时额度，将在 $1 后完全重置刷新。"
+    },
+    {
+      "regex": "You have used some of your weekly limit,?\\s*it will fully refresh in (.*?)\\.?$",
+      "replacement": "您已消耗了部分每周额度，将在 $1 后完全重置刷新。"
+    },
+    {
+      "regex": "You have hit your 5-?hour limit,?\\s*it will refresh in (.*?)\\.?$",
+      "replacement": "您已达到 5 小时上限，将在 $1 后重置刷新。"
+    },
+    {
+      "regex": "You have hit your weekly limit,?\\s*it will refresh in (.*?)\\.?$",
+      "replacement": "您已达到每周上限，将在 $1 后重置刷新。"
+    },
+    {
+      "regex": "^Permanently delete (.*?)\\.?$",
+      "replacement": "永久删除 $1。"
+    },
+    {
+      "regex": "配置浏览器子智能体[。.]\\s*It requires",
+      "replacement": "配置浏览器子智能体。需要安装"
+    },
+    {
+      "regex": "Configure (?:the )?browser subagent[。.]\\s*It requires",
+      "replacement": "配置浏览器子智能体。需要安装"
+    },
+    {
+      "regex": "\\bIt requires\\b",
+      "replacement": "需要安装"
     }
   ]
 }
