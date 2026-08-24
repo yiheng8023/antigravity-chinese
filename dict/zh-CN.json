@@ -861,7 +861,7 @@
     "Ask anything, @ to mention, / for actions": "输入任何问题，输入 @ 提及，输入 / 执行操作",
     "Browser Settings": "浏览器设置",
     "Configure the browser subagent.": "配置浏览器子智能体。",
-    "It requires Google Chrome to be installed.": "需要系统中安装 Google Chrome。",
+    "It requires Google Chrome to be installed.": "需要安装 Google Chrome 才能运行。",
     "Configure the browser subagent. It requires Google Chrome to be installed.": "配置浏览器子智能体。需要系统中已安装 Google Chrome 浏览器。",
     "Browser Javascript Execution Policy": "浏览器 JavaScript 执行策略",
     "Controls whether the agent can run custom JavaScript to automate complex browser actions.": "控制智能体是否可以运行自定义 JavaScript 来实现复杂的浏览器自动化操作。",
@@ -1089,14 +1089,38 @@
     "for conversations outside of projects.": "用于项目外会话。",
     "outside of projects": "项目外",
     "outside of projects.": "项目外。",
-    "It requires Google Chrome to be installed": "需要系统中安装 Google Chrome",
+    "It requires Google Chrome to be installed": "需要安装 Google Chrome 才能运行",
     "It requires": "需要安装",
     "to be installed.": "才能运行。",
     "to be installed": "才能运行",
     "requires Google Chrome to be installed.": "需要安装 Google Chrome 才能运行。",
     "requires Google Chrome to be installed": "需要安装 Google Chrome 才能运行",
     "Configure browser subagent.": "配置浏览器子智能体。",
-    "Configure browser subagent": "配置浏览器子智能体"
+    "Configure browser subagent": "配置浏览器子智能体",
+    "Configure the browser subagent .": "配置浏览器子智能体。",
+    "Configure the browser subagent": "配置浏览器子智能体",
+    "Configure browser subagent .": "配置浏览器子智能体。",
+    "of the customization budget is available.": "的自定义扩展预算可用。",
+    "of the customization budget is available": "的自定义扩展预算可用",
+    "the customization budget is available.": "自定义扩展预算可用。",
+    "the customization budget is available": "自定义扩展预算可用",
+    "customization budget is available.": "自定义扩展预算可用。",
+    "customization budget is available": "自定义扩展预算可用",
+    "Manage project folders, agent settings, and permissions.": "管理项目文件夹、智能体设置与权限。",
+    "Manage project folders, agent settings, and permissions": "管理项目文件夹、智能体设置与权限",
+    "Manage project folders, agent settings and permissions.": "管理项目文件夹、智能体设置与权限。",
+    "Manage project folders, agent settings and permissions": "管理项目文件夹、智能体设置与权限",
+    "No folders added yet.": "暂未添加任何文件夹。",
+    "No folders added yet": "暂未添加任何文件夹",
+    "Add Folder": "添加文件夹",
+    "+ Add Folder": "+ 添加文件夹",
+    "Add folder": "添加文件夹",
+    "+ Add folder": "+ 添加文件夹",
+    "No project folders added yet.": "暂未添加任何项目文件夹。",
+    "No project folders added yet": "暂未添加任何项目文件夹",
+    "Add Project Folder": "添加项目文件夹",
+    "+ Add Project Folder": "+ 添加项目文件夹",
+    "Add project folder": "添加项目文件夹"
   },
   "patterns": [
     {
@@ -1222,6 +1246,30 @@
     {
       "regex": "(\\d+(?:\\.\\d+)?)% of the customization budget is available",
       "replacement": "$1% 的自定义扩展预算可用"
+    },
+    {
+      "regex": "Configure (?:the )?browser subagent\\s*\\.?",
+      "replacement": "配置浏览器子智能体。"
+    },
+    {
+      "regex": "(\\d+(?:\\.\\d+)?)% of the customization budget is available\\.?",
+      "replacement": "$1% 的自定义扩展预算可用。"
+    },
+    {
+      "regex": "(?:^|\\s*)of the customization budget is available\\.?",
+      "replacement": " 的自定义扩展预算可用。"
+    },
+    {
+      "regex": "Manage project folders,\\s*agent settings,?\\s*and permissions\\.?",
+      "replacement": "管理项目文件夹、智能体设置与权限。"
+    },
+    {
+      "regex": "No folders added yet\\.?",
+      "replacement": "暂未添加任何文件夹。"
+    },
+    {
+      "regex": "^\\+\\s*Add Folder$",
+      "replacement": "+ 添加文件夹"
     }
   ]
 }
