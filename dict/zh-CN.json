@@ -861,7 +861,7 @@
     "Ask anything, @ to mention, / for actions": "输入任何问题，输入 @ 提及，输入 / 执行操作",
     "Browser Settings": "浏览器设置",
     "Configure the browser subagent.": "配置浏览器子智能体。",
-    "It requires Google Chrome to be installed.": "需要系统中已安装 Google Chrome 浏览器。",
+    "It requires Google Chrome to be installed.": "需要系统中安装 Google Chrome。",
     "Configure the browser subagent. It requires Google Chrome to be installed.": "配置浏览器子智能体。需要系统中已安装 Google Chrome 浏览器。",
     "Browser Javascript Execution Policy": "浏览器 JavaScript 执行策略",
     "Controls whether the agent can run custom JavaScript to automate complex browser actions.": "控制智能体是否可以运行自定义 JavaScript 来实现复杂的浏览器自动化操作。",
@@ -1088,7 +1088,15 @@
     "when working in this project": "在此项目中工作时",
     "for conversations outside of projects.": "用于项目外会话。",
     "outside of projects": "项目外",
-    "outside of projects.": "项目外。"
+    "outside of projects.": "项目外。",
+    "It requires Google Chrome to be installed": "需要系统中安装 Google Chrome",
+    "It requires": "需要安装",
+    "to be installed.": "才能运行。",
+    "to be installed": "才能运行",
+    "requires Google Chrome to be installed.": "需要安装 Google Chrome 才能运行。",
+    "requires Google Chrome to be installed": "需要安装 Google Chrome 才能运行",
+    "Configure browser subagent.": "配置浏览器子智能体。",
+    "Configure browser subagent": "配置浏览器子智能体"
   },
   "patterns": [
     {
@@ -1206,6 +1214,14 @@
     {
       "regex": "\\bInherit General\\b",
       "replacement": "继承通用设置"
+    },
+    {
+      "regex": "It requires\\s+([a-zA-Z0-9\\s]+?)\\s+to be installed\\.?",
+      "replacement": "需要安装 $1 才能运行。"
+    },
+    {
+      "regex": "(\\d+(?:\\.\\d+)?)% of the customization budget is available",
+      "replacement": "$1% 的自定义扩展预算可用"
     }
   ]
 }
