@@ -1070,7 +1070,25 @@
     "to browse the store, or add a custom server via the MCP config.": "浏览应用商店，或通过 MCP 配置文件添加自定义服务。",
     "to browse the store, or add a custom server via the MCP config": "浏览应用商店，或通过 MCP 配置文件添加自定义服务",
     "Build With Google Plugins": "Build With Google 插件目录",
-    "Browse and enable plugins from the Build With Google catalog.": "浏览并启用 Build With Google 目录中的插件。"
+    "Browse and enable plugins from the Build With Google catalog.": "浏览并启用 Build With Google 目录中的插件。",
+    "Overview": "概览",
+    "Review": "审查",
+    "Background Task Output": "后台任务输出",
+    "Background Tasks": "后台任务",
+    "No background tasks": "暂无后台任务",
+    "No updates available": "暂无可用更新",
+    "Agent settings and permissions for conversations outside of projects.": "项目外会话的智能体设置与权限。",
+    "Inherit General": "继承通用设置",
+    "Local Permissions": "本地权限",
+    "Also includes global settings when working in this project.": "在此项目中工作时也包含全局设置。",
+    "Also includes global settings when working in this project": "在此项目中工作时也包含全局设置",
+    "Also includes": "也包含",
+    "global settings": "全局设置",
+    "when working in this project.": "在此项目中工作时。",
+    "when working in this project": "在此项目中工作时",
+    "for conversations outside of projects.": "用于项目外会话。",
+    "outside of projects": "项目外",
+    "outside of projects.": "项目外。"
   },
   "patterns": [
     {
@@ -1172,6 +1190,22 @@
     {
       "regex": "to browse the store, or add a custom server via the MCP config\\.?",
       "replacement": "浏览应用商店，或通过 MCP 配置文件添加自定义服务。"
+    },
+    {
+      "regex": "^(\\d+(?:\\.\\d+)?)% of the customization budget is available\\.?$",
+      "replacement": "$1% 的自定义扩展预算可用。"
+    },
+    {
+      "regex": "了解更多关于\\s*Inherit General",
+      "replacement": "了解更多关于继承通用设置"
+    },
+    {
+      "regex": "Also includes global settings when working in this project\\.?",
+      "replacement": "在此项目中工作时也包含全局设置。"
+    },
+    {
+      "regex": "\\bInherit General\\b",
+      "replacement": "继承通用设置"
     }
   ]
 }

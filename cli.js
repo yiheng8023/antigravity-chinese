@@ -188,6 +188,27 @@ function patchIdeWizardFile(wizardFilePath) {
   fs.writeFileSync(wizardFilePath, content, 'utf-8');
 }
 
+function patchUpdaterFile(updaterFilePath) {
+  if (!fs.existsSync(updaterFilePath)) return;
+  let content = fs.readFileSync(updaterFilePath, 'utf-8');
+  const replacements = [
+    { from: "title: 'Check for Updates'", to: "title: '检查更新'" },
+    { from: 'title: "Check for Updates"', to: 'title: "检查更新"' },
+    { from: "message: 'No updates available'", to: "message: '暂无可用更新'" },
+    { from: 'message: "No updates available"', to: 'message: "暂无可用更新"' },
+    { from: "buttons: ['OK']", to: "buttons: ['确定']" },
+    { from: 'buttons: ["OK"]', to: 'buttons: ["确定"]' },
+    { from: 'MenuUpdateStep["CheckForUpdates"] = "Check for Updates"', to: 'MenuUpdateStep["CheckForUpdates"] = "检查更新"' },
+    { from: 'MenuUpdateStep["CheckingForUpdates"] = "Checking for Updates..."', to: 'MenuUpdateStep["CheckingForUpdates"] = "正在检查更新..."' },
+    { from: 'MenuUpdateStep["DownloadingUpdate"] = "Downloading Update..."', to: 'MenuUpdateStep["DownloadingUpdate"] = "正在下载更新..."' },
+    { from: 'MenuUpdateStep["RestartToUpdate"] = "Restart to Update"', to: 'MenuUpdateStep["RestartToUpdate"] = "重启以应用更新"' }
+  ];
+  for (const r of replacements) {
+    content = content.split(r.from).join(r.to);
+  }
+  fs.writeFileSync(updaterFilePath, content, 'utf-8');
+}
+
 const MIN_NODE_VERSION = 16;
 
 function runPreflightCheck(customPath) {
@@ -358,6 +379,11 @@ function install(customPath) {
   const wizardHtmlPath = path.join(tempExtractDir, 'dist', 'ideInstall', 'wizardHtml.js');
   if (fs.existsSync(wizardHtmlPath)) {
     patchIdeWizardFile(wizardHtmlPath);
+  }
+
+  const updaterPath = path.join(tempExtractDir, 'dist', 'updater.js');
+  if (fs.existsSync(updaterPath)) {
+    patchUpdaterFile(updaterPath);
   }
 
   // 4. Pack back
