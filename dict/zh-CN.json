@@ -334,7 +334,7 @@
     "No file changes": "无文件更改",
     "Modified files:": "已修改的文件：",
     "Add a message...": "输入消息...",
-    "Add context": "添加上下文",
+    "Add context": "添加到上下文",
     "Send message": "发送消息",
     "Send feedback as": "以此身份发送反馈",
     "User message": "用户消息",
@@ -446,7 +446,7 @@
     "Details": "详情",
     "History": "历史记录",
     "Changes": "更改",
-    "Actions": "操作列表",
+    "Actions": "操作",
     "Comment": "评论",
     "Edit comment": "编辑评论",
     "Submit comment": "提交评论",
@@ -1166,7 +1166,7 @@
     "Rename Terminal": "重命名终端",
     "Select Default Profile": "选择默认配置文件",
     "Configure Terminal Settings": "配置终端设置",
-    "Add Context": "添加上下文",
+    "Add Context": "添加到上下文",
     "Add Context...": "添加上下文...",
     "Add context...": "添加上下文...",
     "Add Context Picker": "添加上下文",
@@ -1175,7 +1175,13 @@
     "Media": "媒体",
     "Media Files": "媒体文件",
     "Mention": "提及",
-    "Action": "操作"
+    "Action": "操作",
+    "Add Context Browser": "添加到上下文",
+    "Add context browser": "添加到上下文",
+    "Add to Context": "添加到上下文",
+    "Add to context": "添加到上下文",
+    "Context Browser": "上下文浏览器",
+    "Context browser": "上下文浏览器"
   },
   "patterns": [
     {
