@@ -446,7 +446,7 @@
     "Details": "详情",
     "History": "历史记录",
     "Changes": "更改",
-    "Actions": "操作",
+    "Actions": "操作列表",
     "Comment": "评论",
     "Edit comment": "编辑评论",
     "Submit comment": "提交评论",
@@ -1156,7 +1156,26 @@
     "Create New Conversation": "新建会话",
     "Create new conversation": "新建会话",
     "Create Conversation": "新建会话",
-    "Create conversation": "新建会话"
+    "Create conversation": "新建会话",
+    "New Terminal": "新建终端",
+    "New terminal": "新建终端",
+    "Add Terminal": "添加终端",
+    "Add terminal": "添加终端",
+    "Kill Terminal": "终止终端",
+    "Clear Terminal": "清空终端",
+    "Rename Terminal": "重命名终端",
+    "Select Default Profile": "选择默认配置文件",
+    "Configure Terminal Settings": "配置终端设置",
+    "Add Context": "添加上下文",
+    "Add Context...": "添加上下文...",
+    "Add context...": "添加上下文...",
+    "Add Context Picker": "添加上下文",
+    "Add Context Server": "添加上下文服务",
+    "Add Context Servers": "添加上下文服务",
+    "Media": "媒体",
+    "Media Files": "媒体文件",
+    "Mention": "提及",
+    "Action": "操作"
   },
   "patterns": [
     {
@@ -1348,6 +1367,18 @@
     {
       "regex": "^Create\\s+(?:New\\s+)?Project$",
       "replacement": "新建项目"
+    },
+    {
+      "regex": "^New Terminal(\\s+Ctrl\\+Shift\\+.*?)$",
+      "replacement": "新建终端$1"
+    },
+    {
+      "regex": "^Add Terminal(\\s+Ctrl\\+Shift\\+.*?)$",
+      "replacement": "添加终端$1"
+    },
+    {
+      "regex": "^Add Context(\\s+.*)$",
+      "replacement": "添加上下文$1"
     }
   ]
 }
