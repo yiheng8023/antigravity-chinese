@@ -80,6 +80,47 @@ function isProcessRunning() {
   }
 }
 
+function confirmCloseClient(appName = 'Antigravity') {
+  const args = process.argv.slice(2);
+  if (args.includes('--force') || args.includes('-f') || args.includes('-y') || args.includes('--yes')) {
+    return true;
+  }
+
+  if (!process.stdin.isTTY) {
+    console.error(`\n⚠️ 检测到 ${appName} 客户端当前正在运行！`);
+    console.error(`为保护未保存的工作，安装器已安全暂停。请先手动退出客户端，或附加 --force 参数执行。`);
+    return false;
+  }
+
+  console.log(`\n⚠️ 检测到 ${appName} 客户端当前正在运行！`);
+  console.log(`为避免文件写入冲突并保护您正在进行的对话与未保存工作，请确认是否允许关闭客户端继续？`);
+  process.stdout.write(`👉 输入 [y/N] 确认关闭并继续 (默认 N 取消): `);
+
+  try {
+    const buffer = Buffer.alloc(1024);
+    const bytesRead = fs.readSync(0, buffer, 0, 1024, null);
+    const answer = buffer.toString('utf8', 0, bytesRead).trim().toLowerCase();
+    if (answer === 'y' || answer === 'yes') {
+      return true;
+    }
+  } catch (e) {}
+
+  return false;
+}
+
+function closeAntigravitySafely() {
+  try {
+    if (os.platform() === 'win32') {
+      execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
+    } else {
+      execSync('pkill -i antigravity || true', { stdio: 'ignore' });
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
 // 计算 ASAR 内容指纹，用于版本化纯净备份（官方升级后指纹变化即重建基线）
 function getAsarFingerprint(asarPath) {
   try {
@@ -283,16 +324,15 @@ function install(customPath) {
 
   const asarPath = preflight.asarPath;
 
-  // 只有在未指定 customPath（即针对当前本机默认宿主安装）时，才执行全局进程释放
+  // 只有在未指定 customPath（即针对当前本机默认宿主安装）时，才检测并征求用户同意后安全退出客户端
   if (!customPath && isProcessRunning()) {
-    console.log('\n⚠️ 检测到 Antigravity 客户端当前正在运行，正在安全退出释放文件锁...');
-    try {
-      if (os.platform() === 'win32') {
-        execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
-      } else {
-        execSync('pkill -i antigravity || true', { stdio: 'ignore' });
-      }
-    } catch (e) {}
+    const shouldClose = confirmCloseClient('Antigravity');
+    if (!shouldClose) {
+      console.log('\nℹ️ 已安全取消安装。请在保存工作并退出 Antigravity 客户端后重新执行。');
+      process.exit(0);
+    }
+    console.log('\n🔄 正在安全退出客户端以释放资源写入锁...');
+    closeAntigravitySafely();
   }
 
   const resourcesDir = path.dirname(asarPath);
@@ -479,14 +519,13 @@ function restore(customPath) {
 
   // 1. 进程占用检测与文件锁释放 (仅在针对原生默认宿主路径时生效)
   if (!customPath && isProcessRunning()) {
-    console.log('⚠️ 检测到 Antigravity 客户端正在运行，正在安全释放文件锁...');
-    try {
-      if (os.platform() === 'win32') {
-        execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
-      } else {
-        execSync('pkill -i antigravity || true', { stdio: 'ignore' });
-      }
-    } catch (e) {}
+    const shouldClose = confirmCloseClient('Antigravity');
+    if (!shouldClose) {
+      console.log('\nℹ️ 已安全取消还原。请在保存工作并退出 Antigravity 客户端后重新执行。');
+      process.exit(0);
+    }
+    console.log('\n🔄 正在安全退出客户端以释放资源写入锁...');
+    closeAntigravitySafely();
   }
 
   console.log(`📦 正在从备份还原原始文件: ${backupPath}`);

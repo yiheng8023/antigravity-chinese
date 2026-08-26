@@ -1129,7 +1129,34 @@
     "Delete this project": "删除此项目",
     "Delete this project.": "删除此项目。",
     "Are you sure you want to delete this project?": "您确定要删除此项目吗？",
-    "This action cannot be undone.": "此操作不可撤销。"
+    "This action cannot be undone.": "此操作不可撤销。",
+    "Display Options": "显示选项",
+    "Group By": "分组依据",
+    "Sort Conversations": "会话排序",
+    "Last Updated": "最近更新",
+    "Last Prompt": "最近提示词",
+    "Alphabetical (A-Z)": "按字母顺序 (A-Z)",
+    "Date Added": "添加日期",
+    "Subtitles": "副标题",
+    "Worktree": "工作树",
+    "No Subtitle": "无副标题",
+    "View Split Diff": "分屏对比",
+    "View Unified Diff": "统一对比",
+    "View Inline Diff": "行内对比",
+    "Split Diff": "分屏差异",
+    "Unified Diff": "统一差异",
+    "Diff Options": "差异选项",
+    "Record Audio": "录制音频",
+    "Record Audio Ctrl+M": "录制音频 Ctrl+M",
+    "Record audio": "录制音频",
+    "Stop Recording": "停止录制",
+    "Stop recording": "停止录制",
+    "Create New Project": "新建项目",
+    "Create new project": "新建项目",
+    "Create New Conversation": "新建会话",
+    "Create new conversation": "新建会话",
+    "Create Conversation": "新建会话",
+    "Create conversation": "新建会话"
   },
   "patterns": [
     {
@@ -1311,6 +1338,16 @@
     {
       "regex": "\\bIt requires\\b",
       "replacement": "需要安装"
+    }
+  ],
+  "rules": [
+    {
+      "regex": "^Record Audio(\\s+Ctrl\\+[A-Za-z])$",
+      "replacement": "录制音频$1"
+    },
+    {
+      "regex": "^Create\\s+(?:New\\s+)?Project$",
+      "replacement": "新建项目"
     }
   ]
 }
