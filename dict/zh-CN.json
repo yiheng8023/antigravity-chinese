@@ -1181,7 +1181,26 @@
     "Add to Context": "添加到上下文",
     "Add to context": "添加到上下文",
     "Context Browser": "上下文浏览器",
-    "Context browser": "上下文浏览器"
+    "Context browser": "上下文浏览器",
+    "Keep Computer Awake": "保持电脑处于唤醒状态",
+    "Keep computer awake": "保持电脑处于唤醒状态",
+    "Keep computer awake while tasks are running": "在任务执行期间保持电脑处于唤醒状态",
+    "Run in Background": "在后台保持运行",
+    "Run in background": "在后台保持运行",
+    "Keep Antigravity running in the background": "在后台保持 Antigravity 运行",
+    "Auto Check for Updates": "自动检查更新",
+    "Automatically check for updates": "自动检查更新",
+    "No agents running": "暂无运行中的智能体",
+    "1 agent running": "1 个运行中的智能体",
+    "Confirm Quit": "确认退出",
+    "Are you sure you want to quit?": "您确定要退出吗？",
+    "There may be agents or background tasks running.": "当前可能仍有正在运行中的智能体或后台任务。",
+    "Checking for updates…": "正在检查更新...",
+    "Checking for updates...": "正在检查更新...",
+    "Downloading update…": "正在下载更新...",
+    "Downloading update...": "正在下载更新...",
+    "Restart to apply update": "重启以应用更新",
+    "Restart to apply updates": "重启以应用更新"
   },
   "patterns": [
     {
@@ -1385,6 +1404,10 @@
     {
       "regex": "^Add Context(\\s+.*)$",
       "replacement": "添加上下文$1"
+    },
+    {
+      "regex": "^(\\d+)\\s+agents?\\s+running$",
+      "replacement": "$1 个运行中的智能体"
     }
   ]
 }
