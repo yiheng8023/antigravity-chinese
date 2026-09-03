@@ -127,17 +127,18 @@ flowchart LR
 
 ## 🔌 Dual-Mode Architecture: Community Plugin Suite
 
-In addition to the host UI localization patch, this project includes a complete **Chinese Agent Enhancement Plugin** compliant with Antigravity specifications (located in [`plugins/chinese-toolkit/`](plugins/chinese-toolkit/)):
+In addition to the host UI localization patch, this project includes a complete **Chinese Agent Enhancement Plugin** compliant with Antigravity specifications (Plugin ID: `antigravity-chinese-toolkit`, located in [`plugins/chinese-toolkit/`](plugins/chinese-toolkit/)):
 
 ### Plugin Features
 - **Interaction & Engineering Rules (`rules/chinese-interaction-rules.md`)**: Configures agents for complete Simplified Chinese thinking, comments, and terminology preservation.
 - **I18n Diagnostics Skill (`skills/i18n-diagnostics/`)**: Equips agents with one-click health diagnosis, drift analysis (`scan:drift`), and test execution capabilities.
 
 ### Enabling the Plugin
-- **One-click Global Install (Recommended)**: Run `node cli.js install-plugin`
+- **One-click Global Install (Recommended)**: Run `node cli.js install-plugin` (or via `install.bat`)
 - **Manual Installation**: Copy `plugins/chinese-toolkit` to your global plugin directory:
   - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
   - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
+  - *Note: Antigravity identifies the plugin by the `name` field in `plugin.json` (`antigravity-chinese-toolkit`), while the folder directory can be `chinese-toolkit`.*
 
 ---
 

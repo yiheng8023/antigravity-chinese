@@ -133,17 +133,18 @@ flowchart LR
 
 ## 🔌 双模生态：Antigravity 社区智能体插件 (Community Plugin Suite)
 
-除了作为客户端宿主 UI 汉化补丁运行外，本项目还内置了完全符合 Antigravity 插件规范的**全栈中文智能体增强插件**（位于 [`plugins/chinese-toolkit/`](plugins/chinese-toolkit/)）：
+除了作为客户端宿主 UI 汉化补丁运行外，本项目还内置了完全符合 Antigravity 插件规范的**全栈中文智能体增强插件**（插件注册 ID：`antigravity-chinese-toolkit`，仓库源码位于 [`plugins/chinese-toolkit/`](plugins/chinese-toolkit/)）：
 
 ### 插件功能特性
 - **中文交互与工程规则 (`rules/chinese-interaction-rules.md`)**：规范智能体全流程简体中文思考、代码中文注释及严格的技术术语保留准则。
 - **本地化诊断技能 (`skills/i18n-diagnostics/`)**：为智能体赋能一键状态诊断、版本漂移分析（`scan:drift`）与自动化测试能力。
 
 ### 启用插件方式
-- **全局一键安装（推荐）**：运行 `node cli.js install-plugin`
+- **全局一键安装（推荐）**：运行 `node cli.js install-plugin`（执行 `install.bat` 时也会默认同步静默安装）
 - **手动启用**：将 `plugins/chinese-toolkit` 目录复制至本地全局插件目录：
   - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
   - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
+  - *注：Antigravity 识别插件注册名为 `plugin.json` 中的 `name` 字段（`antigravity-chinese-toolkit`），安装目录文件夹可为 `chinese-toolkit`。*
 
 ---
 
