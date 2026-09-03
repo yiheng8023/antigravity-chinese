@@ -1300,7 +1300,35 @@
     "Send Now": "立即发送",
     "Send now": "立即发送",
     "send now": "立即发送",
-    "SEND NOW": "立即发送"
+    "SEND NOW": "立即发送",
+    "No Project": "无项目关联",
+    "no project": "无项目关联",
+    "NO PROJECT": "无项目关联",
+    "Quick Start": "快速入门",
+    "quick start": "快速入门",
+    "Select Project": "选择项目",
+    "select project": "选择项目",
+    "Select Model": "选择模型",
+    "select model": "选择模型",
+    "Select Model to Send Message": "选择发送消息所用的模型",
+    "Select Project to associate": "选择要关联的项目",
+    "Copy 项目名称": "复制项目名称",
+    "Copy Project Name": "复制项目名称",
+    "copy project name": "复制项目名称",
+    "Copy project name": "复制项目名称",
+    "Copy Project Path": "复制项目路径",
+    "Copy project path": "复制项目路径",
+    "Pin": "置顶",
+    "pin": "置顶",
+    "PIN": "置顶",
+    "Unpin": "取消置顶",
+    "unpin": "取消置顶",
+    "UNPIN": "取消置顶",
+    "Pin Conversation": "置顶会话",
+    "Unpin Conversation": "取消置顶会话",
+    "Unpin conversation": "取消置顶会话",
+    "Cancel (Ctrl+D)": "取消 (Ctrl+D)",
+    "Cancel (Cmd+D)": "取消 (Cmd+D)"
   },
   "patterns": [
     {
@@ -1574,6 +1602,42 @@
     {
       "regex": "^Send\\s+Now$",
       "replacement": "立即发送"
+    },
+    {
+      "regex": "^Select\\s+Project(\\s+(?:Ctrl|Cmd|Alt|Shift)\\+[\\w;:,\\/\\+\\-]+)?$",
+      "replacement": "选择项目$1"
+    },
+    {
+      "regex": "^Select\\s+Model(\\s+(?:Ctrl|Cmd|Alt|Shift)\\+[\\w;:,\\/\\+\\-]+)?$",
+      "replacement": "选择模型$1"
+    },
+    {
+      "regex": "^No\\s+Project$",
+      "replacement": "无项目关联"
+    },
+    {
+      "regex": "^Quick\\s+Start$",
+      "replacement": "快速入门"
+    },
+    {
+      "regex": "^Copy\\s+项目名称$",
+      "replacement": "复制项目名称"
+    },
+    {
+      "regex": "^Copy\\s+Project\\s+Name$",
+      "replacement": "复制项目名称"
+    },
+    {
+      "regex": "^Cancel\\s*\\(((?:Ctrl|Cmd|Alt|Shift)\\+[\\w\\+\\-]+)\\)$",
+      "replacement": "取消 ($1)"
+    },
+    {
+      "regex": "^Pin$",
+      "replacement": "置顶"
+    },
+    {
+      "regex": "^Unpin$",
+      "replacement": "取消置顶"
     }
   ],
   "rules": [

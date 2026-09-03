@@ -23,7 +23,8 @@
 
   var I18N_DATA = root.__AGY_I18N_DATA__ || { exact: {}, patterns: [] };
   var exactDict = I18N_DATA.exact || {};
-  var patterns = (I18N_DATA.patterns || []).map(function (p) {
+  var allPatterns = (I18N_DATA.patterns || []).concat(I18N_DATA.rules || []);
+  var patterns = allPatterns.map(function (p) {
     return {
       regex: new RegExp(p.regex),
       replacement: p.replacement
@@ -133,13 +134,22 @@
       }
     }
 
-    // 3. 末尾标点容差
+    // 3. 末尾标点与快捷键后缀容差 (例如 "Cancel (Ctrl+D)", "Select Project Ctrl+;", "Record Audio:")
     var punctuationMatch = normalized.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
     if (punctuationMatch) {
       var base = punctuationMatch[1].trim();
       var punc = punctuationMatch[2];
       if (exactDict[base]) {
         return exactDict[base] + (punc === ':' ? '：' : punc);
+      }
+    }
+
+    var hotkeyMatch = normalized.match(/^([\w\s\-\/]+?)\s*(\((?:Ctrl|Cmd|Alt|Shift)\+[^\)]+\)|\b(?:Ctrl|Cmd|Alt|Shift)\+[\w;:,\\/+\-]+)$/i);
+    if (hotkeyMatch) {
+      var cmdBase = hotkeyMatch[1].trim();
+      var hotkey = hotkeyMatch[2].trim();
+      if (exactDict[cmdBase]) {
+        return exactDict[cmdBase] + (hotkey.charAt(0) === '(' ? ' ' + hotkey : ' ' + hotkey);
       }
     }
 
