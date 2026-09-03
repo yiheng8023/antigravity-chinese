@@ -1357,13 +1357,17 @@
     "Timed": "已计时",
     "Finished": "已完成",
     "finished": "已完成",
-    "Outside of Project": "项目外部",
-    "outside of project": "项目外部",
-    "OUTSIDE OF PROJECT": "项目外部",
-    "Inside of Project": "项目内部",
-    "inside of project": "项目内部",
+    "Outside of Project": "项目外",
+    "outside of project": "项目外",
+    "OUTSIDE OF PROJECT": "项目外",
+    "Inside of Project": "项目内",
+    "inside of project": "项目内",
     "Updated": "更新于",
-    "Created": "创建于"
+    "Created": "创建于",
+    "Outside of workspace": "工作区外",
+    "Outside of Workspace": "工作区外",
+    "Inside of workspace": "工作区内",
+    "Inside of Workspace": "工作区内"
   },
   "patterns": [
     {
@@ -1744,11 +1748,11 @@
     },
     {
       "regex": "^Outside\\s+of\\s+Project$",
-      "replacement": "项目外部"
+      "replacement": "项目外"
     },
     {
       "regex": "^Inside\\s+of\\s+Project$",
-      "replacement": "项目内部"
+      "replacement": "项目内"
     },
     {
       "regex": "^Updated\\s+(.*)$",
