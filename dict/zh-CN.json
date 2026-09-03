@@ -930,7 +930,7 @@
     "Run in background": "在后台保持运行",
     "Run in Background": "在后台保持运行",
     "Run in Isolated Environment": "在隔离环境中运行",
-    "Running": "运行中",
+    "Running": "正在运行",
     "Same Project": "同一项目",
     "Sandboxed": "沙箱模式",
     "Save": "保存",
@@ -1346,10 +1346,17 @@
     "1 task running": "1 个运行中的任务",
     "No tasks running": "暂无运行中的任务",
     "Ran": "已运行",
-    "Explored": "已浏览探索",
+    "Explored": "已浏览",
     "Edited": "已编辑",
     "Viewed": "已查看",
-    "Searched": "已搜索"
+    "Searched": "已搜索",
+    "Timer has expired": "定时器已到期",
+    "timer has expired": "定时器已到期",
+    "Timer expired": "定时器已到期",
+    "Timed out": "已超时",
+    "Timed": "已计时",
+    "Finished": "已完成",
+    "finished": "已完成"
   },
   "patterns": [
     {
@@ -1703,6 +1710,30 @@
     {
       "regex": "^Viewed\\s+(.*)$",
       "replacement": "已查看 $1"
+    },
+    {
+      "regex": "^Ran\\s+(\\d+)\\s+commands?$",
+      "replacement": "已运行 $1 个命令"
+    },
+    {
+      "regex": "^Explored\\s+(\\d+)\\s+tasks?$",
+      "replacement": "已查看 $1 个任务"
+    },
+    {
+      "regex": "^Timed\\s+(\\d+)\\s+seconds?$",
+      "replacement": "已计时 $1 秒"
+    },
+    {
+      "regex": "^Timed\\s+(\\d+)\\s+minutes?$",
+      "replacement": "已计时 $1 分钟"
+    },
+    {
+      "regex": "(:?\\s*)Timer has expired$",
+      "replacement": "$1定时器已到期"
+    },
+    {
+      "regex": "(\\s+)finished$",
+      "replacement": "$1已完成"
     }
   ],
   "rules": [
