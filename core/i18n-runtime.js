@@ -408,22 +408,30 @@
       startObserver();
     }
 
-    // Hook document.title
+    // 全局悬浮气泡 (Hover Tooltips / Popovers) 快速反应拦截器
+    // 专门防御光标移入时才动态挂载或改变属性的临时注释节点
     try {
-      var docProto = root.Document ? root.Document.prototype : Object.getPrototypeOf(doc);
-      var originalTitleDescriptor = Object.getOwnPropertyDescriptor(docProto, 'title');
-      if (originalTitleDescriptor && originalTitleDescriptor.set) {
-        Object.defineProperty(doc, 'title', {
-          set: function (newTitle) {
-            var translated = translateSingleUnit(newTitle);
-            originalTitleDescriptor.set.call(this, translated !== null ? translated : newTitle);
-          },
-          get: function () {
-            return originalTitleDescriptor.get.call(this);
-          },
-          configurable: true
-        });
-      }
+      var hoverScanTimer = null;
+      var onHoverAction = function (e) {
+        var target = e.target;
+        if (!target) return;
+        if (target.nodeType === 1) {
+          translateElement(target);
+          if (target.parentElement) {
+            translateElement(target.parentElement);
+          }
+        }
+        // 50ms 节流触发一次全量微扫描，兜底覆盖挂载在 body 顶部的 Portal/Tooltip 弹出框
+        if (!hoverScanTimer) {
+          hoverScanTimer = setTimeout(function () {
+            hoverScanTimer = null;
+            safeFullScan();
+          }, 60);
+        }
+      };
+
+      doc.addEventListener('pointerenter', onHoverAction, { capture: true, passive: true });
+      doc.addEventListener('mouseover', onHoverAction, { capture: true, passive: true });
     } catch (e) {}
   }
 

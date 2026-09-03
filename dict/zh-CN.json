@@ -841,7 +841,7 @@
     "Queue": "排队等待",
     "Queue Delivery": "排队消息发送",
     "Queue for Next Turn": "排队至下一轮",
-    "Queue message": "消息排队",
+    "Queue message": "排队消息",
     "Queued Messages": "排队消息",
     "Queued Messages Behavior": "排队消息处理行为",
     "Quit": "退出",
@@ -1239,7 +1239,31 @@
     "Steps to Reproduce": "重现步骤",
     "Steps to reproduce": "重现步骤",
     "steps to reproduce": "重现步骤",
-    "Steps To Reproduce": "重现步骤"
+    "Steps To Reproduce": "重现步骤",
+    "Queues after the turn": "轮次结束后进入排队",
+    "Sends immediately": "立即发送",
+    "On empty prompt, sends next in queue": "在输入框为空时，发送队列中的下一条消息",
+    "Enter Queues after the turn": "Enter 轮次结束后进入排队",
+    "Enter Sends immediately": "Enter 立即发送",
+    "Alt+Enter Sends immediately": "Alt+Enter 立即发送",
+    "Alt+Enter Queues after the turn": "Alt+Enter 轮次结束后进入排队",
+    "Alt+Enter On empty prompt, sends next in queue": "Alt+Enter 在输入框为空时发送队列中的下一条消息",
+    "Shift+Enter Sends immediately": "Shift+Enter 立即发送",
+    "Shift+Enter Queues after the turn": "Shift+Enter 轮次结束后进入排队",
+    "Cmd+Enter Sends immediately": "Cmd+Enter 立即发送",
+    "Cmd+Enter Queues after the turn": "Cmd+Enter 轮次结束后进入排队",
+    "Ctrl+Enter Sends immediately": "Ctrl+Enter 立即发送",
+    "Ctrl+Enter Queues after the turn": "Ctrl+Enter 轮次结束后进入排队",
+    "Press Enter to send": "按 Enter 发送",
+    "Press Shift+Enter for new line": "按 Shift+Enter 换行",
+    "Press Alt+Enter to queue": "按 Alt+Enter 排队",
+    "Queued message": "排队中的消息",
+    "Queue messages": "排队消息",
+    "Send message immediately": "立即发送消息",
+    "Send next message in queue": "发送队列中的下一条消息",
+    "Clear queue": "清空队列",
+    "Pause queue": "暂停队列",
+    "Resume queue": "恢复队列"
   },
   "patterns": [
     {
@@ -1449,6 +1473,30 @@
     {
       "regex": "^(?:Steps\\s+to\\s+[Rr]eproduce|STEPS\\s+TO\\s+REPRODUCE)\\b",
       "replacement": "重现步骤"
+    },
+    {
+      "regex": "^(Enter|Alt\\+Enter|Shift\\+Enter|Ctrl\\+Enter|Cmd\\+Enter)\\s+Queues after the turn$",
+      "replacement": "$1 轮次结束后进入排队"
+    },
+    {
+      "regex": "^(Enter|Alt\\+Enter|Shift\\+Enter|Ctrl\\+Enter|Cmd\\+Enter)\\s+Sends immediately$",
+      "replacement": "$1 立即发送"
+    },
+    {
+      "regex": "^(Enter|Alt\\+Enter|Shift\\+Enter|Ctrl\\+Enter|Cmd\\+Enter)\\s+On empty prompt,\\s*sends next in queue$",
+      "replacement": "$1 在输入框为空时发送队列中的下一条消息"
+    },
+    {
+      "regex": "^On empty prompt,\\s*sends next in queue$",
+      "replacement": "在输入框为空时发送队列中的下一条消息"
+    },
+    {
+      "regex": "^Queues after the turn$",
+      "replacement": "轮次结束后进入排队"
+    },
+    {
+      "regex": "^Sends immediately$",
+      "replacement": "立即发送"
     }
   ],
   "rules": [
