@@ -1235,7 +1235,11 @@
     "Attach a screenshot (optional)": "附上屏幕截图（可选）",
     "Attach a screenshot": "附上屏幕截图",
     "Attach screenshots": "附上屏幕截图",
-    "Attach screenshot (optional)": "附上屏幕截图（可选）"
+    "Attach screenshot (optional)": "附上屏幕截图（可选）",
+    "Steps to Reproduce": "重现步骤",
+    "Steps to reproduce": "重现步骤",
+    "steps to reproduce": "重现步骤",
+    "Steps To Reproduce": "重现步骤"
   },
   "patterns": [
     {
@@ -1441,6 +1445,10 @@
     {
       "regex": "Describe the bug you encountered\\.{0,3}",
       "replacement": "请详细描述您遇到的问题或缺陷…"
+    },
+    {
+      "regex": "^(?:Steps\\s+to\\s+[Rr]eproduce|STEPS\\s+TO\\s+REPRODUCE)\\b",
+      "replacement": "重现步骤"
     }
   ],
   "rules": [
