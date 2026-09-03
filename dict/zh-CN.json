@@ -226,7 +226,7 @@
     "Background color for code blocks in text.": "文本中代码块（Code Block）的背景颜色。",
     "Background Task Output": "后台任务输出",
     "Background Tasks": "后台任务",
-    "Bad response": "响应错误",
+    "Bad response": "不佳回答",
     "Balanced": "平衡模式",
     "Base URL": "基础请求 URL",
     "Best-of-N Ended": "多选最优模式已结束",
@@ -1328,7 +1328,28 @@
     "Unpin Conversation": "取消置顶会话",
     "Unpin conversation": "取消置顶会话",
     "Cancel (Ctrl+D)": "取消 (Ctrl+D)",
-    "Cancel (Cmd+D)": "取消 (Cmd+D)"
+    "Cancel (Cmd+D)": "取消 (Cmd+D)",
+    "Good response": "优质回答",
+    "good response": "优质回答",
+    "GOOD RESPONSE": "优质回答",
+    "bad response": "不佳回答",
+    "BAD RESPONSE": "不佳回答",
+    "Mark Unread": "标记为未读",
+    "mark unread": "标记为未读",
+    "MARK UNREAD": "标记为未读",
+    "Mark Read": "标记为已读",
+    "mark read": "标记为已读",
+    "MARK READ": "标记为已读",
+    "Copy Command": "复制命令",
+    "copy command": "复制命令",
+    "COPY COMMAND": "复制命令",
+    "1 task running": "1 个运行中的任务",
+    "No tasks running": "暂无运行中的任务",
+    "Ran": "已运行",
+    "Explored": "已浏览探索",
+    "Edited": "已编辑",
+    "Viewed": "已查看",
+    "Searched": "已搜索"
   },
   "patterns": [
     {
@@ -1638,6 +1659,50 @@
     {
       "regex": "^Unpin$",
       "replacement": "取消置顶"
+    },
+    {
+      "regex": "^Good\\s+response$",
+      "replacement": "优质回答"
+    },
+    {
+      "regex": "^Bad\\s+response$",
+      "replacement": "不佳回答"
+    },
+    {
+      "regex": "^Mark\\s+Unread$",
+      "replacement": "标记为未读"
+    },
+    {
+      "regex": "^Mark\\s+Read$",
+      "replacement": "标记为已读"
+    },
+    {
+      "regex": "^Copy\\s+Command$",
+      "replacement": "复制命令"
+    },
+    {
+      "regex": "^(\\d+)\\s+tasks?\\s+running$",
+      "replacement": "$1 个运行中的任务"
+    },
+    {
+      "regex": "^Ran\\s+(.*)$",
+      "replacement": "运行 $1"
+    },
+    {
+      "regex": "^Explored\\s+(\\d+)\\s+files?$",
+      "replacement": "已浏览探索 $1 个文件"
+    },
+    {
+      "regex": "^Explored\\s+(.*)$",
+      "replacement": "已浏览探索 $1"
+    },
+    {
+      "regex": "^Edited\\s+(.*)$",
+      "replacement": "已编辑 $1"
+    },
+    {
+      "regex": "^Viewed\\s+(.*)$",
+      "replacement": "已查看 $1"
     }
   ],
   "rules": [
