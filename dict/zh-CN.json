@@ -1356,7 +1356,14 @@
     "Timed out": "已超时",
     "Timed": "已计时",
     "Finished": "已完成",
-    "finished": "已完成"
+    "finished": "已完成",
+    "Outside of Project": "项目外部",
+    "outside of project": "项目外部",
+    "OUTSIDE OF PROJECT": "项目外部",
+    "Inside of Project": "项目内部",
+    "inside of project": "项目内部",
+    "Updated": "更新于",
+    "Created": "创建于"
   },
   "patterns": [
     {
@@ -1734,6 +1741,22 @@
     {
       "regex": "(\\s+)finished$",
       "replacement": "$1已完成"
+    },
+    {
+      "regex": "^Outside\\s+of\\s+Project$",
+      "replacement": "项目外部"
+    },
+    {
+      "regex": "^Inside\\s+of\\s+Project$",
+      "replacement": "项目内部"
+    },
+    {
+      "regex": "^Updated\\s+(.*)$",
+      "replacement": "更新于 $1"
+    },
+    {
+      "regex": "^Created\\s+(.*)$",
+      "replacement": "创建于 $1"
     }
   ],
   "rules": [
