@@ -292,7 +292,7 @@
     "Close Window": "关闭窗口",
     "Code Search": "代码搜索",
     "Collapse": "收起",
-    "Collapse All": "全部折叠",
+    "Collapse All": "全部收起",
     "Collapse All Folders": "全部折叠文件夹",
     "Color Theme": "颜色主题",
     "Command Palette": "命令面板",
@@ -1205,7 +1205,17 @@
     "Your Plan: Google AI Pro": "当前方案：Google AI Pro",
     "Zoom In": "放大",
     "Zoom Level": "界面缩放",
-    "Zoom Out": "缩小"
+    "Zoom Out": "缩小",
+    "Learn More": "了解更多",
+    "Show More": "显示更多",
+    "Hide details": "隐藏详情",
+    "Hide Details": "隐藏详情",
+    "Show details": "显示详情",
+    "Show Details": "显示详情",
+    "More info": "更多信息",
+    "More Info": "更多信息",
+    "Collapse all": "全部收起",
+    "Expand all": "全部展开"
   },
   "patterns": [
     {
