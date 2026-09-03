@@ -1278,7 +1278,21 @@
     "Inherits your default settings": "继承您的默认设置",
     "Inherits default settings": "继承默认设置",
     "When working in this project": "在此项目中工作时",
-    "When working in this project.": "在此项目中工作时。"
+    "When working in this project.": "在此项目中工作时。",
+    "Your quota for this model is running low.": "您在此模型上的剩余配额即将耗尽。",
+    "Your quota for this model is running low": "您在此模型上的剩余配额即将耗尽",
+    "Your quota for this model has run out.": "您在此模型上的配额已耗尽。",
+    "Your quota for this model has run out": "您在此模型上的配额已耗尽",
+    "Quota running low": "配额即将耗尽",
+    "Quota exceeded": "已超出配额",
+    "View Usage": "查看用量明细",
+    "View usage": "查看用量明细",
+    "view usage": "查看用量明细",
+    "View Usage Details": "查看用量详情",
+    "View Model Usage": "查看模型用量",
+    "Model Usage": "模型用量",
+    "Manage Models": "管理模型",
+    "Configure Models": "配置模型"
   },
   "patterns": [
     {
@@ -1528,6 +1542,18 @@
     {
       "regex": "\\bInherits\\s+your\\s+General\\s+settings\\b",
       "replacement": "继承您的“通用”设置"
+    },
+    {
+      "regex": "^Your\\s+quota\\s+for\\s+this\\s+model\\s+is\\s+running\\s+low\\.?",
+      "replacement": "您在此模型上的剩余配额即将耗尽。"
+    },
+    {
+      "regex": "^Your\\s+quota\\s+for\\s+this\\s+model\\s+has\\s+run\\s+out\\.?",
+      "replacement": "您在此模型上的配额已耗尽。"
+    },
+    {
+      "regex": "^View\\s+Usage\\b",
+      "replacement": "查看用量明细"
     }
   ],
   "rules": [
