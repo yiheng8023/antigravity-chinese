@@ -45,7 +45,7 @@
 
   var IGNORED_TAGS = {
     'SCRIPT': 1, 'STYLE': 1, 'CODE': 1, 'PRE': 1, 'NOSCRIPT': 1,
-    'TEXTAREA': 1, 'INPUT': 1, 'SVG': 1, 'PATH': 1, 'CANVAS': 1,
+    'SVG': 1, 'PATH': 1, 'CANVAS': 1,
     'IFRAME': 1, 'VIDEO': 1, 'AUDIO': 1
   };
 
@@ -107,9 +107,9 @@
     // 如果文本已经是翻译结果，直接跳过
     if (translatedValues[normalized]) return null;
 
-    // 官方原生已汉化文本探测与优雅让位：如果文本纯属中文无英文单词，优雅让位，绝不破坏官方中文
+    // 官方原生已汉化文本探测与优雅让位：仅当文本纯属中文无连续英文字母时才跳过；若含英文字母且词库有规则，绝不跳过！
     var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
-    if (cjkChars && cjkChars.length >= 1 && !exactDict[normalized] && !/[a-zA-Z]{2,}/.test(normalized)) {
+    if (cjkChars && cjkChars.length >= 1 && !/[a-zA-Z]{2,}/.test(normalized)) {
       return null;
     }
 
@@ -207,7 +207,7 @@
   function translateTextNode(node) {
     if (!node || node.nodeType !== 3) return;
     var parent = node.parentElement || node.parentNode;
-    if (parent && shouldIgnoreElement(parent)) return;
+    if (parent && (shouldIgnoreElement(parent) || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) return;
 
     var original = node.nodeValue;
     if (!original || !original.trim()) return;

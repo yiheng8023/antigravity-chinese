@@ -59,7 +59,7 @@
     "Activity bar item foreground color when it is inactive. The activity bar is showing on the far left or right and allows to switch between views of the side bar.": "活动栏项处于非活动状态时的前景文本颜色。活动栏显示在最左侧或最右侧，用于在侧边栏的视图之间进行切换。",
     "Activity notification badge background color. The activity bar is showing on the far left or right and allows to switch between views of the side bar.": "活动栏通知角标的背景颜色。活动栏显示在最左侧或最右侧，用于在侧边栏的视图之间进行切换。",
     "Activity notification badge foreground color. The activity bar is showing on the far left or right and allows to switch between views of the side bar.": "活动栏通知角标的前景文本颜色。活动栏显示在最左侧或最右侧，用于在侧边栏的视图之间进行切换。",
-    "Actual behavior": "实际行为",
+    "Actual behavior": "实际表现",
     "Actuation": "操作执行",
     "Actuation Permissions": "操作执行权限",
     "Add": "添加",
@@ -1215,7 +1215,27 @@
     "More info": "更多信息",
     "More Info": "更多信息",
     "Collapse all": "全部收起",
-    "Expand all": "全部展开"
+    "Expand all": "全部展开",
+    "for quick navigation and control.": "用于快速导航和操作控制。",
+    "快捷键 for quick navigation and control.": "快捷键，用于快速导航和操作控制。",
+    "LAYOUT CONTROLS": "布局控制",
+    "Layout Controls": "布局控制",
+    "Layout controls": "布局控制",
+    "Feedback Type": "反馈类型",
+    "Bug Report": "问题报告 (Bug)",
+    "Feature Request": "功能建议 (Feature)",
+    "General Feedback": "通用反馈",
+    "Please describe the issue in detail. The more actionable your feedback, the quicker our team can address your request. Some helpful information includes:": "请详细描述您遇到的问题。您的反馈越具体详实，我们的团队就能越快跟进解决。建议包含以下信息：",
+    "Steps to reproduce the issue": "重现问题的操作步骤",
+    "Expected behavior": "预期表现",
+    "Any error messages": "任何错误提示或异常报错",
+    "Any relevant information": "其他任何相关信息或上下文",
+    "Describe the bug you encountered...": "请详细描述您遇到的问题或缺陷…",
+    "Please list the steps to reproduce the issue": "请列出重现该问题的具体操作步骤…",
+    "Attach a screenshot (optional)": "附上屏幕截图（可选）",
+    "Attach a screenshot": "附上屏幕截图",
+    "Attach screenshots": "附上屏幕截图",
+    "Attach screenshot (optional)": "附上屏幕截图（可选）"
   },
   "patterns": [
     {
@@ -1397,6 +1417,30 @@
     {
       "regex": "\\bIt requires\\b",
       "replacement": "需要安装"
+    },
+    {
+      "regex": "^快捷键\\s*for quick navigation and control\\.?$",
+      "replacement": "快捷键，用于快速导航和操作控制。"
+    },
+    {
+      "regex": "^(?:Shortcuts\\s+)?for quick navigation and control\\.?$",
+      "replacement": "用于快速导航和操作控制。"
+    },
+    {
+      "regex": "^(?:LAYOUT|Layout)\\s+CONTROLS$",
+      "replacement": "布局控制"
+    },
+    {
+      "regex": "Attach (?:a )?screenshot(?:s)?\\s*\\(optional\\)",
+      "replacement": "附上屏幕截图（可选）"
+    },
+    {
+      "regex": "Please list the steps to reproduce the issue\\.?",
+      "replacement": "请列出重现该问题的具体操作步骤…"
+    },
+    {
+      "regex": "Describe the bug you encountered\\.{0,3}",
+      "replacement": "请详细描述您遇到的问题或缺陷…"
     }
   ],
   "rules": [
