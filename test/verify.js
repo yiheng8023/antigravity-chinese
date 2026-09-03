@@ -153,7 +153,7 @@ function assert(condition, message) {
 
 console.log('--- 1. 验证侧边栏汉化 ---');
 assert(win.document.querySelector('.sidebar .new-chat-btn').textContent.includes('新建对话'), '侧边栏按钮 "+ New Chat" -> "+ 新建对话"');
-assert(win.document.querySelector('.sidebar').textContent.includes('会话历史'), '侧边栏 "Conversation History" -> "会话历史"');
+assert(win.document.querySelector('.sidebar').textContent.includes('历史会话'), '侧边栏 "Conversation History" -> "历史会话"');
 assert(win.document.querySelector('.sidebar').textContent.includes('定时任务'), '侧边栏 "Scheduled Tasks" -> "定时任务"');
 assert(win.document.querySelector('.sidebar').textContent.includes('项目列表'), '侧边栏 "Projects" -> "项目列表"');
 assert(win.document.querySelector('.sidebar').textContent.includes('安装 IDE'), '侧边栏 "Install IDE" -> "安装 IDE"');

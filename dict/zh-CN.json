@@ -352,7 +352,7 @@
     "Controls whether terminal commands require your approval before running.": "控制终端命令在执行前是否需要您的批准。",
     "Controls whether the agent can run custom JavaScript to automate complex browser actions.": "控制智能体是否可以运行自定义 JavaScript 来实现复杂的浏览器自动化操作。",
     "Conversation": "会话",
-    "Conversation History": "会话历史",
+    "Conversation History": "历史会话",
     "Conversation ID": "会话 ID",
     "Conversation Name": "会话名称",
     "Conversation picker": "会话选择器",
@@ -750,7 +750,7 @@
     "Open Command Palette": "打开命令面板",
     "Open Commit Graph": "打开提交历史图",
     "Open Conversation": "打开会话",
-    "Open Conversation History": "打开会话历史",
+    "Open Conversation History": "打开历史会话",
     "Open Conversation Picker": "打开会话选择器",
     "Open File": "打开文件",
     "Open File Search": "打开文件搜索",
@@ -1292,7 +1292,15 @@
     "View Model Usage": "查看模型用量",
     "Model Usage": "模型用量",
     "Manage Models": "管理模型",
-    "Configure Models": "配置模型"
+    "Configure Models": "配置模型",
+    "Sends after agent finishes working": "智能体结束工作后发送",
+    "sends after agent finishes working": "智能体结束工作后发送",
+    "Sends after agent finishes": "智能体结束后发送",
+    "Sends after agent": "智能体结束后发送",
+    "Send Now": "立即发送",
+    "Send now": "立即发送",
+    "send now": "立即发送",
+    "SEND NOW": "立即发送"
   },
   "patterns": [
     {
@@ -1554,6 +1562,18 @@
     {
       "regex": "^View\\s+Usage\\b",
       "replacement": "查看用量明细"
+    },
+    {
+      "regex": "\\bSends\\s+after\\s+agent\\s+finishes\\s+working\\b",
+      "replacement": "智能体结束工作后发送"
+    },
+    {
+      "regex": "^Sends\\s+after\\s+agent\\s+finishes\\s+working[。.]?$",
+      "replacement": "智能体结束工作后发送"
+    },
+    {
+      "regex": "^Send\\s+Now$",
+      "replacement": "立即发送"
     }
   ],
   "rules": [
