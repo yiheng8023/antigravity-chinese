@@ -1263,7 +1263,22 @@
     "Send next message in queue": "发送队列中的下一条消息",
     "Clear queue": "清空队列",
     "Pause queue": "暂停队列",
-    "Resume queue": "恢复队列"
+    "Resume queue": "恢复队列",
+    "Models within this group:": "该分组包含的模型：",
+    "Models within this group": "该分组包含的模型",
+    "Models in this group:": "该分组包含的模型：",
+    "Models in this group": "该分组包含的模型",
+    "Inherits your General settings 在此项目中工作时.": "在此项目中工作时，继承您的“通用”设置。",
+    "Inherits your General settings 在此项目中工作时": "在此项目中工作时，继承您的“通用”设置",
+    "Inherits your General settings": "继承您的“通用”设置",
+    "Inherits your General settings.": "继承您的“通用”设置。",
+    "Inherits General settings": "继承“通用”设置",
+    "Inherits General settings.": "继承“通用”设置。",
+    "Inherits your general settings": "继承您的“通用”设置",
+    "Inherits your default settings": "继承您的默认设置",
+    "Inherits default settings": "继承默认设置",
+    "When working in this project": "在此项目中工作时",
+    "When working in this project.": "在此项目中工作时。"
   },
   "patterns": [
     {
@@ -1497,6 +1512,22 @@
     {
       "regex": "^Sends immediately$",
       "replacement": "立即发送"
+    },
+    {
+      "regex": "^Models\\s+within\\s+this\\s+group:?\\s*(.*)$",
+      "replacement": "该分组包含的模型：$1"
+    },
+    {
+      "regex": "^Inherits\\s+your\\s+General\\s+settings\\s*在此项目中工作时[。.]?$",
+      "replacement": "在此项目中工作时，继承您的“通用”设置。"
+    },
+    {
+      "regex": "^Inherits\\s+(?:your\\s+)?(?:General|default)\\s+settings[。.]?$",
+      "replacement": "继承您的“通用”设置。"
+    },
+    {
+      "regex": "\\bInherits\\s+your\\s+General\\s+settings\\b",
+      "replacement": "继承您的“通用”设置"
     }
   ],
   "rules": [

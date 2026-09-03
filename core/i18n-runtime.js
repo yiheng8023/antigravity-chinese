@@ -182,12 +182,22 @@
       }
     }
 
-    // 5. 多词复合子短语全量替换（仅对包含空格的多词短语或超长固定短语生效，杜绝单个单词误伤用户自定义标题）
+    // 5. 多词复合子短语与动态正则全量级联替换（杜绝单个孤立单词误伤，精准捕获中英混排长句）
     var processed = normalized;
     var modified = false;
+
+    // 先跑 patterns 动态正则替换
+    for (var pi = 0; pi < patterns.length; pi++) {
+      if (patterns[pi].regex.test(processed)) {
+        processed = processed.replace(patterns[pi].regex, patterns[pi].replacement);
+        modified = true;
+      }
+    }
+
+    // 再跑多词短语替换
     for (var j = 0; j < sortedExactKeys.length; j++) {
       var key = sortedExactKeys[j];
-      if ((key.indexOf(' ') !== -1 || key.length >= 15) && processed.indexOf(key) !== -1) {
+      if ((key.indexOf(' ') !== -1 || key.length >= 12) && processed.indexOf(key) !== -1) {
         processed = processed.split(key).join(exactDict[key]);
         modified = true;
       }
@@ -223,8 +233,6 @@
     if (translated !== null && translated !== trimmed) {
       node.nodeValue = leadingSpace + translated + trailingSpace;
       node._agyOriginal = node.nodeValue; // 记录翻译后的值，防止重复处理
-    } else {
-      node._agyOriginal = original; // 记录已检查过
     }
   }
 
@@ -250,8 +258,6 @@
           if (trans !== null && trans !== val) {
             el.setAttribute(attr, trans);
             el[markKey] = trans; // 标记已翻译的值
-          } else {
-            el[markKey] = val; // 标记已检查
           }
         }
       }
@@ -421,12 +427,16 @@
             translateElement(target.parentElement);
           }
         }
-        // 50ms 节流触发一次全量微扫描，兜底覆盖挂载在 body 顶部的 Portal/Tooltip 弹出框
+        // 即时扫描 body 最后一个子元素（通常是 Portal/Tooltip 容器挂载点）
+        if (doc.body && doc.body.lastElementChild) {
+          translateElement(doc.body.lastElementChild);
+        }
+        // 级联防抖/多级扫描：在 16ms 和 60ms 各触发一次，确保异步动态渲染的气泡完全被捕获
         if (!hoverScanTimer) {
           hoverScanTimer = setTimeout(function () {
             hoverScanTimer = null;
             safeFullScan();
-          }, 60);
+          }, 20);
         }
       };
 
