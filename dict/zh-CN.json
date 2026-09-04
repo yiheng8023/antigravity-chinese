@@ -1383,7 +1383,20 @@
     "Inherits your \"General\" settings when working in this project.": "在此项目中工作时，继承您的“通用”设置。",
     "Inherits your \"General\" settings when working in this project": "在此项目中工作时，继承您的“通用”设置",
     "继承您的“通用”设置 when working in this project.": "在此项目中工作时，继承您的“通用”设置。",
-    "继承您的“通用”设置 when working in this project": "在此项目中工作时，继承您的“通用”设置"
+    "继承您的“通用”设置 when working in this project": "在此项目中工作时，继承您的“通用”设置",
+    "Tool Permissions": "工具权限",
+    "Modify permissions for file, terminal, and MCP tools.": "修改文件、终端及 MCP 工具的访问权限。",
+    "Modify permissions for file, terminal, and MCP tools": "修改文件、终端及 MCP 工具的访问权限",
+    "Controls the actions the agent can take.": "控制智能体可以执行的操作。",
+    "Controls the actions the agent can take": "控制智能体可以执行的操作",
+    "Whether the agent asks you to review its documents.": "智能体在创建产物文档时是否请求您审查。",
+    "Whether the agent asks you to review its documents": "智能体在创建产物文档时是否请求您审查",
+    "Browser settings have moved": "浏览器设置已迁移",
+    "Browser settings have moved to the Browser section of General settings.": "浏览器设置已迁移至“通用设置”中的“浏览器”板块。",
+    "Browser settings have moved to the Browser section of General settings": "浏览器设置已迁移至“通用设置”中的“浏览器”板块",
+    "Go to General settings": "前往通用设置",
+    "Browser settings have moved to the Browser section of General settings. Go to General settings": "浏览器设置已迁移至“通用设置”中的“浏览器”板块。前往通用设置",
+    "Browser settings have moved to the Browser section of General settings. Go to General settings.": "浏览器设置已迁移至“通用设置”中的“浏览器”板块。前往通用设置。"
   },
   "patterns": [
     {
@@ -1789,6 +1802,30 @@
     {
       "regex": "\\bwhen working in this project\\.?",
       "replacement": "在此项目中工作时。"
+    },
+    {
+      "regex": "^Tool\\s+Permissions$",
+      "replacement": "工具权限"
+    },
+    {
+      "regex": "^Controls\\s+the\\s+actions\\s+the\\s+agent\\s+can\\s+take[。.]?$",
+      "replacement": "控制智能体可以执行的操作。"
+    },
+    {
+      "regex": "^Whether\\s+the\\s+agent\\s+asks\\s+you\\s+to\\s+review\\s+its\\s+documents[。.]?$",
+      "replacement": "智能体在创建产物文档时是否请求您审查。"
+    },
+    {
+      "regex": "^Browser\\s+settings\\s+have\\s+moved$",
+      "replacement": "浏览器设置已迁移"
+    },
+    {
+      "regex": "Browser\\s+settings\\s+have\\s+moved\\s+to\\s+the\\s+Browser\\s+section\\s+of\\s+General\\s+settings\\.?",
+      "replacement": "浏览器设置已迁移至“通用设置”中的“浏览器”板块。"
+    },
+    {
+      "regex": "^Go\\s+to\\s+General\\s+settings$",
+      "replacement": "前往通用设置"
     }
   ],
   "rules": [
