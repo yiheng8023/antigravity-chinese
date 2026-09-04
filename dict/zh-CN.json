@@ -1367,7 +1367,23 @@
     "Outside of workspace": "工作区外",
     "Outside of Workspace": "工作区外",
     "Inside of workspace": "工作区内",
-    "Inside of Workspace": "工作区内"
+    "Inside of Workspace": "工作区内",
+    "Install Antigravity IDE to run and edit your workspace scripts.": "安装 Antigravity IDE 以运行和编辑您的工作区脚本。",
+    "Install Antigravity IDE to run and edit your workspace scripts": "安装 Antigravity IDE 以运行和编辑您的工作区脚本",
+    "Manually customize individual settings.": "手动自定义各项设置。",
+    "Manually customize individual settings": "手动自定义各项设置",
+    "Refresh quota and credits data": "刷新配额与积分数据",
+    "Refresh quota and credits data.": "刷新配额与积分数据。",
+    "Block all browser JavaScript execution.": "禁止执行所有浏览器 JavaScript 脚本。",
+    "Block all browser JavaScript execution": "禁止执行所有浏览器 JavaScript 脚本",
+    "Prompt for approval before running browser scripts.": "在运行浏览器脚本前提示以征得批准。",
+    "Prompt for approval before running browser scripts": "在运行浏览器脚本前提示以征得批准",
+    "Inherits your “General” settings when working in this project.": "在此项目中工作时，继承您的“通用”设置。",
+    "Inherits your “General” settings when working in this project": "在此项目中工作时，继承您的“通用”设置",
+    "Inherits your \"General\" settings when working in this project.": "在此项目中工作时，继承您的“通用”设置。",
+    "Inherits your \"General\" settings when working in this project": "在此项目中工作时，继承您的“通用”设置",
+    "继承您的“通用”设置 when working in this project.": "在此项目中工作时，继承您的“通用”设置。",
+    "继承您的“通用”设置 when working in this project": "在此项目中工作时，继承您的“通用”设置"
   },
   "patterns": [
     {
@@ -1761,6 +1777,18 @@
     {
       "regex": "^Created\\s+(.*)$",
       "replacement": "创建于 $1"
+    },
+    {
+      "regex": "继承您的“通用”设置\\s+when working in this project\\.?",
+      "replacement": "在此项目中工作时，继承您的“通用”设置。"
+    },
+    {
+      "regex": "Inherits\\s+your\\s+[“\\\"]?General[”\\\"]?\\s+settings\\s+when working in this project\\.?",
+      "replacement": "在此项目中工作时，继承您的“通用”设置。"
+    },
+    {
+      "regex": "\\bwhen working in this project\\.?",
+      "replacement": "在此项目中工作时。"
     }
   ],
   "rules": [

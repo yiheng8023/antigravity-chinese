@@ -1,6 +1,6 @@
 {
   "name": "antigravity-chinese",
-  "version": "3.2.26",
+  "version": "3.2.27",
   "description": "Google Antigravity 2.0 桌面客户端轻量级中文汉化工具包 (Cross-Platform Localization Tool for Google Antigravity)",
   "main": "cli.js",
   "engines": {
