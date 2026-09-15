@@ -1486,9 +1486,9 @@
     "Window Controls": "窗口控制按钮",
     "Word Wrap": "自动换行",
     "Work with local agents from another device.": "从其他设备与本地智能体协同工作。",
-    "Working": "正在处理",
+    "Working": "正在运行",
     "Working Changes": "工作区变更",
-    "Working...": "处理中...",
+    "Working...": "正在运行...",
     "Workspace": "工作区",
     "Workspace Command Access": "工作区命令访问权限",
     "Workspace File Access": "工作区文件访问权限",
@@ -1565,7 +1565,44 @@
     "浅色主题": "浅色主题",
     "深色主题": "深色主题",
     "继承您的“通用”设置 when working in this project": "在此项目中工作时，继承您的“通用”设置",
-    "继承您的“通用”设置 when working in this project.": "在此项目中工作时，继承您的“通用”设置。"
+    "继承您的“通用”设置 when working in this project.": "在此项目中工作时，继承您的“通用”设置。",
+    "Compacting": "正在压缩上下文",
+    "Agent Stopped": "智能体已停止",
+    "Killed": "已终止",
+    "External tools the agent can call via Model Context Protocol.": "智能体可通过模型上下文协议 (Model Context Protocol) 调用的外部工具。",
+    "Configure MCP Server": "配置 MCP 服务",
+    "Enter the required configuration values to install this MCP server.": "输入安装此 MCP 服务所需的配置参数。",
+    "Could not determine MCP config file path. Please check your home directory settings.": "无法确定 MCP 配置文件路径，请检查您的用户主目录设置。",
+    "Could not read MCP config file": "无法读取 MCP 配置文件",
+    "Could not determine MCP config file path": "无法确定 MCP 配置文件路径",
+    "Failed to load MCP servers": "加载 MCP 服务失败",
+    "Failed to fetch available MCP servers:": "获取可用 MCP 服务失败：",
+    "Search MCP servers by name": "按名称搜索 MCP 服务",
+    "MCP Install Error:": "MCP 安装错误：",
+    "Loading MCP servers...": "正在加载 MCP 服务...",
+    "Search for MCP servers to add to your configuration": "搜索 MCP 服务以添加到您的配置中",
+    "? This will remove it from your MCP configuration.": "？这将从您的 MCP 配置中将其移除。",
+    "No method available to open MCP config file": "没有可用于打开 MCP 配置文件的关联程序",
+    "Failed to open MCP config file": "打开 MCP 配置文件失败",
+    "Your administrator has disabled MCP servers for this workspace.": "您的管理员已禁用此工作区的 MCP 服务。",
+    "No MCP servers yet. Use Add to browse the store.": "暂无 MCP 服务。使用“添加”浏览应用商店。",
+    "MCP Configuration Error:": "MCP 配置错误：",
+    "Unnamed MCP server": "未命名 MCP 服务",
+    "Unnamed MCP Server": "未命名 MCP 服务",
+    "Install this plugin to see the commands it adds, along with its skills, agents and MCP servers.": "安装此插件以查看其添加的命令，以及其包含的技能、智能体和 MCP 服务。",
+    "Error while running MCP tool": "运行 MCP 工具时出错",
+    "Used MCP tool": "已使用 MCP 工具",
+    "MCP tool": "MCP 工具",
+    "Execute an MCP tool call": "执行 MCP 工具调用",
+    "Plugins are packaged collections of skills and MCPs to help the Agent": "插件是技能与 MCP 的打包集合，用于辅助智能体",
+    "Plugins are packaged collections of skills and MCPs to help the Agent in ": "插件是技能与 MCP 的打包集合，用于在此环境中辅助智能体 ",
+    "MCP Servers Disabled": "MCP 服务已禁用",
+    "Use Add MCP to browse the store.": "使用“添加 MCP”浏览应用商店。",
+    " Organization MCP Allowlist (Read-Only)": " 组织 MCP 允许名单（只读）",
+    "These MCP allowlist rules are enforced by your organization": "这些 MCP 允许名单规则由您的组织强制执行",
+    "using this MCP tool": "使用此 MCP 工具",
+    "Error fetching MCP prompt": "获取 MCP 提示词出错",
+    "Enter tool name or server...": "输入工具名称或服务..."
   },
   "patterns": [
     {
@@ -1995,6 +2032,62 @@
     {
       "regex": "^Go\\s+to\\s+General\\s+settings$",
       "replacement": "前往通用设置"
+    },
+    {
+      "regex": "^Worked\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "已运行 $1 小时 $2 分 $3 秒"
+    },
+    {
+      "regex": "^Worked\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+      "replacement": "已运行 $1 小时 $2 分钟"
+    },
+    {
+      "regex": "^Worked\\s+for\\s+(\\d+)\\s*h$",
+      "replacement": "已运行 $1 小时"
+    },
+    {
+      "regex": "^Worked\\s+for\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "已运行 $1 分 $2 秒"
+    },
+    {
+      "regex": "^Worked\\s+for\\s+(\\d+)\\s*m$",
+      "replacement": "已运行 $1 分钟"
+    },
+    {
+      "regex": "^Worked\\s+for\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "已运行 $1 秒"
+    },
+    {
+      "regex": "^Stopped\\s+after\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "在 $1 小时 $2 分 $3 秒后停止"
+    },
+    {
+      "regex": "^Stopped\\s+after\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+      "replacement": "在 $1 小时 $2 分钟后停止"
+    },
+    {
+      "regex": "^Stopped\\s+after\\s+(\\d+)\\s*h$",
+      "replacement": "在 $1 小时后停止"
+    },
+    {
+      "regex": "^Stopped\\s+after\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "在 $1 分 $2 秒后停止"
+    },
+    {
+      "regex": "^Stopped\\s+after\\s+(\\d+)\\s*m$",
+      "replacement": "在 $1 分钟后停止"
+    },
+    {
+      "regex": "^Stopped\\s+after\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "在 $1 秒后停止"
+    },
+    {
+      "regex": "^Message\\s+from\\s+(.+)$",
+      "replacement": "来自 $1 的消息"
+    },
+    {
+      "regex": "^Executing\\s+task:\\s+(.+)$",
+      "replacement": "正在执行任务: $1"
     }
   ],
   "rules": [

@@ -196,6 +196,20 @@ console.log('\n--- 4. 验证代码保护机制（确保不误伤代码与终端�
 const codeContent = win.document.querySelector('.monaco-editor code').textContent;
 assert(codeContent === 'const isPending = false; // Queue and Send Immediately', 'Monaco Editor 与代码区内容被严格保护，未被误翻译！');
 
+console.log('\n--- 4.1 验证智能体状态机与 MCP 工具全量汉化 ---');
+const translate = win.__AGY_TRANSLATE_UNIT__;
+assert(translate('Worked for 1s') === '已运行 1 秒', '"Worked for 1s" -> "已运行 1 秒"');
+assert(translate('Worked for 12s') === '已运行 12 秒', '"Worked for 12s" -> "已运行 12 秒"');
+assert(translate('Worked for 1m') === '已运行 1 分钟', '"Worked for 1m" -> "已运行 1 分钟"');
+assert(translate('Worked for 1m 24s') === '已运行 1 分 24 秒', '"Worked for 1m 24s" -> "已运行 1 分 24 秒"');
+assert(translate('Stopped after 1s') === '在 1 秒后停止', '"Stopped after 1s" -> "在 1 秒后停止"');
+assert(translate('Stopped after 1m 24s') === '在 1 分 24 秒后停止', '"Stopped after 1m 24s" -> "在 1 分 24 秒后停止"');
+assert(translate('Message from Deep Investigator (DeepInvestigator)') === '来自 Deep Investigator (DeepInvestigator) 的消息', '"Message from ..." 消息折叠栏汉化通过');
+assert(translate('Working...') === '正在运行...', '"Working..." 状态汉化通过');
+assert(translate('External tools the agent can call via Model Context Protocol.') === '智能体可通过模型上下文协议 (Model Context Protocol) 调用的外部工具。', 'MCP 权限卡片说明汉化通过');
+assert(translate('Configure MCP Server') === '配置 MCP 服务', 'MCP 服务配置项汉化通过');
+assert(translate('Search MCP servers by name') === '按名称搜索 MCP 服务', 'MCP 搜索项汉化通过');
+
 console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');
 const pluginJsonPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'plugin.json');
 assert(fs.existsSync(pluginJsonPath), '插件清单 plugins/chinese-toolkit/plugin.json 存在');

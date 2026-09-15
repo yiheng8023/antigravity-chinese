@@ -1,6 +1,6 @@
 {
   "name": "antigravity-chinese",
-  "version": "3.2.32",
+  "version": "3.2.33",
   "description": "Google Antigravity 2.0 桌面客户端轻量级中文汉化工具包 (Cross-Platform Localization Tool for Google Antigravity)",
   "main": "cli.js",
   "engines": {
@@ -26,13 +26,21 @@
     "restore": "node cli.js restore"
   },
   "keywords": [
+    "chinese",
+    "zh-cn",
+    "i18n",
+    "localization",
+    "electron",
+    "windows",
+    "macos",
+    "linux",
+    "self-healing",
+    "electron-patch",
     "antigravity",
     "google-antigravity",
-    "localization",
-    "chinese",
-    "electron",
-    "i18n",
-    "zh-cn"
+    "antigravity-ide",
+    "gemini",
+    "ai-agent"
   ],
   "author": "Antigravity Open Source Community",
   "license": "MIT",

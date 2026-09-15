@@ -343,15 +343,35 @@
     reconnectObserver();
   }
 
-  // ---- 节流：合并高频 mutation 到下一个 rAF ----
+  // ---- 节流与去重：合并高频 mutation 到下一个 rAF ----
   var pendingNodes = [];
+  var pendingNodeSet = typeof Set !== 'undefined' ? new Set() : null;
   var rafScheduled = false;
+
+  function enqueueNode(node) {
+    if (!node) return;
+    if (pendingNodeSet) {
+      if (pendingNodeSet.has(node)) return;
+      if (pendingNodes.length < 500) {
+        pendingNodes.push(node);
+        pendingNodeSet.add(node);
+      }
+    } else {
+      if (pendingNodes.length < 500) {
+        pendingNodes.push(node);
+      }
+    }
+  }
 
   function flushPendingNodes() {
     rafScheduled = false;
     if (pendingNodes.length === 0) return;
-    // 去重：最多处理 200 个节点，防止极端场景
     var batch = pendingNodes.splice(0, 200);
+    if (pendingNodeSet) {
+      for (var bIdx = 0; bIdx < batch.length; bIdx++) {
+        pendingNodeSet.delete(batch[bIdx]);
+      }
+    }
     safeTranslateNodes(batch);
     // 如果还有剩余，安排下一帧处理
     if (pendingNodes.length > 0) {
@@ -384,15 +404,13 @@
           if (mutation.type === 'childList') {
             var added = mutation.addedNodes;
             for (var j = 0; j < added.length; j++) {
-              if (pendingNodes.length < 500) {
-                pendingNodes.push(added[j]);
-              }
+              enqueueNode(added[j]);
             }
           } else if (mutation.type === 'characterData') {
             // 文本内容变化，重置标记使其可以被重新翻译
             if (mutation.target) {
               mutation.target._agyOriginal = undefined;
-              pendingNodes.push(mutation.target);
+              enqueueNode(mutation.target);
             }
           }
         }
@@ -428,6 +446,24 @@
     // 专门防御光标移入时才动态挂载或改变属性的临时注释节点
     try {
       var hoverScanTimer = null;
+      function scanFloatingContainers() {
+        if (!doc || !doc.body) return;
+        // 定向扫描顶层 Portal 容器、Tooltip、Popover 节点，绝不遍历整棵 DOM 树
+        var last = doc.body.lastElementChild;
+        if (last) {
+          translateElement(last);
+          if (last.previousElementSibling) {
+            translateElement(last.previousElementSibling);
+          }
+        }
+        var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [data-floating-ui-portal], .popover, .tooltip') : null;
+        if (tooltips && tooltips.length > 0) {
+          for (var tIdx = 0; tIdx < tooltips.length; tIdx++) {
+            translateElement(tooltips[tIdx]);
+          }
+        }
+      }
+
       var onHoverAction = function (e) {
         var target = e.target;
         if (!target) return;
@@ -437,16 +473,15 @@
             translateElement(target.parentElement);
           }
         }
-        // 即时扫描 body 最后一个子元素（通常是 Portal/Tooltip 容器挂载点）
-        if (doc.body && doc.body.lastElementChild) {
-          translateElement(doc.body.lastElementChild);
-        }
-        // 级联防抖/多级扫描：在 16ms 和 60ms 各触发一次，确保异步动态渲染的气泡完全被捕获
+        // 即时定向扫描浮动提示层
+        scanFloatingContainers();
+
+        // 异步微延迟再次定向扫描（捕获动态延迟 40ms 挂载的气泡），杜绝全局 safeFullScan() 引起的掉帧
         if (!hoverScanTimer) {
           hoverScanTimer = setTimeout(function () {
             hoverScanTimer = null;
-            safeFullScan();
-          }, 20);
+            scanFloatingContainers();
+          }, 40);
         }
       };
 
