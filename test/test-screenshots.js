@@ -168,7 +168,37 @@ const testCases = [
   "Configure external tools via Model Context Protocol.",
   "No MCP servers installed",
   "Build With Google Plugins",
-  "Browse and enable plugins from the Build With Google catalog."
+  "Browse and enable plugins from the Build With Google catalog.",
+
+  // Screenshot 7: Project Settings & Global Permissions (media_1789624999478.png)
+  "Inherit Global",
+  "Global Permissions",
+  "Project Permissions",
+  "Proceed in Sandbox",
+  "Require Review",
+  "Vetted (Preview)",
+  "Turbo",
+  "Always Proceed",
+  "Warning: \"Always Proceed\" is enabled without sandbox protection. This is very dangerous and we do not recommend doing this.",
+
+  // Screenshot 8: Right Drawer Panel & Media Time & Status Machine (media_1789625187011.png)
+  "Files Changed",
+  "Skills Used",
+  "See all (79)",
+  "(2 subagents)",
+  "Thought for 12.5s",
+  "Jan 15 - Feb 3",
+  "Sep 17, 2:25 PM",
+  "5 minutes ago",
+  "Just now",
+
+  // Battle Mode & Winner Survey
+  "Battle Mode",
+  "Best-of-N",
+  "Select Winner",
+  "Winner Survey",
+  "Both are good",
+  "Tie"
 ];
 
 console.log('Testing', testCases.length, 'cases from screenshots:');

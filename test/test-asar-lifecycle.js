@@ -58,10 +58,26 @@ function getWizardHtml() {
 }
 `;
 
+const origMainA = `"use strict";
+(0, tray_1.createTray)([
+  { id: 'running-agents', label: 'No agents running', enabled: false },
+  { label: \`Open \${electron_1.app.getName()}\` },
+  { label: 'Quit', click: () => { electron_1.app.quit(); } }
+]);
+`;
+
+const origTrayA = `"use strict";
+function updateTrayAgentCount(count) {
+  countItem.label = (count > 0 ? \`\${count}\` : 'No') + ' agent' + (count === 1 ? '' : 's') + ' running';
+}
+`;
+
 fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadA, 'utf-8');
 fs.writeFileSync(path.join(mockSrcDir, 'dist', 'menu.js'), origMenuA, 'utf-8');
 fs.writeFileSync(path.join(mockSrcDir, 'dist', 'ipcHandlers.js'), origIpcA, 'utf-8');
 fs.writeFileSync(path.join(mockSrcDir, 'dist', 'ideInstall', 'wizardHtml.js'), origWizardA, 'utf-8');
+fs.writeFileSync(path.join(mockSrcDir, 'dist', 'main.js'), origMainA, 'utf-8');
+fs.writeFileSync(path.join(mockSrcDir, 'dist', 'tray.js'), origTrayA, 'utf-8');
 
 try {
   // 2. 打包出真实的初始 app.asar (版本 A)
@@ -87,6 +103,10 @@ try {
   execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirA}"`, { stdio: 'ignore' });
   const restoredPreloadA = fs.readFileSync(path.join(unpackDirA, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadA === origPreloadA, '【P0 验证通过】二次安装后 restore 仍 100% 等于官方原版 A (未被已打补丁副本污染)');
+  const restoredMainA = fs.readFileSync(path.join(unpackDirA, 'dist', 'main.js'), 'utf-8');
+  assert(restoredMainA === origMainA, '【P0 验证通过】二次安装后 restore 的 main.js 仍 100% 等于官方原版 A');
+  const restoredTrayA = fs.readFileSync(path.join(unpackDirA, 'dist', 'tray.js'), 'utf-8');
+  assert(restoredTrayA === origTrayA, '【P0 验证通过】二次安装后 restore 的 tray.js 仍 100% 等于官方原版 A');
 
   // 5. 【P0 关键用例】模拟官方静默发版升级为版本 B
   console.log('\n📦 【阶段 2】模拟上游官方升级为全新版本 B...');

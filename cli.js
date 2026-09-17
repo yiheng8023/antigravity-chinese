@@ -80,7 +80,22 @@ function isProcessRunning() {
   }
 }
 
+function isProtectedEnvironment() {
+  return Boolean(
+    process.env.ANTIGRAVITY_AGENT ||
+    process.env.ANTIGRAVITY_CONVERSATION_ID ||
+    process.env.ANTIGRAVITY_AGENTAPI_EXE ||
+    process.env.AGY_NO_KILL === '1' ||
+    process.env.NODE_ENV === 'test'
+  );
+}
+
 function confirmCloseClient(appName = 'Antigravity') {
+  if (isProtectedEnvironment()) {
+    console.warn(`\n🛡️ [安全保护拦截] 当前正运行于 ${appName} 智能体会话/受保护环境中，绝对禁止强杀或关闭宿主客户端！`);
+    return false;
+  }
+
   const args = process.argv.slice(2);
   if (args.includes('--force') || args.includes('-f') || args.includes('-y') || args.includes('--yes')) {
     return true;
@@ -109,6 +124,12 @@ function confirmCloseClient(appName = 'Antigravity') {
 }
 
 function closeAntigravitySafely() {
+  // 安全铁律：严禁在 Antigravity 智能体会话内部或显式保护模式下强杀自身宿主进程！
+  if (isProtectedEnvironment()) {
+    console.warn('🛡️ [安全保护拦截] 检测到当前运行于 Antigravity 智能体会话或受保护环境中，已严正拦截强杀宿主进程，防止会话与客户端崩溃！');
+    return false;
+  }
+
   try {
     if (os.platform() === 'win32') {
       execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
@@ -248,6 +269,49 @@ function patchUpdaterFile(updaterFilePath) {
     content = content.split(r.from).join(r.to);
   }
   fs.writeFileSync(updaterFilePath, content, 'utf-8');
+}
+
+function patchMainFile(mainFilePath) {
+  if (!fs.existsSync(mainFilePath)) return;
+  let content = fs.readFileSync(mainFilePath, 'utf-8');
+
+  // 1. 系统托盘静态初始文本与右键菜单项
+  content = content.replace(/label:\s*['"]No agents running['"]/g, "label: '无正在运行的智能体'");
+  content = content.replace(/label:\s*`Open \$\{([^\}]+)\}`/g, "label: `打开 ${$1}`");
+  content = content.replace(/label:\s*['"]Open ['"]\s*\+\s*([a-zA-Z0-9_\.]+\.getName\(\))/g, "label: '打开 ' + $1");
+  content = content.replace(/label:\s*['"]Quit['"]/g, "label: '退出'");
+
+  // 2. 原生退出二次确认对话框、错误与启动弹窗
+  content = content.replace(/title:\s*['"]Confirm Quit['"]/g, "title: '确认退出'");
+  content = content.replace(/message:\s*['"]Are you sure you want to quit\?['"]/g, "message: '您确定要退出吗？'");
+  content = content.replace(/detail:\s*['"]There may be agents or background tasks running\.['"]/g, "detail: '可能仍有正在运行的智能体或后台任务。'");
+  content = content.replace(/buttons:\s*\[\s*['"]Cancel['"]\s*,\s*['"]Quit['"]\s*\]/g, "buttons: ['取消', '退出']");
+  content = content.replace(/['"]Binary not found['"]/g, "'未找到二进制文件'");
+  content = content.replace(/['"]Startup failed['"]/g, "'启动失败'");
+
+  // 3. macOS dock 菜单支持
+  content = content.replace(/label:\s*['"]New Window['"]/g, "label: '新建窗口'");
+
+  fs.writeFileSync(mainFilePath, content, 'utf-8');
+}
+
+function patchTrayFile(trayFilePath) {
+  if (!fs.existsSync(trayFilePath)) return;
+  let content = fs.readFileSync(trayFilePath, 'utf-8');
+
+  // 动态更新运行中智能体计数文本 (例如 "No agents running", "1 agent running", "2 agents running")
+  const dynamicRegex = /\(count\s*>\s*0\s*\?\s*`\$\{count\}`\s*:\s*['"]No['"]\)\s*\+\s*['"] agent['"]\s*\+\s*\(count\s*===\s*1\s*\?\s*['"]['"]\s*:\s*['"]s['"]\)\s*\+\s*['"] running['"]/g;
+  if (dynamicRegex.test(content)) {
+    content = content.replace(dynamicRegex, "(count > 0 ? `${count} 个正在运行的智能体` : '无正在运行的智能体')");
+  } else {
+    // 兼容其他格式变体
+    content = content.split("' agent' + (count === 1 ? '' : 's') + ' running'").join("' 个正在运行的智能体'");
+    content = content.split('" agent" + (count === 1 ? "" : "s") + " running"').join('" 个正在运行的智能体"');
+    content = content.split("'No agents running'").join("'无正在运行的智能体'");
+    content = content.split('"No agents running"').join('"无正在运行的智能体"');
+  }
+
+  fs.writeFileSync(trayFilePath, content, 'utf-8');
 }
 
 const MIN_NODE_VERSION = 16;
@@ -424,6 +488,16 @@ function install(customPath) {
   const updaterPath = path.join(tempExtractDir, 'dist', 'updater.js');
   if (fs.existsSync(updaterPath)) {
     patchUpdaterFile(updaterPath);
+  }
+
+  const mainPath = path.join(tempExtractDir, 'dist', 'main.js');
+  if (fs.existsSync(mainPath)) {
+    patchMainFile(mainPath);
+  }
+
+  const trayPath = path.join(tempExtractDir, 'dist', 'tray.js');
+  if (fs.existsSync(trayPath)) {
+    patchTrayFile(trayPath);
   }
 
   // 4. Pack back
@@ -837,5 +911,11 @@ module.exports = {
   getCandidateAsarPaths,
   findAsarPath,
   isAsarPatched,
-  runPreflightCheck
+  runPreflightCheck,
+  patchMenuFile,
+  patchMainFile,
+  patchTrayFile,
+  confirmCloseClient,
+  closeAntigravitySafely,
+  isProtectedEnvironment
 };

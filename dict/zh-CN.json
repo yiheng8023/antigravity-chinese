@@ -8,7 +8,7 @@
     "+ New Chat": "+ 新建对话",
     ", or": "，或",
     ", or ": "，或 ",
-    "1 agent running": "1 个运行中的智能体",
+    "1 agent running": "1 个正在运行的智能体",
     "1 task running": "1 个运行中的任务",
     "2. Make sure that your selected workspace is synced to head. This ensures that the installed skills are available in your workspace.": "2. 请确保您所选的工作区已同步至最新提交（Head）。这可确保安装的技能在您的工作区中可用。",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",
@@ -922,7 +922,7 @@
     "No Project": "无项目关联",
     "No Proxy": "不使用代理",
     "No Subtitle": "无副标题",
-    "No agents running": "暂无运行中的智能体",
+    "No agents running": "无正在运行的智能体",
     "No background tasks": "暂无后台任务",
     "No conversations yet": "暂无会话",
     "No file changes": "无文件更改",
@@ -1450,7 +1450,7 @@
     "Verify": "验证",
     "Verify API Connection": "验证 API 连接",
     "Version": "版本信息",
-    "Vetted (Preview)": "官方审核 (预览版)",
+    "Vetted (Preview)": "已审查 (预览)",
     "Video attachment": "视频附件",
     "View": "视图",
     "View Inline Diff": "行内对比",
@@ -1602,9 +1602,324 @@
     "These MCP allowlist rules are enforced by your organization": "这些 MCP 允许名单规则由您的组织强制执行",
     "using this MCP tool": "使用此 MCP 工具",
     "Error fetching MCP prompt": "获取 MCP 提示词出错",
-    "Enter tool name or server...": "输入工具名称或服务..."
+    "Enter tool name or server...": "输入工具名称或服务...",
+    "Battle Mode": "对决模式",
+    "Battle mode": "对决模式",
+    "Start Battle Mode": "开启对决模式",
+    "Start battle mode": "开启对决模式",
+    "End Battle Mode": "结束对决模式",
+    "End battle mode": "结束对决模式",
+    "Best-of-N": "多候选对决 (Best-of-N)",
+    "Best-of-N Mode": "多候选对决模式",
+    "Best-of-N mode": "多候选对决模式",
+    "Best of N": "多候选对决",
+    "Best of N Mode": "多候选对决模式",
+    "Best of N mode": "多候选对决模式",
+    "Battle Mode Overrides": "对决模式参数重载",
+    "Candidate": "候选方案",
+    "Candidates": "候选方案",
+    "Candidate A": "候选方案 A",
+    "Candidate B": "候选方案 B",
+    "Candidate C": "候选方案 C",
+    "Candidate 1": "候选方案 1",
+    "Candidate 2": "候选方案 2",
+    "Model A": "模型 A",
+    "Model B": "模型 B",
+    "Model A was better": "模型 A 表现更优",
+    "Model B was better": "模型 B 表现更优",
+    "Response A": "回答 A",
+    "Response B": "回答 B",
+    "Response A was better": "回答 A 表现更优",
+    "Response B was better": "回答 B 表现更优",
+    "Select Winner": "选择优胜方案",
+    "Select winner": "选择优胜方案",
+    "Choose Winner": "选择优胜方案",
+    "Choose winner": "选择优胜方案",
+    "Pick a Winner": "评选优胜方案",
+    "Pick a winner": "评选优胜方案",
+    "Winner": "优胜方案",
+    "Winner Survey": "优胜方案评选调查",
+    "Winner survey": "优胜方案评选调查",
+    "Select a winner to continue": "选择一个优胜方案以继续",
+    "Please select a winner": "请选择一个优胜方案",
+    "Both are good": "两项均表现优秀",
+    "Both are bad": "两项均表现不佳",
+    "Both were good": "两项均表现优秀",
+    "Both were bad": "两项均表现不佳",
+    "Tie": "平局",
+    "It's a tie": "势均力敌（平局）",
+    "Better instruction following": "更好地遵循了指令",
+    "Better code quality": "代码质量更高",
+    "Fewer bugs": "更少缺陷",
+    "Faster response": "响应更快速",
+    "More creative": "更有创意",
+    "More accurate": "更准确",
+    "More comprehensive": "更全面详尽",
+    "Other reason": "其他原因",
+    "Why did you choose this winner?": "您为什么选择此优胜方案？",
+    "Why did you choose this model?": "您为什么选择此模型？",
+    "Why did you prefer this response?": "您为什么更青睐此回答？",
+    "Tell us more about your choice (optional)": "详细说明您的选择（可选）",
+    "Tell us more about your choice": "详细说明您的选择",
+    "Submit feedback": "提交反馈",
+    "Skip survey": "跳过问卷",
+    "Skip Survey": "跳过问卷",
+    "Thank you for your feedback!": "感谢您的反馈！",
+    "Thank you for your feedback": "感谢您的反馈",
+    "Battle Mode requires at least one commit in the Git repository": "对决模式要求 Git 仓库中至少包含一次提交",
+    "Battle Mode requires at least one commit in the Git repository.": "对决模式要求 Git 仓库中至少包含一次提交。",
+    "Inherit Global": "继承全局设置",
+    "Inherit global": "继承全局设置",
+    "Inherit Global Permissions": "继承全局权限",
+    "Inherit global permissions": "继承全局权限",
+    "Inherit Global Settings": "继承全局设置",
+    "Inherit global settings": "继承全局设置",
+    "Global Permissions": "全局权限",
+    "Global permissions": "全局权限",
+    "Project Permissions": "项目权限",
+    "Project permissions": "项目权限",
+    "Inherited from Global Settings": "继承自全局设置",
+    "Inherited from global settings": "继承自全局设置",
+    "Inherited from Global Permissions": "继承自全局权限",
+    "Inherited from global permissions": "继承自全局权限",
+    "Inherited from global": "继承自全局",
+    "Override Global Settings": "覆盖全局设置",
+    "Override global settings": "覆盖全局设置",
+    "Override Global Permissions": "覆盖全局权限",
+    "Override global permissions": "覆盖全局权限",
+    "Custom for this project": "为此项目单独配置",
+    "Project-specific permissions": "项目专属权限",
+    "allow": "允许",
+    "ask": "询问",
+    "deny": "拒绝",
+    "Allow": "允许",
+    "Ask": "询问",
+    "Deny": "拒绝",
+    "Proceed in Sandbox": "在沙箱中执行",
+    "proceed in sandbox": "在沙箱中执行",
+    "Require Review": "需要复核",
+    "require review": "需要复核",
+    "Vetted": "已审查",
+    "Turbo": "Turbo 极速",
+    "Always proceed": "总是直接继续",
+    "\"Always Proceed\"": "“总是直接继续”",
+    "Always allow": "始终允许",
+    "Always Deny": "始终拒绝",
+    "Always deny": "始终拒绝",
+    "Always ask": "始终询问",
+    "⚠️ Warning: \"Always Proceed\" is enabled without sandbox protection. This is very dangerous and we do not recommend doing this.": "⚠️ 警告：“总是直接继续”在无沙箱保护的情况下已启用。这非常危险，我们不建议这样做。",
+    "Warning: \"Always Proceed\" is enabled without sandbox protection. This is very dangerous and we do not recommend doing this.": "警告：“总是直接继续”在无沙箱保护的情况下已启用。这非常危险，我们不建议这样做。",
+    "Warning: \"Always Proceed\" is enabled without sandbox protection.": "警告：“总是直接继续”在无沙箱保护的情况下已启用。",
+    "⚠️ Warning: \"Always Proceed\" is enabled without sandbox protection.": "⚠️ 警告：“总是直接继续”在无沙箱保护的情况下已启用。",
+    "This is very dangerous and we do not recommend doing this.": "这非常危险，我们不建议这样做。",
+    "This is very dangerous and we do not recommend doing this": "这非常危险，我们不建议这样做",
+    "is enabled without sandbox protection.": "在无沙箱保护的情况下已启用。",
+    "is enabled without sandbox protection": "在无沙箱保护的情况下已启用",
+    "without sandbox protection": "无沙箱保护",
+    "without sandbox protection.": "无沙箱保护。",
+    "Files Changed": "已修改文件",
+    "Files changed": "已修改文件",
+    "File Changed": "已修改文件",
+    "File changed": "已修改文件",
+    "No files changed": "未修改任何文件",
+    "No files changed.": "未修改任何文件。",
+    "Skills Used": "已使用技能",
+    "Skills used": "已使用技能",
+    "Skill Used": "已使用技能",
+    "Skill used": "已使用技能",
+    "No skills used": "未使用任何技能",
+    "No skills used.": "未使用任何技能。",
+    "See all": "查看全部",
+    "See All": "查看全部",
+    "Just now": "刚刚",
+    "just now": "刚刚",
+    "Yesterday": "昨天",
+    "yesterday": "昨天",
+    "Today": "今天",
+    "today": "今天",
+    "Open Antigravity": "打开 Antigravity"
   },
   "patterns": [
+    {
+      "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "已思考 $1 小时 $2 分 $3 秒"
+    },
+    {
+      "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+      "replacement": "已思考 $1 小时 $2 分钟"
+    },
+    {
+      "regex": "^Thought\\s+for\\s+(\\d+)\\s*h$",
+      "replacement": "已思考 $1 小时"
+    },
+    {
+      "regex": "^Thought\\s+for\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "已思考 $1 分 $2 秒"
+    },
+    {
+      "regex": "^Thought\\s+for\\s+(\\d+)\\s*m$",
+      "replacement": "已思考 $1 分钟"
+    },
+    {
+      "regex": "^Thought\\s+for\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+      "replacement": "已思考 $1 秒"
+    },
+    {
+      "regex": "^See all\\s*\\((\\d+)\\)$",
+      "replacement": "查看全部 ($1)"
+    },
+    {
+      "regex": "^See all\\s+(\\d+)$",
+      "replacement": "查看全部 $1 项"
+    },
+    {
+      "regex": "^\\((\\d+)\\s+subagents?\\)$",
+      "replacement": "($1 个子智能体)"
+    },
+    {
+      "regex": "^(\\d+)\\s+subagents?$",
+      "replacement": "$1 个子智能体"
+    },
+    {
+      "regex": "^(\\d+)\\s+seconds?\\s+ago$",
+      "replacement": "$1 秒前"
+    },
+    {
+      "regex": "^(\\d+)\\s+minutes?\\s+ago$",
+      "replacement": "$1 分钟前"
+    },
+    {
+      "regex": "^(\\d+)\\s+hours?\\s+ago$",
+      "replacement": "$1 小时前"
+    },
+    {
+      "regex": "^(\\d+)\\s+days?\\s+ago$",
+      "replacement": "$1 天前"
+    },
+    {
+      "regex": "^(\\d+)\\s+weeks?\\s+ago$",
+      "replacement": "$1 周前"
+    },
+    {
+      "regex": "^(\\d+)\\s+months?\\s+ago$",
+      "replacement": "$1 个月前"
+    },
+    {
+      "regex": "^(\\d+)\\s+years?\\s+ago$",
+      "replacement": "$1 年前"
+    },
+    {
+      "regex": "^(\\d+)[sS]\\s+ago$",
+      "replacement": "$1 秒前"
+    },
+    {
+      "regex": "^(\\d+)[mM]\\s+ago$",
+      "replacement": "$1 分钟前"
+    },
+    {
+      "regex": "^(\\d+)[hH]\\s+ago$",
+      "replacement": "$1 小时前"
+    },
+    {
+      "regex": "^(\\d+)[dD]\\s+ago$",
+      "replacement": "$1 天前"
+    },
+    {
+      "regex": "^(\\d{1,2}:\\d{2})\\s*\\/\\s*(\\d{1,2}:\\d{2})$",
+      "replacement": "$1 / $2"
+    },
+    {
+      "regex": "^(\\d{1,2}:\\d{2}:\\d{2})\\s*\\/\\s*(\\d{1,2}:\\d{2}:\\d{2})$",
+      "replacement": "$1 / $2"
+    },
+    {
+      "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})\\s*[-–—]\\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})$",
+      "replacement": "$1 $2日 - $3 $4日"
+    },
+    {
+      "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})\\s*[-–—]\\s*(\\d{1,2})$",
+      "replacement": "$1 $2日 - $3日"
+    },
+    {
+      "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2}),\\s*(\\d{4}),\\s*(\\d{1,2}:\\d{2}(?::\\d{2})?)\\s*(AM|PM)?$",
+      "replacement": "$3年 $1 $2日 $5 $4"
+    },
+    {
+      "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2}),\\s*(\\d{1,2}:\\d{2}(?::\\d{2})?)\\s*(AM|PM)?$",
+      "replacement": "$1 $2日 $4 $3"
+    },
+    {
+      "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2}),\\s*(\\d{4})$",
+      "replacement": "$3年 $1 $2日"
+    },
+    {
+      "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})$",
+      "replacement": "$1 $2日"
+    },
+    {
+      "regex": "\\bJan\\b(?=\\s+\\d+日)",
+      "replacement": "1月"
+    },
+    {
+      "regex": "\\bFeb\\b(?=\\s+\\d+日)",
+      "replacement": "2月"
+    },
+    {
+      "regex": "\\bMar\\b(?=\\s+\\d+日)",
+      "replacement": "3月"
+    },
+    {
+      "regex": "\\bApr\\b(?=\\s+\\d+日)",
+      "replacement": "4月"
+    },
+    {
+      "regex": "\\bMay\\b(?=\\s+\\d+日)",
+      "replacement": "5月"
+    },
+    {
+      "regex": "\\bJun\\b(?=\\s+\\d+日)",
+      "replacement": "6月"
+    },
+    {
+      "regex": "\\bJul\\b(?=\\s+\\d+日)",
+      "replacement": "7月"
+    },
+    {
+      "regex": "\\bAug\\b(?=\\s+\\d+日)",
+      "replacement": "8月"
+    },
+    {
+      "regex": "\\bSep\\b(?=\\s+\\d+日)",
+      "replacement": "9月"
+    },
+    {
+      "regex": "\\bOct\\b(?=\\s+\\d+日)",
+      "replacement": "10月"
+    },
+    {
+      "regex": "\\bNov\\b(?=\\s+\\d+日)",
+      "replacement": "11月"
+    },
+    {
+      "regex": "\\bDec\\b(?=\\s+\\d+日)",
+      "replacement": "12月"
+    },
+    {
+      "regex": "\\bAM\\b(?=\\s+\\d{1,2}:\\d{2})",
+      "replacement": "上午"
+    },
+    {
+      "regex": "\\bPM\\b(?=\\s+\\d{1,2}:\\d{2})",
+      "replacement": "下午"
+    },
+    {
+      "regex": "(?<=\\d{1,2}:\\d{2}(?::\\d{2})?\\s*)AM\\b",
+      "replacement": "上午"
+    },
+    {
+      "regex": "(?<=\\d{1,2}:\\d{2}(?::\\d{2})?\\s*)PM\\b",
+      "replacement": "下午"
+    },
     {
       "regex": "^([\\d\\.]+)% of the customization budget is available\\.$",
       "replacement": "$1% 的自定义扩展预算可用。"
