@@ -1,12 +1,12 @@
 /**
- * Antigravity Chinese Localization Engine (Runtime v3.0)
- * 修复死循环/性能雪崩，确保设置面板等重 DOM 场景可用
+ * Antigravity Chinese Localization Engine (Runtime v3.2.35)
+ * 修复自旋死循环/悬浮树暴搜/DOM否定标记缺失，极致性能闭环
  *
  * 核心改进：
- * 1. Observer 回调中暂停观察，防止翻译写入 → 触发 mutation → 再翻译的死循环
- * 2. 用 requestIdleCallback / setTimeout 替代 150ms setInterval 全量扫描
- * 3. 已翻译节点打标记 (_agyDone)，跳过重复处理
- * 4. 批量处理 mutation，用 requestAnimationFrame 节流
+ * 1. 彻底阻断 requestIdleCallback 自旋死循环，改为 15 秒低频保底扫描
+ * 2. 增加 DOM 否定标记，未命中节点二次扫描 O(1) 瞬时退出
+ * 3. 增加悬浮 Portal/Tooltip 门禁过滤与 100ms 节流阀，根绝 mouseover 树暴搜
+ * 4. 算法与死代码优化：英文字母快速短路、移除 Step 5 patterns 死代码、空格/长度门禁、双向 Map 缓存
  */
 (function (root) {
   'use strict';
@@ -35,6 +35,10 @@
   var sortedExactKeys = Object.keys(exactDict).sort(function (a, b) {
     return b.length - a.length;
   });
+  // 预过滤多词复合子短语 key（含空格或长度 >= 12），消除 Step 5 每轮 1700+ 次冗余属性与长度判断
+  var phraseKeys = sortedExactKeys.filter(function (k) {
+    return k.indexOf(' ') !== -1 || k.length >= 12;
+  });
 
   // 构建一个反向映射：翻译结果 → true，用于快速判断文本是否已经被翻译过
   var translatedValues = {};
@@ -42,6 +46,28 @@
     if (exactDict.hasOwnProperty(k)) {
       translatedValues[exactDict[k]] = true;
     }
+  }
+
+  // 正负记忆化双向 Map 缓存（正向为翻译结果，负向为 null），带容量上限保护
+  var translationCache = typeof Map !== 'undefined' ? new Map() : null;
+  var MAX_CACHE_SIZE = 10000;
+
+  function cacheAndReturn(key, value) {
+    if (translationCache) {
+      if (translationCache.size >= MAX_CACHE_SIZE) {
+        var iter = translationCache.keys();
+        for (var ci = 0; ci < 1000; ci++) {
+          var oldK = iter.next().value;
+          if (oldK !== undefined) {
+            translationCache.delete(oldK);
+          } else {
+            break;
+          }
+        }
+      }
+      translationCache.set(key, value);
+    }
+    return value;
   }
 
   var IGNORED_TAGS = {
@@ -105,18 +131,28 @@
     var normalized = normalizeWhitespace(rawStr);
     if (!normalized) return null;
 
-    // 如果文本已经是翻译结果，直接跳过
-    if (translatedValues[normalized]) return null;
+    // 算法优化 1：极速短路，纯数字与符号瞬间退出（无英文字母）
+    if (!/[a-zA-Z]/.test(normalized)) return null;
+
+    // 算法优化 2：正负记忆化双向 Map 缓存极速 O(1) 命中
+    if (translationCache && translationCache.has(normalized)) {
+      return translationCache.get(normalized);
+    }
+
+    // 如果文本已经是翻译结果，直接跳过并存入负向缓存
+    if (translatedValues[normalized]) {
+      return cacheAndReturn(normalized, null);
+    }
 
     // 官方原生已汉化文本探测与优雅让位：仅当文本纯属中文无连续英文字母时才跳过；若含英文字母且词库有规则，绝不跳过！
     var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
     if (cjkChars && cjkChars.length >= 1 && !/[a-zA-Z]{2,}/.test(normalized)) {
-      return null;
+      return cacheAndReturn(normalized, null);
     }
 
     // 1. 直接精确匹配
     if (exactDict[normalized]) {
-      return exactDict[normalized];
+      return cacheAndReturn(normalized, exactDict[normalized]);
     }
 
     // 2. 正则模式匹配（支持嵌套级联替换，例如时间+单位）
@@ -130,7 +166,7 @@
           }
         }
         p.regex.lastIndex = 0;
-        return result;
+        return cacheAndReturn(normalized, result);
       }
     }
 
@@ -140,7 +176,7 @@
       var base = punctuationMatch[1].trim();
       var punc = punctuationMatch[2];
       if (exactDict[base]) {
-        return exactDict[base] + (punc === ':' ? '：' : punc);
+        return cacheAndReturn(normalized, exactDict[base] + (punc === ':' ? '：' : punc));
       }
     }
 
@@ -149,7 +185,7 @@
       var cmdBase = hotkeyMatch[1].trim();
       var hotkey = hotkeyMatch[2].trim();
       if (exactDict[cmdBase]) {
-        return exactDict[cmdBase] + (hotkey.charAt(0) === '(' ? ' ' + hotkey : ' ' + hotkey);
+        return cacheAndReturn(normalized, exactDict[cmdBase] + (hotkey.charAt(0) === '(' ? ' ' + hotkey : ' ' + hotkey));
       }
     }
 
@@ -188,34 +224,31 @@
         }
       }
       if (anyTranslated) {
-        return translatedParts.join('').replace(/([。！？])\s*/g, '$1 ');
+        return cacheAndReturn(normalized, translatedParts.join('').replace(/([。！？])\s*/g, '$1 '));
       }
     }
 
-    // 5. 多词复合子短语与动态正则全量级联替换（杜绝单个孤立单词误伤，精准捕获中英混排长句）
+    // 5. 多词复合子短语替换（杜绝单个孤立单词误伤，精准捕获中英混排长句）
     var processed = normalized;
-    var modified = false;
 
-    // 先跑 patterns 动态正则替换
-    for (var pi = 0; pi < patterns.length; pi++) {
-      if (patterns[pi].regex.test(processed)) {
-        processed = processed.replace(patterns[pi].regex, patterns[pi].replacement);
-        modified = true;
-      }
+    // 算法优化 3：长度与空格门禁，无空格且短于 12 字符的文本直接快速返回 null
+    if (processed.indexOf(' ') === -1 && processed.length < 12) {
+      return cacheAndReturn(normalized, null);
     }
 
-    // 再跑多词短语替换
-    for (var j = 0; j < sortedExactKeys.length; j++) {
-      var key = sortedExactKeys[j];
-      if ((key.indexOf(' ') !== -1 || key.length >= 12) && processed.indexOf(key) !== -1) {
+    // 算法优化 4：已删除重复执行必定未命中的 patterns 动态正则死代码，直接遍历预筛选 phraseKeys
+    var modified = false;
+    for (var j = 0; j < phraseKeys.length; j++) {
+      var key = phraseKeys[j];
+      if (processed.indexOf(key) !== -1) {
         processed = processed.split(key).join(exactDict[key]);
         modified = true;
       }
     }
 
-    if (modified) return processed;
+    if (modified) return cacheAndReturn(normalized, processed);
 
-    return null;
+    return cacheAndReturn(normalized, null);
   }
 
   // 标记属性名，用于避免重复翻译
@@ -230,19 +263,27 @@
     if (parent && (shouldIgnoreElement(parent) || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) return;
 
     var original = node.nodeValue;
-    if (!original || !original.trim()) return;
+    if (!original) return;
 
-    // 如果节点已标记原始文本且未变化，跳过
+    // 如果节点已标记原始文本且未变化，直接 O(1) 瞬时退出
     if (node._agyOriginal === original) return;
 
-    var leadingSpace = original.match(/^\s*/)[0];
-    var trailingSpace = original.match(/\s*$/)[0];
     var trimmed = original.trim();
+    if (!trimmed) {
+      // 对纯空白节点补充否定标记，二次扫描直接 O(1) 退出，避免重复调用 trim()
+      node._agyOriginal = original;
+      return;
+    }
 
     var translated = translateSingleUnit(trimmed);
     if (translated !== null && translated !== trimmed) {
+      var leadingSpace = original.match(/^\s*/)[0];
+      var trailingSpace = original.match(/\s*$/)[0];
       node.nodeValue = leadingSpace + translated + trailingSpace;
       node._agyOriginal = node.nodeValue; // 记录翻译后的值，防止重复处理
+    } else {
+      // 关键性能优化：补充 DOM 否定标记，未命中时记录原始文本，二次扫描直接 O(1) 退出
+      node._agyOriginal = original;
     }
   }
 
@@ -268,6 +309,9 @@
           if (trans !== null && trans !== val) {
             el.setAttribute(attr, trans);
             el[markKey] = trans; // 标记已翻译的值
+          } else {
+            // 关键性能优化：补充 DOM 否定标记，未命中时记录原属性值，二次扫描直接 O(1) 退出
+            el[markKey] = val;
           }
         }
       }
@@ -422,17 +466,53 @@
       reconnectObserver();
     }
 
-    // 用 requestIdleCallback 做周期性增量扫描（替代 setInterval）
-    // 仅在浏览器空闲时执行，绝不阻塞主线程交互
-    var idleCallback = root.requestIdleCallback || function (cb) { setTimeout(cb, 2000); };
-    function idleScan() {
-      safeFullScan();
-      idleCallback(idleScan, { timeout: 5000 });
+    // 低频保底扫描：彻底阻断 50~60Hz 无限自旋死循环，改为每 15 秒配合 requestIdleCallback 执行一次低频保底扫描
+    var idleScanScheduled = false;
+    function scheduleIdleScan() {
+      if (idleScanScheduled) return;
+      if (root.requestIdleCallback) {
+        idleScanScheduled = true;
+        root.requestIdleCallback(function () {
+          idleScanScheduled = false;
+          safeFullScan();
+        }, { timeout: 5000 });
+      } else {
+        safeFullScan();
+      }
     }
-    // 首次延迟 1 秒再启动空闲扫描
-    setTimeout(function () {
-      idleCallback(idleScan, { timeout: 5000 });
-    }, 1000);
+    setInterval(scheduleIdleScan, 15000);
+  }
+
+  function isFloatingElement(el) {
+    if (!el || el.nodeType !== 1) return false;
+    if (doc && (el === doc.body || el === doc.documentElement)) return false;
+    if (el.id === 'workbench') return false;
+    var cls = typeof el.className === 'string' ? el.className : '';
+    if (cls && cls.indexOf('monaco-workbench') !== -1) return false;
+
+    if (el.matches) {
+      try {
+        return el.matches('[role="tooltip"], [data-floating-ui-portal], .popover, .tooltip, .context-view, .monaco-hover');
+      } catch (e) {}
+    }
+    var role = el.getAttribute ? el.getAttribute('role') : '';
+    if (role === 'tooltip') return true;
+    if (el.hasAttribute && el.hasAttribute('data-floating-ui-portal')) return true;
+    if (cls) {
+      if (cls.indexOf('popover') !== -1 || cls.indexOf('tooltip') !== -1 || cls.indexOf('context-view') !== -1 || cls.indexOf('monaco-hover') !== -1) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function isWorkbenchOrRoot(el) {
+    if (!el || el.nodeType !== 1) return true;
+    if (doc && (el === doc.body || el === doc.documentElement)) return true;
+    if (el.id === 'workbench') return true;
+    var cls = typeof el.className === 'string' ? el.className : '';
+    if (cls && cls.indexOf('monaco-workbench') !== -1) return true;
+    return false;
   }
 
   if (doc) {
@@ -445,34 +525,51 @@
     // 全局悬浮气泡 (Hover Tooltips / Popovers) 快速反应拦截器
     // 专门防御光标移入时才动态挂载或改变属性的临时注释节点
     try {
+      var lastHoverTime = 0;
       var hoverScanTimer = null;
+
       function scanFloatingContainers() {
         if (!doc || !doc.body) return;
-        // 定向扫描顶层 Portal 容器、Tooltip、Popover 节点，绝不遍历整棵 DOM 树
-        var last = doc.body.lastElementChild;
-        if (last) {
-          translateElement(last);
-          if (last.previousElementSibling) {
+        disconnectObserver();
+        try {
+          // 定向扫描顶层 Portal 容器、Tooltip、Popover 节点，门禁拦截非浮层元素，绝不遍历整棵 DOM 树
+          var last = doc.body.lastElementChild;
+          if (last && isFloatingElement(last)) {
+            translateElement(last);
+          }
+          if (last && last.previousElementSibling && isFloatingElement(last.previousElementSibling)) {
             translateElement(last.previousElementSibling);
           }
-        }
-        var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [data-floating-ui-portal], .popover, .tooltip') : null;
-        if (tooltips && tooltips.length > 0) {
-          for (var tIdx = 0; tIdx < tooltips.length; tIdx++) {
-            translateElement(tooltips[tIdx]);
+          var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [data-floating-ui-portal], .popover, .tooltip, .context-view, .monaco-hover') : null;
+          if (tooltips && tooltips.length > 0) {
+            for (var tIdx = 0; tIdx < tooltips.length; tIdx++) {
+              translateElement(tooltips[tIdx]);
+            }
           }
-        }
+        } catch (e) {}
+        reconnectObserver();
       }
 
       var onHoverAction = function (e) {
+        // 100ms 节流阀：阻断高频 mouseover 事件风暴与全树深搜，杜绝剧烈掉帧
+        var now = Date.now ? Date.now() : (+new Date());
+        if (now - lastHoverTime < 100) return;
+        lastHoverTime = now;
+
         var target = e.target;
         if (!target) return;
-        if (target.nodeType === 1) {
-          translateElement(target);
-          if (target.parentElement) {
-            translateElement(target.parentElement);
+        disconnectObserver();
+        try {
+          if (target.nodeType === 1) {
+            translateElement(target);
+            // 严禁对 #workbench / body 根容器递归全树深搜，防止 13ms+ 剧烈掉帧
+            if (target.parentElement && !isWorkbenchOrRoot(target.parentElement)) {
+              translateElement(target.parentElement);
+            }
           }
-        }
+        } catch (e) {}
+        reconnectObserver();
+
         // 即时定向扫描浮动提示层
         scanFloatingContainers();
 
@@ -493,4 +590,6 @@
   root.__AGY_TRANSLATE_UNIT__ = translateSingleUnit;
   root.__AGY_TRANSLATE_EL__ = translateElement;
   root.__AGY_RUN_FULL_SCAN__ = safeFullScan;
+  root.__AGY_CACHE__ = translationCache;
+  root.__AGY_IS_FLOATING__ = isFloatingElement;
 })(typeof window !== 'undefined' ? window : this);

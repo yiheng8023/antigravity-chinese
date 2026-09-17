@@ -247,6 +247,68 @@ assert(linuxPaths.includes('/usr/lib/antigravity/resources/app.asar'), 'Linux �
 assert(linuxPaths.includes('/usr/share/antigravity/resources/app.asar'), 'Linux 包含 /usr/share 路径');
 assert(linuxPaths.includes('/home/testuser/.local/share/antigravity/resources/app.asar'), 'Linux 包含 ~/.local/share 路径');
 
+console.log('\n--- 7. 验证 v3.2.35 性能黑洞修复与引擎优化断言 ---');
+// 1. 算法极速短路：纯数字与纯符号瞬间退出
+assert(translate('123456') === null, '纯数字 "123456" 极速短路返回 null');
+assert(translate('---') === null, '纯符号 "---" 极速短路返回 null');
+assert(translate('###') === null, '纯标点 "###" 极速短路返回 null');
+
+// 2. DOM 否定标记断言（未命中节点与属性）
+const mockDiv = win.document.createElement('div');
+mockDiv.setAttribute('title', 'hash_3f8a92c1_unmatched');
+const mockTextNode = win.document.createTextNode('/users/local/path/to/unmatched_file.js');
+const mockWhitespaceNode = win.document.createTextNode('   \n  ');
+mockDiv.appendChild(mockTextNode);
+mockDiv.appendChild(mockWhitespaceNode);
+win.document.body.appendChild(mockDiv);
+
+win.__AGY_TRANSLATE_EL__(mockDiv);
+assert(mockTextNode._agyOriginal === '/users/local/path/to/unmatched_file.js', '未命中 TextNode 正确打上 DOM 否定标记 _agyOriginal');
+assert(mockWhitespaceNode._agyOriginal === '   \n  ', '纯空白 TextNode 正确打上 DOM 否定标记 _agyOriginal 避免重复 trim');
+assert(mockDiv['_agyDone_title'] === 'hash_3f8a92c1_unmatched', '未命中属性正确打上 DOM 否定标记 _agyDone_title');
+
+// 3. Step 5 长度与空格门禁断言
+assert(translate('shortword') === null, '无空格且短于 12 字符的文本直接门禁拦截返回 null');
+assert(translate('a'.repeat(11)) === null, '11 字符无空格文本门禁拦截返回 null');
+
+// 4. 双向 Map 缓存正向与负向记忆化断言
+assert(translate('Save') === '保存', '正向翻译 "Save" -> "保存"');
+const cache = win.__AGY_CACHE__;
+assert(cache !== null, '双向 Map 缓存存在并已初始化');
+assert(cache.has('Save'), '正向命中条目 "Save" 成功存入双向缓存');
+assert(cache.get('Save') === '保存', '正向缓存条目内容准确');
+assert(cache.has('shortword'), '负向未命中条目 "shortword" 成功存入双向缓存');
+assert(cache.get('shortword') === null, '负向缓存条目值为 null');
+
+// 验证缓存容量上限保护机制（10,000 上限与 1,000 项批量淘汰）
+const initialCacheSize = cache.size;
+for (let i = 0; i < 10005; i++) {
+  translate(`cache_test_key_${i}`);
+}
+assert(cache.size <= 10000, `缓存容量超限触发淘汰保护，当前容量: ${cache.size} (<= 10000)`);
+
+// 5. 悬浮门禁过滤 isFloatingElement 严谨断言
+const isFloating = win.__AGY_IS_FLOATING__;
+const workbenchEl = win.document.createElement('div');
+workbenchEl.id = 'workbench';
+assert(!isFloating(workbenchEl), 'isFloatingElement 坚决排除 #workbench');
+
+const workbenchClassEl = win.document.createElement('div');
+workbenchClassEl.className = 'monaco-workbench';
+assert(!isFloating(workbenchClassEl), 'isFloatingElement 坚决排除 .monaco-workbench');
+
+const tooltipEl = win.document.createElement('div');
+tooltipEl.setAttribute('role', 'tooltip');
+assert(isFloating(tooltipEl), 'isFloatingElement 准确放行 [role="tooltip"]');
+
+const portalEl = win.document.createElement('div');
+portalEl.setAttribute('data-floating-ui-portal', '');
+assert(isFloating(portalEl), 'isFloatingElement 准确放行 [data-floating-ui-portal]');
+
+const monacoHoverEl = win.document.createElement('div');
+monacoHoverEl.className = 'monaco-hover fade-in';
+assert(isFloating(monacoHoverEl), 'isFloatingElement 准确放行 .monaco-hover');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');
