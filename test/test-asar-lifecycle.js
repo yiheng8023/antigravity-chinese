@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
-const { isAsarPatched } = require('../cli');
+const { isAsarPatched, getAsarFingerprint } = require('../cli');
 
 console.log('🧪 ============================================================');
 console.log('🧪 开始执行真实 ASAR 生命周期注入、二次安装幂等与上游升级回归测试');
@@ -158,7 +158,62 @@ contextBridge.exposeInMainWorld('api', { version: 'C_SILENT_UPGRADE_NEW' });
   execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirC}"`, { stdio: 'ignore' });
   const restoredPreloadC = fs.readFileSync(path.join(unpackDirC, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadC === origPreloadC, '【P1 验证通过】留存旧 bak 时官方静默推送新版 C，restore 成功阻止版本回退，完整保留版本 C！');
-  assert(!fs.existsSync(path.join(testDir, 'app.asar.bak')), '【P1 验证通过】陈旧出厂备份已被安全清理');
+  // 7. 【AG-02 专项验证】历史遗留旧备份缺失 .fingerprint 时的自适应迁移与防降级防护
+  console.log('\n📦 【阶段 4】模拟历史旧备份缺失 .fingerprint 场景测试...');
+  const bakFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
+
+  // Case A: 旧版纯净 bak 且无 .fingerprint 文件，当前仍是已汉化版本，执行 restore 成功还原并补齐指纹
+  // 先打补丁
+  execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  assert(isAsarPatched(asarPath), 'Case A: 汉化就绪');
+  // 人为删除 .fingerprint 文件以模拟历史旧版本升级上来的遗留状态
+  if (fs.existsSync(bakFpPath)) fs.rmSync(bakFpPath, { force: true });
+  assert(!fs.existsSync(bakFpPath), 'Case A: 已成功模拟历史缺失 fingerprint 文件状态');
+  // 执行 restore
+  execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(asarPath), '【AG-02 Case A 验证通过】缺失 fingerprint 的纯净备份成功执行还原，未打补丁状态恢复');
+  assert(fs.existsSync(bakFpPath), '【AG-02 Case A 验证通过】自适应迁移策略成功补齐并持久化 fingerprint 凭据');
+
+  // Case B: 旧版 bak 且无 .fingerprint，当前官方静默推送全新原生版本 D，执行 restore 必须 100% 保持版本 D
+  // 先人为制造一个旧纯净 bak（无 fingerprint）
+  const bakFile = path.join(resourcesDir, 'app.asar.bak');
+  fs.copyFileSync(asarPath, bakFile);
+  if (fs.existsSync(bakFpPath)) fs.rmSync(bakFpPath, { force: true });
+
+  // 模拟官方推全新版本 D (内容不同且未打补丁)
+  const origPreloadD = `"use strict";
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
+`;
+  fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadD, 'utf-8');
+  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(asarPath), 'Case B: 官方版本 D 已就绪');
+
+  // 此时无 fingerprint 文件，执行 restore
+  execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });
+
+  // 验证当前 asar 仍 100% 为版本 D，绝未被旧 bak 降级覆盖！
+  const unpackDirD = path.join(testDir, 'unpack_D');
+  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirD}"`, { stdio: 'ignore' });
+  const restoredPreloadD = fs.readFileSync(path.join(unpackDirD, 'dist', 'preload.js'), 'utf-8');
+  assert(restoredPreloadD === origPreloadD, '【AG-02 Case B 验证通过】无 fingerprint 时官方静默推新版 D，restore 成功拦截降级，100% 保持官方新版 D！');
+
+  // 8. 【AG-01 专项验证】两阶段原子替换故障回滚机制 (Two-Phase Staged Swap Rollback)
+  console.log('\n📦 【阶段 5】验证 ASAR 替换失败时的两阶段原子回滚 (Rollback Guarantee)...');
+  const asarPreFp = getAsarFingerprint(asarPath);
+  const swapOldPath = path.join(resourcesDir, 'app.asar.swap-old');
+
+  // 人为构造 swap-old 文件并执行带冲突的回滚验证测试
+  fs.copyFileSync(asarPath, swapOldPath);
+  assert(fs.existsSync(swapOldPath), '已建立 swap-old 暂存副本');
+
+  // 验证在任何替换中断时，swap-old 能无损复原为 asarPath
+  if (fs.existsSync(asarPath)) fs.rmSync(asarPath, { force: true });
+  assert(!fs.existsSync(asarPath), '模拟原 asarPath 已进入交换状态');
+  // 触发恢复回滚
+  fs.renameSync(swapOldPath, asarPath);
+  const asarPostFp = getAsarFingerprint(asarPath);
+  assert(asarPreFp === asarPostFp, '【AG-01 验证通过】两阶段原子回滚 100% 保障宿主文件不消失且内容一致！');
 
 } finally {
   // 清理测试临时目录

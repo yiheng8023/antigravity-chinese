@@ -512,27 +512,59 @@ function install(customPath) {
       : `npx -y @electron/asar@3.2.14 pack "${tempExtractDir}" "${tempNewAsar}"`;
     execSync(packCmd, { stdio: 'inherit' });
     
-    // Replace old asar (带重试的安全原子替换)
+    // 带自动回滚的双阶段安全替换架构 (Two-Phase Staged Swap with Automatic Rollback)
+    const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
+    if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
+
     let replaceSuccess = false;
+    let isSwapped = false;
+    let lastError = null;
+
     for (let attempt = 0; attempt < 5; attempt++) {
       try {
-        fs.rmSync(asarPath, { force: true });
+        // 阶段 1: 将原 app.asar rename 为 app.asar.swap-old（安全暂存原版，绝不直接物理删除！）
+        if (!isSwapped && fs.existsSync(asarPath)) {
+          fs.renameSync(asarPath, swapOldAsar);
+          isSwapped = true;
+        }
+        // 阶段 2: 将生成好的 app.asar.new rename 为 app.asar
         fs.renameSync(tempNewAsar, asarPath);
         replaceSuccess = true;
         break;
       } catch (permErr) {
+        lastError = permErr;
         if (permErr.code === 'EPERM' || permErr.code === 'EBUSY') {
           if (attempt < 4) {
             try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 400); } catch (_) {}
-          } else {
-            console.error('\n❌ 文件被占用错误 (EPERM / EBUSY):');
-            console.error('   Antigravity 客户端正在运行并锁定了 app.asar 文件。');
-            process.exit(1);
           }
         } else {
-          throw permErr;
+          break;
         }
       }
+    }
+
+    if (!replaceSuccess) {
+      // 核心安全防御：两阶段替换失败，触发自动 Rollback！
+      console.error('\n⚠️ [安全回滚触发] ASAR 替换失败，正在执行出厂原件自动回滚...');
+      if (isSwapped && fs.existsSync(swapOldAsar)) {
+        try {
+          if (fs.existsSync(asarPath)) fs.rmSync(asarPath, { force: true });
+          fs.renameSync(swapOldAsar, asarPath);
+          console.log('✅ 已成功将宿主客户端恢复至安装前完整状态，未发生文件丢失。');
+        } catch (rollbackErr) {
+          console.error('❌ 回滚遇到错误:', rollbackErr.message);
+        }
+      }
+      if (fs.existsSync(tempNewAsar)) fs.rmSync(tempNewAsar, { force: true });
+      if (fs.existsSync(tempExtractDir)) fs.rmSync(tempExtractDir, { recursive: true, force: true });
+      console.error('\n❌ 文件被占用或替换失败:', lastError ? lastError.message : '未知错误');
+      console.error('   Antigravity 客户端可能正在运行并锁定了文件。已保持原版完整，安装中止。');
+      process.exit(1);
+    }
+
+    // 成功替换后，安全清理暂存原版
+    if (fs.existsSync(swapOldAsar)) {
+      try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
     }
 
     // 写入汉化元数据指纹 (Hash/Manifest 根治架构)
@@ -595,11 +627,24 @@ function restore(customPath) {
   const isPatched = isAsarPatched(asarPath);
   const currentFp = getAsarFingerprint(asarPath);
   let prevFp = null;
+
+  // 1. 优先从 fingerprint 文件读取
   if (fs.existsSync(backupFpPath)) {
     try { prevFp = fs.readFileSync(backupFpPath, 'utf8').trim(); } catch (e) {}
   }
 
-  // 状态感知防降级保护：如果当前 asar 已经未打补丁且指纹不等于旧备份指纹，代表官方已静默升级，绝不可降级覆盖！
+  // 2. 历史无 fingerprint 文件自适应迁移策略 (Provenance & Migration Guard)
+  if (!prevFp && fs.existsSync(backupPath)) {
+    prevFp = getAsarFingerprint(backupPath);
+    // 若备份经检验为官方未修改版本，安全补齐指纹凭据
+    if (!isAsarPatched(backupPath) && prevFp) {
+      try { fs.writeFileSync(backupFpPath, String(prevFp), 'utf8'); } catch (e) {}
+    }
+  }
+
+  const isBakPatched = isAsarPatched(backupPath);
+
+  // 核心安全原则 1：如果当前宿主已经是官方原生未打补丁版本，且与备份指纹不一致，严禁跨版本覆盖，自动保护新版！
   if (!isPatched && prevFp && currentFp !== prevFp) {
     console.log('ℹ️ 检测到当前客户端已由官方升级至全新纯净原生版本，无需还原。');
     console.log('🧹 正在安全清理陈旧出厂基准备份与元数据...');
@@ -608,6 +653,17 @@ function restore(customPath) {
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     uninstallPlugin();
     console.log('\n✅ 客户端版本安全保护完成，当前官方全新原生版本已完整保留！\n');
+    return;
+  }
+
+  // 核心安全原则 2：若旧备份本身存在汉化污染标记（历史遗留损坏备份）且当前是原生版，禁止还原以防二次污染！
+  if (!isPatched && isBakPatched) {
+    console.warn('⚠️ [安全熔断] 检测到历史备份文件已包含汉化标记且当前客户端为官方原生版，禁止回退覆盖！');
+    if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
+    if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
+    if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
+    uninstallPlugin();
+    console.log('✅ 已清理污染的历史备份，完整保留当前官方原生客户端。\n');
     return;
   }
 
@@ -931,6 +987,7 @@ module.exports = {
   getCandidateAsarPaths,
   findAsarPath,
   isAsarPatched,
+  getAsarFingerprint,
   runPreflightCheck,
   patchMenuFile,
   patchMainFile,

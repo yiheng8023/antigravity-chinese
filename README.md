@@ -15,14 +15,14 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.36**）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.37**）。
 
 ---
 
 ## 🌟 核心特性与设计哲学
 
 - **可逆式运行时注入 (Reversible Runtime Engine)**：通过 Electron `preload` 阶段挂载响应式 DOM 翻译引擎，兼顾轻量与深度本地化。
-- **零卡顿极速闭环 (Zero-Lag Architecture)**：彻底阻断 `requestIdleCallback` 50~60Hz 无限自旋死循环；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 瞬时短路；悬浮 Portal 门禁与 100ms 节流阀，保证长对话流与虚拟滚动 0 掉帧。
+- **低开销高响应渲染架构 (High-Performance Runtime Architecture)**：阻断 `requestIdleCallback` 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路；悬浮 Portal 门禁与 100ms 节流阀，确保长对话消息流与高频虚拟滚动下保持平滑流畅。
 - **预加载同步挂载 (Preload Hook)**：在渲染进程初始化阶段尽早介入，最大程度减少英文向中文的界面跳变。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
 - **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
@@ -41,7 +41,7 @@
    - **macOS**：macOS 12+（支持 Apple Silicon M系列及 Intel 芯片，首次注入自动处理 `codesign` 签名）
    - **Linux**：主流发行版（Ubuntu, Debian, Fedora, Arch 等 x64 / ARM64）
 2. **Node.js 基础运行环境**：
-   - 系统中需安装 **Node.js (>= 16.x)** 及附带的 **npm / npx** 工具（向下完全兼容 Node 18/20/22/24 等所有更高版本）。
+   - 系统中需安装 **Node.js (>= 18.x)** 及附带的 **npm / npx** 工具（向下兼容 Node 18/20/22/24 等所有 LTS 版本）。
    - 验证方式：在终端运行 `node -v` 和 `npx -v`。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
 3. **已安装 Antigravity 客户端**：
    - 确保本机已安装官方 **Google Antigravity 2.0** 桌面客户端。

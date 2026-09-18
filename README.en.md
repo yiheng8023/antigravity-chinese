@@ -15,14 +15,14 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.2.36**.
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.2.37**.
 
 ---
 
 ## 🌟 Key Features & Engineering Design
 
 - **Reversible Runtime Engine**: Injects a responsive DOM translation engine at Electron's `preload` phase, balancing lightweight execution with deep localization.
-- **Zero-Lag Architecture (Zero Jitter Closed Loop)**: Completely eliminates `requestIdleCallback` 50~60Hz infinite spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal gates and 100ms throttle valves ensure 0 dropped frames during intensive streaming dialogues and virtual scrolling.
+- **High-Performance Low-Overhead Runtime Architecture**: Eliminates uncontrolled `requestIdleCallback` spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal filters and a 100ms throttle valve keep intensive streaming dialogues and virtual scrolling smooth and responsive.
 - **Preload Synchronization Hook (Minimizing FOUC)**: Mounts early during renderer initialization to minimize English-to-Chinese visual flicker.
 - **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), strictly preserving user code and terminal commands.
 - **Self-Healing & File Watcher**: Built-in self-healing launcher (`launch.bat`) and file watcher to automatically detect and reapply patches after upstream updates.
@@ -41,7 +41,7 @@ Before installing the patch, make sure your environment meets the following requ
    - **macOS**: macOS 12+ (Apple Silicon M-series & Intel chips; automated `codesign` ad-hoc signing included)
    - **Linux**: Major distributions (Ubuntu, Debian, Fedora, Arch, etc., x64 / ARM64)
 2. **Node.js Runtime Environment**:
-   - **Node.js (>= 16.x)** with `npm` and `npx` (Fully compatible with Node 18/20/22/24+ LTS releases).
+   - **Node.js (>= 18.x)** with `npm` and `npx` (Fully compatible with Node 18/20/22/24+ LTS releases).
    - Run `node -v` and `npx -v` in your terminal to verify. If not installed, download the LTS release from [Node.js Official Website](https://nodejs.org/).
 3. **Google Antigravity Installed**:
    - Official **Google Antigravity 2.0** desktop client installed.
