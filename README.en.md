@@ -104,12 +104,12 @@ The project includes an end-to-end regression test suite and cross-platform CI m
 npm test
 ```
 
-- **DOM Translation & Code Protection (`test/verify.js`)**: Uses JSDOM to verify 50 key DOM paths, Monaco Editor protection, and cross-platform path resolution.
-- **Screenshot Fixture Assertions (`test/test-screenshots.js`)**: Covers 64 test cases from real UI screenshots with compound sentences and dynamic quota values.
-- **Menu & Session Title Safety (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom user session titles.
+- **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 81 assertions covering critical DOM paths, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
+- **Screenshot Fixture Assertions (`test/test-screenshots.js`)**: Covers 88 test cases from real UI screenshots with compound sentences and dynamic quota values.
+- **Menu, Tray & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: 22 assertions ensuring single-character words do not corrupt custom session titles, main process system tray integration and native dialog safety, and suicide prevention gates in agent environments (preventing process termination).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream upgrade simulation, and atomic restoration (18 assertions, including Stage 3 regression testing for silent upstream updates preventing downgrade on restore).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions ensuring zero typos, full-width punctuation, standard terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions ensuring zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 
 ---
 
@@ -220,7 +220,7 @@ Heartfelt thanks to all developers who contribute code, report bugs, and improve
 
 ## 📈 Star History & Community Growth
 
-[![Star History Chart](https://api.star-history.com/svg?repos=yiheng8023/antigravity-chinese,yiheng8023/claude-chinese&type=Date)](https://star-history.com/#yiheng8023/antigravity-chinese&yiheng8023/claude-chinese&Date)
+[![Star History Chart](https://api.star-history.com/svg?repos=yiheng8023/antigravity-chinese&type=Date)](https://star-history.com/#yiheng8023/antigravity-chinese&Date)
 
 ---
 
