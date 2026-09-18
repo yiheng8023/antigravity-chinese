@@ -22,11 +22,12 @@
 ## 🌟 核心特性与设计哲学
 
 - **可逆式运行时注入 (Reversible Runtime Engine)**：通过 Electron `preload` 阶段挂载响应式 DOM 翻译引擎，兼顾轻量与深度本地化。
+- **零卡顿极速闭环 (Zero-Lag Architecture)**：彻底阻断 `requestIdleCallback` 50~60Hz 无限自旋死循环；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 瞬时短路；悬浮 Portal 门禁与 100ms 节流阀，保证长对话流与虚拟滚动 0 掉帧。
 - **预加载同步挂载 (Preload Hook)**：在渲染进程初始化阶段尽早介入，最大程度减少英文向中文的界面跳变。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
 - **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
-- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换。
-- **版本化指纹基线备份与可逆还原**：首次注入时自动创建 `app.asar.bak` 原生备份，上游版本更新自动刷新纯净基线，随时可一键还原至官方纯英文初始状态。
+- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换（已收录 1730+ 精确词条与 166 组级联正则）。
+- **双重状态感知出厂基线与版本防回退 (Dual-State Baseline & Anti-Downgrade)**：首次注入时创建纯净备份；官方静默推送新版时自动刷新出厂基线，restore 还原时自动熔断拦截，彻底杜绝老旧备份覆盖官方新版导致的版本回退惨剧。
 - **官方中文优雅让位 (Graceful Yield)**：内置 CJK 字符与官方语言环境自动探针，上游一旦上线官方中文自动主动让位，杜绝破坏。
 
 ---
@@ -106,7 +107,7 @@ npm test
 - **核心 DOM 注入与代码保护 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，验证 50 项关键 DOM 路径的翻译准确性、Monaco Editor 保护及跨平台路径解析。
 - **真实截图用例集 (`test/test-screenshots.js`)**：覆盖 64 项来自真实界面截图的复合句子、动态限额与时间解析。
 - **菜单与会话标题防误伤 (`test/test-menu-and-titles.js`)**：确保单字词不破坏用户自定义会话名称。
-- **ASAR 全真生命周期测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，验证解包、注入、签名校验与出厂原子回滚。
+- **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 18 项全真断言，验证解包、注入、防误杀门禁、二次安装幂等、官方静默升级防降级与出厂原子回滚。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
 - **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言自动扫描 0 错别字（登录/账号/其他等）、全角标点排版、CCF 核心学术术语与正则安全。
 
@@ -153,7 +154,7 @@ flowchart LR
 ```text
 antigravity-chinese/
 ├── dict/
-│   └── zh-CN.json            # 汉化词典库（1070+ 精确词条 + 25 组级联正则）
+│   └── zh-CN.json            # 汉化词典库（1730+ 精确词条 + 166 组级联正则）
 ├── core/
 │   └── i18n-runtime.js       # 前端运行时注入引擎（Preload 挂载、防抖、代码区保护、优雅让位）
 ├── plugins/
