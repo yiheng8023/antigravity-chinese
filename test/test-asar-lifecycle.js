@@ -215,6 +215,21 @@ contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
   const asarPostFp = getAsarFingerprint(asarPath);
   assert(asarPreFp === asarPostFp, '【AG-01 验证通过】两阶段原子回滚 100% 保障宿主文件不消失且内容一致！');
 
+  // 9. 【终极防御】模拟硬件死机/断电导致的 swap-old 孤儿残留，验证冷启动崩溃自愈机制 (Cold-Boot Crash Recovery)
+  console.log('\n📦 【阶段 6】验证断电孤儿 swap-old 残留时的冷启动崩溃自愈 (Cold-Boot Crash Recovery)...');
+  // 构造孤儿状态：app.asar 缺失，仅存留 app.asar.swap-old
+  fs.copyFileSync(asarPath, swapOldPath);
+  fs.rmSync(asarPath, { force: true });
+  assert(!fs.existsSync(asarPath), '模拟突发断电：app.asar 已在磁盘中暂时缺失');
+  assert(fs.existsSync(swapOldPath), '模拟突发断电：磁盘仅留存 app.asar.swap-old 孤儿文件');
+
+  // 调用 node cli.js status 触发冷启动自愈
+  execSync(`node "${cliPath}" status --path "${testDir}"`, { stdio: 'ignore' });
+  assert(fs.existsSync(asarPath), '【冷启动自愈验证通过】CLI 自动识别孤儿 swap-old 并成功将其满血复原为 app.asar！');
+  assert(!fs.existsSync(swapOldPath), '【冷启动自愈验证通过】孤儿 swap-old 文件已被自动清理干净！');
+  const asarRecoveredFp = getAsarFingerprint(asarPath);
+  assert(asarPreFp === asarRecoveredFp, '【冷启动自愈验证通过】复原后的 app.asar 内容指纹完全一致，客户端永不瘫痪！');
+
 } finally {
   // 清理测试临时目录
   if (fs.existsSync(testDir)) {

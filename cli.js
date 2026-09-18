@@ -43,21 +43,47 @@ function getCandidateAsarPaths(platform = os.platform(), homedir = os.homedir())
   }
 }
 
+// 冷启动断电与异常中断自愈守卫 (Cold-Boot Crash-Resilient Auto-Healing)
+function tryRecoverSwappedAsar(targetAsarPath) {
+  if (!targetAsarPath) return false;
+  const swapOldPath = path.join(path.dirname(targetAsarPath), 'app.asar.swap-old');
+  if (!fs.existsSync(targetAsarPath) && fs.existsSync(swapOldPath)) {
+    try {
+      fs.renameSync(swapOldPath, targetAsarPath);
+      console.log(`🛡️ [冷启动崩溃自愈] 检测到断电/异常中断遗留的暂存文件 ${swapOldPath}，已自动安全复原为 ${targetAsarPath}！`);
+      return true;
+    } catch (e) {
+      try {
+        fs.copyFileSync(swapOldPath, targetAsarPath);
+        fs.rmSync(swapOldPath, { force: true });
+        console.log(`🛡️ [冷启动崩溃自愈] 通过降级复制成功复原 ${targetAsarPath}！`);
+        return true;
+      } catch (copyErr) {}
+    }
+  }
+  return false;
+}
+
 function findAsarPath(customPath) {
   if (customPath) {
     let resolved = path.resolve(customPath);
-    if (fs.existsSync(resolved)) {
-      if (fs.statSync(resolved).isDirectory()) {
-        resolved = path.join(resolved, 'resources', 'app.asar');
-      }
-      if (fs.existsSync(resolved)) return resolved;
+    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
+      resolved = path.join(resolved, 'resources', 'app.asar');
     }
+    tryRecoverSwappedAsar(resolved);
+    if (fs.existsSync(resolved)) return resolved;
+
+    const candidateDirect = path.join(resolved, 'app.asar');
+    tryRecoverSwappedAsar(candidateDirect);
+    if (fs.existsSync(candidateDirect)) return candidateDirect;
+
     console.error(`❌ 指定路径未找到 app.asar: ${customPath}`);
     process.exit(1);
   }
 
   const candidates = getCandidateAsarPaths();
   for (const p of candidates) {
+    tryRecoverSwappedAsar(p);
     if (fs.existsSync(p)) {
       return p;
     }
@@ -986,6 +1012,7 @@ Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
 module.exports = {
   getCandidateAsarPaths,
   findAsarPath,
+  tryRecoverSwappedAsar,
   isAsarPatched,
   getAsarFingerprint,
   runPreflightCheck,
