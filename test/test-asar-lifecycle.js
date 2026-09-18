@@ -135,6 +135,31 @@ contextBridge.exposeInMainWorld('api', { version: 'B_UPSTREAM_NEW' });
   const restoredPreloadB = fs.readFileSync(path.join(unpackDirB, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadB === origPreloadB, '【P0 验证通过】版本 B 上打补丁并 restore 后 100% 等于新版本 B (绝未回退老版本 A)');
 
+  // 6. 【P1 专项验证】在留存旧备份时，官方后台静默升级为全新原生版本 C，此时直接执行 restore，绝不能将新版本 C 降级覆盖为旧备份！
+  console.log('\n📦 【阶段 3】模拟留存旧备份时官方静默推送新版 C，直接执行 restore 防降级验证...');
+  // 先打上补丁建立基准备份
+  execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
+  assert(isAsarPatched(asarPath), '版本 B 汉化就绪，存在有效备份');
+
+  // 模拟官方静默升级为全新版本 C (覆盖 asar 为原生未修改状态，保留旧 bak)
+  const origPreloadC = `"use strict";
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('api', { version: 'C_SILENT_UPGRADE_NEW' });
+`;
+  fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadC, 'utf-8');
+  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(asarPath), '官方新版本 C 已静默覆盖为原生未打补丁状态');
+
+  // 此时直接执行 restore
+  execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });
+
+  // 验证当前 asar 仍 100% 为版本 C，绝未被旧 bak 降级覆盖！
+  const unpackDirC = path.join(testDir, 'unpack_C');
+  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirC}"`, { stdio: 'ignore' });
+  const restoredPreloadC = fs.readFileSync(path.join(unpackDirC, 'dist', 'preload.js'), 'utf-8');
+  assert(restoredPreloadC === origPreloadC, '【P1 验证通过】留存旧 bak 时官方静默推送新版 C，restore 成功阻止版本回退，完整保留版本 C！');
+  assert(!fs.existsSync(path.join(testDir, 'app.asar.bak')), '【P1 验证通过】陈旧出厂备份已被安全清理');
+
 } finally {
   // 清理测试临时目录
   if (fs.existsSync(testDir)) {

@@ -591,6 +591,26 @@ function restore(customPath) {
     process.exit(1);
   }
 
+  const backupFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
+  const isPatched = isAsarPatched(asarPath);
+  const currentFp = getAsarFingerprint(asarPath);
+  let prevFp = null;
+  if (fs.existsSync(backupFpPath)) {
+    try { prevFp = fs.readFileSync(backupFpPath, 'utf8').trim(); } catch (e) {}
+  }
+
+  // 状态感知防降级保护：如果当前 asar 已经未打补丁且指纹不等于旧备份指纹，代表官方已静默升级，绝不可降级覆盖！
+  if (!isPatched && prevFp && currentFp !== prevFp) {
+    console.log('ℹ️ 检测到当前客户端已由官方升级至全新纯净原生版本，无需还原。');
+    console.log('🧹 正在安全清理陈旧出厂基准备份与元数据...');
+    if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
+    if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
+    if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
+    uninstallPlugin();
+    console.log('\n✅ 客户端版本安全保护完成，当前官方全新原生版本已完整保留！\n');
+    return;
+  }
+
   // 1. 进程占用检测与文件锁释放 (仅在针对原生默认宿主路径时生效)
   if (!customPath && isProcessRunning()) {
     const shouldClose = confirmCloseClient('Antigravity');
