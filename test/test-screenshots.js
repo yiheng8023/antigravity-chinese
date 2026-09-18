@@ -198,7 +198,17 @@ const testCases = [
   "Select Winner",
   "Winner Survey",
   "Both are good",
-  "Tie"
+  "Tie",
+
+  // Screenshot 9: Security Preset Tooltip & Local Permissions (media_1789756124531.png)
+  "Inherits your Global Permissions when working in this project.",
+  "Inherits your Global Permissions 在此项目中工作时。",
+  "Inherits your Global Permissions 在此项目中工作时",
+  "Inherits your Global Permissions",
+  "Also includes Global Permissions when working in this project.",
+  "也包含 全局权限 在此项目中工作时。",
+  "也包含 全局权限 在此项目中工作时",
+  "也包含 全局权限 在此项目中工作时。 了解更多。"
 ];
 
 console.log('Testing', testCases.length, 'cases from screenshots:');

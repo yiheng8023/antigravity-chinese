@@ -131,12 +131,19 @@
     var normalized = normalizeWhitespace(rawStr);
     if (!normalized) return null;
 
-    // 算法优化 1：极速短路，纯数字与符号瞬间退出（无英文字母）
-    if (!/[a-zA-Z]/.test(normalized)) return null;
-
     // 算法优化 2：正负记忆化双向 Map 缓存极速 O(1) 命中
     if (translationCache && translationCache.has(normalized)) {
       return translationCache.get(normalized);
+    }
+
+    // 0. 直接精确匹配 (O(1) 哈希查询：优先命中包括特殊倒装自愈、英文短语、符号在内的确切条目)
+    if (exactDict[normalized]) {
+      return cacheAndReturn(normalized, exactDict[normalized]);
+    }
+
+    // 算法优化 1：极速短路，纯数字与符号瞬间退出（无英文字母）
+    if (!/[a-zA-Z]/.test(normalized)) {
+      return cacheAndReturn(normalized, null);
     }
 
     // 如果文本已经是翻译结果，直接跳过并存入负向缓存
@@ -148,11 +155,6 @@
     var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
     if (cjkChars && cjkChars.length >= 1 && !/[a-zA-Z]{2,}/.test(normalized)) {
       return cacheAndReturn(normalized, null);
-    }
-
-    // 1. 直接精确匹配
-    if (exactDict[normalized]) {
-      return cacheAndReturn(normalized, exactDict[normalized]);
     }
 
     // 2. 正则模式匹配（支持嵌套级联替换，例如时间+单位）

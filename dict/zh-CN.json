@@ -1737,7 +1737,54 @@
     "yesterday": "昨天",
     "Today": "今天",
     "today": "今天",
-    "Open Antigravity": "打开 Antigravity"
+    "Open Antigravity": "打开 Antigravity",
+    "Inherits your Global Permissions": "继承您的全局权限",
+    "Inherits your Global Permissions.": "继承您的全局权限。",
+    "Inherits your global permissions": "继承您的全局权限",
+    "Inherits your global permissions.": "继承您的全局权限。",
+    "Inherits your Global Permissions when working in this project": "在此项目中工作时，继承您的全局权限",
+    "Inherits your Global Permissions when working in this project.": "在此项目中工作时，继承您的全局权限。",
+    "Inherits your global permissions when working in this project": "在此项目中工作时，继承您的全局权限",
+    "Inherits your global permissions when working in this project.": "在此项目中工作时，继承您的全局权限。",
+    "Inherits your Global Permissions 在此项目中工作时": "在此项目中工作时，继承您的全局权限",
+    "Inherits your Global Permissions 在此项目中工作时.": "在此项目中工作时，继承您的全局权限。",
+    "Inherits your Global Permissions 在此项目中工作时。": "在此项目中工作时，继承您的全局权限。",
+    "Inherits your global permissions 在此项目中工作时": "在此项目中工作时，继承您的全局权限",
+    "Inherits your global permissions 在此项目中工作时.": "在此项目中工作时，继承您的全局权限。",
+    "Inherits your global permissions 在此项目中工作时。": "在此项目中工作时，继承您的全局权限。",
+    "继承您的全局权限 when working in this project": "在此项目中工作时，继承您的全局权限",
+    "继承您的全局权限 when working in this project.": "在此项目中工作时，继承您的全局权限。",
+    "继承您的全局权限 在此项目中工作时": "在此项目中工作时，继承您的全局权限",
+    "继承您的全局权限 在此项目中工作时.": "在此项目中工作时，继承您的全局权限。",
+    "继承您的全局权限 在此项目中工作时。": "在此项目中工作时，继承您的全局权限。",
+    "Also includes Global Permissions": "也包含全局权限",
+    "Also includes Global Permissions.": "也包含全局权限。",
+    "Also includes global permissions": "也包含全局权限",
+    "Also includes global permissions.": "也包含全局权限。",
+    "Also includes Global Permissions when working in this project": "在此项目中工作时也包含全局权限",
+    "Also includes Global Permissions when working in this project.": "在此项目中工作时也包含全局权限。",
+    "Also includes global permissions when working in this project": "在此项目中工作时也包含全局权限",
+    "Also includes global permissions when working in this project.": "在此项目中工作时也包含全局权限。",
+    "Also includes Global Permissions when working in this project. Learn more.": "在此项目中工作时也包含全局权限。了解更多。",
+    "Also includes 全局权限 when working in this project": "在此项目中工作时也包含全局权限",
+    "Also includes 全局权限 when working in this project.": "在此项目中工作时也包含全局权限。",
+    "Also includes Global Permissions 在此项目中工作时": "在此项目中工作时也包含全局权限",
+    "Also includes Global Permissions 在此项目中工作时.": "在此项目中工作时也包含全局权限。",
+    "Also includes Global Permissions 在此项目中工作时。": "在此项目中工作时也包含全局权限。",
+    "Also includes global permissions 在此项目中工作时": "在此项目中工作时也包含全局权限",
+    "Also includes global permissions 在此项目中工作时.": "在此项目中工作时也包含全局权限。",
+    "Also includes global permissions 在此项目中工作时。": "在此项目中工作时也包含全局权限。",
+    "Also includes 全局权限 在此项目中工作时": "在此项目中工作时也包含全局权限",
+    "Also includes 全局权限 在此项目中工作时.": "在此项目中工作时也包含全局权限。",
+    "Also includes 全局权限 在此项目中工作时。": "在此项目中工作时也包含全局权限。",
+    "也包含 Global Permissions 在此项目中工作时": "在此项目中工作时也包含全局权限",
+    "也包含 Global Permissions 在此项目中工作时.": "在此项目中工作时也包含全局权限。",
+    "也包含 Global Permissions 在此项目中工作时。": "在此项目中工作时也包含全局权限。",
+    "也包含 全局权限 在此项目中工作时": "在此项目中工作时也包含全局权限",
+    "也包含 全局权限 在此项目中工作时.": "在此项目中工作时也包含全局权限。",
+    "也包含 全局权限 在此项目中工作时。": "在此项目中工作时也包含全局权限。",
+    "也包含 全局权限 在此项目中工作时。 了解更多。": "在此项目中工作时也包含全局权限。了解更多。",
+    "也包含 全局权限 在此项目中工作时。 了解更多": "在此项目中工作时也包含全局权限。了解更多"
   },
   "patterns": [
     {
@@ -2433,6 +2480,30 @@
     {
       "regex": "Remote Control,\\s*or\\s*",
       "replacement": "远程控制，或 "
+    },
+    {
+      "regex": "^(?:继承您的全局权限|Inherits\\s+your\\s+(?:Global\\s+Permissions|global\\s+permissions))[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?$",
+      "replacement": "在此项目中工作时，继承您的全局权限。"
+    },
+    {
+      "regex": "^Inherits\\s+your\\s+(?:Global\\s+Permissions|global\\s+permissions)[。.]?$",
+      "replacement": "继承您的全局权限。"
+    },
+    {
+      "regex": "\\b(?:Inherits\\s+your|继承您的)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?",
+      "replacement": "在此项目中工作时，继承您的全局权限。"
+    },
+    {
+      "regex": "^(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?\\s*(?:Learn\\s+more|了解更多)[。.]?$",
+      "replacement": "在此项目中工作时也包含全局权限。了解更多。"
+    },
+    {
+      "regex": "^(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?$",
+      "replacement": "在此项目中工作时也包含全局权限。"
+    },
+    {
+      "regex": "\\b(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?",
+      "replacement": "在此项目中工作时也包含全局权限。"
     }
   ]
 }

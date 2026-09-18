@@ -209,6 +209,11 @@ assert(translate('Working...') === '正在运行...', '"Working..." 状态汉化
 assert(translate('External tools the agent can call via Model Context Protocol.') === '智能体可通过模型上下文协议 (Model Context Protocol) 调用的外部工具。', 'MCP 权限卡片说明汉化通过');
 assert(translate('Configure MCP Server') === '配置 MCP 服务', 'MCP 服务配置项汉化通过');
 assert(translate('Search MCP servers by name') === '按名称搜索 MCP 服务', 'MCP 搜索项汉化通过');
+assert(translate('Inherits your Global Permissions when working in this project.') === '在此项目中工作时，继承您的全局权限。', '项目安全预设气泡 Tooltip 汉化通过');
+assert(translate('Inherits your Global Permissions 在此项目中工作时。') === '在此项目中工作时，继承您的全局权限。', '项目安全预设气泡中英混合拼接残缺态自愈汉化通过');
+assert(translate('Also includes Global Permissions when working in this project.') === '在此项目中工作时也包含全局权限。', '项目本地权限说明长句汉化通过');
+assert(translate('也包含 全局权限 在此项目中工作时。') === '在此项目中工作时也包含全局权限。', '项目本地权限中英倒装拼接态自愈汉化通过');
+
 
 console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');
 const pluginJsonPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'plugin.json');
