@@ -149,26 +149,41 @@ flowchart LR
 
 ---
 
-## 📁 仓库结构
+## 📁 仓库结构 (Repository Structure)
 
 ```text
 antigravity-chinese/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                    # 全平台 CI 自动化测试流水线 (Ubuntu/macOS/Windows)
 ├── dict/
-│   └── zh-CN.json            # 汉化词典库（1730+ 精确词条 + 166 组级联正则）
+│   └── zh-CN.json                    # 核心汉化词库 (1,730+ 精确词条 + 166 组级联正则)
 ├── core/
-│   └── i18n-runtime.js       # 前端运行时注入引擎（Preload 挂载、防抖、代码区保护、优雅让位）
+│   └── i18n-runtime.js               # 零卡顿前端注入引擎 (DOM 否定标记、悬浮门禁节流、代码区保护)
 ├── plugins/
-│   └── chinese-toolkit/      # Antigravity 官方智能体插件（中文规则 Rules + 诊断技能 Skills）
-├── cli.js                    # 跨平台管理工具（Buffer 签名探测、解包、注入、打包、还原、自愈启动）
-├── install.bat / install.sh  # 一键安装脚本（默认双装 UI 补丁 + 官方插件）
-├── launch.bat                # 自愈启动脚本
-├── uninstall.bat / uninstall.sh # 一键还原脚本
-├── test/                     # 自动化全真回归测试套件（DOM 模拟、截图用例、ASAR 生命周期、无参探测）
-├── tools/                    # 文本提取、差量比对与漂移检测工具链
-├── docs/assets/sponsoring/   # 赞助与支持相关资产
-├── package.json              # 项目配置
-├── LICENSE                   # MIT 开源许可证
-└── README.md                 # 说明文档
+│   └── chinese-toolkit/              # Antigravity 官方中文智能体增强插件
+│       ├── rules/                    # 智能体中文交互规则 (chinese-interaction-rules.md)
+│       ├── skills/                   # 本地化诊断技能 (i18n-diagnostics)
+│       └── plugin.json               # 插件规范清单配置文件
+├── test/                             # 自动化全真回归测试套件 (149+ 项全维断言)
+│   ├── verify.js                     # JSDOM DOM 模拟与代码区保护断言
+│   ├── test-screenshots.js          # 真实 UI 截图复合句式与动态状态机断言
+│   ├── test-menu-and-titles.js       # 菜单项、托盘协同与用户标题防误伤断言
+│   ├── test-asar-lifecycle.js        # 18 项真实 ASAR 生命周期、二次安装幂等与官方升级防降级断言
+│   ├── test-detector-live.js         # 真实宿主系统 0 参数无参安装路径探测断言
+│   └── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
+├── tools/                            # 上游逆向、差量分析与漂移检测工具链
+│   ├── drift-detector.js             # 上游版本文本与候选漂移检测器 (npm run scan:drift)
+│   ├── build-full-dict.js            # 全量词典自动化构建与去重工具
+│   └── gap-analysis.js               # 覆盖率差量与漏项自动化分析器
+├── docs/assets/sponsoring/           # 赞助与社区资产
+├── cli.js                            # 跨平台生命周期管理 CLI (探测、备份、解包、注入、打包、防降级还原)
+├── install.bat / install.sh          # 一键安装脚本 (默认双装 UI 补丁 + 官方插件)
+├── launch.bat                        # 自愈启动脚本 (秒级自愈检测并拉起客户端)
+├── uninstall.bat / uninstall.sh      # 一键还原脚本 (安全防降级出厂复原)
+├── package.json                      # 项目配置与 npm scripts
+├── LICENSE                           # MIT 开源许可证
+└── README.md / README.en.md          # 中英双语说明文档
 ```
 
 ---
