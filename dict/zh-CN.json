@@ -1784,7 +1784,15 @@
     "也包含 全局权限 在此项目中工作时.": "在此项目中工作时也包含全局权限。",
     "也包含 全局权限 在此项目中工作时。": "在此项目中工作时也包含全局权限。",
     "也包含 全局权限 在此项目中工作时。 了解更多。": "在此项目中工作时也包含全局权限。了解更多。",
-    "也包含 全局权限 在此项目中工作时。 了解更多": "在此项目中工作时也包含全局权限。了解更多"
+    "也包含 全局权限 在此项目中工作时。 了解更多": "在此项目中工作时也包含全局权限。了解更多",
+    "Resets in 4d 13h": "4 天 13 小时后重置",
+    "Resets in 4d 13h.": "4 天 13 小时后重置。",
+    "Resets in 2h 35m": "2 小时 35 分钟后重置",
+    "Resets in 2h 35m.": "2 小时 35 分钟后重置。",
+    "Resets in less than a minute": "不到 1 分钟后重置",
+    "Resets in less than a minute.": "不到 1 分钟后重置。",
+    "Resets soon": "即将重置",
+    "Resets soon.": "即将重置。"
   },
   "patterns": [
     {
@@ -2450,9 +2458,7 @@
     {
       "regex": "^Executing\\s+task:\\s+(.+)$",
       "replacement": "正在执行任务: $1"
-    }
-  ],
-  "rules": [
+    },
     {
       "regex": "^Record Audio(\\s+Ctrl\\+[A-Za-z])$",
       "replacement": "录制音频$1"
@@ -2504,6 +2510,110 @@
     {
       "regex": "\\b(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?",
       "replacement": "在此项目中工作时也包含全局权限。"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+      "replacement": "$1 天 $2 小时 $3 分钟后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[。.]?$",
+      "replacement": "$1 天 $2 小时后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+      "replacement": "$1 小时 $2 分钟后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[,\\s]+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+      "replacement": "$1 分 $2 秒后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[。.]?$",
+      "replacement": "$1 天后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[。.]?$",
+      "replacement": "$1 小时后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+      "replacement": "$1 分钟后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+      "replacement": "$1 秒后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+less\\s+than\\s+a\\s+minute[。.]?$",
+      "replacement": "不到 1 分钟后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+in\\s+a\\s+few\\s+seconds[。.]?$",
+      "replacement": "几秒后重置"
+    },
+    {
+      "regex": "^[Rr]esets?\\s+soon[。.]?$",
+      "replacement": "即将重置"
+    },
+    {
+      "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)",
+      "replacement": "$1 天 $2 小时后重置"
+    },
+    {
+      "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)",
+      "replacement": "$1 小时 $2 分钟后重置"
+    },
+    {
+      "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[,\\s]+(\\d+)\\s*(?:s|secs?|seconds?)",
+      "replacement": "$1 分 $2 秒后重置"
+    },
+    {
+      "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)",
+      "replacement": "$1 天后重置"
+    },
+    {
+      "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)",
+      "replacement": "$1 小时后重置"
+    },
+    {
+      "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)",
+      "replacement": "$1 分钟后重置"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+      "replacement": "$1 天 $2 小时 $3 分钟后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[。.]?$",
+      "replacement": "$1 天 $2 小时后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+      "replacement": "$1 小时 $2 分钟后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[,\\s]+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+      "replacement": "$1 分 $2 秒后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:d|days?)[。.]?$",
+      "replacement": "$1 天后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[。.]?$",
+      "replacement": "$1 小时后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+      "replacement": "$1 分钟后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+      "replacement": "$1 秒后重置刷新"
+    },
+    {
+      "regex": "^[Rr]efreshes?\\s+soon[。.]?$",
+      "replacement": "即将重置刷新"
     }
   ]
 }

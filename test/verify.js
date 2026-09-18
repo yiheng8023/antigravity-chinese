@@ -213,6 +213,12 @@ assert(translate('Inherits your Global Permissions when working in this project.
 assert(translate('Inherits your Global Permissions 在此项目中工作时。') === '在此项目中工作时，继承您的全局权限。', '项目安全预设气泡中英混合拼接残缺态自愈汉化通过');
 assert(translate('Also includes Global Permissions when working in this project.') === '在此项目中工作时也包含全局权限。', '项目本地权限说明长句汉化通过');
 assert(translate('也包含 全局权限 在此项目中工作时。') === '在此项目中工作时也包含全局权限。', '项目本地权限中英倒装拼接态自愈汉化通过');
+assert(translate('Resets in 4d 13h') === '4 天 13 小时后重置', '模型配额悬浮卡片 "Resets in 4d 13h" 汉化通过');
+assert(translate('Resets in 2h 35m') === '2 小时 35 分钟后重置', '模型配额悬浮卡片 "Resets in 2h 35m" 汉化通过');
+assert(translate('Resets in 4d') === '4 天后重置', '模型配额单段天数 "Resets in 4d" 汉化通过');
+assert(translate('Resets in 2h') === '2 小时后重置', '模型配额单段小时 "Resets in 2h" 汉化通过');
+assert(translate('Refreshes in 4d 13h') === '4 天 13 小时后重置刷新', '模型配额 "Refreshes in 4d 13h" 汉化通过');
+
 
 
 console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');

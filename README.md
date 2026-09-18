@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.39**）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.40**）。
 
 ---
 
@@ -26,7 +26,9 @@
 - **预加载同步挂载 (Preload Hook)**：在渲染进程初始化阶段尽早介入，最大程度减少英文向中文的界面跳变。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
 - **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
-- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换（已收录 1780+ 精确词条与 166 组级联正则）。
+- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换（已收录 1790+ 精确词条与 205 组级联正则）。
+- **模型配额悬浮卡片与动态时间重置 (Model Quota & Reset Timers)**：完整覆盖模型选择器用量明细悬浮卡片中的周期性重置时间（如 `Resets in 4d 13h` ➔ `4 天 13 小时后重置`、`Resets in 2h 35m` ➔ `2 小时 35 分钟后重置` 等多段式倒计时）。
+- **词典结构规范归一化 (Dictionary Structure Normalization)**：彻底合并历史遗留的多字段正则数组为统一顶级 `patterns` 体系，消除测试断言与运行时的结构偏差。
 - **DOM 动态插值与语义自愈 (Dynamic Interpolation & Semantic Self-Healing)**：专项解决上游设置面板定语从句拼接与局部渲染导致的语言倒装与中英夹杂缺陷（如项目安全预设气泡提示 Tooltip 与本地权限说明），提供整句闭环覆盖。
 - **两阶段原子回滚与冷启动断电自愈 (Two-Phase Staged Swap & Crash-Resilient Auto-Healing)**：注入采用安全暂存流转机制，失败自动回滚；若遭遇机器死机断电遗留孤儿暂存文件，CLI 启动入口自动识别并原子复原，杜绝客户端主文件丢失。
 - **双重状态感知出厂基线与版本防回退 (Dual-State Baseline & Anti-Downgrade)**：首次注入时创建纯净备份；官方静默推送新版时自动刷新出厂基线，restore 还原时自动熔断拦截，彻底杜绝老旧备份覆盖官方新版导致的版本回退惨剧。

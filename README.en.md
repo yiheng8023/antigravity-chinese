@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.2.39**.
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.2.40**.
 
 ---
 
@@ -26,7 +26,9 @@ A high-performance, reversible Chinese localization patch and lifecycle manager 
 - **Preload Synchronization Hook (Minimizing FOUC)**: Mounts early during renderer initialization to minimize English-to-Chinese visual flicker.
 - **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), strictly preserving user code and terminal commands.
 - **Self-Healing & File Watcher**: Built-in self-healing launcher (`launch.bat`) and file watcher to automatically detect and reapply patches after upstream updates.
-- **Multi-Sentence Compound Parsing & Cascading Regexes**: Seamlessly breaks down complex multi-sentence paragraphs, with support for cascading dynamic regex replacements for timestamps and quotas (over **1,780+ exact entries** and **166 cascading dynamic regex rules**).
+- **Multi-Sentence Compound Parsing & Cascading Regexes**: Seamlessly breaks down complex multi-sentence paragraphs, with support for cascading dynamic regex replacements for timestamps and quotas (over **1,790+ exact entries** and **205 cascading dynamic regex rules**).
+- **Model Quota Floating Cards & Dynamic Reset Timers**: Fully covers periodic quota reset countdowns in model selector usage cards (e.g. `Resets in 4d 13h` ➔ `4 天 13 小时后重置`, `Resets in 2h 35m` ➔ `2 小时 35 分钟后重置`).
+- **Dictionary Structure Normalization**: Unifies legacy split regex blocks into the canonical top-level `patterns` array, eliminating structural divergence between test suites and runtime.
 - **DOM Dynamic Interpolation & Semantic Self-Healing**: Resolves upstream split node fragments and relative clause inverted word order (e.g. Security Preset floating Tooltips and Local Permissions clauses) with full-sentence closed-loop recovery.
 - **Two-Phase Staged Swap & Cold-Boot Crash Recovery**: Employs safe staged file swap with auto-rollback. If sudden power-offs leave an orphaned swap file, the CLI entrance automatically detects and restores `app.asar` on next startup, preventing client binary loss.
 - **Dual-State Baseline & Anti-Downgrade Circuit Breaker**: Automatically creates a pristine `app.asar.bak` baseline on initial installation and updates the baseline upon silent upstream updates; enforces circuit breakers during `restore` to prevent stale backups from overwriting newer official releases.

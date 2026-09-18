@@ -208,7 +208,22 @@ const testCases = [
   "Also includes Global Permissions when working in this project.",
   "也包含 全局权限 在此项目中工作时。",
   "也包含 全局权限 在此项目中工作时",
-  "也包含 全局权限 在此项目中工作时。 了解更多。"
+  "也包含 全局权限 在此项目中工作时。 了解更多。",
+
+  // Screenshot 10: Model Quota Tooltip & Relative Reset Time (media_1789756522985.png)
+  "Resets in 4d 13h",
+  "Resets in 2h 35m",
+  "Resets in 4d 13h.",
+  "Resets in 2h 35m.",
+  "Resets in 5m 20s",
+  "Resets in 4d",
+  "Resets in 2h",
+  "Resets in 35m",
+  "Resets in 10s",
+  "Resets in less than a minute",
+  "Resets soon",
+  "Refreshes in 4d 13h",
+  "Refreshes in 2h 35m"
 ];
 
 console.log('Testing', testCases.length, 'cases from screenshots:');
