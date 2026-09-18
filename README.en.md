@@ -15,18 +15,19 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.2.36**.
 
 ---
 
 ## 🌟 Key Features & Engineering Design
 
 - **Reversible Runtime Engine**: Injects a responsive DOM translation engine at Electron's `preload` phase, balancing lightweight execution with deep localization.
-- **Preload Synchronization (Minimizing FOUC)**: Early mount during renderer initialization to minimize English-to-Chinese visual flicker.
-- **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), preserving user code and terminal commands.
+- **Zero-Lag Architecture (Zero Jitter Closed Loop)**: Completely eliminates `requestIdleCallback` 50~60Hz infinite spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal gates and 100ms throttle valves ensure 0 dropped frames during intensive streaming dialogues and virtual scrolling.
+- **Preload Synchronization Hook (Minimizing FOUC)**: Mounts early during renderer initialization to minimize English-to-Chinese visual flicker.
+- **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), strictly preserving user code and terminal commands.
 - **Self-Healing & File Watcher**: Built-in self-healing launcher (`launch.bat`) and file watcher to automatically detect and reapply patches after upstream updates.
-- **Multi-Sentence Compound Parsing**: Seamlessly breaks down multi-sentence paragraphs and translates cascading dynamic time/quota values.
-- **Versioned Fingerprint Baseline & Reversible Restore**: Automatically creates pristine `app.asar.bak` baseline on initial installation and updates baseline on upstream updates; restores official English status with one click.
+- **Multi-Sentence Compound Parsing & Cascading Regexes**: Seamlessly breaks down complex multi-sentence paragraphs, with support for cascading dynamic regex replacements for timestamps and quotas (over **1,730+ exact entries** and **166 cascading dynamic regex rules**).
+- **Dual-State Baseline & Anti-Downgrade Circuit Breaker**: Automatically creates a pristine `app.asar.bak` baseline on initial installation and updates the baseline upon silent upstream updates; enforces circuit breakers during `restore` to prevent stale backups from overwriting newer official releases.
 - **Graceful Yield to Upstream Chinese**: Built-in CJK character and native locale probes to automatically yield when official upstream Chinese lands.
 
 ---
@@ -38,9 +39,9 @@ Before installing the patch, make sure your environment meets the following requ
 1. **Supported Operating Systems**:
    - **Windows**: Windows 10 / 11 (x64)
    - **macOS**: macOS 12+ (Apple Silicon M-series & Intel chips; automated `codesign` ad-hoc signing included)
-   - **Linux**: Major distributions (Ubuntu, Debian, Fedora, Arch, etc., x64/ARM64)
+   - **Linux**: Major distributions (Ubuntu, Debian, Fedora, Arch, etc., x64 / ARM64)
 2. **Node.js Runtime Environment**:
-   - **Node.js (>= 16.x)** with `npm` / `npx` (Fully compatible with Node 18/20/22/24+).
+   - **Node.js (>= 16.x)** with `npm` and `npx` (Fully compatible with Node 18/20/22/24+ LTS releases).
    - Run `node -v` and `npx -v` in your terminal to verify. If not installed, download the LTS release from [Node.js Official Website](https://nodejs.org/).
 3. **Google Antigravity Installed**:
    - Official **Google Antigravity 2.0** desktop client installed.
@@ -51,11 +52,11 @@ Before installing the patch, make sure your environment meets the following requ
 
 ## 🚀 Quick Start
 
-### Method 1: Scripts (Recommended)
+### Method 1: Scripts (Recommended for Daily Use)
 
 #### Windows
-- **Install Patch**: Double-click [`install.bat`](install.bat) (Runs pre-flight check, safely releases file locks, and installs UI patch + community agent plugin)
-- **Self-Healing Launch**: Double-click [`launch.bat`](launch.bat)
+- **Install Patch**: Double-click [`install.bat`](install.bat) (Runs pre-flight health check, safely releases file locks, and installs UI patch + community agent plugin)
+- **Self-Healing Launch**: Double-click [`launch.bat`](launch.bat) (Auto-detects upstream updates, re-patches, and launches)
 - **Restore English**: Double-click [`uninstall.bat`](uninstall.bat)
 
 #### macOS / Linux
@@ -96,23 +97,25 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 
 ## 🧪 Automated Testing & CI Verification
 
-The project includes an end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering 145+ assertions:
+The project includes an end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **149+ assertions**:
 
 ```bash
-# Run all automated test suites
+# Run all automated test suites (aggregating 6 full-fidelity test suites, 149+ assertions)
 npm test
 ```
 
 - **DOM Translation & Code Protection (`test/verify.js`)**: Uses JSDOM to verify 50 key DOM paths, Monaco Editor protection, and cross-platform path resolution.
 - **Screenshot Fixture Assertions (`test/test-screenshots.js`)**: Covers 64 test cases from real UI screenshots with compound sentences and dynamic quota values.
 - **Menu & Session Title Safety (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom user session titles.
-- **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream upgrade simulation, and atomic restoration.
+- **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream upgrade simulation, and atomic restoration (18 assertions, including Stage 3 regression testing for silent upstream updates preventing downgrade on restore).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions ensuring full-width punctuation, standard terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions ensuring zero typos, full-width punctuation, standard terminology, and safe regex compilation.
 
 ---
 
 ## 🔄 Self-Evolving Pipeline (Roadmap)
+
+Facing frequent Antigravity updates, the core evolution direction is building a closed loop that automatically tracks upstream changes:
 
 ```mermaid
 flowchart LR
@@ -122,6 +125,10 @@ flowchart LR
     D -->|npm test| E[Automated DOM & Regression Testing]
     E --> F[Human Review & Merge]
 ```
+
+- **Three-Tier Metrics**: `npm run scan:drift` outputs total observed candidates, exact match coverage, and rule-assisted coverage.
+- **Stale Rule Detection**: Identifies historical entries in the dictionary that are no longer observed upstream (`exactKeys - observed`), providing cleanup leads.
+- **Reduced Maintenance Cost**: Replaces manual verification with automated diff extraction and regression testing.
 
 ---
 
@@ -134,11 +141,11 @@ In addition to the host UI localization patch, this project includes a complete 
 - **I18n Diagnostics Skill (`skills/i18n-diagnostics/`)**: Equips agents with one-click health diagnosis, drift analysis (`scan:drift`), and test execution capabilities.
 
 ### Enabling the Plugin
-- **One-click Global Install (Recommended)**: Run `node cli.js install-plugin` (or via `install.bat`)
+- **One-click Global Install (Recommended)**: Run `node cli.js install-plugin` (or automatically via `install.bat`)
 - **Manual Installation**: Copy `plugins/chinese-toolkit` to your global plugin directory:
   - Windows: `%USERPROFILE%\.gemini\config\plugins\chinese-toolkit`
   - macOS / Linux: `~/.gemini/config/plugins/chinese-toolkit`
-  - *Note: Antigravity identifies the plugin by the `name` field in `plugin.json` (`antigravity-chinese-toolkit`), while the folder directory can be `chinese-toolkit`.*
+  - *Note: Antigravity identifies the plugin by the `name` field in `plugin.json` (`antigravity-chinese-toolkit`), while the directory can be `chinese-toolkit`.*
 
 ---
 
@@ -146,21 +153,56 @@ In addition to the host UI localization patch, this project includes a complete 
 
 ```text
 antigravity-chinese/
+├── .github/
+│   └── workflows/
+│       └── ci.yml                    # Cross-platform CI automated test workflow (Ubuntu/macOS/Windows)
 ├── dict/
-│   └── zh-CN.json            # Translation dictionary (1070+ keys + 25 regex patterns)
+│   └── zh-CN.json                    # Core translation dictionary (1,730+ exact entries + 166 dynamic regexes)
 ├── core/
-│   └── i18n-runtime.js       # Preload runtime injection engine
+│   └── i18n-runtime.js               # Zero-lag preload runtime injection engine (DOM negative tags & gates)
 ├── plugins/
-│   └── chinese-toolkit/      # Community Agent Plugin (Rules + Diagnostic Skills)
-├── cli.js                    # Cross-platform CLI lifecycle manager
-├── install.bat / install.sh  # One-click installation scripts
-├── launch.bat                # Self-healing launcher
-├── uninstall.bat / uninstall.sh # One-click restore scripts
-├── package.json              # Project configuration & npm scripts
-├── LICENSE                   # MIT License
-├── README.md                 # Simplified Chinese Documentation
-└── README.en.md              # English Documentation
+│   └── chinese-toolkit/              # Antigravity official Chinese agent community plugin
+│       ├── rules/                    # Agent Chinese interaction rules (chinese-interaction-rules.md)
+│       ├── skills/                   # Localization diagnostic skills (i18n-diagnostics)
+│       └── plugin.json               # Antigravity plugin manifest specification
+├── test/                             # Automated full-fidelity regression test suites (149+ assertions)
+│   ├── verify.js                     # JSDOM DOM simulation and code area protection assertions
+│   ├── test-screenshots.js          # Real UI screenshot compound sentences & state machine assertions
+│   ├── test-menu-and-titles.js       # Menu items, tray integration, and custom title protection assertions
+│   ├── test-asar-lifecycle.js        # 18 ASAR lifecycle, double-install idempotence & anti-downgrade assertions
+│   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
+│   └── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
+├── tools/                            # Upstream reverse engineering, diff analysis & drift detection toolchain
+│   ├── drift-detector.js             # Upstream version text & candidate drift detector (npm run scan:drift)
+│   ├── build-full-dict.js            # Full dictionary automated builder and deduplication tool
+│   └── gap-analysis.js               # Translation coverage gap & missed item automated analyzer
+├── docs/assets/sponsoring/           # Sponsorship & community assets
+├── cli.js                            # Cross-platform lifecycle CLI (detect, backup, extract, inject, pack, restore)
+├── install.bat / install.sh          # One-click installation scripts (installs UI patch + community plugin)
+├── launch.bat                        # Self-healing launcher (second-level drift check and launch)
+├── uninstall.bat / uninstall.sh      # One-click restore scripts (safe anti-downgrade rollback)
+├── package.json                      # Project configuration & npm scripts
+├── LICENSE                           # MIT License
+└── README.md / README.en.md          # Bilingual documentation
 ```
+
+---
+
+## 💖 Voluntary Sponsoring & Support
+
+If the Antigravity Chinese Localization Toolkit has benefited your work and daily development, and you would like to support ongoing maintenance, documentation improvements, automated testing, and version updates, voluntary donations of any amount are deeply appreciated. Sponsorship is entirely voluntary and does not constitute any service-level agreement.
+
+- **RMB Sponsorship**: Scan the WeChat Pay or Alipay QR codes below.
+- **Cross-Border / Other Currencies**: Use our **[PayPal Sponsoring Link](https://www.paypal.com/ncp/payment/LNTF8KXGJXMZY)**. Accepted currencies, payment methods, and exchange rates are subject to PayPal's checkout page.
+
+Please verify the payee name shown on the checkout page before confirming payment. Thank you for your support of open-source software!
+
+<table>
+  <tr>
+    <td align="center"><strong>WeChat Pay (RMB)</strong><br><img src="docs/assets/sponsoring/wechat-pay.png" alt="WeChat Pay Donation QR Code" width="260"></td>
+    <td align="center"><strong>Alipay (RMB)</strong><br><img src="docs/assets/sponsoring/alipay.png" alt="Alipay Donation QR Code" width="260"></td>
+  </tr>
+</table>
 
 ---
 

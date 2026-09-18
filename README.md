@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.36**）。
 
 ---
 
@@ -100,14 +100,14 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 本项目引入严格的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（包含 6 大全真测试套件，共 145+ 项断言）
+# 运行全套自动化测试（包含 6 大全真测试套件，共 149+ 项断言）
 npm test
 ```
 
 - **核心 DOM 注入与代码保护 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，验证 50 项关键 DOM 路径的翻译准确性、Monaco Editor 保护及跨平台路径解析。
 - **真实截图用例集 (`test/test-screenshots.js`)**：覆盖 64 项来自真实界面截图的复合句子、动态限额与时间解析。
 - **菜单与会话标题防误伤 (`test/test-menu-and-titles.js`)**：确保单字词不破坏用户自定义会话名称。
-- **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 18 项全真断言，验证解包、注入、防误杀门禁、二次安装幂等、官方静默升级防降级与出厂原子回滚。
+- **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 18 项全真断言（包含阶段 3 模拟留存旧 bak 时官方静默推送新版 C 并直接执行 restore 的防降级回归测试），验证解包、注入、防误杀门禁、二次安装幂等、官方静默升级防降级与出厂原子回滚。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
 - **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言自动扫描 0 错别字（登录/账号/其他等）、全角标点排版、CCF 核心学术术语与正则安全。
 
