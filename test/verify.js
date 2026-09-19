@@ -237,6 +237,8 @@ assert(translate('Search conversations...') === '搜索会话...', '"Search conv
 assert(translate('Display') === '显示方式', '"Display" -> "显示方式"');
 assert(translate('Project + Worktree') === '项目 + 工作树', '"Project + Worktree" -> "项目 + 工作树"');
 assert(translate('Only Unread') === '仅未读', '"Only Unread" -> "仅未读"');
+assert(translate('Queue until after the current turn.') === '排队等待，直至当前轮次结束。', '"Queue until after the current turn." -> "排队等待，直至当前轮次结束。"');
+assert(translate('Interrupt the agent and send immediately.') === '打断智能体并立即发送。', '"Interrupt the agent and send immediately." -> "打断智能体并立即发送。"');
 assert(translate('Copy Conversation Markdown') === '复制会话 Markdown', '会话操作 "Copy Conversation Markdown" 通过');
 assert(translate('Product Skin') === '产品界面风格', '外观设置 "Product Skin" 通过');
 assert(translate('Workspace CL Status') === '工作区 CL 状态', '审查联动 "Workspace CL Status" 通过');

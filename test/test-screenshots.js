@@ -259,6 +259,10 @@ const testCases = [
   // Screenshot 15: Filter menu Only Unread (media_1789790951393.png)
   "Only Unread",
 
+  // Screenshot 16: Queued Messages Strategy Tooltips (media_1789793151370.png & media_1789793163093.png)
+  "Queue until after the current turn.",
+  "Interrupt the agent and send immediately.",
+
   // v2.15.0 Core Features: Conversation Actions, Skins, CL Status, Plugins
   "Copy Conversation Markdown",
   "Archive This Conversation",

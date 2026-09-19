@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.42**）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.2.43**）。
 
 ---
 
@@ -23,12 +23,13 @@
 
 - **可逆式运行时注入 (Reversible Runtime Engine)**：通过 Electron `preload` 阶段挂载响应式 DOM 翻译引擎，兼顾轻量与深度本地化。
 - **低开销高响应渲染架构 (High-Performance Runtime Architecture)**：阻断 `requestIdleCallback` 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路；悬浮 Portal 门禁与 100ms 节流阀，确保长对话消息流与高频虚拟滚动下保持平滑流畅。
+- **深层选项悬浮气泡与执行策略全量覆盖 (Option Tooltips & Delivery Strategies)**：全量收录排队消息策略悬浮气泡提示（`Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`、`Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`）以及终端自动执行、产物审查模式、严格模式等深层选项的动态说明。
 - **行内纯文本容器联合自愈 (Multi-TextNode Coalescing Self-Healing)**：针对上游 React 模板碎片化拆分（如 `"All ", e, "s run as Flash."` 拆分为多个兄弟 TextNode 导致英文复数残片），在保持虚拟 DOM 节点引用稳定不报错的前提下，整句提纯联合自愈。
 - **预加载同步挂载 (Preload Hook)**：在渲染进程初始化阶段尽早介入，最大程度减少英文向中文的界面跳变。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
 - **自愈启动与文件守护 (Self-Healing & Watcher)**：提供自愈启动器（`launch.bat`）与文件监听守护机制，上游更新覆盖后可自动检测并重新注入。
 - **适配官方 v2.15.0 全域新特性与生命周期管理 (v2.15.0 Upstream Adaptation)**：完整适配官方 v2.15.0 前端架构，全量收录定时任务新建与管理（Scheduled Tasks 模态框及占位符）、会话操作流（置顶/归档/重命名/复制 Markdown）、双界面风格模式（Product Skin: 极简非技术/开发者全功能模式）、工作区代码审查状态联动（Workspace CL Status）与插件应用市场扩展。
-- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换（已收录 1930+ 精确词条与 218 组级联正则）。
+- **复合段落智能拆分 (Multi-Sentence Parsing)**：自动拆解多句子复合段落，支持动态时间与配额百分比的级联正则替换（已收录 1940+ 精确词条与 218 组级联正则）。
 - **模型配额悬浮卡片与动态时间重置 (Model Quota & Reset Timers)**：完整覆盖模型选择器用量明细悬浮卡片中的周期性重置时间（如 `Resets in 4d 13h` ➔ `4 天 13 小时后重置`、`Resets in 2h 35m` ➔ `2 小时 35 分钟后重置` 等多段式倒计时）。
 - **词典结构规范归一化 (Dictionary Structure Normalization)**：彻底合并历史遗留的多字段正则数组为统一顶级 `patterns` 体系，消除测试断言与运行时的结构偏差。
 - **DOM 动态插值与语义自愈 (Dynamic Interpolation & Semantic Self-Healing)**：专项解决上游设置面板定语从句拼接与局部渲染导致的语言倒装与中英夹杂缺陷（如项目安全预设气泡提示 Tooltip 与本地权限说明），提供整句闭环覆盖。
