@@ -219,6 +219,26 @@ assert(translate('Resets in 4d') === '4 天后重置', '模型配额单段天数
 assert(translate('Resets in 2h') === '2 小时后重置', '模型配额单段小时 "Resets in 2h" 汉化通过');
 assert(translate('Refreshes in 4d 13h') === '4 天 13 小时后重置刷新', '模型配额 "Refreshes in 4d 13h" 汉化通过');
 
+console.log('\n--- 4.2 验证 v2.15.0 新特性与漏项汉化 ---');
+assert(translate('Contrast') === '对比度', '"Contrast" -> "对比度"');
+assert(translate('Strong') === '高对比度', '"Strong" -> "高对比度"');
+assert(translate('+ New') === '+ 新建', '"+ New" -> "+ 新建"');
+assert(translate('Search tasks...') === '搜索任务...', '"Search tasks..." -> "搜索任务..."');
+assert(translate('No scheduled tasks configured.') === '尚未配置任何定时任务。', '定时任务空状态提示通过');
+assert(translate('New Scheduled Task') === '新建定时任务', '"New Scheduled Task" -> "新建定时任务"');
+assert(translate('Enter scheduled task name...') === '输入定时任务名称...', '定时任务名称占位符通过');
+assert(translate('Enter a prompt for the agent to run...') === '输入供智能体执行的提示词...', '定时任务提示词占位符通过');
+assert(translate('All scheduled tasks run as Flash.') === '所有定时任务均以 Flash 模型运行。', '全部定时任务运行说明通过');
+assert(translate('全部 scheduled tasks run as Flash.') === '所有定时任务均以 Flash 模型运行。', '中英残缺混合态自愈汉化通过');
+assert(translate('Search conversations...') === '搜索会话...', '"Search conversations..." -> "搜索会话..."');
+assert(translate('Display') === '显示方式', '"Display" -> "显示方式"');
+assert(translate('Project + Worktree') === '项目 + 工作树', '"Project + Worktree" -> "项目 + 工作树"');
+assert(translate('Only Unread') === '仅未读', '"Only Unread" -> "仅未读"');
+assert(translate('Copy Conversation Markdown') === '复制会话 Markdown', '会话操作 "Copy Conversation Markdown" 通过');
+assert(translate('Product Skin') === '产品界面风格', '外观设置 "Product Skin" 通过');
+assert(translate('Workspace CL Status') === '工作区 CL 状态', '审查联动 "Workspace CL Status" 通过');
+assert(translate('Create a Plugin with the Agent') === '与智能体一起创建插件', '插件市场 "Create a Plugin with the Agent" 通过');
+
 
 
 console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');

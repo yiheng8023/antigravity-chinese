@@ -223,7 +223,56 @@ const testCases = [
   "Resets in less than a minute",
   "Resets soon",
   "Refreshes in 4d 13h",
-  "Refreshes in 2h 35m"
+  "Refreshes in 2h 35m",
+
+  // Screenshot 11: Contrast in Appearance (media_1789789564305.png)
+  "Contrast",
+  "Strong",
+  "High Contrast",
+
+  // Screenshot 12: Scheduled Tasks modal & page (media_1789790849888.png)
+  "+ New",
+  "Search tasks...",
+  "No scheduled tasks configured.",
+  "New Scheduled Task",
+  "Name",
+  "Enter scheduled task name...",
+  "Schedule",
+  "Daily",
+  "around",
+  "Prompt",
+  "Enter a prompt for the agent to run...",
+  "全部 scheduled tasks run as Flash.",
+  "All scheduled tasks run as Flash.",
+  "Add Scheduled Task",
+
+  // Screenshot 13: Search conversations (media_1789790888612.png)
+  "Search conversations...",
+
+  // Screenshot 14: Display menu (media_1789790931048.png)
+  "Display",
+  "Project + Worktree",
+
+  // Screenshot 15: Filter menu Only Unread (media_1789790951393.png)
+  "Only Unread",
+
+  // v2.15.0 Core Features: Conversation Actions, Skins, CL Status, Plugins
+  "Copy Conversation Markdown",
+  "Archive This Conversation",
+  "Find in Conversation",
+  "Pin This Conversation",
+  "Unpin This Conversation",
+  "Rename This Conversation",
+  "Move to New Group",
+  "Product Skin",
+  "Non-technical",
+  "Simplified interface without developer tooling.",
+  "The full developer experience.",
+  "Workspace CL Status",
+  "CL details unavailable",
+  "Create a Plugin with the Agent",
+  "This skill came from the marketplace, so you can add it again whenever you need it.",
+  "Undo restores your entire workspace to its state at this point."
 ];
 
 console.log('Testing', testCases.length, 'cases from screenshots:');

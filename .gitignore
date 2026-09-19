@@ -22,6 +22,8 @@ tools/uncovered-ui-strings.json
 tools/to-translate.json
 tools/gap-result.txt
 tools/drift-report.json
+tools/upstream_*/
+tools/*_new_strings.json
 
 # OS & IDE
 .DS_Store
