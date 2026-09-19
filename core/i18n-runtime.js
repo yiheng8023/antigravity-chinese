@@ -320,6 +320,37 @@
     }
 
     // 遍历子节点
+    // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
+    var first = el.firstChild;
+    if (first && first.nextSibling) {
+      var allText = true;
+      var cur = first;
+      while (cur) {
+        if (cur.nodeType !== 3) {
+          allText = false;
+          break;
+        }
+        cur = cur.nextSibling;
+      }
+      if (allText) {
+        var combinedText = el.textContent;
+        if (combinedText) {
+          var combinedTrans = translateSingleUnit(combinedText);
+          if (combinedTrans !== null && combinedTrans !== combinedText) {
+            first.nodeValue = combinedTrans;
+            first._agyOriginal = combinedTrans;
+            var other = first.nextSibling;
+            while (other) {
+              other.nodeValue = '';
+              other._agyOriginal = '';
+              other = other.nextSibling;
+            }
+            return;
+          }
+        }
+      }
+    }
+
     var child = el.firstChild;
     while (child) {
       if (child.nodeType === 3) {

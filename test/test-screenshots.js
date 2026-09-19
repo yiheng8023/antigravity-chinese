@@ -230,11 +230,14 @@ const testCases = [
   "Strong",
   "High Contrast",
 
-  // Screenshot 12: Scheduled Tasks modal & page (media_1789790849888.png)
+  // Screenshot 12: Scheduled Tasks modal & page (media_1789790849888.png & media_1789792208851.png)
   "+ New",
+  "New",
   "Search tasks...",
   "No scheduled tasks configured.",
   "New Scheduled Task",
+  "scheduled task",
+  "s run as Flash.",
   "Name",
   "Enter scheduled task name...",
   "Schedule",

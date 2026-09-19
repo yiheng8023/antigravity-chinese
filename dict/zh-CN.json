@@ -1920,7 +1920,20 @@
     "Browser tools are not available in the Antigravity Android desktop app.": "浏览器工具在 Antigravity Android 桌面应用中不可用。",
     "Browser tools are disabled in the Antigravity Android desktop app.": "浏览器工具在 Antigravity Android 桌面应用中已禁用。",
     "Failed to revalidate slash commands:": "重新验证斜杠命令失败：",
-    "Cannot store content under the reserved new-tab id": "无法在保留的 new-tab ID 下存储内容"
+    "Cannot store content under the reserved new-tab id": "无法在保留的 new-tab ID 下存储内容",
+    "New": "新建",
+    "scheduled task": "定时任务",
+    "scheduled tasks": "定时任务",
+    "s run as Flash.": "均以 Flash 模型运行。",
+    "s run as Flash": "均以 Flash 模型运行",
+    "run as Flash.": "均以 Flash 模型运行。",
+    "run as Flash": "均以 Flash 模型运行",
+    "plugin": "插件",
+    "automation": "自动化任务",
+    "All plugins run as Flash.": "所有插件均以 Flash 模型运行。",
+    "All plugins run as Flash": "所有插件均以 Flash 模型运行",
+    "All automations run as Flash.": "所有自动化任务均以 Flash 模型运行。",
+    "All automations run as Flash": "所有自动化任务均以 Flash 模型运行"
   },
   "patterns": [
     {
@@ -2782,6 +2795,18 @@
     {
       "regex": "^Failed\\s+to\\s+add\\s+plugin[。.]?\\s*(?:Please\\s+try\\s+again[。.]?)?$",
       "replacement": "添加插件失败。请重试。"
+    },
+    {
+      "regex": "^(?:All|全部)\\\\s+scheduled\\\\s+tasks?\\\\s+run\\\\s+as\\\\s+(.+?)[。.]?$",
+      "replacement": "所有定时任务均以  模型运行。"
+    },
+    {
+      "regex": "^(?:All|全部)\\\\s+plugins?\\\\s+run\\\\s+as\\\\s+(.+?)[。.]?$",
+      "replacement": "所有插件均以  模型运行。"
+    },
+    {
+      "regex": "^(?:All|全部)\\\\s+automations?\\\\s+run\\\\s+as\\\\s+(.+?)[。.]?$",
+      "replacement": "所有自动化任务均以  模型运行。"
     }
   ]
 }

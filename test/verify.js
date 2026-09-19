@@ -223,9 +223,12 @@ console.log('\n--- 4.2 验证 v2.15.0 新特性与漏项汉化 ---');
 assert(translate('Contrast') === '对比度', '"Contrast" -> "对比度"');
 assert(translate('Strong') === '高对比度', '"Strong" -> "高对比度"');
 assert(translate('+ New') === '+ 新建', '"+ New" -> "+ 新建"');
+assert(translate('New') === '新建', '"New" -> "新建"');
 assert(translate('Search tasks...') === '搜索任务...', '"Search tasks..." -> "搜索任务..."');
 assert(translate('No scheduled tasks configured.') === '尚未配置任何定时任务。', '定时任务空状态提示通过');
 assert(translate('New Scheduled Task') === '新建定时任务', '"New Scheduled Task" -> "新建定时任务"');
+assert(translate('scheduled task') === '定时任务', '"scheduled task" -> "定时任务"');
+assert(translate('s run as Flash.') === '均以 Flash 模型运行。', '"s run as Flash." -> "均以 Flash 模型运行。"');
 assert(translate('Enter scheduled task name...') === '输入定时任务名称...', '定时任务名称占位符通过');
 assert(translate('Enter a prompt for the agent to run...') === '输入供智能体执行的提示词...', '定时任务提示词占位符通过');
 assert(translate('All scheduled tasks run as Flash.') === '所有定时任务均以 Flash 模型运行。', '全部定时任务运行说明通过');
@@ -238,6 +241,21 @@ assert(translate('Copy Conversation Markdown') === '复制会话 Markdown', '会
 assert(translate('Product Skin') === '产品界面风格', '外观设置 "Product Skin" 通过');
 assert(translate('Workspace CL Status') === '工作区 CL 状态', '审查联动 "Workspace CL Status" 通过');
 assert(translate('Create a Plugin with the Agent') === '与智能体一起创建插件', '插件市场 "Create a Plugin with the Agent" 通过');
+
+// 验证 React 碎片化模板容器联合自愈 (All , e, s run as Flash.)
+const mockFragmentSpan = win.document.createElement('span');
+mockFragmentSpan.className = 'text-xs text-muted-foreground';
+const node1 = win.document.createTextNode('All ');
+const node2 = win.document.createTextNode('scheduled task');
+const node3 = win.document.createTextNode('s run as Flash.');
+mockFragmentSpan.appendChild(node1);
+mockFragmentSpan.appendChild(node2);
+mockFragmentSpan.appendChild(node3);
+win.document.body.appendChild(mockFragmentSpan);
+
+win.__AGY_TRANSLATE_EL__(mockFragmentSpan);
+assert(mockFragmentSpan.textContent === '所有定时任务均以 Flash 模型运行。', 'React 碎片化模板容器联合自愈为整句通过！');
+assert(mockFragmentSpan.childNodes.length === 3, '联合自愈保持子节点树结构稳定 (length: 3)');
 
 
 
