@@ -1,0 +1,874 @@
+[
+  {
+    "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "已思考 $1 小时 $2 分 $3 秒"
+  },
+  {
+    "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+    "replacement": "已思考 $1 小时 $2 分钟"
+  },
+  {
+    "regex": "^Thought\\s+for\\s+(\\d+)\\s*h$",
+    "replacement": "已思考 $1 小时"
+  },
+  {
+    "regex": "^Thought\\s+for\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "已思考 $1 分 $2 秒"
+  },
+  {
+    "regex": "^Thought\\s+for\\s+(\\d+)\\s*m$",
+    "replacement": "已思考 $1 分钟"
+  },
+  {
+    "regex": "^Thought\\s+for\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "已思考 $1 秒"
+  },
+  {
+    "regex": "^See all\\s*\\((\\d+)\\)$",
+    "replacement": "查看全部 ($1)"
+  },
+  {
+    "regex": "^See all\\s+(\\d+)$",
+    "replacement": "查看全部 $1 项"
+  },
+  {
+    "regex": "^\\((\\d+)\\s+subagents?\\)$",
+    "replacement": "($1 个子智能体)"
+  },
+  {
+    "regex": "^(\\d+)\\s+subagents?$",
+    "replacement": "$1 个子智能体"
+  },
+  {
+    "regex": "^(\\d+)\\s+seconds?\\s+ago$",
+    "replacement": "$1 秒前"
+  },
+  {
+    "regex": "^(\\d+)\\s+minutes?\\s+ago$",
+    "replacement": "$1 分钟前"
+  },
+  {
+    "regex": "^(\\d+)\\s+hours?\\s+ago$",
+    "replacement": "$1 小时前"
+  },
+  {
+    "regex": "^(\\d+)\\s+days?\\s+ago$",
+    "replacement": "$1 天前"
+  },
+  {
+    "regex": "^(\\d+)\\s+weeks?\\s+ago$",
+    "replacement": "$1 周前"
+  },
+  {
+    "regex": "^(\\d+)\\s+months?\\s+ago$",
+    "replacement": "$1 个月前"
+  },
+  {
+    "regex": "^(\\d+)\\s+years?\\s+ago$",
+    "replacement": "$1 年前"
+  },
+  {
+    "regex": "^(\\d+)[sS]\\s+ago$",
+    "replacement": "$1 秒前"
+  },
+  {
+    "regex": "^(\\d+)[mM]\\s+ago$",
+    "replacement": "$1 分钟前"
+  },
+  {
+    "regex": "^(\\d+)[hH]\\s+ago$",
+    "replacement": "$1 小时前"
+  },
+  {
+    "regex": "^(\\d+)[dD]\\s+ago$",
+    "replacement": "$1 天前"
+  },
+  {
+    "regex": "^(\\d{1,2}:\\d{2})\\s*\\/\\s*(\\d{1,2}:\\d{2})$",
+    "replacement": "$1 / $2"
+  },
+  {
+    "regex": "^(\\d{1,2}:\\d{2}:\\d{2})\\s*\\/\\s*(\\d{1,2}:\\d{2}:\\d{2})$",
+    "replacement": "$1 / $2"
+  },
+  {
+    "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})\\s*[-–—]\\s*(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})$",
+    "replacement": "$1 $2日 - $3 $4日"
+  },
+  {
+    "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})\\s*[-–—]\\s*(\\d{1,2})$",
+    "replacement": "$1 $2日 - $3日"
+  },
+  {
+    "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2}),\\s*(\\d{4}),\\s*(\\d{1,2}:\\d{2}(?::\\d{2})?)\\s*(AM|PM)?$",
+    "replacement": "$3年 $1 $2日 $5 $4"
+  },
+  {
+    "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2}),\\s*(\\d{1,2}:\\d{2}(?::\\d{2})?)\\s*(AM|PM)?$",
+    "replacement": "$1 $2日 $4 $3"
+  },
+  {
+    "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2}),\\s*(\\d{4})$",
+    "replacement": "$3年 $1 $2日"
+  },
+  {
+    "regex": "^(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\\s+(\\d{1,2})$",
+    "replacement": "$1 $2日"
+  },
+  {
+    "regex": "\\bJan\\b(?=\\s+\\d+日)",
+    "replacement": "1月"
+  },
+  {
+    "regex": "\\bFeb\\b(?=\\s+\\d+日)",
+    "replacement": "2月"
+  },
+  {
+    "regex": "\\bMar\\b(?=\\s+\\d+日)",
+    "replacement": "3月"
+  },
+  {
+    "regex": "\\bApr\\b(?=\\s+\\d+日)",
+    "replacement": "4月"
+  },
+  {
+    "regex": "\\bMay\\b(?=\\s+\\d+日)",
+    "replacement": "5月"
+  },
+  {
+    "regex": "\\bJun\\b(?=\\s+\\d+日)",
+    "replacement": "6月"
+  },
+  {
+    "regex": "\\bJul\\b(?=\\s+\\d+日)",
+    "replacement": "7月"
+  },
+  {
+    "regex": "\\bAug\\b(?=\\s+\\d+日)",
+    "replacement": "8月"
+  },
+  {
+    "regex": "\\bSep\\b(?=\\s+\\d+日)",
+    "replacement": "9月"
+  },
+  {
+    "regex": "\\bOct\\b(?=\\s+\\d+日)",
+    "replacement": "10月"
+  },
+  {
+    "regex": "\\bNov\\b(?=\\s+\\d+日)",
+    "replacement": "11月"
+  },
+  {
+    "regex": "\\bDec\\b(?=\\s+\\d+日)",
+    "replacement": "12月"
+  },
+  {
+    "regex": "\\bAM\\b(?=\\s+\\d{1,2}:\\d{2})",
+    "replacement": "上午"
+  },
+  {
+    "regex": "\\bPM\\b(?=\\s+\\d{1,2}:\\d{2})",
+    "replacement": "下午"
+  },
+  {
+    "regex": "(?<=\\d{1,2}:\\d{2}(?::\\d{2})?\\s*)AM\\b",
+    "replacement": "上午"
+  },
+  {
+    "regex": "(?<=\\d{1,2}:\\d{2}(?::\\d{2})?\\s*)PM\\b",
+    "replacement": "下午"
+  },
+  {
+    "regex": "^([\\d\\.]+)% of the customization budget is available\\.$",
+    "replacement": "$1% 的自定义扩展预算可用。"
+  },
+  {
+    "regex": "^Show (\\d+) breakdowns?$",
+    "replacement": "显示 $1 项明细"
+  },
+  {
+    "regex": "^Hide (\\d+) breakdowns?$",
+    "replacement": "隐藏 $1 项明细"
+  },
+  {
+    "regex": "^You have used some of your weekly limit, it will fully refresh in (.+)\\.$",
+    "replacement": "您已消耗了部分每周额度，将在 $1 后完全重置刷新。"
+  },
+  {
+    "regex": "^You have used some of your 5 hour limit, it will fully refresh in (.+)\\.$",
+    "replacement": "您已消耗了部分 5 小时额度，将在 $1 后完全重置刷新。"
+  },
+  {
+    "regex": "^You have hit your 5-hour limit, so the weekly limit does not currently apply\\. Your 5-hour limit will refresh in (.+)\\.$",
+    "replacement": "您已达到 5 小时上限，因此每周额度当前不适用。您的 5 小时额度将在 $1 后重置刷新。"
+  },
+  {
+    "regex": "^You have hit your 5-hour limit, it will refresh in (.+)\\. If on a supported paid plan, you can use AI credits in the interim\\.$",
+    "replacement": "您已达到 5 小时上限，将在 $1 后重置刷新。如果使用的是支持的付费套餐，您可以在此期间使用 AI 积分。"
+  },
+  {
+    "regex": "(\\d+) days?, (\\d+) hours?",
+    "replacement": "$1 天 $2 小时"
+  },
+  {
+    "regex": "(\\d+) hours?, (\\d+) minutes?",
+    "replacement": "$1 小时 $2 分钟"
+  },
+  {
+    "regex": "(\\d+) days?",
+    "replacement": "$1 天"
+  },
+  {
+    "regex": "(\\d+) hours?",
+    "replacement": "$1 小时"
+  },
+  {
+    "regex": "(\\d+) minutes?",
+    "replacement": "$1 分钟"
+  },
+  {
+    "regex": "^(\\d+) files? changed$",
+    "replacement": "$1 个文件已修改"
+  },
+  {
+    "regex": "^(\\d+) insertions?\\(\\+\\)$",
+    "replacement": "$1 行新增(+)"
+  },
+  {
+    "regex": "^(\\d+) deletions?\\(-\\)$",
+    "replacement": "$1 行删除(-)"
+  },
+  {
+    "regex": "^Step (\\d+) of (\\d+)$",
+    "replacement": "第 $1 步（共 $2 步）"
+  },
+  {
+    "regex": "^Task (\\d+) running$",
+    "replacement": "正在运行任务 $1"
+  },
+  {
+    "regex": "^Saved at (\\d{1,2}:\\d{2}(?::\\d{2})?)$",
+    "replacement": "已于 $1 保存"
+  },
+  {
+    "regex": "^(\\d+) active subagents?$",
+    "replacement": "$1 个运行中的子智能体"
+  },
+  {
+    "regex": "^Created (\\d+) files?$",
+    "replacement": "已创建 $1 个文件"
+  },
+  {
+    "regex": "^Modified (\\d+) files?$",
+    "replacement": "已修改 $1 个文件"
+  },
+  {
+    "regex": "^Thinking for (\\d+)s$",
+    "replacement": "已思考 $1 秒"
+  },
+  {
+    "regex": "^Stopped after (\\d+) steps?$",
+    "replacement": "已在 $1 步后停止"
+  },
+  {
+    "regex": "Scan the code to open this device in\\s*",
+    "replacement": "扫描二维码在此设备中打开 "
+  },
+  {
+    "regex": "to browse the store, or add a custom server via the MCP config\\.?",
+    "replacement": "浏览应用商店，或通过 MCP 配置文件添加自定义服务。"
+  },
+  {
+    "regex": "^(\\d+(?:\\.\\d+)?)% of the customization budget is available\\.?$",
+    "replacement": "$1% 的自定义扩展预算可用。"
+  },
+  {
+    "regex": "了解更多关于\\s*Inherit General",
+    "replacement": "了解更多关于继承通用设置"
+  },
+  {
+    "regex": "Also includes global settings when working in this project\\.?",
+    "replacement": "在此项目中工作时也包含全局设置。"
+  },
+  {
+    "regex": "\\bInherit General\\b",
+    "replacement": "继承通用设置"
+  },
+  {
+    "regex": "It requires\\s+([a-zA-Z0-9\\s]+?)\\s+to be installed\\.?",
+    "replacement": "需要安装 $1 才能运行。"
+  },
+  {
+    "regex": "(\\d+(?:\\.\\d+)?)% of the customization budget is available",
+    "replacement": "$1% 的自定义扩展预算可用"
+  },
+  {
+    "regex": "Configure (?:the )?browser subagent\\s*\\.?",
+    "replacement": "配置浏览器子智能体。"
+  },
+  {
+    "regex": "(\\d+(?:\\.\\d+)?)% of the customization budget is available\\.?",
+    "replacement": "$1% 的自定义扩展预算可用。"
+  },
+  {
+    "regex": "(?:^|\\s*)of the customization budget is available\\.?",
+    "replacement": " 的自定义扩展预算可用。"
+  },
+  {
+    "regex": "Manage project folders,\\s*agent settings,?\\s*and permissions\\.?",
+    "replacement": "管理项目文件夹、智能体设置与权限。"
+  },
+  {
+    "regex": "No folders added yet\\.?",
+    "replacement": "暂未添加任何文件夹。"
+  },
+  {
+    "regex": "^\\+\\s*Add Folder$",
+    "replacement": "+ 添加文件夹"
+  },
+  {
+    "regex": "You have used some of your 5-?hour limit,?\\s*it will fully refresh in (.*?)\\.?$",
+    "replacement": "您已消耗了部分 5 小时额度，将在 $1 后完全重置刷新。"
+  },
+  {
+    "regex": "You have used some of your weekly limit,?\\s*it will fully refresh in (.*?)\\.?$",
+    "replacement": "您已消耗了部分每周额度，将在 $1 后完全重置刷新。"
+  },
+  {
+    "regex": "You have hit your 5-?hour limit,?\\s*it will refresh in (.*?)\\.?$",
+    "replacement": "您已达到 5 小时上限，将在 $1 后重置刷新。"
+  },
+  {
+    "regex": "You have hit your weekly limit,?\\s*it will refresh in (.*?)\\.?$",
+    "replacement": "您已达到每周上限，将在 $1 后重置刷新。"
+  },
+  {
+    "regex": "^Permanently delete (.*?)\\.?$",
+    "replacement": "永久删除 $1。"
+  },
+  {
+    "regex": "配置浏览器子智能体[。.]\\s*It requires",
+    "replacement": "配置浏览器子智能体。需要安装"
+  },
+  {
+    "regex": "Configure (?:the )?browser subagent[。.]\\s*It requires",
+    "replacement": "配置浏览器子智能体。需要安装"
+  },
+  {
+    "regex": "\\bIt requires\\b",
+    "replacement": "需要安装"
+  },
+  {
+    "regex": "^快捷键\\s*for quick navigation and control\\.?$",
+    "replacement": "快捷键，用于快速导航和操作控制。"
+  },
+  {
+    "regex": "^(?:Shortcuts\\s+)?for quick navigation and control\\.?$",
+    "replacement": "用于快速导航和操作控制。"
+  },
+  {
+    "regex": "^(?:LAYOUT|Layout)\\s+CONTROLS$",
+    "replacement": "布局控制"
+  },
+  {
+    "regex": "Attach (?:a )?screenshot(?:s)?\\s*\\(optional\\)",
+    "replacement": "附上屏幕截图（可选）"
+  },
+  {
+    "regex": "Please list the steps to reproduce the issue\\.?",
+    "replacement": "请列出重现该问题的具体操作步骤…"
+  },
+  {
+    "regex": "Describe the bug you encountered\\.{0,3}",
+    "replacement": "请详细描述您遇到的问题或缺陷…"
+  },
+  {
+    "regex": "^(?:Steps\\s+to\\s+[Rr]eproduce|STEPS\\s+TO\\s+REPRODUCE)\\b",
+    "replacement": "重现步骤"
+  },
+  {
+    "regex": "^(Enter|Alt\\+Enter|Shift\\+Enter|Ctrl\\+Enter|Cmd\\+Enter)\\s+Queues after the turn$",
+    "replacement": "$1 轮次结束后进入排队"
+  },
+  {
+    "regex": "^(Enter|Alt\\+Enter|Shift\\+Enter|Ctrl\\+Enter|Cmd\\+Enter)\\s+Sends immediately$",
+    "replacement": "$1 立即发送"
+  },
+  {
+    "regex": "^(Enter|Alt\\+Enter|Shift\\+Enter|Ctrl\\+Enter|Cmd\\+Enter)\\s+On empty prompt,\\s*sends next in queue$",
+    "replacement": "$1 在输入框为空时发送队列中的下一条消息"
+  },
+  {
+    "regex": "^On empty prompt,\\s*sends next in queue$",
+    "replacement": "在输入框为空时发送队列中的下一条消息"
+  },
+  {
+    "regex": "^Queues after the turn$",
+    "replacement": "轮次结束后进入排队"
+  },
+  {
+    "regex": "^Sends immediately$",
+    "replacement": "立即发送"
+  },
+  {
+    "regex": "^Models\\s+within\\s+this\\s+group:?\\s*(.*)$",
+    "replacement": "该分组包含的模型：$1"
+  },
+  {
+    "regex": "^Inherits\\s+your\\s+General\\s+settings\\s*在此项目中工作时[。.]?$",
+    "replacement": "在此项目中工作时，继承您的“通用”设置。"
+  },
+  {
+    "regex": "^Inherits\\s+(?:your\\s+)?(?:General|default)\\s+settings[。.]?$",
+    "replacement": "继承您的“通用”设置。"
+  },
+  {
+    "regex": "\\bInherits\\s+your\\s+General\\s+settings\\b",
+    "replacement": "继承您的“通用”设置"
+  },
+  {
+    "regex": "^Your\\s+quota\\s+for\\s+this\\s+model\\s+is\\s+running\\s+low\\.?",
+    "replacement": "您在此模型上的剩余配额即将耗尽。"
+  },
+  {
+    "regex": "^Your\\s+quota\\s+for\\s+this\\s+model\\s+has\\s+run\\s+out\\.?",
+    "replacement": "您在此模型上的配额已耗尽。"
+  },
+  {
+    "regex": "^View\\s+Usage\\b",
+    "replacement": "查看用量明细"
+  },
+  {
+    "regex": "\\bSends\\s+after\\s+agent\\s+finishes\\s+working\\b",
+    "replacement": "智能体结束工作后发送"
+  },
+  {
+    "regex": "^Sends\\s+after\\s+agent\\s+finishes\\s+working[。.]?$",
+    "replacement": "智能体结束工作后发送"
+  },
+  {
+    "regex": "^Send\\s+Now$",
+    "replacement": "立即发送"
+  },
+  {
+    "regex": "^Select\\s+Project(\\s+(?:Ctrl|Cmd|Alt|Shift)\\+[\\w;:,\\/\\+\\-]+)?$",
+    "replacement": "选择项目$1"
+  },
+  {
+    "regex": "^Select\\s+Model(\\s+(?:Ctrl|Cmd|Alt|Shift)\\+[\\w;:,\\/\\+\\-]+)?$",
+    "replacement": "选择模型$1"
+  },
+  {
+    "regex": "^No\\s+Project$",
+    "replacement": "无项目关联"
+  },
+  {
+    "regex": "^Quick\\s+Start$",
+    "replacement": "快速入门"
+  },
+  {
+    "regex": "^Copy\\s+项目名称$",
+    "replacement": "复制项目名称"
+  },
+  {
+    "regex": "^Copy\\s+Project\\s+Name$",
+    "replacement": "复制项目名称"
+  },
+  {
+    "regex": "^Cancel\\s*\\(((?:Ctrl|Cmd|Alt|Shift)\\+[\\w\\+\\-]+)\\)$",
+    "replacement": "取消 ($1)"
+  },
+  {
+    "regex": "^Pin$",
+    "replacement": "置顶"
+  },
+  {
+    "regex": "^Unpin$",
+    "replacement": "取消置顶"
+  },
+  {
+    "regex": "^Good\\s+response$",
+    "replacement": "优质回答"
+  },
+  {
+    "regex": "^Bad\\s+response$",
+    "replacement": "不佳回答"
+  },
+  {
+    "regex": "^Mark\\s+Unread$",
+    "replacement": "标记为未读"
+  },
+  {
+    "regex": "^Mark\\s+Read$",
+    "replacement": "标记为已读"
+  },
+  {
+    "regex": "^Copy\\s+Command$",
+    "replacement": "复制命令"
+  },
+  {
+    "regex": "^(\\d+)\\s+tasks?\\s+running$",
+    "replacement": "$1 个运行中的任务"
+  },
+  {
+    "regex": "^Ran\\s+(.*)$",
+    "replacement": "运行 $1"
+  },
+  {
+    "regex": "^Explored\\s+(\\d+)\\s+files?$",
+    "replacement": "已浏览探索 $1 个文件"
+  },
+  {
+    "regex": "^Explored\\s+(.*)$",
+    "replacement": "已浏览探索 $1"
+  },
+  {
+    "regex": "^Edited\\s+(.*)$",
+    "replacement": "已编辑 $1"
+  },
+  {
+    "regex": "^Viewed\\s+(.*)$",
+    "replacement": "已查看 $1"
+  },
+  {
+    "regex": "^Ran\\s+(\\d+)\\s+commands?$",
+    "replacement": "已运行 $1 个命令"
+  },
+  {
+    "regex": "^Explored\\s+(\\d+)\\s+tasks?$",
+    "replacement": "已查看 $1 个任务"
+  },
+  {
+    "regex": "^Timed\\s+(\\d+)\\s+seconds?$",
+    "replacement": "已计时 $1 秒"
+  },
+  {
+    "regex": "^Timed\\s+(\\d+)\\s+minutes?$",
+    "replacement": "已计时 $1 分钟"
+  },
+  {
+    "regex": "(:?\\s*)Timer has expired$",
+    "replacement": "$1定时器已到期"
+  },
+  {
+    "regex": "(\\s+)finished$",
+    "replacement": "$1已完成"
+  },
+  {
+    "regex": "^Outside\\s+of\\s+Project$",
+    "replacement": "项目外"
+  },
+  {
+    "regex": "^Inside\\s+of\\s+Project$",
+    "replacement": "项目内"
+  },
+  {
+    "regex": "^Updated\\s+(.*)$",
+    "replacement": "更新于 $1"
+  },
+  {
+    "regex": "^Created\\s+(.*)$",
+    "replacement": "创建于 $1"
+  },
+  {
+    "regex": "继承您的“通用”设置\\s+when working in this project\\.?",
+    "replacement": "在此项目中工作时，继承您的“通用”设置。"
+  },
+  {
+    "regex": "Inherits\\s+your\\s+[“\\\"]?General[”\\\"]?\\s+settings\\s+when working in this project\\.?",
+    "replacement": "在此项目中工作时，继承您的“通用”设置。"
+  },
+  {
+    "regex": "\\bwhen working in this project\\.?",
+    "replacement": "在此项目中工作时。"
+  },
+  {
+    "regex": "^Tool\\s+Permissions$",
+    "replacement": "工具权限"
+  },
+  {
+    "regex": "^Controls\\s+the\\s+actions\\s+the\\s+agent\\s+can\\s+take[。.]?$",
+    "replacement": "控制智能体可以执行的操作。"
+  },
+  {
+    "regex": "^Whether\\s+the\\s+agent\\s+asks\\s+you\\s+to\\s+review\\s+its\\s+documents[。.]?$",
+    "replacement": "智能体在创建产物文档时是否请求您审查。"
+  },
+  {
+    "regex": "^Browser\\s+settings\\s+have\\s+moved$",
+    "replacement": "浏览器设置已迁移"
+  },
+  {
+    "regex": "Browser\\s+settings\\s+have\\s+moved\\s+to\\s+the\\s+Browser\\s+section\\s+of\\s+General\\s+settings\\.?",
+    "replacement": "浏览器设置已迁移至“通用设置”中的“浏览器”板块。"
+  },
+  {
+    "regex": "^Go\\s+to\\s+General\\s+settings$",
+    "replacement": "前往通用设置"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "已运行 $1 小时 $2 分 $3 秒"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+    "replacement": "已运行 $1 小时 $2 分钟"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+)\\s*h$",
+    "replacement": "已运行 $1 小时"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "已运行 $1 分 $2 秒"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+)\\s*m$",
+    "replacement": "已运行 $1 分钟"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "已运行 $1 秒"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "在 $1 小时 $2 分 $3 秒后停止"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+    "replacement": "在 $1 小时 $2 分钟后停止"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+)\\s*h$",
+    "replacement": "在 $1 小时后停止"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "在 $1 分 $2 秒后停止"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+)\\s*m$",
+    "replacement": "在 $1 分钟后停止"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
+    "replacement": "在 $1 秒后停止"
+  },
+  {
+    "regex": "^Message\\s+from\\s+(.+)$",
+    "replacement": "来自 $1 的消息"
+  },
+  {
+    "regex": "^Executing\\s+task:\\s+(.+)$",
+    "replacement": "正在执行任务: $1"
+  },
+  {
+    "regex": "^Record Audio(\\s+Ctrl\\+[A-Za-z])$",
+    "replacement": "录制音频$1"
+  },
+  {
+    "regex": "^Create\\s+(?:New\\s+)?Project$",
+    "replacement": "新建项目"
+  },
+  {
+    "regex": "^New Terminal(\\s+Ctrl\\+Shift\\+.*?)$",
+    "replacement": "新建终端$1"
+  },
+  {
+    "regex": "^Add Terminal(\\s+Ctrl\\+Shift\\+.*?)$",
+    "replacement": "添加终端$1"
+  },
+  {
+    "regex": "^Add Context(\\s+.*)$",
+    "replacement": "添加上下文$1"
+  },
+  {
+    "regex": "^(\\d+)\\s+agents?\\s+running$",
+    "replacement": "$1 个运行中的智能体"
+  },
+  {
+    "regex": "Remote Control,\\s*or\\s*",
+    "replacement": "远程控制，或 "
+  },
+  {
+    "regex": "^(?:继承您的全局权限|Inherits\\s+your\\s+(?:Global\\s+Permissions|global\\s+permissions))[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?$",
+    "replacement": "在此项目中工作时，继承您的全局权限。"
+  },
+  {
+    "regex": "^Inherits\\s+your\\s+(?:Global\\s+Permissions|global\\s+permissions)[。.]?$",
+    "replacement": "继承您的全局权限。"
+  },
+  {
+    "regex": "\\b(?:Inherits\\s+your|继承您的)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?",
+    "replacement": "在此项目中工作时，继承您的全局权限。"
+  },
+  {
+    "regex": "^(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?\\s*(?:Learn\\s+more|了解更多)[。.]?$",
+    "replacement": "在此项目中工作时也包含全局权限。了解更多。"
+  },
+  {
+    "regex": "^(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?$",
+    "replacement": "在此项目中工作时也包含全局权限。"
+  },
+  {
+    "regex": "\\b(?:Also\\s+includes|也包含)[\\s,，]*(?:Global\\s+Permissions|global\\s+permissions|全局权限)[\\s,，]*(?:when\\s+working\\s+in\\s+this\\s+project|在此项目中工作时)[。.]?",
+    "replacement": "在此项目中工作时也包含全局权限。"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+    "replacement": "$1 天 $2 小时 $3 分钟后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[。.]?$",
+    "replacement": "$1 天 $2 小时后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+    "replacement": "$1 小时 $2 分钟后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[,\\s]+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+    "replacement": "$1 分 $2 秒后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[。.]?$",
+    "replacement": "$1 天后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[。.]?$",
+    "replacement": "$1 小时后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+    "replacement": "$1 分钟后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+    "replacement": "$1 秒后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+less\\s+than\\s+a\\s+minute[。.]?$",
+    "replacement": "不到 1 分钟后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+in\\s+a\\s+few\\s+seconds[。.]?$",
+    "replacement": "几秒后重置"
+  },
+  {
+    "regex": "^[Rr]esets?\\s+soon[。.]?$",
+    "replacement": "即将重置"
+  },
+  {
+    "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)",
+    "replacement": "$1 天 $2 小时后重置"
+  },
+  {
+    "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)",
+    "replacement": "$1 小时 $2 分钟后重置"
+  },
+  {
+    "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[,\\s]+(\\d+)\\s*(?:s|secs?|seconds?)",
+    "replacement": "$1 分 $2 秒后重置"
+  },
+  {
+    "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:d|days?)",
+    "replacement": "$1 天后重置"
+  },
+  {
+    "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:h|hours?)",
+    "replacement": "$1 小时后重置"
+  },
+  {
+    "regex": "\\b[Rr]esets?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)",
+    "replacement": "$1 分钟后重置"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+    "replacement": "$1 天 $2 小时 $3 分钟后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:d|days?)[,\\s]+(\\d+)\\s*(?:h|hours?)[。.]?$",
+    "replacement": "$1 天 $2 小时后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[,\\s]+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+    "replacement": "$1 小时 $2 分钟后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[,\\s]+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+    "replacement": "$1 分 $2 秒后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:d|days?)[。.]?$",
+    "replacement": "$1 天后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:h|hours?)[。.]?$",
+    "replacement": "$1 小时后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:m|mins?|minutes?)[。.]?$",
+    "replacement": "$1 分钟后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+in\\s+(\\d+)\\s*(?:s|secs?|seconds?)[。.]?$",
+    "replacement": "$1 秒后重置刷新"
+  },
+  {
+    "regex": "^[Rr]efreshes?\\s+soon[。.]?$",
+    "replacement": "即将重置刷新"
+  },
+  {
+    "regex": "^(?:All|全部)\\s+scheduled\\s+tasks\\s+run\\s+as\\s+(.+?)[。.]?$",
+    "replacement": "所有定时任务均以 $1 模型运行。"
+  },
+  {
+    "regex": "^scheduled\\s+tasks\\s+run\\s+as\\s+(.+?)[。.]?$",
+    "replacement": "定时任务均以 $1 模型运行。"
+  },
+  {
+    "regex": "^Search\\s+tasks[\\.…]*$",
+    "replacement": "搜索任务..."
+  },
+  {
+    "regex": "^Search\\s+conversations[\\.…]*$",
+    "replacement": "搜索会话..."
+  },
+  {
+    "regex": "^Enter\\s+scheduled\\s+task\\s+name[\\.…]*$",
+    "replacement": "输入定时任务名称..."
+  },
+  {
+    "regex": "^Enter\\s+a\\s+prompt\\s+for\\s+the\\s+agent\\s+to\\s+run[\\.…]*$",
+    "replacement": "输入供智能体执行的提示词..."
+  },
+  {
+    "regex": "\\bProject\\s*\\+\\s*Worktree\\b",
+    "replacement": "项目 + 工作树"
+  },
+  {
+    "regex": "^Undo\\s+to\\s+(?:this\\s+point|here)[。.]?$",
+    "replacement": "撤销到此处"
+  },
+  {
+    "regex": "^Failed\\s+to\\s+revalidate\\s+slash\\s+commands:[\\s]*(.*)$",
+    "replacement": "重新验证斜杠命令失败：$1"
+  },
+  {
+    "regex": "^Failed\\s+to\\s+add\\s+plugin[。.]?\\s*(?:Please\\s+try\\s+again[。.]?)?$",
+    "replacement": "添加插件失败。请重试。"
+  },
+  {
+    "regex": "^(?:All|全部)\\s+scheduled\\s+tasks?\\s+run\\s+as\\s+(.+?)[。.]?$",
+    "replacement": "所有定时任务均以 $1 模型运行。"
+  },
+  {
+    "regex": "^(?:All|全部)\\s+plugins?\\s+run\\s+as\\s+(.+?)[。.]?$",
+    "replacement": "所有插件均以 $1 模型运行。"
+  },
+  {
+    "regex": "^(?:All|全部)\\s+automations?\\s+run\\s+as\\s+(.+?)[。.]?$",
+    "replacement": "所有自动化任务均以 $1 模型运行。"
+  }
+]

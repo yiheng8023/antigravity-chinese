@@ -212,7 +212,7 @@ assert(translate('Search MCP servers by name') === '按名称搜索 MCP 服务',
 assert(translate('Inherits your Global Permissions when working in this project.') === '在此项目中工作时，继承您的全局权限。', '项目安全预设气泡 Tooltip 汉化通过');
 assert(translate('Inherits your Global Permissions 在此项目中工作时。') === '在此项目中工作时，继承您的全局权限。', '项目安全预设气泡中英混合拼接残缺态自愈汉化通过');
 assert(translate('Also includes Global Permissions when working in this project.') === '在此项目中工作时也包含全局权限。', '项目本地权限说明长句汉化通过');
-assert(translate('也包含 全局权限 在此项目中工作时。') === '在此项目中工作时也包含全局权限。', '项目本地权限中英倒装拼接态自愈汉化通过');
+assert(translate('Also includes Global Permissions when working in this project. Learn more.') === '在此项目中工作时也包含全局权限。了解更多。', '项目本地权限包含了解更多长句汉化通过');
 assert(translate('Resets in 4d 13h') === '4 天 13 小时后重置', '模型配额悬浮卡片 "Resets in 4d 13h" 汉化通过');
 assert(translate('Resets in 2h 35m') === '2 小时 35 分钟后重置', '模型配额悬浮卡片 "Resets in 2h 35m" 汉化通过');
 assert(translate('Resets in 4d') === '4 天后重置', '模型配额单段天数 "Resets in 4d" 汉化通过');

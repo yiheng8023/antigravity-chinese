@@ -1,4 +1,6 @@
 {
+  "version": "3.3.0",
+  "buildTime": "2026-09-20T02:22:31.490Z",
   "exact": {
     "+ Add Folder": "+ 添加文件夹",
     "+ Add Hook": "+ 添加钩子",

@@ -16,59 +16,198 @@
   }
   if (!root) return;
 
-  if (root.__AGY_I18N_INITIALIZED__) return;
-  root.__AGY_I18N_INITIALIZED__ = true;
+  function createI18nEngine(dictData) {
+    var data = dictData || {};
+    var exactDict = data.exact || {};
+    var allPatterns = (data.patterns || []).concat(data.rules || []);
+    var patterns = allPatterns.map(function (p) {
+      return {
+        regex: new RegExp(p.regex),
+        replacement: p.replacement
+      };
+    });
 
-  var doc = root.document || (typeof document !== 'undefined' ? document : null);
+    var sortedExactKeys = Object.keys(exactDict).sort(function (a, b) {
+      return b.length - a.length;
+    });
+    var phraseKeys = sortedExactKeys.filter(function (k) {
+      return k.indexOf(' ') !== -1 || k.length >= 12;
+    });
 
-  var I18N_DATA = root.__AGY_I18N_DATA__ || { exact: {}, patterns: [] };
-  var exactDict = I18N_DATA.exact || {};
-  var allPatterns = (I18N_DATA.patterns || []).concat(I18N_DATA.rules || []);
-  var patterns = allPatterns.map(function (p) {
-    return {
-      regex: new RegExp(p.regex),
-      replacement: p.replacement
-    };
-  });
-
-  // 按长度降序排列的 key 列表（仅保留 length >= 4 的，避免过短匹配造成误伤）
-  var sortedExactKeys = Object.keys(exactDict).sort(function (a, b) {
-    return b.length - a.length;
-  });
-  // 预过滤多词复合子短语 key（含空格或长度 >= 12），消除 Step 5 每轮 1700+ 次冗余属性与长度判断
-  var phraseKeys = sortedExactKeys.filter(function (k) {
-    return k.indexOf(' ') !== -1 || k.length >= 12;
-  });
-
-  // 构建一个反向映射：翻译结果 → true，用于快速判断文本是否已经被翻译过
-  var translatedValues = {};
-  for (var k in exactDict) {
-    if (exactDict.hasOwnProperty(k)) {
-      translatedValues[exactDict[k]] = true;
+    var translatedValues = {};
+    for (var k in exactDict) {
+      if (exactDict.hasOwnProperty(k)) {
+        translatedValues[exactDict[k]] = true;
+      }
     }
-  }
 
-  // 正负记忆化双向 Map 缓存（正向为翻译结果，负向为 null），带容量上限保护
-  var translationCache = typeof Map !== 'undefined' ? new Map() : null;
-  var MAX_CACHE_SIZE = 10000;
+    var translationCache = typeof Map !== 'undefined' ? new Map() : null;
+    var MAX_CACHE_SIZE = 10000;
 
-  function cacheAndReturn(key, value) {
-    if (translationCache) {
-      if (translationCache.size >= MAX_CACHE_SIZE) {
-        var iter = translationCache.keys();
-        for (var ci = 0; ci < 1000; ci++) {
-          var oldK = iter.next().value;
-          if (oldK !== undefined) {
-            translationCache.delete(oldK);
-          } else {
-            break;
+    function cacheAndReturn(key, value) {
+      if (translationCache) {
+        if (translationCache.size >= MAX_CACHE_SIZE) {
+          var iter = translationCache.keys();
+          for (var ci = 0; ci < 1000; ci++) {
+            var oldK = iter.next().value;
+            if (oldK !== undefined) {
+              translationCache.delete(oldK);
+            } else {
+              break;
+            }
           }
         }
+        translationCache.set(key, value);
       }
-      translationCache.set(key, value);
+      return value;
     }
-    return value;
+
+    function normalizeWhitespace(str) {
+      return str.replace(/\s+/g, ' ').trim();
+    }
+
+    function translateSingleUnit(rawStr) {
+      if (!rawStr || typeof rawStr !== 'string') return null;
+      var normalized = normalizeWhitespace(rawStr);
+      if (!normalized) return null;
+
+      if (translationCache && translationCache.has(normalized)) {
+        return translationCache.get(normalized);
+      }
+
+      if (exactDict[normalized]) {
+        return cacheAndReturn(normalized, exactDict[normalized]);
+      }
+
+      if (!/[a-zA-Z]/.test(normalized)) {
+        return cacheAndReturn(normalized, null);
+      }
+
+      if (translatedValues[normalized]) {
+        return cacheAndReturn(normalized, null);
+      }
+
+      var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
+      if (cjkChars && cjkChars.length >= 1 && !/[a-zA-Z]{2,}/.test(normalized)) {
+        return cacheAndReturn(normalized, null);
+      }
+
+      for (var i = 0; i < patterns.length; i++) {
+        var p = patterns[i];
+        if (p.regex.test(normalized)) {
+          var result = normalized.replace(p.regex, p.replacement);
+          for (var pi = 0; pi < patterns.length; pi++) {
+            if (patterns[pi].regex.test(result)) {
+              result = result.replace(patterns[pi].regex, patterns[pi].replacement);
+            }
+          }
+          p.regex.lastIndex = 0;
+          return cacheAndReturn(normalized, result);
+        }
+      }
+
+      var punctuationMatch = normalized.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
+      if (punctuationMatch) {
+        var base = punctuationMatch[1].trim();
+        var punc = punctuationMatch[2];
+        if (exactDict[base]) {
+          return cacheAndReturn(normalized, exactDict[base] + (punc === ':' ? '：' : punc));
+        }
+      }
+
+      var hotkeyMatch = normalized.match(/^([\w\s\-\/]+?)\s*(\((?:Ctrl|Cmd|Alt|Shift)\+[^\)]+\)|\b(?:Ctrl|Cmd|Alt|Shift)\+[\w;:,\\/+\-]+)$/i);
+      if (hotkeyMatch) {
+        var cmdBase = hotkeyMatch[1].trim();
+        var hotkey = hotkeyMatch[2].trim();
+        if (exactDict[cmdBase]) {
+          return cacheAndReturn(normalized, exactDict[cmdBase] + (hotkey.charAt(0) === '(' ? ' ' + hotkey : ' ' + hotkey));
+        }
+      }
+
+      if (normalized.indexOf('. ') !== -1 || normalized.indexOf('! ') !== -1 || normalized.indexOf('? ') !== -1 || normalized.indexOf('。') !== -1) {
+        var sentences = normalized.split(/([.!?]\s+|[。！？]\s*)/);
+        var anyTranslated = false;
+        var translatedParts = [];
+        for (var sIdx = 0; sIdx < sentences.length; sIdx++) {
+          var part = sentences[sIdx];
+          var trimmedPart = part.trim();
+          if (!trimmedPart || /^[.!?。！？\s]+$/.test(part)) {
+            translatedParts.push(part.replace(/\.\s*/g, '。 '));
+            continue;
+          }
+          var transPart = exactDict[trimmedPart];
+          if (!transPart) {
+            for (var pIdx = 0; pIdx < patterns.length; pIdx++) {
+              if (patterns[pIdx].regex.test(trimmedPart)) {
+                transPart = trimmedPart.replace(patterns[pIdx].regex, patterns[pIdx].replacement);
+                break;
+              }
+            }
+          }
+          if (!transPart) {
+            var pMatch = trimmedPart.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
+            if (pMatch && exactDict[pMatch[1].trim()]) {
+              transPart = exactDict[pMatch[1].trim()] + (pMatch[2] === ':' ? '：' : pMatch[2]);
+            }
+          }
+          if (transPart) {
+            anyTranslated = true;
+            translatedParts.push(transPart);
+          } else {
+            translatedParts.push(part);
+          }
+        }
+        if (anyTranslated) {
+          return cacheAndReturn(normalized, translatedParts.join('').replace(/([。！？])\s*/g, '$1 '));
+        }
+      }
+
+      var processed = normalized;
+      if (processed.indexOf(' ') === -1 && processed.length < 12) {
+        return cacheAndReturn(normalized, null);
+      }
+
+      var modified = false;
+      for (var j = 0; j < phraseKeys.length; j++) {
+        var key = phraseKeys[j];
+        if (processed.indexOf(key) !== -1) {
+          processed = processed.split(key).join(exactDict[key]);
+          modified = true;
+        }
+      }
+
+      if (modified) return cacheAndReturn(normalized, processed);
+      return cacheAndReturn(normalized, null);
+    }
+
+    return {
+      translate: translateSingleUnit,
+      exactDict: exactDict,
+      patterns: patterns,
+      cache: translationCache,
+      normalizeWhitespace: normalizeWhitespace
+    };
   }
+
+  // 若处于 Node.js 环境，优先准备导出
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      createI18nEngine: createI18nEngine
+    };
+  }
+
+  if (root && root.__AGY_I18N_INITIALIZED__) return;
+  if (root) root.__AGY_I18N_INITIALIZED__ = true;
+
+  var doc = root ? (root.document || (typeof document !== 'undefined' ? document : null)) : null;
+
+  var I18N_DATA = (root && root.__AGY_I18N_DATA__) || { exact: {}, patterns: [] };
+  var defaultEngine = createI18nEngine(I18N_DATA);
+  var exactDict = defaultEngine.exactDict;
+  var patterns = defaultEngine.patterns;
+  var translationCache = defaultEngine.cache;
+  var normalizeWhitespace = defaultEngine.normalizeWhitespace;
+  var translateSingleUnit = defaultEngine.translate;
 
   var IGNORED_TAGS = {
     'SCRIPT': 1, 'STYLE': 1, 'CODE': 1, 'PRE': 1, 'NOSCRIPT': 1,
@@ -118,140 +257,7 @@
     return false;
   }
 
-  function normalizeWhitespace(str) {
-    return str.replace(/\s+/g, ' ').trim();
-  }
 
-  /**
-   * 翻译单个文本片段
-   * 返回 null 表示无需翻译
-   */
-  function translateSingleUnit(rawStr) {
-    if (!rawStr || typeof rawStr !== 'string') return null;
-    var normalized = normalizeWhitespace(rawStr);
-    if (!normalized) return null;
-
-    // 算法优化 2：正负记忆化双向 Map 缓存极速 O(1) 命中
-    if (translationCache && translationCache.has(normalized)) {
-      return translationCache.get(normalized);
-    }
-
-    // 0. 直接精确匹配 (O(1) 哈希查询：优先命中包括特殊倒装自愈、英文短语、符号在内的确切条目)
-    if (exactDict[normalized]) {
-      return cacheAndReturn(normalized, exactDict[normalized]);
-    }
-
-    // 算法优化 1：极速短路，纯数字与符号瞬间退出（无英文字母）
-    if (!/[a-zA-Z]/.test(normalized)) {
-      return cacheAndReturn(normalized, null);
-    }
-
-    // 如果文本已经是翻译结果，直接跳过并存入负向缓存
-    if (translatedValues[normalized]) {
-      return cacheAndReturn(normalized, null);
-    }
-
-    // 官方原生已汉化文本探测与优雅让位：仅当文本纯属中文无连续英文字母时才跳过；若含英文字母且词库有规则，绝不跳过！
-    var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
-    if (cjkChars && cjkChars.length >= 1 && !/[a-zA-Z]{2,}/.test(normalized)) {
-      return cacheAndReturn(normalized, null);
-    }
-
-    // 2. 正则模式匹配（支持嵌套级联替换，例如时间+单位）
-    for (var i = 0; i < patterns.length; i++) {
-      var p = patterns[i];
-      if (p.regex.test(normalized)) {
-        var result = normalized.replace(p.regex, p.replacement);
-        for (var pi = 0; pi < patterns.length; pi++) {
-          if (patterns[pi].regex.test(result)) {
-            result = result.replace(patterns[pi].regex, patterns[pi].replacement);
-          }
-        }
-        p.regex.lastIndex = 0;
-        return cacheAndReturn(normalized, result);
-      }
-    }
-
-    // 3. 末尾标点与快捷键后缀容差 (例如 "Cancel (Ctrl+D)", "Select Project Ctrl+;", "Record Audio:")
-    var punctuationMatch = normalized.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
-    if (punctuationMatch) {
-      var base = punctuationMatch[1].trim();
-      var punc = punctuationMatch[2];
-      if (exactDict[base]) {
-        return cacheAndReturn(normalized, exactDict[base] + (punc === ':' ? '：' : punc));
-      }
-    }
-
-    var hotkeyMatch = normalized.match(/^([\w\s\-\/]+?)\s*(\((?:Ctrl|Cmd|Alt|Shift)\+[^\)]+\)|\b(?:Ctrl|Cmd|Alt|Shift)\+[\w;:,\\/+\-]+)$/i);
-    if (hotkeyMatch) {
-      var cmdBase = hotkeyMatch[1].trim();
-      var hotkey = hotkeyMatch[2].trim();
-      if (exactDict[cmdBase]) {
-        return cacheAndReturn(normalized, exactDict[cmdBase] + (hotkey.charAt(0) === '(' ? ' ' + hotkey : ' ' + hotkey));
-      }
-    }
-
-    // 4. 多句子拆分与复合段落翻译（按中英文句号、感叹号、问号分隔）
-    if (normalized.indexOf('. ') !== -1 || normalized.indexOf('! ') !== -1 || normalized.indexOf('? ') !== -1 || normalized.indexOf('。') !== -1) {
-      var sentences = normalized.split(/([.!?]\s+|[。！？]\s*)/);
-      var anyTranslated = false;
-      var translatedParts = [];
-      for (var sIdx = 0; sIdx < sentences.length; sIdx++) {
-        var part = sentences[sIdx];
-        var trimmedPart = part.trim();
-        if (!trimmedPart || /^[.!?。！？\s]+$/.test(part)) {
-          translatedParts.push(part.replace(/\.\s*/g, '。 '));
-          continue;
-        }
-        var transPart = exactDict[trimmedPart];
-        if (!transPart) {
-          for (var pIdx = 0; pIdx < patterns.length; pIdx++) {
-            if (patterns[pIdx].regex.test(trimmedPart)) {
-              transPart = trimmedPart.replace(patterns[pIdx].regex, patterns[pIdx].replacement);
-              break;
-            }
-          }
-        }
-        if (!transPart) {
-          var pMatch = trimmedPart.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
-          if (pMatch && exactDict[pMatch[1].trim()]) {
-            transPart = exactDict[pMatch[1].trim()] + (pMatch[2] === ':' ? '：' : pMatch[2]);
-          }
-        }
-        if (transPart) {
-          anyTranslated = true;
-          translatedParts.push(transPart);
-        } else {
-          translatedParts.push(part);
-        }
-      }
-      if (anyTranslated) {
-        return cacheAndReturn(normalized, translatedParts.join('').replace(/([。！？])\s*/g, '$1 '));
-      }
-    }
-
-    // 5. 多词复合子短语替换（杜绝单个孤立单词误伤，精准捕获中英混排长句）
-    var processed = normalized;
-
-    // 算法优化 3：长度与空格门禁，无空格且短于 12 字符的文本直接快速返回 null
-    if (processed.indexOf(' ') === -1 && processed.length < 12) {
-      return cacheAndReturn(normalized, null);
-    }
-
-    // 算法优化 4：已删除重复执行必定未命中的 patterns 动态正则死代码，直接遍历预筛选 phraseKeys
-    var modified = false;
-    for (var j = 0; j < phraseKeys.length; j++) {
-      var key = phraseKeys[j];
-      if (processed.indexOf(key) !== -1) {
-        processed = processed.split(key).join(exactDict[key]);
-        modified = true;
-      }
-    }
-
-    if (modified) return cacheAndReturn(normalized, processed);
-
-    return cacheAndReturn(normalized, null);
-  }
 
   // 标记属性名，用于避免重复翻译
   var MARK_ATTR = '_agyDone';
@@ -620,9 +626,13 @@
     } catch (e) {}
   }
 
-  root.__AGY_TRANSLATE_UNIT__ = translateSingleUnit;
-  root.__AGY_TRANSLATE_EL__ = translateElement;
-  root.__AGY_RUN_FULL_SCAN__ = safeFullScan;
-  root.__AGY_CACHE__ = translationCache;
-  root.__AGY_IS_FLOATING__ = isFloatingElement;
-})(typeof window !== 'undefined' ? window : this);
+  if (root) {
+    root.__AGY_CREATE_ENGINE__ = createI18nEngine;
+    root.__AGY_TRANSLATE_UNIT__ = translateSingleUnit;
+    root.__AGY_TRANSLATE_EL__ = translateElement;
+    root.__AGY_RUN_FULL_SCAN__ = safeFullScan;
+    root.__AGY_CACHE__ = translationCache;
+    root.__AGY_IS_FLOATING__ = isFloatingElement;
+  }
+})(typeof window !== 'undefined' ? window : (typeof globalThis !== 'undefined' ? globalThis : this));
+

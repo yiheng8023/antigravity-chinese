@@ -18,100 +18,16 @@ const dict = require(dictPath);
 const exactDict = dict.exact || {};
 const exactKeys = Object.keys(exactDict);
 const exactKeySet = new Set(exactKeys);
-const sortedExactKeys = exactKeys.slice().sort((a, b) => b.length - a.length);
+const patterns = dict.patterns || [];
+const { createI18nEngine } = require('../core/i18n-runtime.js');
+const engine = createI18nEngine(dict);
 
-const patterns = (dict.patterns || []).map(p => ({
-  regex: new RegExp(p.regex),
-  replacement: p.replacement
-}));
-
-const translatedValues = {};
-for (const k in exactDict) {
-  translatedValues[exactDict[k]] = true;
-}
-
-// 模拟核心运行时的完整翻译管道
+// 彻底单源解耦：直接接入核心运行时引擎
 function emulateTranslation(rawStr) {
   if (!rawStr || typeof rawStr !== 'string') return null;
-  const normalized = rawStr.replace(/\s+/g, ' ').trim();
-  if (!normalized) return null;
-  if (translatedValues[normalized]) return normalized;
-
-  // 1. 直接精确匹配
-  if (exactDict[normalized]) {
-    return { type: 'exact', result: exactDict[normalized] };
-  }
-
-  // 2. 正则模式匹配（级联）
-  for (let i = 0; i < patterns.length; i++) {
-    const p = patterns[i];
-    if (p.regex.test(normalized)) {
-      let result = normalized.replace(p.regex, p.replacement);
-      for (let pi = 0; pi < patterns.length; pi++) {
-        if (patterns[pi].regex.test(result)) {
-          result = result.replace(patterns[pi].regex, patterns[pi].replacement);
-        }
-      }
-      p.regex.lastIndex = 0;
-      return { type: 'pattern', result: result };
-    }
-  }
-
-  // 3. 末尾标点容差
-  const punctuationMatch = normalized.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
-  if (punctuationMatch) {
-    const base = punctuationMatch[1].trim();
-    const punc = punctuationMatch[2];
-    if (exactDict[base]) {
-      return { type: 'punctuation', result: exactDict[base] + (punc === ':' ? '：' : punc) };
-    }
-  }
-
-  // 4. 多句子拆分与复合段落翻译
-  if (normalized.indexOf('. ') !== -1 || normalized.indexOf('! ') !== -1 || normalized.indexOf('? ') !== -1) {
-    const sentences = normalized.split(/([.!?]\s+)/);
-    let anyTranslated = false;
-    const translatedParts = [];
-    for (let sIdx = 0; sIdx < sentences.length; sIdx++) {
-      const part = sentences[sIdx];
-      const trimmedPart = part.trim();
-      if (!trimmedPart) {
-        translatedParts.push(part);
-        continue;
-      }
-      let transPart = exactDict[trimmedPart];
-      if (!transPart) {
-        const pMatch = trimmedPart.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
-        if (pMatch && exactDict[pMatch[1].trim()]) {
-          transPart = exactDict[pMatch[1].trim()] + (pMatch[2] === ':' ? '：' : pMatch[2]);
-        }
-      }
-      if (transPart) {
-        anyTranslated = true;
-        translatedParts.push(transPart);
-      } else {
-        translatedParts.push(part);
-      }
-    }
-    if (anyTranslated) {
-      return { type: 'multi-sentence', result: translatedParts.join(' ') };
-    }
-  }
-
-  // 5. 多词复合子短语全量替换
-  let processed = normalized;
-  let modified = false;
-  for (let j = 0; j < sortedExactKeys.length; j++) {
-    const key = sortedExactKeys[j];
-    if ((key.indexOf(' ') !== -1 || key.length >= 15) && processed.indexOf(key) !== -1) {
-      processed = processed.split(key).join(exactDict[key]);
-      modified = true;
-    }
-  }
-
-  if (modified) return { type: 'compound', result: processed };
-
-  return null;
+  const res = engine.translate(rawStr);
+  if (!res) return null;
+  return { type: 'engine', result: res };
 }
 
 // 判定是否为面向用户的真实 UI 文本（过滤纯代码语法、属性选择器、变量名噪声）
