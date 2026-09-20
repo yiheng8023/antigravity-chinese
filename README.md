@@ -105,19 +105,21 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 
 ## 🧪 自动化测试与质量保证 (Testing & Verification)
 
-本项目引入严格的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
+本项目引入极其严苛的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（包含 6 大全真测试套件，共 149+ 项断言）
+# 运行全套自动化测试（聚合 8 大全真测试套件，共 320+ 项真理断言）
 npm test
 ```
 
-- **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 81 项断言，验证关键 DOM 路径翻译准确性、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
-- **真实截图用例集 (`test/test-screenshots.js`)**：覆盖 88 项来自真实界面截图的复合句子、动态限额与时间状态机解析。
-- **菜单、托盘与自杀防御门禁 (`test/test-menu-and-titles.js`)**：包含 22 项断言，严格确保单字词不误伤会话标题、主进程系统托盘协同注入与原生弹窗安全、以及智能体会话环境下的自杀防御门禁（拦截强杀宿主进程）。
-- **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 18 项全真断言（包含阶段 3 模拟留存旧 bak 时官方静默推送新版 C 并直接执行 restore 的防降级回归测试），验证解包、注入、二次安装幂等、官方静默升级防降级与出厂原子回滚。
+- **词库格式与语法排毒 (`test/test-lint.js`)**：检测词库 JSON 格式合规性与基础语法健康度。
+- **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 115 项断言，验证关键 DOM 路径翻译准确性、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
+- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 149 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
+- **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
+- **菜单、托盘与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
+- **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言自动扫描 0 错别字（登录/账号/其他等）、全角标点排版、CCF 核心学术术语与正则安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 1,920 条词条与 218 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 
 ---
 
@@ -164,25 +166,35 @@ antigravity-chinese/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                    # 全平台 CI 自动化测试流水线 (Ubuntu/macOS/Windows)
-├── dict/
-│   └── zh-CN.json                    # 核心汉化词库 (1,730+ 精确词条 + 166 组级联正则)
-├── core/
-│   └── i18n-runtime.js               # 零卡顿前端注入引擎 (DOM 否定标记、悬浮门禁节流、代码区保护)
+├── dict/                             # 汉化词库与分层源码
+│   ├── src/                          # 三层分层词库源码
+│   │   ├── core/                     # 原子纯词条 (common.json)
+│   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
+│   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json)
+│   └── zh-CN.json                    # 核心汉化词库 (1,920 精确词条 + 218 组级联正则，兼容同步)
+├── dist/                             # 自动化构建编译产物
+│   └── zh-CN.bundle.json             # 三层编译整合单一发布包
+├── core/                             # 核心引擎与双模驱动
+│   ├── i18n-runtime.js               # 零卡顿前端注入引擎 (DOM 否定标记、悬浮门禁节流、createI18nEngine 纯工厂)
+│   └── cdp-client.js                 # 零依赖 RFC 6455 CDP WebSocket 客户端 (免解包热挂载协议层)
 ├── plugins/
 │   └── chinese-toolkit/              # Antigravity 官方中文智能体增强插件
 │       ├── rules/                    # 智能体中文交互规则 (chinese-interaction-rules.md)
 │       ├── skills/                   # 本地化诊断技能 (i18n-diagnostics)
 │       └── plugin.json               # 插件规范清单配置文件
-├── test/                             # 自动化全真回归测试套件 (149+ 项全维断言)
-│   ├── verify.js                     # JSDOM DOM 模拟与代码区保护断言
-│   ├── test-screenshots.js          # 真实 UI 截图复合句式与动态状态机断言
-│   ├── test-menu-and-titles.js       # 菜单项、托盘协同与用户标题防误伤断言
-│   ├── test-asar-lifecycle.js        # 18 项真实 ASAR 生命周期、二次安装幂等与官方升级防降级断言
+├── test/                             # 自动化全真回归测试套件 (8 大套件 320+ 断言)
+│   ├── test-lint.js                  # 词库格式与语法排毒校验
+│   ├── verify.js                     # 115 项 JSDOM 状态机与运行时性能断言
+│   ├── test-screenshots.js          # 149 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
+│   ├── test-cdp.js                   # 零依赖 RFC 6455 CDP 协议层双向通信测试
+│   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
+│   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言
 │   ├── test-detector-live.js         # 真实宿主系统 0 参数无参安装路径探测断言
 │   └── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
-├── tools/                            # 上游逆向、差量分析与漂移检测工具链
+├── tools/                            # 自动化编译、逆向与漂移检测工具链
+│   ├── build-dict.js                 # 三层词典构建编译器 (ASCII Key 阻断、捕获组守恒门禁)
 │   ├── drift-detector.js             # 上游版本文本与候选漂移检测器 (npm run scan:drift)
-│   ├── build-full-dict.js            # 全量词典自动化构建与去重工具
+│   ├── build-full-dict.js            # 全量词典自动化去重与辅助工具
 │   └── gap-analysis.js               # 覆盖率差量与漏项自动化分析器
 ├── docs/assets/sponsoring/           # 赞助与社区资产
 ├── cli.js                            # 跨平台生命周期管理 CLI (探测、备份、解包、注入、打包、防降级还原)

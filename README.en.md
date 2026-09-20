@@ -105,19 +105,21 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 
 ## 🧪 Automated Testing & CI Verification
 
-The project includes an end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **149+ assertions**:
+The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **320+ assertions**:
 
 ```bash
-# Run all automated test suites (aggregating 6 full-fidelity test suites, 149+ assertions)
+# Run all automated test suites (aggregating 8 full-fidelity test suites, 320+ assertions)
 npm test
 ```
 
-- **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 81 assertions covering critical DOM paths, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
-- **Screenshot Fixture Assertions (`test/test-screenshots.js`)**: Covers 88 test cases from real UI screenshots with compound sentences and dynamic quota values.
-- **Menu, Tray & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: 22 assertions ensuring single-character words do not corrupt custom session titles, main process system tray integration and native dialog safety, and suicide prevention gates in agent environments (preventing process termination).
-- **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream upgrade simulation, and atomic restoration (18 assertions, including Stage 3 regression testing for silent upstream updates preventing downgrade on restore).
+- **Dictionary Lint & Syntax Sanitization (`test/test-lint.js`)**: Validates dictionary JSON structure, formatting compliance, and syntax health.
+- **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 115 assertions covering critical DOM paths, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
+- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 149 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
+- **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
+- **Menu, Tray & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
+- **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions ensuring zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 1,920 exact entries and 218 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 
 ---
 
@@ -164,23 +166,33 @@ antigravity-chinese/
 ├── .github/
 │   └── workflows/
 │       └── ci.yml                    # Cross-platform CI automated test workflow (Ubuntu/macOS/Windows)
-├── dict/
-│   └── zh-CN.json                    # Core translation dictionary (1,730+ exact entries + 166 dynamic regexes)
-├── core/
-│   └── i18n-runtime.js               # Zero-lag preload runtime injection engine (DOM negative tags & gates)
+├── dict/                             # Translation dictionary and source modules
+│   ├── src/                          # Three-tier modular dictionary source
+│   │   ├── core/                     # Atomic phrases (common.json)
+│   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
+│   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json)
+│   └── zh-CN.json                    # Core translation dictionary (1,920 exact entries + 218 regexes, backwards-compatible)
+├── dist/                             # Automated compilation bundles
+│   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
+├── core/                             # Core injection & dual-mode engines
+│   ├── i18n-runtime.js               # Zero-lag preload runtime injection engine (DOM negative tags & createI18nEngine factory)
+│   └── cdp-client.js                 # Zero-dependency RFC 6455 CDP WebSocket client (no-unpack hot-mount protocol layer)
 ├── plugins/
 │   └── chinese-toolkit/              # Antigravity official Chinese agent community plugin
 │       ├── rules/                    # Agent Chinese interaction rules (chinese-interaction-rules.md)
 │       ├── skills/                   # Localization diagnostic skills (i18n-diagnostics)
 │       └── plugin.json               # Antigravity plugin manifest specification
-├── test/                             # Automated full-fidelity regression test suites (149+ assertions)
-│   ├── verify.js                     # JSDOM DOM simulation and code area protection assertions
-│   ├── test-screenshots.js          # Real UI screenshot compound sentences & state machine assertions
-│   ├── test-menu-and-titles.js       # Menu items, tray integration, and custom title protection assertions
-│   ├── test-asar-lifecycle.js        # 18 ASAR lifecycle, double-install idempotence & anti-downgrade assertions
+├── test/                             # Automated full-fidelity regression test suites (8 suites, 320+ assertions)
+│   ├── test-lint.js                  # Dictionary lint & syntax health checks
+│   ├── verify.js                     # 115 JSDOM state machine and runtime performance assertions
+│   ├── test-screenshots.js          # 149 strictEqual golden truth assertions + 20 invariant fuzzing tests
+│   ├── test-cdp.js                   # Zero-dependency RFC 6455 CDP protocol bidirectional tests
+│   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
+│   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
 │   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
 │   └── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
-├── tools/                            # Upstream reverse engineering, diff analysis & drift detection toolchain
+├── tools/                            # Compiler, reverse engineering, diff analysis & drift detection toolchain
+│   ├── build-dict.js                 # Three-tier dictionary compiler (ASCII key gate & capture group conservation)
 │   ├── drift-detector.js             # Upstream version text & candidate drift detector (npm run scan:drift)
 │   ├── build-full-dict.js            # Full dictionary automated builder and deduplication tool
 │   └── gap-analysis.js               # Translation coverage gap & missed item automated analyzer
