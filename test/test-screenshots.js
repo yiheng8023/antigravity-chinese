@@ -211,7 +211,22 @@ const goldenCases = [
   { input: "Are you sure you want to mark all 3 conversations as read? This action cannot be undone.", expected: "您确定要将全部 3 个会话标记为已读吗？此操作无法撤销。" },
   { input: "Pinned Chats Only", expected: "仅固定会话" },
   { input: "Workspace + Worktree", expected: "工作区 + 工作树" },
-  { input: "Archive Conversation", expected: "归档会话" }
+  { input: "Archive Conversation", expected: "归档会话" },
+
+  // History Execution Control & Group Actions (media_1789956147036.png)
+  { input: "Stop Execution", expected: "停止执行" },
+  { input: "Restore Conversation", expected: "恢复会话" },
+  { input: "Archive conversation", expected: "归档会话" },
+  { input: "Group Actions", expected: "分组操作" },
+  { input: "Rename Group", expected: "重命名分组" },
+  { input: "Move Up", expected: "上移" },
+  { input: "Move Down", expected: "下移" },
+  { input: "Delete Group", expected: "删除分组" },
+  { input: "View Debug", expected: "查看调试信息" },
+  { input: "Stop Task", expected: "停止任务" },
+  { input: "Cancel Task", expected: "取消任务" },
+  { input: "Close Sidebar", expected: "关闭侧边栏" },
+  { input: "Clear Search", expected: "清除搜索" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);
