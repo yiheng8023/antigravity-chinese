@@ -870,5 +870,25 @@
   {
     "regex": "^(?:All|全部)\\s+automations?\\s+run\\s+as\\s+(.+?)[。.]?$",
     "replacement": "所有自动化任务均以 $1 模型运行。"
+  },
+  {
+    "regex": "^Mark\\s+all\\s+(\\d+)\\s+conversations\\s+as\\s+read$",
+    "replacement": "将全部 $1 个会话标记为已读"
+  },
+  {
+    "regex": "^Mark\\s+(\\d+)\\s+conversations?\\s+as\\s+read$",
+    "replacement": "将 $1 个会话标记为已读"
+  },
+  {
+    "regex": "^Are\\s+you\\s+sure\\s+you\\s+want\\s+to\\s+mark\\s+all\\s+(\\d+)\\s+conversations\\s+as\\s+read\\?\\s+This\\s+action\\s+cannot\\s+be\\s+undone\\.?$",
+    "replacement": "您确定要将全部 $1 个会话标记为已读吗？此操作无法撤销。"
+  },
+  {
+    "regex": "^Are\\s+you\\s+sure\\s+you\\s+want\\s+to\\s+mark\\s+(\\d+)\\s+conversations?\\s+as\\s+read\\?\\s+This\\s+action\\s+cannot\\s+be\\s+undone\\.?$",
+    "replacement": "您确定要将 $1 个会话标记为已读吗？此操作无法撤销。"
+  },
+  {
+    "regex": "\\bWorkspace\\s*\\+\\s*Worktree\\b",
+    "replacement": "工作区 + 工作树"
   }
 ]

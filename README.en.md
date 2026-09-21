@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.0**.
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.1**.
 
 ---
 
@@ -29,7 +29,7 @@ A high-performance, reversible Chinese localization patch and lifecycle manager 
   - Built-in **ASCII Key Barrier** (guards against Chinese intermediate key fragments), **Capture-Group Invariant Guard** (syntax compilation and `$1..$N` conservation), and **Duplicate Key Conflict Guard**, producing a unified `dist/zh-CN.bundle.json` with seamless backward compatibility.
 - 🎯 **Single-Source Truth & Golden Snapshots**:
   - Core runtime extracts a stateless calculation factory `createI18nEngine` eliminating shadow duplicates across test suites and drift tools.
-  - 149 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
+  - 159 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
 - **High-Performance Low-Overhead Runtime Architecture**: Eliminates uncontrolled `requestIdleCallback` spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal filters and a 100ms throttle valve keep intensive streaming dialogues and virtual scrolling smooth and responsive.
 - **Option Floating Tooltips & Delivery Strategies Coverage**: Fully covers dynamic floating tooltips across Settings (e.g. Queued Messages options: `Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`, `Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`), terminal auto-execution policies, artifact review policies, and Strict Mode descriptions.
 - **Multi-TextNode Coalescing Self-Healing**: Resolves upstream React split-node fragmentations (e.g. `"All ", e, "s run as Flash."` split into sibling TextNodes causing plural suffix leftovers) with atomic full-sentence coalescence while strictly preserving virtual DOM node topology and reference integrity.
@@ -171,7 +171,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json)
-│   └── zh-CN.json                    # Core translation dictionary (1,920 exact entries + 218 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (1,928 exact entries + 223 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
@@ -182,10 +182,10 @@ antigravity-chinese/
 │       ├── rules/                    # Agent Chinese interaction rules (chinese-interaction-rules.md)
 │       ├── skills/                   # Localization diagnostic skills (i18n-diagnostics)
 │       └── plugin.json               # Antigravity plugin manifest specification
-├── test/                             # Automated full-fidelity regression test suites (8 suites, 320+ assertions)
+├── test/                             # Automated full-fidelity regression test suites (8 suites, 330+ assertions)
 │   ├── test-lint.js                  # Dictionary lint & syntax health checks
 │   ├── verify.js                     # 115 JSDOM state machine and runtime performance assertions
-│   ├── test-screenshots.js          # 149 strictEqual golden truth assertions + 20 invariant fuzzing tests
+│   ├── test-screenshots.js          # 159 strictEqual golden truth assertions + 20 invariant fuzzing tests
 │   ├── test-cdp.js                   # Zero-dependency RFC 6455 CDP protocol bidirectional tests
 │   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
 │   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions

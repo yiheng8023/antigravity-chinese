@@ -199,7 +199,19 @@ const goldenCases = [
   { input: "CL details unavailable", expected: "CL 详情不可用" },
   { input: "Create a Plugin with the Agent", expected: "与智能体一起创建插件" },
   { input: "This skill came from the marketplace, so you can add it again whenever you need it.", expected: "此技能来自应用市场，您可以随时按需再次添加。" },
-  { input: "Undo restores your entire workspace to its state at this point.", expected: "撤销会将整个工作区恢复到此节点的状态。" }
+  { input: "Undo restores your entire workspace to its state at this point.", expected: "撤销会将整个工作区恢复到此节点的状态。" },
+
+  // History Menu & Batch Mark As Read (media_1789956060212.png)
+  { input: "Mark 1 conversation as read", expected: "将 1 个会话标记为已读" },
+  { input: "Mark all 5 conversations as read", expected: "将全部 5 个会话标记为已读" },
+  { input: "Mark as Read", expected: "标记为已读" },
+  { input: "Mark all as read", expected: "全部标记为已读" },
+  { input: "Failed to mark all as read", expected: "无法全部标记为已读" },
+  { input: "Are you sure you want to mark 1 conversation as read? This action cannot be undone.", expected: "您确定要将 1 个会话标记为已读吗？此操作无法撤销。" },
+  { input: "Are you sure you want to mark all 3 conversations as read? This action cannot be undone.", expected: "您确定要将全部 3 个会话标记为已读吗？此操作无法撤销。" },
+  { input: "Pinned Chats Only", expected: "仅固定会话" },
+  { input: "Workspace + Worktree", expected: "工作区 + 工作树" },
+  { input: "Archive Conversation", expected: "归档会话" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

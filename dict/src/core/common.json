@@ -1476,5 +1476,19 @@
   "Queue until after the current turn.": "排队等待，直至当前轮次结束。",
   "Queue until after the current turn": "排队等待，直至当前轮次结束",
   "Interrupt the agent and send immediately.": "打断智能体并立即发送。",
-  "Interrupt the agent and send immediately": "打断智能体并立即发送"
+  "Interrupt the agent and send immediately": "打断智能体并立即发送",
+  "Mark 1 conversation as read": "将 1 个会话标记为已读",
+  "Mark 1 conversation as read.": "将 1 个会话标记为已读。",
+  "Mark as read": "标记为已读",
+  "Mark as Read": "标记为已读",
+  "Mark as unread": "标记为未读",
+  "Mark as Unread": "标记为未读",
+  "Mark all as read": "全部标记为已读",
+  "Failed to mark all as read": "无法全部标记为已读",
+  "Are you sure you want to mark 1 conversation as read? This action cannot be undone.": "您确定要将 1 个会话标记为已读吗？此操作无法撤销。",
+  "Pinned Chats Only": "仅固定会话",
+  "Workspace + Worktree": "工作区 + 工作树",
+  "Archive Conversation": "归档会话",
+  "Archive": "归档",
+  "Archived": "已归档"
 }
