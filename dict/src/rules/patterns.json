@@ -890,5 +890,37 @@
   {
     "regex": "\\bWorkspace\\s*\\+\\s*Worktree\\b",
     "replacement": "工作区 + 工作树"
+  },
+  {
+    "regex": "^(\\d+)\\s+active\\s+conversations?$",
+    "replacement": "$1 个活跃会话"
+  },
+  {
+    "regex": "^(\\d+)\\s+archived\\s+conversations?$",
+    "replacement": "$1 个已归档会话"
+  },
+  {
+    "regex": "^Try\\s+(?:远程控制|Remote Control)$",
+    "replacement": "体验远程控制"
+  },
+  {
+    "regex": "^(\\d+)\\s+tools?\\s+enabled$",
+    "replacement": "已启用 $1 个工具"
+  },
+  {
+    "regex": "^Plugin:\\s*(.*)$",
+    "replacement": "插件: $1"
+  },
+  {
+    "regex": "^This plugin provides a specialized suite of skills for data engineers.*$",
+    "replacement": "此插件为在 Google Cloud 上工作的数据工程师和数据库从业者提供专业技能套件。它充当专家助手，让您轻松与数据库交互、分析数据并优化数据库工作负载。"
+  },
+  {
+    "regex": "^Build applications with the Gemini Interactions API.*$",
+    "replacement": "使用 Gemini Interactions API 和 Live API 构建应用，包括文本生成、多轮对话、流式传输、函数调用、托管智能体以及实时音视频。"
+  },
+  {
+    "regex": "^Kick off work on your computer and continue working with your agents from your phone or another device\\.\\s*Turn on (?:远程控制|Remote Control) in app settings\\.?$",
+    "replacement": "在您的计算机上开启工作，并通过手机或其他设备继续与您的智能体协同。可在应用设置中开启远程控制。"
   }
 ]

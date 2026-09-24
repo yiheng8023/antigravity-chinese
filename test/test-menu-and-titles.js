@@ -16,6 +16,15 @@ const mockHtml = `
     <div class="menu-item" id="item4">New Project</div>
     <div class="menu-item" id="item5">Create Project</div>
     <div class="menu-item" id="item6">Project</div>
+    <div class="menu-item" id="item7">Connect to WSL</div>
+    <div class="menu-item" id="item8">Reopen Locally</div>
+    <div id="item9">Try 远程控制</div>
+    <div id="item10">Get Started</div>
+    <div id="item11">2 tools enabled</div>
+    <div data-testid="plan-command-fyi-alert" id="planAlert">
+      <span>Type <code>/</code> and select <code>plan</code> to have the agent generate a plan.</span>
+    </div>
+    <div id="pluginDesc">Core tools and knowledge required to develop for Android</div>
     <div class="chat-title" id="title1">Localization Project Setup</div>
     <div class="chat-title" id="title2">Initiating Localization Project...</div>
   </div>
@@ -57,18 +66,28 @@ const tests = [
   check('item4', '新建项目'),
   check('item5', '创建项目'),
   check('item6', '项目'),
+  check('item7', '连接到 WSL'),
+  check('item8', '在本地重新打开'),
+  check('item9', '体验远程控制'),
+  check('item10', '开始体验'),
+  check('item11', '已启用 2 个工具'),
+  check('planAlert', '输入 / 并选择 plan 以让智能体生成计划。'),
+  check('pluginDesc', '开发 Android 应用所需的核心工具与知识'),
   check('title1', 'Localization Project Setup'),
   check('title2', 'Initiating Localization Project...')
 ];
 
 const allPassed = tests.every(Boolean);
 
-console.log('\n=== 验证主进程系统托盘协同注入 (dist/main.js & dist/tray.js) ===');
+console.log('\n=== 验证主进程系统托盘协同注入与 WSL 补丁 ===');
 const os = require('os');
-const { patchMainFile, patchTrayFile } = require('../cli');
+const { patchMainFile, patchTrayFile, patchMenuFile, patchIpcHandlersFile, patchWslFile } = require('../cli');
 
 const tmpMain = path.join(os.tmpdir(), `agy_test_main_${Date.now()}.js`);
 const tmpTray = path.join(os.tmpdir(), `agy_test_tray_${Date.now()}.js`);
+const tmpMenu = path.join(os.tmpdir(), `agy_test_menu_${Date.now()}.js`);
+const tmpIpc = path.join(os.tmpdir(), `agy_test_ipc_${Date.now()}.js`);
+const tmpWsl = path.join(os.tmpdir(), `agy_test_wsl_${Date.now()}.js`);
 
 const mockMainContent = `
 (0, tray_1.createTray)([
@@ -105,6 +124,11 @@ const quitDialog = {
 };
 electron_1.dialog.showErrorBox('Binary not found', 'msg');
 electron_1.dialog.showErrorBox('Startup failed', 'msg');
+
+const wslDistroDialog = {
+    title: 'WSL distro not found',
+    detail: 'Antigravity opened on Windows instead.',
+};
 `;
 
 const mockTrayContent = `
@@ -123,16 +147,51 @@ function updateTrayAgentCount(count) {
 }
 `;
 
+const mockMenuContent = `
+const menuItems = [
+    { label: 'Connect to WSL' },
+    { label: 'Reopen Locally' }
+];
+`;
+
+const mockIpcContent = `
+dialog.showMessageBox({
+    message: 'Folder is on the Windows filesystem',
+});
+`;
+
+const mockWslContent = `
+const w = {
+    warning: 'This folder is on the Windows filesystem. Accessing it from WSL (via /mnt) can be slow — for best performance keep projects inside the WSL filesystem.',
+    error: 'This location cannot be opened in WSL: ' + winPath
+};
+`;
+
 fs.writeFileSync(tmpMain, mockMainContent, 'utf-8');
 fs.writeFileSync(tmpTray, mockTrayContent, 'utf-8');
+fs.writeFileSync(tmpMenu, mockMenuContent, 'utf-8');
+fs.writeFileSync(tmpIpc, mockIpcContent, 'utf-8');
+fs.writeFileSync(tmpWsl, mockWslContent, 'utf-8');
 
 patchMainFile(tmpMain);
 patchTrayFile(tmpTray);
+patchMenuFile(tmpMenu);
+patchIpcHandlersFile(tmpIpc);
+patchWslFile(tmpWsl);
 
 const patchedMain = fs.readFileSync(tmpMain, 'utf-8');
 const patchedTray = fs.readFileSync(tmpTray, 'utf-8');
+const patchedMenu = fs.readFileSync(tmpMenu, 'utf-8');
+const patchedIpc = fs.readFileSync(tmpIpc, 'utf-8');
+const patchedWsl = fs.readFileSync(tmpWsl, 'utf-8');
 
-try { fs.unlinkSync(tmpMain); fs.unlinkSync(tmpTray); } catch (e) {}
+try {
+  fs.unlinkSync(tmpMain);
+  fs.unlinkSync(tmpTray);
+  fs.unlinkSync(tmpMenu);
+  fs.unlinkSync(tmpIpc);
+  fs.unlinkSync(tmpWsl);
+} catch (e) {}
 
 const trayTests = [
   { name: 'main.js 托盘初始未运行文本已汉化', pass: patchedMain.includes("label: '无正在运行的智能体'") },
@@ -142,7 +201,11 @@ const trayTests = [
   { name: 'main.js 原生退出确认弹窗标题与提示已汉化', pass: patchedMain.includes("title: '确认退出'") && patchedMain.includes("message: '您确定要退出吗？'") },
   { name: 'main.js 原生退出确认弹窗按钮已汉化', pass: patchedMain.includes("buttons: ['取消', '退出']") },
   { name: 'main.js 启动错误提示框已汉化', pass: patchedMain.includes("'未找到二进制文件'") && patchedMain.includes("'启动失败'") },
-  { name: 'tray.js 动态数量更新逻辑已汉化', pass: patchedTray.includes("${count} 个正在运行的智能体") && patchedTray.includes("'无正在运行的智能体'") }
+  { name: 'main.js WSL 未找到发行版弹窗已汉化', pass: patchedMain.includes("'未找到 WSL 发行版'") && patchedMain.includes("'Antigravity 已改为在 Windows 本地打开。'") },
+  { name: 'tray.js 动态数量更新逻辑已汉化', pass: patchedTray.includes("${count} 个正在运行的智能体") && patchedTray.includes("'无正在运行的智能体'") },
+  { name: 'menu.js WSL 连接与返回本地菜单项已汉化', pass: patchedMenu.includes("label: '连接到 WSL'") && patchedMenu.includes("label: '在本地重新打开'") },
+  { name: 'ipcHandlers.js WSL 文件系统弹窗已汉化', pass: patchedIpc.includes("message: '文件夹位于 Windows 文件系统上'") },
+  { name: 'wsl.js 性能警告与错误提示已汉化', pass: patchedWsl.includes("此文件夹位于 Windows 文件系统上") && patchedWsl.includes("此位置无法在 WSL 中打开：") }
 ];
 
 let trayAllPassed = true;

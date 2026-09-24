@@ -235,6 +235,10 @@ function patchMenuFile(menuFilePath) {
     { from: "'Toggle Developer Tools'", to: "'切换开发者工具'" },
     { from: '"Toggle Developer Tools"', to: '"切换开发者工具"' },
     { from: 'updater_1.MenuUpdateStep.CheckForUpdates', to: '"检查更新"' },
+    { from: "'Connect to WSL'", to: "'连接到 WSL'" },
+    { from: '"Connect to WSL"', to: '"连接到 WSL"' },
+    { from: "'Reopen Locally'", to: "'在本地重新打开'" },
+    { from: '"Reopen Locally"', to: '"在本地重新打开"' },
   ];
 
   for (const r of replacements) {
@@ -251,7 +255,9 @@ function patchIpcHandlersFile(ipcFilePath) {
     { from: "'Open workspace'", to: "'打开工作区'" },
     { from: '"Open workspace"', to: '"打开工作区"' },
     { from: "'Open workspaces'", to: "'打开多个工作区'" },
-    { from: '"Open workspaces"', to: '"打开多个工作区"' }
+    { from: '"Open workspaces"', to: '"打开多个工作区"' },
+    { from: "'Folder is on the Windows filesystem'", to: "'文件夹位于 Windows 文件系统上'" },
+    { from: '"Folder is on the Windows filesystem"', to: '"文件夹位于 Windows 文件系统上"' }
   ];
   for (const r of replacements) {
     content = content.split(r.from).join(r.to);
@@ -318,7 +324,20 @@ function patchMainFile(mainFilePath) {
   // 3. macOS dock 菜单支持
   content = content.replace(/label:\s*['"]New Window['"]/g, "label: '新建窗口'");
 
+  // 4. WSL 弹窗与系统提示
+  content = content.replace(/title:\s*['"]WSL distro not found['"]/g, "title: '未找到 WSL 发行版'");
+  content = content.replace(/['"]WSL distro not found['"]/g, "'未找到 WSL 发行版'");
+  content = content.replace(/['"]Antigravity opened on Windows instead\.['"]/g, "'Antigravity 已改为在 Windows 本地打开。'");
+
   fs.writeFileSync(mainFilePath, content, 'utf-8');
+}
+
+function patchWslFile(wslFilePath) {
+  if (!fs.existsSync(wslFilePath)) return;
+  let content = fs.readFileSync(wslFilePath, 'utf-8');
+  content = content.replace(/This folder is on the Windows filesystem\. Accessing it from WSL \(via \/mnt\) can be slow — for best performance keep projects inside the WSL filesystem\./g, '此文件夹位于 Windows 文件系统上。从 WSL 访问该目录（通过 /mnt）可能会较慢 —— 为获得最佳性能，建议将项目保留在 WSL 文件系统内。');
+  content = content.replace(/This location cannot be opened in WSL:/g, '此位置无法在 WSL 中打开：');
+  fs.writeFileSync(wslFilePath, content, 'utf-8');
 }
 
 function patchTrayFile(trayFilePath) {
@@ -524,6 +543,11 @@ function install(customPath) {
   const trayPath = path.join(tempExtractDir, 'dist', 'tray.js');
   if (fs.existsSync(trayPath)) {
     patchTrayFile(trayPath);
+  }
+
+  const wslPath = path.join(tempExtractDir, 'dist', 'wsl.js');
+  if (fs.existsSync(wslPath)) {
+    patchWslFile(wslPath);
   }
 
   // 4. Pack back
@@ -1019,6 +1043,8 @@ module.exports = {
   patchMenuFile,
   patchMainFile,
   patchTrayFile,
+  patchWslFile,
+  patchIpcHandlersFile,
   confirmCloseClient,
   closeAntigravitySafely,
   isProtectedEnvironment

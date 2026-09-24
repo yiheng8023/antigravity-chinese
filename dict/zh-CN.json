@@ -1542,6 +1542,38 @@
     "when working in this project": "在此项目中工作时",
     "when working in this project.": "在此项目中工作时。",
     "yesterday": "昨天",
+    "Customization token budget exceeded. Large customizations will be truncated.": "已超出自定义扩展的 Token 预算。超长自定义项将被截断。",
+    "Type / and select plan to have the agent generate a plan.": "输入 / 并选择 plan 以让智能体生成计划。",
+    "to have the agent generate a plan.": "以让智能体生成计划。",
+    "and select": "并选择",
+    "Try Remote Control": "体验远程控制",
+    "Kick off work on your computer and continue working with your agents from your phone or another device. Turn on Remote Control in app settings.": "在您的计算机上开启工作，并通过手机或其他设备继续与您的智能体协同。可在应用设置中开启远程控制。",
+    "Get Started": "开始体验",
+    "Main Agent": "主智能体",
+    "Mcp Tools": "MCP 工具",
+    "Core tools and knowledge required to develop for Android": "开发 Android 应用所需的核心工具与知识",
+    "Reliable automation, in-depth debugging, and performance analysis in Chrome using Chrome DevTools and Puppeteer": "在 Chrome 中使用 Chrome DevTools 和 Puppeteer 进行可靠的自动化、深度调试与性能分析",
+    "This plugin provides a specialized suite of skills for data engineers and database practitioners working on Google Cloud. It acts as an expert assistant, allowing you to easily interact with your database, analyze your data, and optimize your database workload.": "此插件为在 Google Cloud 上工作的数据工程师和数据库从业者提供专业技能套件。它充当专家助手，让您轻松与数据库交互、分析数据并优化数据库工作负载。",
+    "Build applications with the Gemini Interactions API and Live API including text generation, multi-turn chat, streaming, function calling, managed agents, and real-time audio and video.": "使用 Gemini Interactions API 和 Live API 构建应用，包括文本生成、多轮对话、流式传输、函数调用、托管智能体以及实时音视频。",
+    "Using the Google Antigravity Python SDK to build AI agents": "使用 Google Antigravity Python SDK 构建 AI 智能体",
+    "Integration skill and tools for Google Maps Platform APIs": "用于 Google Maps Platform API 的集成技能与工具",
+    "Keep your coding agent up to date with the latest web best practices.": "让您的编码智能体紧跟最新的 Web 最佳实践。",
+    "Curated collection of agent skills for science tasks.": "精选用于科学计算与科研任务的智能体技能集合。",
+    "Proactively connect to running Dart/Flutter apps and trigger hot reload or hot restart upon editing .dart files under lib/.": "主动连接到正在运行的 Dart/Flutter 应用，并在编辑 lib/ 下的 .dart 文件时触发热重载或热重启。",
+    "Expert at reviewing Flutter code for accessibility (a11y) issues. Invoke this agent to perform an a11y review of a codebase, pending changes, or PR.": "擅长审查 Flutter 代码中的无障碍 (a11y) 问题。调用此智能体对代码库、待定更改或 PR 进行无障碍审查。",
+    "Autonomous mode active: the agent works independently and does not ask questions or request new permissions.": "自主模式已激活：智能体将独立工作，不会提问或请求新权限。",
+    "The Google3 project is deprecated": "Google3 项目已弃用",
+    "Show settings anyway": "仍然显示设置",
+    "CitC Workspace Type": "CitC 工作区类型",
+    "Switch IDE Workspace": "切换 IDE 工作区",
+    "Toggle Overview Panel": "切换概览面板",
+    "Remove from Split": "从分屏中移除",
+    "Modified Files": "已修改文件",
+    "Select Workspace": "选择工作区",
+    "This subagent was killed and can no longer be messaged.": "该子智能体已被终止，无法再发送消息。",
+    "DevTools port is still closed. Please make sure Chrome is running with remote debugging enabled.": "DevTools 端口仍处于关闭状态。请确保 Chrome 正在运行且已启用远程调试。",
+    "Record voice memo": "录制语音备忘录",
+    "Generate a link that lets any Googler load a read-only copy of a conversation. Sharing exports the conversation history to your public x20 folder, so it needs that folder to be readable by others.": "生成一个链接，允许任何 Googler 加载该会话的只读副本。分享会将对话历史导出到您的公共 x20 文件夹，因此需要该文件夹对他人可读。",
     "\"Allow remote debugging for this browser instance\"": "“为此浏览器实例允许远程调试”",
     "1 task running": "1 个运行中的任务",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",
@@ -1983,7 +2015,18 @@
     "Diagnostic Data": "诊断数据",
     "Crash Reporting": "崩溃报告",
     "Terminal Shell": "终端 Shell",
-    "Language": "语言"
+    "Language": "语言",
+    "Windows Subsystem for Linux": "Windows 的 Linux 子系统 (WSL)",
+    "Run the app against a Linux environment. Connecting relaunches the app into the selected WSL distro.": "在 Linux 环境中运行此应用。连接后将把应用重新启动到所选的 WSL 发行版中。",
+    "Local Windows environment": "本地 Windows 环境",
+    "The app is currently connected to a WSL distro. Reopening locally relaunches it directly on Windows.": "此应用当前已连接到 WSL 发行版。在本地重新打开将直接在 Windows 上重新启动该应用。",
+    "Reopen Locally": "在本地重新打开",
+    "Connect to WSL": "连接到 WSL",
+    "Connect": "连接",
+    "Folder is on the Windows filesystem": "文件夹位于 Windows 文件系统上",
+    "This folder is on the Windows filesystem. Accessing it from WSL (via /mnt) can be slow — for best performance keep projects inside the WSL filesystem.": "此文件夹位于 Windows 文件系统上。从 WSL 访问该目录（通过 /mnt）可能会较慢 —— 为获得最佳性能，建议将项目保留在 WSL 文件系统内。",
+    "WSL distro not found": "未找到 WSL 发行版",
+    "Antigravity opened on Windows instead.": "Antigravity 已改为在 Windows 本地打开。"
   },
   "patterns": [
     {
@@ -2877,6 +2920,38 @@
     {
       "regex": "\\bWorkspace\\s*\\+\\s*Worktree\\b",
       "replacement": "工作区 + 工作树"
+    },
+    {
+      "regex": "^(\\d+)\\s+active\\s+conversations?$",
+      "replacement": "$1 个活跃会话"
+    },
+    {
+      "regex": "^(\\d+)\\s+archived\\s+conversations?$",
+      "replacement": "$1 个已归档会话"
+    },
+    {
+      "regex": "^Try\\s+(?:远程控制|Remote Control)$",
+      "replacement": "体验远程控制"
+    },
+    {
+      "regex": "^(\\d+)\\s+tools?\\s+enabled$",
+      "replacement": "已启用 $1 个工具"
+    },
+    {
+      "regex": "^Plugin:\\s*(.*)$",
+      "replacement": "插件: $1"
+    },
+    {
+      "regex": "^This plugin provides a specialized suite of skills for data engineers.*$",
+      "replacement": "此插件为在 Google Cloud 上工作的数据工程师和数据库从业者提供专业技能套件。它充当专家助手，让您轻松与数据库交互、分析数据并优化数据库工作负载。"
+    },
+    {
+      "regex": "^Build applications with the Gemini Interactions API.*$",
+      "replacement": "使用 Gemini Interactions API 和 Live API 构建应用，包括文本生成、多轮对话、流式传输、函数调用、托管智能体以及实时音视频。"
+    },
+    {
+      "regex": "^Kick off work on your computer and continue working with your agents from your phone or another device\\.\\s*Turn on (?:远程控制|Remote Control) in app settings\\.?$",
+      "replacement": "在您的计算机上开启工作，并通过手机或其他设备继续与您的智能体协同。可在应用设置中开启远程控制。"
     }
   ]
 }

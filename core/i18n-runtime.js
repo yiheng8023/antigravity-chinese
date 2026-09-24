@@ -1,6 +1,6 @@
 /**
- * Antigravity Chinese Localization Engine (Runtime v3.2.35)
- * 修复自旋死循环/悬浮树暴搜/DOM否定标记缺失，极致性能闭环
+ * Antigravity Chinese Localization Engine (Runtime v3.3.3)
+ * 支持 2.17.0 复合 Alert 自愈 / WSL 跨平台菜单与弹窗适配 / 极速性能闭环
  *
  * 核心改进：
  * 1. 彻底阻断 requestIdleCallback 自旋死循环，改为 15 秒低频保底扫描
@@ -302,6 +302,22 @@
     // 同一轮扫描中，已处理的元素跳过
     if (scanId && el._agyScanId === scanId) return;
     if (scanId) el._agyScanId = scanId;
+
+    // 复合组件自愈：处理特定 JSX 碎片化 Alert（如 plan-command-fyi-alert）
+    if (el.getAttribute && el.getAttribute('data-testid') === 'plan-command-fyi-alert') {
+      var alertSpan = el.querySelector ? el.querySelector('span') : null;
+      if (alertSpan && !alertSpan._agyAlertDone) {
+        var alertChild = alertSpan.firstChild;
+        while (alertChild) {
+          if (alertChild.nodeType === 3 && alertChild.nodeValue && alertChild.nodeValue.trim() === 'Type') {
+            alertChild.nodeValue = alertChild.nodeValue.replace('Type', '输入');
+            alertChild._agyOriginal = alertChild.nodeValue;
+          }
+          alertChild = alertChild.nextSibling;
+        }
+        alertSpan._agyAlertDone = true;
+      }
+    }
 
     // 翻译属性
     for (var i = 0; i < TRANSLATABLE_ATTRS.length; i++) {

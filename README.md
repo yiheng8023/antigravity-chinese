@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.2**）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.3**，全面适配 Antigravity **v2.17.0** 升级）。
 
 ---
 
@@ -24,6 +24,14 @@
 - ⚡ **原生双模互补架构 (Dual-Mode Synergy Architecture)**：
   - **Mode 1（ASAR 深度持久化注入）**：通过 Electron ASAR 深度注入，实现系统托盘（`tray.js`）、主菜单（`menu.js`）、系统退出弹窗与界面 DOM 的 100% 原生全景汉化；
   - **Mode 2（零依赖 CDP 免解包热挂载）**：手搓 150 行原生 Node.js RFC 6455 协议客户端，免解包、0 磁盘修改、完全免疫上游静默更新覆写，随开随用。
+- 🐧 **WSL 跨平台子系统全维适配 (WSL Cross-Platform Synergy)**：
+  - 深度适配 Windows 客户端连接 WSL (Ubuntu 等) 运行环境全流程；
+  - 原生支持应用菜单 `Connect to WSL`（连接到 WSL）/ `Reopen Locally`（在本地重新打开）；
+  - 深度注入主进程 WSL 发行版缺失警告与跨系统 `/mnt` 路径性能告警弹窗，兼顾性能提示与无死角中文体验。
+- 🧩 **2.17.0 复合 Alert 碎片化自愈与官方 10 大插件全景中文**：
+  - 针对上游 2.17.0 全新 JSX 碎片化 Alert（如 `plan-command-fyi-alert`），通过复合节点探针实现手术刀级特异性自愈，避免全局单字歧义污染；
+  - 彻底治愈新手引导 NUX 卡片（`Try 远程控制` ➔ `体验远程控制`、`Get Started` ➔ `开始体验`）及半中半英残留；
+  - 全量出版级汉化官方 10 大插件（Android CLI, Chrome DevTools, Data Agent Kit, Gemini API, SDK 等）及其全景说明。
 - 🏗️ **三层词库架构与自动化质量编译管线 (Three-Tier Compiler & Security Gates)**：
   - 词库源码彻底模块化分层：`dict/src/core/`（原子纯词条）、`dict/src/rules/`（级联规则）、`dict/src/ctx/`（特定上下文）；
   - 配备 **ASCII Key 阻断门禁**（物理杜绝中文残片混入 Key）、**捕获组守恒门禁**（语法编译与 `$1..$N` 严格对齐）、**重复 Key 冲突守卫**，编译生成单一发布包 `dist/zh-CN.bundle.json` 并平滑向后兼容。
@@ -171,7 +179,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json)
-│   └── zh-CN.json                    # 核心汉化词库 (1,984 精确词条 + 223 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (2,027 精确词条 + 231 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动

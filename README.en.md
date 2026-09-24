@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.2**.
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.3** (fully adapted for Antigravity **v2.17.0**).
 
 ---
 
@@ -24,6 +24,14 @@ A high-performance, reversible Chinese localization patch and lifecycle manager 
 - ⚡ **Dual-Mode Synergy Architecture**:
   - **Mode 1 (Deep ASAR Physical Injection)**: Deeply patches the ASAR archive for 100% native localization covering system tray (`tray.js`), menus (`menu.js`), and UI DOM.
   - **Mode 2 (Zero-Dependency CDP Hot-Mount)**: Custom-built 150-line native Node.js RFC 6455 protocol client; zero disk modifications, completely immune to upstream silent updates.
+- 🐧 **WSL Cross-Platform Synergy**:
+  - Deeply supports Windows clients connecting to WSL (Ubuntu, etc.) Linux environments.
+  - Natively translates application menus `Connect to WSL` and `Reopen Locally`.
+  - Injects translations for main-process dialogs, including missing WSL distros and cross-filesystem `/mnt` performance warnings.
+- 🧩 **2.17.0 Composite Alert De-fragmentation & Full Plugin Coverage**:
+  - Surgical healing for newly introduced JSX composite alerts (e.g. `plan-command-fyi-alert`), avoiding global single-word ambiguity while producing clean Chinese sentences.
+  - Fully resolves newcomer NUX onboarding cards (`Try Remote Control` ➔ `体验远程控制`, `Get Started` ➔ `开始体验`) and half-English/half-Chinese text fragments.
+  - Comprehensive publication-grade translations for the 10 official plugins (Android CLI, Chrome DevTools, Data Agent Kit, Gemini API, SDK, etc.) and custom skills/agents.
 - 🏗️ **Three-Tier Dictionary Compiler & Security Gates**:
   - Modularized source layout: `dict/src/core/` (atomic pure terms), `dict/src/rules/` (cascading regexes), `dict/src/ctx/` (context-scoped entries).
   - Built-in **ASCII Key Barrier** (guards against Chinese intermediate key fragments), **Capture-Group Invariant Guard** (syntax compilation and `$1..$N` conservation), and **Duplicate Key Conflict Guard**, producing a unified `dist/zh-CN.bundle.json` with seamless backward compatibility.
@@ -171,7 +179,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json)
-│   └── zh-CN.json                    # Core translation dictionary (1,984 exact entries + 223 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (2,027 exact entries + 231 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
