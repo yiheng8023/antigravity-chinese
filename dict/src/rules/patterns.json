@@ -922,5 +922,113 @@
   {
     "regex": "^Kick off work on your computer and continue working with your agents from your phone or another device\\.\\s*Turn on (?:远程控制|Remote Control) in app settings\\.?$",
     "replacement": "在您的计算机上开启工作，并通过手机或其他设备继续与您的智能体协同。可在应用设置中开启远程控制。"
+  },
+  {
+    "regex": "^Build with (.+) Plugins$",
+    "replacement": "Build with $1 插件目录"
+  },
+  {
+    "regex": "^Plugins are packaged collections of skills and MCPs to help the Agent in (.+?) work with Google developer products\\.\\s*You can always change your choices in Settings\\.?$",
+    "replacement": "插件是技能与 MCP 的打包集合，用于辅助 $1 中的智能体协同使用 Google 开发者产品。您随时可以在“设置”中更改选择。"
+  },
+  {
+    "regex": "^Plugins are packaged collections of skills and MCPs to help the Agent work with Google developer products\\.\\s*You can always change your choices in Settings\\.?$",
+    "replacement": "插件是技能与 MCP 的打包集合，用于辅助智能体协同使用 Google 开发者产品。您随时可以在“设置”中更改选择。"
+  },
+  {
+    "regex": "^There are currently no Build with (.+) plugins available\\.?$",
+    "replacement": "当前暂无可用的 Build with $1 插件。"
+  },
+  {
+    "regex": "^Specialized suite of skills for data engineers and database practitioners (?:working )?on Google Cloud\\.?$",
+    "replacement": "专为 Google Cloud 上的数据工程师与数据库从业者打造的专业技能套件。"
+  },
+  {
+    "regex": "^(\\d+)\\s+tools?\\s+disabled$",
+    "replacement": "已禁用 $1 个工具"
+  },
+  {
+    "regex": "^Disable\\s+(.+)\\s+tool\\s+for\\s+(.+)$",
+    "replacement": "为 $2 禁用 $1 工具"
+  },
+  {
+    "regex": "^Enable\\s+(.+)\\s+tool\\s+for\\s+(.+)$",
+    "replacement": "为 $2 启用 $1 工具"
+  },
+  {
+    "regex": "^Auth code for (.+)$",
+    "replacement": "$1 的授权码"
+  },
+  {
+    "regex": "^The (.+) MCP server requires configuration parameters before it can be started\\.?$",
+    "replacement": "$1 MCP 服务需要先配置参数才能启动。"
+  },
+  {
+    "regex": "^See more in (.+)$",
+    "replacement": "在 $1 中查看更多"
+  },
+  {
+    "regex": "^(?:See less|收起) in (.+)$",
+    "replacement": "在 $1 中收起"
+  },
+  {
+    "regex": "^(?:More actions|更多操作) for (.+)$",
+    "replacement": "$1 的更多操作"
+  },
+  {
+    "regex": "^Failed to enable plugin (.+)$",
+    "replacement": "启用插件 $1 失败"
+  },
+  {
+    "regex": "^Failed to update agent:\\s*(.+)$",
+    "replacement": "更新智能体失败：$1"
+  },
+  {
+    "regex": "^Failed to remove agent:\\s*(.+)$",
+    "replacement": "移除智能体失败：$1"
+  },
+  {
+    "regex": "^Failed to remove plugin:\\s*(.+)$",
+    "replacement": "移除插件失败：$1"
+  },
+  {
+    "regex": "^Failed to toggle plugin:\\s*(.+)$",
+    "replacement": "切换插件状态失败：$1"
+  },
+  {
+    "regex": "^Error updating agent:\\s*(.+)$",
+    "replacement": "更新智能体出错：$1"
+  },
+  {
+    "regex": "^Failed to write MCP config:\\s*(.+)$",
+    "replacement": "写入 MCP 配置失败：$1"
+  },
+  {
+    "regex": "^Unnamed [Aa]gent (\\d+)$",
+    "replacement": "未命名智能体 $1"
+  },
+  {
+    "regex": "^Unnamed [Ss]kill (\\d+)$",
+    "replacement": "未命名技能 $1"
+  },
+  {
+    "regex": "^UI Extension (\\d+)$",
+    "replacement": "界面扩展 $1"
+  },
+  {
+    "regex": "^Automation (\\d+)$",
+    "replacement": "自动化任务 $1"
+  },
+  {
+    "regex": "^Rule (\\d+)$",
+    "replacement": "规则 $1"
+  },
+  {
+    "regex": "^Show (\\d+) breakdowns?$",
+    "replacement": "显示 $1 项明细"
+  },
+  {
+    "regex": "^(.+),\\s*setup required$",
+    "replacement": "$1（需要配置）"
   }
 ]

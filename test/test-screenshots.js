@@ -226,7 +226,17 @@ const goldenCases = [
   { input: "Stop Task", expected: "停止任务" },
   { input: "Cancel Task", expected: "取消任务" },
   { input: "Close Sidebar", expected: "关闭侧边栏" },
-  { input: "Clear Search", expected: "清除搜索" }
+  { input: "Clear Search", expected: "清除搜索" },
+
+  // Build With Google / Antigravity Plugins Catalog (media_1790531730315.png & media_1790531749495.png)
+  { input: "Build with Antigravity Plugins", expected: "Build with Antigravity 插件目录" },
+  { input: "Plugins are packaged collections of skills and MCPs to help the Agent in Antigravity work with Google developer products. You can always change your choices in Settings.", expected: "插件是技能与 MCP 的打包集合，用于辅助 Antigravity 中的智能体协同使用 Google 开发者产品。您随时可以在“设置”中更改选择。" },
+  { input: "Using the Antigravity Python SDK to build AI agents", expected: "使用 Antigravity Python SDK 构建 AI 智能体" },
+  { input: "Curated collection of agent skills for science.", expected: "精选用于科学计算与科研任务的智能体技能集合。" },
+  { input: "Prototype, build & run modern apps users love with Firebase's backend, AI, and operational infrastructure.", expected: "借助 Firebase 的后端、AI 与运维基础设施，快速构建、运行并打造深受用户喜爱的现代应用原型。" },
+  { input: "Skills providing tailored instructions for happy path Dart and Flutter development workflows.", expected: "为 Dart 与 Flutter 标准开发工作流提供量身定制指导的技能集合。" },
+  { input: "Build and prototype location-aware applications with Google Maps Platform. Integrate interactive maps, search and inspect Places details, calculate optimal routes.", expected: "使用 Google Maps Platform 构建和设计位置感知型应用原型。集成交互式地图、搜索与查看地点详情，并计算最佳路线。" },
+  { input: "Specialized suite of skills for data engineers and database practitioners on Google Cloud", expected: "专为 Google Cloud 上的数据工程师与数据库从业者打造的专业技能套件" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

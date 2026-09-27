@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.3**，全面适配 Antigravity **v2.17.0** 升级）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.4**，全面适配 Antigravity **v2.17.0** 升级）。
 
 ---
 
@@ -28,16 +28,16 @@
   - 深度适配 Windows 客户端连接 WSL (Ubuntu 等) 运行环境全流程；
   - 原生支持应用菜单 `Connect to WSL`（连接到 WSL）/ `Reopen Locally`（在本地重新打开）；
   - 深度注入主进程 WSL 发行版缺失警告与跨系统 `/mnt` 路径性能告警弹窗，兼顾性能提示与无死角中文体验。
-- 🧩 **2.17.0 复合 Alert 碎片化自愈与官方 10 大插件全景中文**：
+- 🧩 **2.17.0 复合 Alert 碎片化自愈与官方 10 大插件 + 131 项技能全景中文**：
   - 针对上游 2.17.0 全新 JSX 碎片化 Alert（如 `plan-command-fyi-alert`），通过复合节点探针实现手术刀级特异性自愈，避免全局单字歧义污染；
   - 彻底治愈新手引导 NUX 卡片（`Try 远程控制` ➔ `体验远程控制`、`Get Started` ➔ `开始体验`）及半中半英残留；
-  - 全量出版级汉化官方 10 大插件（Android CLI, Chrome DevTools, Data Agent Kit, Gemini API, SDK 等）及其全景说明。
+  - 全量出版级汉化官方 10 大插件目录（`Build with Antigravity Plugins`：Android CLI, Chrome DevTools, Data Agent Kit, Dart and Flutter, Firebase, Gemini API, Google Maps Platform, Modern Web Guidance, Google Antigravity SDK, Science）的双源简介，以及旗下全部 **131 项 `SKILL.md` / `agents` / `rules` 技能与子智能体说明**。
 - 🏗️ **三层词库架构与自动化质量编译管线 (Three-Tier Compiler & Security Gates)**：
-  - 词库源码彻底模块化分层：`dict/src/core/`（原子纯词条）、`dict/src/rules/`（级联规则）、`dict/src/ctx/`（特定上下文）；
+  - 词库源码彻底模块化分层：`dict/src/core/`（原子纯词条）、`dict/src/rules/`（级联规则）、`dict/src/ctx/`（特定上下文：`permissions.json`、`settings.json`、`plugins.json`）；
   - 配备 **ASCII Key 阻断门禁**（物理杜绝中文残片混入 Key）、**捕获组守恒门禁**（语法编译与 `$1..$N` 严格对齐）、**重复 Key 冲突守卫**，编译生成单一发布包 `dist/zh-CN.bundle.json` 并平滑向后兼容。
 - 🎯 **真理单源解耦与黄金语义真断言 (Single-Source Truth & Golden Snapshots)**：
   - 核心运行时抽离无状态计算工厂 `createI18nEngine`，全仓消灭一切测试与工具中的影子副本；
-  - 全量 172 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
+  - 全量 180 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
 - **低开销高响应渲染架构 (High-Performance Runtime Architecture)**：阻断 `requestIdleCallback` 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路；悬浮 Portal 门禁与 100ms 节流阀，确保长对话消息流与高频虚拟滚动下保持平滑流畅。
 - **深层选项悬浮气泡与执行策略全量覆盖 (Option Tooltips & Delivery Strategies)**：全量收录排队消息策略悬浮气泡提示（`Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`、`Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`）以及终端自动执行、产物审查模式、严格模式等深层选项的动态说明。
 - **行内纯文本容器联合自愈 (Multi-TextNode Coalescing Self-Healing)**：针对上游 React 模板碎片化拆分（如 `"All ", e, "s run as Flash."` 拆分为多个兄弟 TextNode 导致英文复数残片），在保持虚拟 DOM 节点引用稳定不报错的前提下，整句提纯联合自愈。
@@ -116,18 +116,18 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 本项目引入极其严苛的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（聚合 8 大全真测试套件，共 320+ 项真理断言）
+# 运行全套自动化测试（聚合 8 大全真测试套件，共 350+ 项真理断言）
 npm test
 ```
 
 - **词库格式与语法排毒 (`test/test-lint.js`)**：检测词库 JSON 格式合规性与基础语法健康度。
 - **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 115 项断言，验证关键 DOM 路径翻译准确性、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
-- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 159 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
+- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 180 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
 - **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
 - **菜单、托盘与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 1,928 条词条与 223 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 2,410 条词条与 258 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 
 ---
 
@@ -178,8 +178,8 @@ antigravity-chinese/
 │   ├── src/                          # 三层分层词库源码
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
-│   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json)
-│   └── zh-CN.json                    # 核心汉化词库 (2,027 精确词条 + 231 组级联正则，兼容同步)
+│   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
+│   └── zh-CN.json                    # 核心汉化词库 (2,410 精确词条 + 258 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动
@@ -190,10 +190,10 @@ antigravity-chinese/
 │       ├── rules/                    # 智能体中文交互规则 (chinese-interaction-rules.md)
 │       ├── skills/                   # 本地化诊断技能 (i18n-diagnostics)
 │       └── plugin.json               # 插件规范清单配置文件
-├── test/                             # 自动化全真回归测试套件 (8 大套件 340+ 断言)
+├── test/                             # 自动化全真回归测试套件 (8 大套件 350+ 断言)
 │   ├── test-lint.js                  # 词库格式与语法排毒校验
 │   ├── verify.js                     # 115 项 JSDOM 状态机与运行时性能断言
-│   ├── test-screenshots.js          # 172 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
+│   ├── test-screenshots.js          # 180 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
 │   ├── test-cdp.js                   # 零依赖 RFC 6455 CDP 协议层双向通信测试
 │   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
 │   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言

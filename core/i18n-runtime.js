@@ -1,6 +1,6 @@
 /**
- * Antigravity Chinese Localization Engine (Runtime v3.3.3)
- * 支持 2.17.0 复合 Alert 自愈 / WSL 跨平台菜单与弹窗适配 / 极速性能闭环
+ * Antigravity Chinese Localization Engine (Runtime v3.3.4)
+ * 支持 2.17.0 复合 Alert 自愈 / WSL 跨平台菜单与弹窗适配 / 官方 10 大插件与 131 项技能全量汉化 / 极速性能闭环
  *
  * 核心改进：
  * 1. 彻底阻断 requestIdleCallback 自旋死循环，改为 15 秒低频保底扫描
