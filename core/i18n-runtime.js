@@ -135,7 +135,7 @@
             translatedParts.push(part.replace(/\.\s*/g, '。 '));
             continue;
           }
-          var transPart = exactDict[trimmedPart];
+          var transPart = exactDict[trimmedPart] || exactDict[trimmedPart + '.'];
           if (!transPart) {
             for (var pIdx = 0; pIdx < patterns.length; pIdx++) {
               if (patterns[pIdx].regex.test(trimmedPart)) {
@@ -158,7 +158,7 @@
           }
         }
         if (anyTranslated) {
-          return cacheAndReturn(normalized, translatedParts.join('').replace(/([。！？])\s*/g, '$1 '));
+          return cacheAndReturn(normalized, translatedParts.join('').replace(/([。！？])[。！？.]*\s*/g, '$1 ').trim());
         }
       }
 
@@ -280,6 +280,12 @@
     if (!trimmed) {
       // 对纯空白节点补充否定标记，二次扫描直接 O(1) 退出，避免重复调用 trim()
       node._agyOriginal = original;
+      return;
+    }
+
+    if (trimmed === '.' && node.previousSibling && /[\u4e00-\u9fa5]/.test(node.previousSibling.textContent || '')) {
+      node.nodeValue = original.replace('.', '。');
+      node._agyOriginal = node.nodeValue;
       return;
     }
 

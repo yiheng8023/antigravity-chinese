@@ -1,6 +1,6 @@
 {
-  "version": "3.3.4",
-  "buildTime": "2026-09-27T18:43:44.240Z",
+  "version": "3.3.5",
+  "buildTime": "2026-09-29T11:54:32.304Z",
   "exact": {
     "\"Always Proceed\"": "“总是直接继续”",
     "+ Add Folder": "+ 添加文件夹",
@@ -2411,7 +2411,40 @@
     "Folder is on the Windows filesystem": "文件夹位于 Windows 文件系统上",
     "This folder is on the Windows filesystem. Accessing it from WSL (via /mnt) can be slow — for best performance keep projects inside the WSL filesystem.": "此文件夹位于 Windows 文件系统上。从 WSL 访问该目录（通过 /mnt）可能会较慢 —— 为获得最佳性能，建议将项目保留在 WSL 文件系统内。",
     "WSL distro not found": "未找到 WSL 发行版",
-    "Antigravity opened on Windows instead.": "Antigravity 已改为在 Windows 本地打开。"
+    "Antigravity opened on Windows instead.": "Antigravity 已改为在 Windows 本地打开。",
+    "Baseline model quota reached": "已达到基础模型配额上限",
+    "Model quota reached": "已达到模型配额上限",
+    "Insufficient AI Credits": "AI 积分不足",
+    "See Plans": "查看套餐方案",
+    "See plans": "查看套餐方案",
+    "See plans.": "查看套餐方案。",
+    "View Plans": "查看套餐方案",
+    "Your AI credits balance is too low to continue.": "您的 AI 积分余额不足，无法继续。",
+    "To continue using this model now, enable AI Credit overages.": "若要立即继续使用此模型，请启用超额 AI 积分计费。",
+    "You need more AI Credits to send messages.": "您需要更多 AI 积分才能发送消息。",
+    "To continue using this model now, purchase more AI Credits.": "若要立即继续使用此模型，请购买更多 AI 积分。",
+    "Too many requests, please try again in a bit!": "请求过于频繁，请稍后再试！",
+    "Verification required": "需要验证身份",
+    "Please verify your account to continue using": "请验证您的账号以继续使用",
+    "Agent terminated due to error": "智能体因错误而终止",
+    "See our": "请参阅我们的",
+    "troubleshooting guide": "故障排查指南",
+    "for more help.": "以获取更多帮助。",
+    "Error Loading Models": "加载模型出错",
+    "No Models Available": "暂无可用模型",
+    "No models available": "暂无可用模型",
+    "No models are available for your current project or account. Please check your project settings and IAM permissions.": "您当前的项目或账号暂无可用模型。请检查您的项目设置与 IAM 权限。",
+    "No quota information available.": "暂无配额信息。",
+    "Labs settings have moved": "实验性功能设置已迁移",
+    "Labs settings have moved to the Advanced section of General settings.": "实验性功能设置已迁移至“通用设置”中的“高级”板块。",
+    "Best of N Models": "Best-of-N 多模型优选",
+    "Custom models are only supported on Linux machines.": "自定义模型仅在 Linux 设备上受支持。",
+    "Loading models...": "正在加载模型...",
+    "Extension Is Loading": "扩展正在加载中",
+    "Model selector loading": "模型选择器正在加载",
+    "For Antigravity Business consumption options, see": "有关 Antigravity 商业版用量选项，请参阅",
+    "Resets in <1m": "不到 1 分钟后重置",
+    "Resets in <1m.": "不到 1 分钟后重置。"
   },
   "patterns": [
     {
@@ -3445,6 +3478,62 @@
     {
       "regex": "^(.+),\\s*setup required$",
       "replacement": "$1（需要配置）"
+    },
+    {
+      "regex": "^Your\\s+plan's\\s+baseline\\s+quota\\s+will\\s+refresh\\s+on\\s+(.+?)\\.\\s+You\\s+can\\s+upgrade\\s+to\\s+a\\s+Google\\s+AI\\s+Ultra\\s+plan\\s+to\\s+receive\\s+higher\\s+rate\\s+limits[。.]?$",
+      "replacement": "您的套餐基础配额将于 $1 重置刷新。您可以升级至 Google AI Ultra 以获取更高的请求配额与速率上限。"
+    },
+    {
+      "regex": "^Your\\s+plan's\\s+baseline\\s+quota\\s+will\\s+refresh\\s+on\\s+(.+?)\\.\\s+To\\s+continue\\s+using\\s+this\\s+model\\s+now,\\s*enable\\s+AI\\s+Credit\\s+overages[。.]?$",
+      "replacement": "您的套餐基础配额将于 $1 重置刷新。若要立即继续使用此模型，请启用超额 AI 积分计费。"
+    },
+    {
+      "regex": "^Your\\s+plan's\\s+baseline\\s+quota\\s+will\\s+refresh\\s+on\\s+([^.。]+)[。.]?$",
+      "replacement": "您的套餐基础配额将于 $1 重置刷新。"
+    },
+    {
+      "regex": "^(?:Model|Your)\\s+quota\\s+will\\s+refresh\\s+on\\s+([^.。]+)[。.]?$",
+      "replacement": "您的模型配额将于 $1 重置刷新。"
+    },
+    {
+      "regex": "^You\\s+need\\s+at\\s+least\\s+(\\d+)\\s+AI\\s+Credits\\s+to\\s+send\\s+messages[。.]?$",
+      "replacement": "您至少需要 $1 点 AI 积分才能发送消息。"
+    },
+    {
+      "regex": "^To\\s+continue\\s+using\\s+this\\s+model\\s+now,\\s*purchase\\s+more\\s+AI\\s+Credits[。.]?$",
+      "replacement": "若要立即继续使用此模型，请购买更多 AI 积分。"
+    },
+    {
+      "regex": "^To\\s+continue\\s+using\\s+this\\s+model\\s+now,\\s*enable\\s+AI\\s+Credit\\s+overages[。.]?$",
+      "replacement": "若要立即继续使用此模型，请启用超额 AI 积分计费。"
+    },
+    {
+      "regex": "^To\\s+continue\\s+using\\s+(.+?)\\s+now,\\s*purchase\\s+more\\s+AI\\s+Credits[。.]?$",
+      "replacement": "若要立即继续使用 $1，请购买更多 AI 积分。"
+    },
+    {
+      "regex": "^To\\s+continue\\s+using\\s+(.+?)\\s+now,\\s*enable\\s+AI\\s+Credit\\s+overages[。.]?$",
+      "replacement": "若要立即继续使用 $1，请启用超额 AI 积分计费。"
+    },
+    {
+      "regex": "^Available\\s+AI\\s+Credits:\\s*(.+)$",
+      "replacement": "可用 AI 积分：$1"
+    },
+    {
+      "regex": "^Shared\\s+with:\\s*(.+)$",
+      "replacement": "共享模型：$1"
+    },
+    {
+      "regex": "^Your\\s+Plan:\\s*(.+)$",
+      "replacement": "当前方案：$1"
+    },
+    {
+      "regex": "^(\\d+)\\s+models\\s+selected$",
+      "replacement": "已选择 $1 个模型"
+    },
+    {
+      "regex": "^Select\\s+model,\\s*current:\\s*(.+)$",
+      "replacement": "选择模型，当前：$1"
     }
   ]
 }

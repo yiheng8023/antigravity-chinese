@@ -1030,5 +1030,61 @@
   {
     "regex": "^(.+),\\s*setup required$",
     "replacement": "$1（需要配置）"
+  },
+  {
+    "regex": "^Your\\s+plan's\\s+baseline\\s+quota\\s+will\\s+refresh\\s+on\\s+(.+?)\\.\\s+You\\s+can\\s+upgrade\\s+to\\s+a\\s+Google\\s+AI\\s+Ultra\\s+plan\\s+to\\s+receive\\s+higher\\s+rate\\s+limits[。.]?$",
+    "replacement": "您的套餐基础配额将于 $1 重置刷新。您可以升级至 Google AI Ultra 以获取更高的请求配额与速率上限。"
+  },
+  {
+    "regex": "^Your\\s+plan's\\s+baseline\\s+quota\\s+will\\s+refresh\\s+on\\s+(.+?)\\.\\s+To\\s+continue\\s+using\\s+this\\s+model\\s+now,\\s*enable\\s+AI\\s+Credit\\s+overages[。.]?$",
+    "replacement": "您的套餐基础配额将于 $1 重置刷新。若要立即继续使用此模型，请启用超额 AI 积分计费。"
+  },
+  {
+    "regex": "^Your\\s+plan's\\s+baseline\\s+quota\\s+will\\s+refresh\\s+on\\s+([^.。]+)[。.]?$",
+    "replacement": "您的套餐基础配额将于 $1 重置刷新。"
+  },
+  {
+    "regex": "^(?:Model|Your)\\s+quota\\s+will\\s+refresh\\s+on\\s+([^.。]+)[。.]?$",
+    "replacement": "您的模型配额将于 $1 重置刷新。"
+  },
+  {
+    "regex": "^You\\s+need\\s+at\\s+least\\s+(\\d+)\\s+AI\\s+Credits\\s+to\\s+send\\s+messages[。.]?$",
+    "replacement": "您至少需要 $1 点 AI 积分才能发送消息。"
+  },
+  {
+    "regex": "^To\\s+continue\\s+using\\s+this\\s+model\\s+now,\\s*purchase\\s+more\\s+AI\\s+Credits[。.]?$",
+    "replacement": "若要立即继续使用此模型，请购买更多 AI 积分。"
+  },
+  {
+    "regex": "^To\\s+continue\\s+using\\s+this\\s+model\\s+now,\\s*enable\\s+AI\\s+Credit\\s+overages[。.]?$",
+    "replacement": "若要立即继续使用此模型，请启用超额 AI 积分计费。"
+  },
+  {
+    "regex": "^To\\s+continue\\s+using\\s+(.+?)\\s+now,\\s*purchase\\s+more\\s+AI\\s+Credits[。.]?$",
+    "replacement": "若要立即继续使用 $1，请购买更多 AI 积分。"
+  },
+  {
+    "regex": "^To\\s+continue\\s+using\\s+(.+?)\\s+now,\\s*enable\\s+AI\\s+Credit\\s+overages[。.]?$",
+    "replacement": "若要立即继续使用 $1，请启用超额 AI 积分计费。"
+  },
+  {
+    "regex": "^Available\\s+AI\\s+Credits:\\s*(.+)$",
+    "replacement": "可用 AI 积分：$1"
+  },
+  {
+    "regex": "^Shared\\s+with:\\s*(.+)$",
+    "replacement": "共享模型：$1"
+  },
+  {
+    "regex": "^Your\\s+Plan:\\s*(.+)$",
+    "replacement": "当前方案：$1"
+  },
+  {
+    "regex": "^(\\d+)\\s+models\\s+selected$",
+    "replacement": "已选择 $1 个模型"
+  },
+  {
+    "regex": "^Select\\s+model,\\s*current:\\s*(.+)$",
+    "replacement": "选择模型，当前：$1"
   }
 ]

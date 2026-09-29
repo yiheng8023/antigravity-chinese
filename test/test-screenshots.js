@@ -236,7 +236,18 @@ const goldenCases = [
   { input: "Prototype, build & run modern apps users love with Firebase's backend, AI, and operational infrastructure.", expected: "借助 Firebase 的后端、AI 与运维基础设施，快速构建、运行并打造深受用户喜爱的现代应用原型。" },
   { input: "Skills providing tailored instructions for happy path Dart and Flutter development workflows.", expected: "为 Dart 与 Flutter 标准开发工作流提供量身定制指导的技能集合。" },
   { input: "Build and prototype location-aware applications with Google Maps Platform. Integrate interactive maps, search and inspect Places details, calculate optimal routes.", expected: "使用 Google Maps Platform 构建和设计位置感知型应用原型。集成交互式地图、搜索与查看地点详情，并计算最佳路线。" },
-  { input: "Specialized suite of skills for data engineers and database practitioners on Google Cloud", expected: "专为 Google Cloud 上的数据工程师与数据库从业者打造的专业技能套件" }
+  { input: "Specialized suite of skills for data engineers and database practitioners on Google Cloud", expected: "专为 Google Cloud 上的数据工程师与数据库从业者打造的专业技能套件" },
+
+  // Baseline Model Quota Reached & Overages Banner (media_1790680500059.png)
+  { input: "Baseline model quota reached", expected: "已达到基础模型配额上限" },
+  { input: "Model quota reached", expected: "已达到模型配额上限" },
+  { input: "Insufficient AI Credits", expected: "AI 积分不足" },
+  { input: "See Plans", expected: "查看套餐方案" },
+  { input: "See plans", expected: "查看套餐方案" },
+  { input: "Your plan's baseline quota will refresh on 2026/9/29 19:28:39.", expected: "您的套餐基础配额将于 2026/9/29 19:28:39 重置刷新。" },
+  { input: "Your plan's baseline quota will refresh on 2026/9/29 19:28:39. You can upgrade to a Google AI Ultra plan to receive higher rate limits.", expected: "您的套餐基础配额将于 2026/9/29 19:28:39 重置刷新。您可以升级至 Google AI Ultra 以获取更高的请求配额与速率上限。" },
+  { input: "To continue using this model now, enable AI Credit overages.", expected: "若要立即继续使用此模型，请启用超额 AI 积分计费。" },
+  { input: "Your AI credits balance is too low to continue.", expected: "您的 AI 积分余额不足，无法继续。" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);
