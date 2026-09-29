@@ -247,7 +247,19 @@ const goldenCases = [
   { input: "Your plan's baseline quota will refresh on 2026/9/29 19:28:39.", expected: "您的套餐基础配额将于 2026/9/29 19:28:39 重置刷新。" },
   { input: "Your plan's baseline quota will refresh on 2026/9/29 19:28:39. You can upgrade to a Google AI Ultra plan to receive higher rate limits.", expected: "您的套餐基础配额将于 2026/9/29 19:28:39 重置刷新。您可以升级至 Google AI Ultra 以获取更高的请求配额与速率上限。" },
   { input: "To continue using this model now, enable AI Credit overages.", expected: "若要立即继续使用此模型，请启用超额 AI 积分计费。" },
-  { input: "Your AI credits balance is too low to continue.", expected: "您的 AI 积分余额不足，无法继续。" }
+  { input: "Your AI credits balance is too low to continue.", expected: "您的 AI 积分余额不足，无法继续。" },
+  // 2.18.1 新增特性黄金语义回归断言 (Trajectory Debug / Plugin Auth / Token Budget / Telemetry / Billing / PDF Viewer)
+  { input: "Open Trajectory Debug View", expected: "打开轨迹调试视图" },
+  { input: "Trajectory Telemetry: Redacted (User Content Stripped)", expected: "轨迹遥测诊断：已脱敏（已剥离用户内容）" },
+  { input: "Use Global Settings", expected: "使用全局设置" },
+  { input: "Every command requires approval.", expected: "每条命令均需审批。" },
+  { input: "This plugin requires authentication before the agent can use its tools.", expected: "智能体使用此插件的工具前需要先完成身份验证。" },
+  { input: "Customization token budget exceeded. Large customizations are excluded from context.", expected: "已超出自定义项 Token 预算上限。体积较大的自定义项已从上下文中排除。" },
+  { input: "Telemetry is disabled in Settings", expected: "设置中已禁用遥测诊断" },
+  { input: "Select billing model", expected: "选择计费模式" },
+  { input: "Open in Built-in Browser", expected: "在内置浏览器中打开" },
+  { input: "You have 3 conversations in progress. Updating will interrupt them, and they will automatically resume once the update completes.", expected: "您当前有 3 个正在进行的会话。更新将暂时中断这些会话，并在更新完成后自动恢复。" },
+  { input: "Agents created by GitHub Helper run in a dedicated project with its own permissions, which you can change anytime in the project settings page. On top of those defaults, GitHub Helper requests the access below.", expected: "由 GitHub Helper 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。除默认权限外，GitHub Helper 还请求以下访问权限。" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

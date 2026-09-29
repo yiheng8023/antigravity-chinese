@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.5**，全面适配 Antigravity **v2.17.0** 升级）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.6**，全面适配 Antigravity **v2.18.1** 升级）。
 
 ---
 
@@ -28,22 +28,22 @@
   - 深度适配 Windows 客户端连接 WSL (Ubuntu 等) 运行环境全流程；
   - 原生支持应用菜单 `Connect to WSL`（连接到 WSL）/ `Reopen Locally`（在本地重新打开）；
   - 深度注入主进程 WSL 发行版缺失警告与跨系统 `/mnt` 路径性能告警弹窗，兼顾性能提示与无死角中文体验。
-- 🧩 **2.17.0 复合 Alert 碎片化自愈、配额/积分/错误横幅全量覆盖与 10 大插件 + 131 项技能全景中文**：
-  - 针对上游 2.17.0 全新 JSX 碎片化 Alert（如 `plan-command-fyi-alert`），通过复合节点探针实现手术刀级特异性自愈，避免全局单字歧义污染；
+- 🧩 **2.18.1 全景特性覆盖、复合 Alert 自愈与 10 大插件 + 131 项技能全景中文**：
+  - 全面覆盖 **2.18.1** 新增模块：轨迹调试视图（`Open Trajectory Debug View`）、子智能体声明权限审查弹窗（`declared-permissions-modal`）、插件 OAuth 身份验证与自定义项 Token 预算超限降级告警、单会话遥测开关、企业计费模式选择器（`Select billing model`）、内置浏览器与 PDF 预览器全套工具栏；
+  - 针对上游 JSX 碎片化 Alert（如 `plan-command-fyi-alert`），通过复合节点探针实现手术刀级特异性自愈，避免全局单字歧义污染；
   - 彻底治愈基础模型/专属模型配额上限（`Baseline model quota reached`）、AI 积分不足（`Insufficient AI Credits`）、开启超额使用（`Overages`）及错误通知卡片的复合多句拼接与行内 `<a>` 链接尾部孤立句点全角化；
-  - 彻底治愈新手引导 NUX 卡片（`Try 远程控制` ➔ `体验远程控制`、`Get Started` ➔ `开始体验`）及半中半英残留；
   - 全量出版级汉化官方 10 大插件目录（`Build with Antigravity Plugins`：Android CLI, Chrome DevTools, Data Agent Kit, Dart and Flutter, Firebase, Gemini API, Google Maps Platform, Modern Web Guidance, Google Antigravity SDK, Science）的双源简介，以及旗下全部 **131 项 `SKILL.md` / `agents` / `rules` 技能与子智能体说明**。
 - 🏗️ **三层词库架构与自动化质量编译管线 (Three-Tier Compiler & Security Gates)**：
   - 词库源码彻底模块化分层：`dict/src/core/`（原子纯词条）、`dict/src/rules/`（级联规则）、`dict/src/ctx/`（特定上下文：`permissions.json`、`settings.json`、`plugins.json`）；
   - 配备 **ASCII Key 阻断门禁**（物理杜绝中文残片混入 Key）、**捕获组守恒门禁**（语法编译与 `$1..$N` 严格对齐）、**重复 Key 冲突守卫**，编译生成单一发布包 `dist/zh-CN.bundle.json` 并平滑向后兼容。
 - 🎯 **真理单源解耦与黄金语义真断言 (Single-Source Truth & Golden Snapshots)**：
   - 核心运行时抽离无状态计算工厂 `createI18nEngine`，全仓消灭一切测试与工具中的影子副本；
-  - 全量 189 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
+  - 全量 200 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
 - **低开销高响应渲染架构 (High-Performance Runtime Architecture)**：阻断 `requestIdleCallback` 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路；悬浮 Portal 门禁与 100ms 节流阀，确保长对话消息流与高频虚拟滚动下保持平滑流畅。
 - **深层选项悬浮气泡与执行策略全量覆盖 (Option Tooltips & Delivery Strategies)**：全量收录排队消息策略悬浮气泡提示（`Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`、`Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`）以及终端自动执行、产物审查模式、严格模式等深层选项的动态说明。
 - **行内纯文本容器联合自愈 (Multi-TextNode Coalescing Self-Healing)**：针对上游 React 模板碎片化拆分（如 `"All ", e, "s run as Flash."` 拆分为多个兄弟 TextNode 导致英文复数残片），在保持虚拟 DOM 节点引用稳定不报错的前提下，整句提纯联合自愈。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
-- **两阶段原子回滚与冷启动断电自愈 (Two-Phase Staged Swap & Crash-Resilient Auto-Healing)**：注入采用安全暂存流转机制，失败自动回滚；若遭遇机器死机断电遗留孤儿暂存文件，CLI 启动入口自动识别并原子复原，杜绝客户端主文件丢失。
+- **两阶段原子回滚、会话内无损预注入与冷启动自愈 (Two-Phase Staged Swap, Auto-Apply on Exit & Crash-Resilient Auto-Healing)**：支持在运行中的 Antigravity 智能体会话内直接预构建 `app.asar.staged` 并挂载后台静默守候进程，客户端关闭瞬间 0.3 秒内自动完成原子替换；若遭遇断电遗留孤儿暂存文件，CLI 启动入口自动识别并原子复原。
 - **双重状态感知出厂基线与版本防回退 (Dual-State Baseline & Anti-Downgrade)**：首次注入时创建纯净备份；官方静默推送新版时自动刷新出厂基线，restore 还原时自动熔断拦截，彻底杜绝老旧备份覆盖官方新版导致的版本回退惨剧。
 - **官方中文优雅让位 (Graceful Yield)**：内置 CJK 字符与官方语言环境自动探针，上游一旦上线官方中文自动主动让位，杜绝破坏。
 
@@ -123,12 +123,12 @@ npm test
 
 - **词库格式与语法排毒 (`test/test-lint.js`)**：检测词库 JSON 格式合规性与基础语法健康度。
 - **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 115 项断言，验证关键 DOM 路径翻译准确性、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
-- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 189 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
+- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 200 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
 - **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
 - **菜单、托盘与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 2,443 条词条与 272 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 2,573 条词条与 289 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 
 ---
 
@@ -180,7 +180,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (2,443 精确词条 + 272 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (2,573 精确词条 + 289 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动
@@ -194,7 +194,7 @@ antigravity-chinese/
 ├── test/                             # 自动化全真回归测试套件 (8 大套件 350+ 断言)
 │   ├── test-lint.js                  # 词库格式与语法排毒校验
 │   ├── verify.js                     # 115 项 JSDOM 状态机与运行时性能断言
-│   ├── test-screenshots.js          # 189 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
+│   ├── test-screenshots.js          # 200 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
 │   ├── test-cdp.js                   # 零依赖 RFC 6455 CDP 协议层双向通信测试
 │   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
 │   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言

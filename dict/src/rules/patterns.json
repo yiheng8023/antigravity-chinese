@@ -1086,5 +1086,73 @@
   {
     "regex": "^Select\\s+model,\\s*current:\\s*(.+)$",
     "replacement": "选择模型，当前：$1"
+  },
+  {
+    "regex": "^You have (\\d+) conversations in progress\\. Updating will interrupt them, and they will automatically resume once the update completes\\.$",
+    "replacement": "您当前有 $1 个正在进行的会话。更新将暂时中断这些会话，并在更新完成后自动恢复。"
+  },
+  {
+    "regex": "^You have (\\d+) conversations in progress\\. Updating will cancel them and you'll need to manually restart them\\.$",
+    "replacement": "您当前有 $1 个正在进行的会话。更新将取消这些会话，更新后您需要手动重新开始。"
+  },
+  {
+    "regex": "^Set up (.+)$",
+    "replacement": "设置 $1"
+  },
+  {
+    "regex": "^Review permissions for (.+)$",
+    "replacement": "审查 $1 的权限"
+  },
+  {
+    "regex": "^(.+) needs a few details from you before it can run\\.$",
+    "replacement": "$1 运行前需要您补充几项详细信息。"
+  },
+  {
+    "regex": "^Agents created by (.+) run in a dedicated (?:project|workspace) with its own permissions, which you can change anytime in the (?:project|workspace) settings page\\. On top of those defaults, (.+) requests the access below\\.$",
+    "replacement": "由 $1 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。除默认权限外，$2 还请求以下访问权限。"
+  },
+  {
+    "regex": "^Agents created by (.+) run in a dedicated (?:project|workspace) with its own permissions, which you can change anytime in the (?:project|workspace) settings page\\.$",
+    "replacement": "由 $1 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。"
+  },
+  {
+    "regex": "^On top of those defaults, (.+) requests the access below\\.$",
+    "replacement": "除默认权限外，$1 还请求以下访问权限。"
+  },
+  {
+    "regex": "^Failed to load skills:\\s*(.+)$",
+    "replacement": "加载技能失败：$1"
+  },
+  {
+    "regex": "^Failed to scan skills config file:\\s*(.+)$",
+    "replacement": "扫描技能配置文件失败：$1"
+  },
+  {
+    "regex": "^Failed to load page (\\d+):\\s*(.+)$",
+    "replacement": "加载第 $1 页失败：$2"
+  },
+  {
+    "regex": "^Failed to load text layer for page (\\d+):\\s*(.+)$",
+    "replacement": "加载第 $1 页的文本图层失败：$2"
+  },
+  {
+    "regex": "^Text layer render failed:\\s*(.+)$",
+    "replacement": "文本图层渲染失败：$1"
+  },
+  {
+    "regex": "^Failed to initialize text layer:\\s*(.+)$",
+    "replacement": "初始化文本图层失败：$1"
+  },
+  {
+    "regex": "^Tool Definition:\\s*(.+)$",
+    "replacement": "工具定义：$1"
+  },
+  {
+    "regex": "^Invocation:\\s*(.+)$",
+    "replacement": "调用：$1"
+  },
+  {
+    "regex": "^Agent permissions preset selector, current:\\s*(.+)$",
+    "replacement": "智能体权限预设选择器，当前：$1"
   }
 ]

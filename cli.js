@@ -435,13 +435,17 @@ function install(customPath) {
 
   // 只有在未指定 customPath（即针对当前本机默认宿主安装）时，才检测并征求用户同意后安全退出客户端
   if (!customPath && isProcessRunning()) {
-    const shouldClose = confirmCloseClient('Antigravity');
-    if (!shouldClose) {
-      console.log('\nℹ️ 已安全取消安装。请在保存工作并退出 Antigravity 客户端后重新执行。');
-      process.exit(0);
+    if (isProtectedEnvironment()) {
+      console.log('\n🛡️ [智能体会话无损预注入模式] 检测到当前运行于 Antigravity 会话内部，绝不强关宿主，将预构建汉化包并挂载退出自动生效守护...');
+    } else {
+      const shouldClose = confirmCloseClient('Antigravity');
+      if (!shouldClose) {
+        console.log('\nℹ️ 已安全取消安装。请在保存工作并退出 Antigravity 客户端后重新执行。');
+        process.exit(0);
+      }
+      console.log('\n🔄 正在安全退出客户端以释放资源写入锁...');
+      closeAntigravitySafely();
     }
-    console.log('\n🔄 正在安全退出客户端以释放资源写入锁...');
-    closeAntigravitySafely();
   }
 
   const resourcesDir = path.dirname(asarPath);
@@ -595,7 +599,6 @@ function install(customPath) {
 
     if (!replaceSuccess) {
       // 核心安全防御：两阶段替换失败，触发自动 Rollback！
-      console.error('\n⚠️ [安全回滚触发] ASAR 替换失败，正在执行出厂原件自动回滚...');
       if (isSwapped && fs.existsSync(swapOldAsar)) {
         try {
           if (fs.existsSync(asarPath)) fs.rmSync(asarPath, { force: true });
@@ -605,6 +608,33 @@ function install(customPath) {
           console.error('❌ 回滚遇到错误:', rollbackErr.message);
         }
       }
+
+      const isLockedErr = lastError && (lastError.code === 'EBUSY' || lastError.code === 'EPERM');
+      if (!customPath && isProtectedEnvironment() && isLockedErr && fs.existsSync(tempNewAsar)) {
+        const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
+        if (fs.existsSync(stagedAsar)) fs.rmSync(stagedAsar, { force: true });
+        fs.renameSync(tempNewAsar, stagedAsar);
+        if (fs.existsSync(tempExtractDir)) fs.rmSync(tempExtractDir, { recursive: true, force: true });
+
+        try {
+          const { spawn } = require('child_process');
+          const child = spawn(process.execPath, [__filename, 'apply-staged', '--path', asarPath], {
+            detached: true,
+            stdio: 'ignore',
+            windowsHide: true
+          });
+          child.unref();
+        } catch (_) {}
+
+        console.log('\n✨ ==============================================');
+        console.log('✨ [无损预注入就绪] 最新汉化包已预构建为: app.asar.staged');
+        console.log('✨ 已挂载后台静默守候进程：当您稍后正常关闭 Antigravity 客户端时，');
+        console.log('✨ 将在 0.5 秒内自动完成原子替换，下次打开即刻呈现中文界面！');
+        console.log('✨ ==============================================\n');
+        return;
+      }
+
+      console.error('\n⚠️ [安全回滚触发] ASAR 替换失败，正在执行出厂原件自动回滚...');
       if (fs.existsSync(tempNewAsar)) fs.rmSync(tempNewAsar, { force: true });
       if (fs.existsSync(tempExtractDir)) fs.rmSync(tempExtractDir, { recursive: true, force: true });
       console.error('\n❌ 文件被占用或替换失败:', lastError ? lastError.message : '未知错误');
@@ -787,7 +817,12 @@ function status(customPath) {
   console.log(`• 安全备份:     ${hasBackup ? '✅ 存在 (' + backupPath + ')' : '⚠️ 无备份'}`);
   
   const patched = isAsarPatched(asarPath);
-  console.log(`• 汉化状态:     ${patched ? '🟢 已安装宿主汉化补丁' : '⚪ 原生未修改状态'}`);
+  const stagedPath = path.join(resourcesDir, 'app.asar.staged');
+  const hasStaged = !patched && fs.existsSync(stagedPath);
+  const statusLabel = patched
+    ? '🟢 已安装宿主汉化补丁'
+    : (hasStaged ? '🟡 预注入已就绪 (app.asar.staged 已挂载，关闭客户端后自动秒级生效)' : '⚪ 原生未修改状态');
+  console.log(`• 汉化状态:     ${statusLabel}`);
 
   const pluginDir = getGlobalPluginTargetDir();
   const hasPlugin = fs.existsSync(path.join(pluginDir, 'plugin.json'));
@@ -954,6 +989,52 @@ function uninstallPlugin() {
   }
 }
 
+function applyStagedWhenUnlocked(customPath) {
+  const asarPath = findAsarPath(customPath);
+  if (!asarPath) process.exit(0);
+  const resourcesDir = path.dirname(asarPath);
+  const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
+  const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
+  const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+
+  let ticks = 0;
+  const maxTicks = 144000; // 最多静默守候 12 小时 (300ms * 144000)
+  const timer = setInterval(() => {
+    ticks++;
+    if (ticks > maxTicks || !fs.existsSync(stagedAsar)) {
+      clearInterval(timer);
+      process.exit(0);
+    }
+    if (!isProcessRunning()) {
+      clearInterval(timer);
+      let swapped = false;
+      for (let attempt = 0; attempt < 10; attempt++) {
+        try {
+          if (!swapped && fs.existsSync(asarPath)) {
+            if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
+            fs.renameSync(asarPath, swapOldAsar);
+            swapped = true;
+          }
+          fs.renameSync(stagedAsar, asarPath);
+          if (fs.existsSync(swapOldAsar)) {
+            try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
+          }
+          const newFp = getAsarFingerprint(asarPath);
+          fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newFp, timestamp: Date.now() }, null, 2), 'utf8');
+          break;
+        } catch (err) {
+          if (attempt < 9) {
+            try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 150); } catch (_) {}
+          } else if (swapped && !fs.existsSync(asarPath) && fs.existsSync(swapOldAsar)) {
+            try { fs.renameSync(swapOldAsar, asarPath); } catch (_) {}
+          }
+        }
+      }
+      process.exit(0);
+    }
+  }, 300);
+}
+
 // CLI Routing
 if (require.main === module) {
   const args = process.argv.slice(2);
@@ -972,6 +1053,9 @@ if (require.main === module) {
       if (args.includes('--with-plugin')) {
         installPlugin();
       }
+      break;
+    case 'apply-staged':
+      applyStagedWhenUnlocked(customPath);
       break;
     case 'install-plugin':
     case 'plugin:install':

@@ -2442,7 +2442,137 @@
     "Model selector loading": "模型选择器正在加载",
     "For Antigravity Business consumption options, see": "有关 Antigravity 商业版用量选项，请参阅",
     "Resets in <1m": "不到 1 分钟后重置",
-    "Resets in <1m.": "不到 1 分钟后重置。"
+    "Resets in <1m.": "不到 1 分钟后重置。",
+    "Open Trajectory Debug View": "打开轨迹调试视图",
+    "Copy Trajectory ID": "复制轨迹 ID",
+    "Trajectory ID": "轨迹 ID",
+    "Cascade ID": "级联会话 ID",
+    "Open in Trajectory Dashboard": "在轨迹控制台中打开",
+    "Trajectory Telemetry: Redacted (User Content Stripped)": "轨迹遥测诊断：已脱敏（已剥离用户内容）",
+    "Trajectory Telemetry: Active (Uploading)": "轨迹遥测诊断：已激活（正在上传）",
+    "Parent Conversation": "父级会话",
+    "Root Conversation": "根级会话",
+    "Use Global Settings": "使用全局设置",
+    "Every command requires approval.": "每条命令均需审批。",
+    "Ask before sensitive operations.": "在执行敏感操作前询问。",
+    "Security agent decides if commands run.": "由安全智能体决定是否运行命令。",
+    "Automatically decide if commands run.": "自动决定是否运行命令。",
+    "Run all commands without restrictions.": "无限制运行所有命令。",
+    "needs a few details from you before it can run.": "运行前需要您补充几项详细信息。",
+    "This extension has no declared permissions requiring user input.": "此扩展程序没有需要用户输入的声明权限。",
+    "Please fill out all required values to continue.": "请填写所有必填项以继续。",
+    "Resolving...": "正在解析...",
+    "Next: Review Permissions": "下一步：审查权限",
+    "Resolving permissions...": "正在解析权限...",
+    "Folders these agents can access.": "这些智能体可以访问的文件夹。",
+    "Commands and files these agents can use.": "这些智能体可以使用的命令与文件。",
+    "Confirm & Save": "确认并保存",
+    "Agents created by": "由",
+    "with its own permissions, which you can change anytime in the": "并拥有独立权限，您可以随时在",
+    "settings page.": "设置页面中更改。",
+    "No matching plugins found.": "未找到匹配的插件。",
+    "Demoted": "已降级",
+    "Excluded": "已排除",
+    "Account connected.": "账号已连接。",
+    "Disconnect your account from this plugin?": "确定要断开您的账号与此插件的连接吗？",
+    "Disconnect": "断开连接",
+    "This plugin requires authentication before the agent can use its tools.": "智能体使用此插件的工具前需要先完成身份验证。",
+    "Set up authentication": "设置身份验证",
+    "Authenticate": "验证身份",
+    "This plugin was force disabled.": "此插件已被强制禁用。",
+    "Customization token budget exceeded. Large customizations are excluded from context.": "已超出自定义项 Token 预算上限。体积较大的自定义项已从上下文中排除。",
+    "Rules and customization token budgets exceeded. Large rules are demoted to path pointers and large customizations are excluded from context.": "已超出规则与自定义项 Token 预算上限。体积较大的规则已降级为路径指针，体积较大的自定义项已从上下文中排除。",
+    "Rules token budget exceeded. Large rules are demoted to path pointers.": "已超出规则 Token 预算上限。体积较大的规则已降级为路径指针。",
+    "Telemetry is disabled in Settings": "设置中已禁用遥测诊断",
+    "Enable telemetry in Settings before changing per-conversation telemetry.": "请先在“设置”中启用遥测诊断，然后再更改单会话遥测设置。",
+    "Telemetry is off for all conversations.": "所有会话的遥测诊断均已关闭。",
+    "Telemetry is off for this conversation.": "此会话的遥测诊断已关闭。",
+    "Telemetry is turned off in settings": "设置中已关闭遥测诊断",
+    "Turn off telemetry for this conversation": "关闭此会话的遥测诊断",
+    "Turn on telemetry for this conversation": "开启此会话的遥测诊断",
+    "You have a conversation in progress. Updating will interrupt it, and it will automatically resume once the update completes.": "您当前有 1 个正在进行的会话。更新将暂时中断该会话，并在更新完成后自动恢复。",
+    "You have a conversation in progress. Updating will cancel it and you'll need to manually restart it.": "您当前有 1 个正在进行的会话。更新将取消该会话，更新后您需要手动重新开始。",
+    "Updating will restart the server and apply the latest changes.": "更新将重启后台服务并应用最新更改。",
+    "Failed to inspect license for this project": "检查此项目的许可证失败",
+    "Your Antigravity use will be associated with provided project. Make sure you trust the project ID before proceeding. Account activity and data may be logged by your organization.": "您的 Antigravity 使用情况将与所提供的项目关联。继续操作前请确保您信任该项目 ID。您的账号活动与数据可能会被所在组织记录。",
+    "Select billing model": "选择计费模式",
+    "Billing model": "计费模式",
+    "Draws from your organization's pooled Gemini Enterprise usage.": "使用您所在组织共享的 Gemini Enterprise 配额池。",
+    "Pay as you go": "按量计费",
+    "Pay only for the tokens you use, billed through Agent Platform (formerly Vertex AI).": "仅为您实际使用的 Token 付费，通过 Agent Platform（原 Vertex AI）计费。",
+    "Back to licenses": "返回许可证列表",
+    "Choose a license": "选择许可证",
+    "Available licenses": "可用许可证",
+    "Other License": "其他许可证",
+    "Forward": "前进",
+    "Open in external browser": "在外部浏览器中打开",
+    "New Browser": "新建浏览器",
+    "Open in Built-in Browser": "在内置浏览器中打开",
+    "Embedded web preview": "内嵌网页预览",
+    "Toggle file diff": "切换文件差异视图",
+    "Archived Only": "仅已归档",
+    "Visit": "访问",
+    "Legal Help": "法律帮助",
+    "to ask for content changes for legal reasons.": "以出于法律原因申请内容变更。",
+    "This conversation is in a different workspace.": "此会话位于其他工作区中。",
+    "This project is associated with a different workspace.": "此项目关联了其他工作区。",
+    "Show less": "收起",
+    "Customize sections": "自定义分组",
+    "Sidecar feature is not available.": "Sidecar 辅助容器功能不可用。",
+    "[/automation](slashCommand;automation) Guide me through creating an automated task": "[/automation](slashCommand;automation) 引导我创建一项自动化任务",
+    "Hide Thumbnail Sidebar": "隐藏缩略图侧边栏",
+    "Show Thumbnail Sidebar": "显示缩略图侧边栏",
+    "Toggle Thumbnails": "切换缩略图",
+    "Exit Fullscreen": "退出全屏",
+    "Enter Fullscreen": "进入全屏",
+    "Download PDF": "下载 PDF",
+    "Disable Text Selection": "禁用文本选择",
+    "Enable Text Selection": "启用文本选择",
+    "Switch to Light Mode": "切换至浅色模式",
+    "Switch to Dark Mode": "切换至深色模式",
+    "Light Mode": "浅色模式",
+    "Dark Mode": "深色模式",
+    "Fit to Width": "适应页宽",
+    "Fit to Page": "适应页面",
+    "Fit Mode": "适应模式",
+    "Text Selection": "文本选择",
+    "More toolbar actions": "更多工具栏操作",
+    "More": "更多",
+    "Failed to toggle fullscreen mode": "切换全屏模式失败",
+    "Initializing...": "正在初始化...",
+    "Developer": "开发者",
+    "Choose how technical the interface should be.": "选择界面的专业技术复杂度。",
+    "Simplified": "精简模式",
+    "The agent auto-executes commands matched by an allow list entry.": "智能体会自动执行与允许列表条目匹配的命令。",
+    "The agent asks for permission before executing commands matched by a deny list entry.": "智能体在执行与拒绝列表条目匹配的命令前会请求许可。",
+    "Give the agent awareness of lint errors created by its edits so it can fix them without explicit prompting.": "让智能体感知其编辑操作产生的代码检查（Lint）错误，以便无需显式提示即可自动修复。",
+    "Allow sandboxed commands to make network requests.": "允许沙箱中的命令发起网络请求。",
+    "Use the IDE's shell integration to detect and report terminal command execution. When disabled, the agent uses its own shell. Restart the application for this to take effect.": "使用 IDE 的 Shell 集成来检测并报告终端命令执行情况。禁用后，智能体将使用其自带的 Shell。重启应用后生效。",
+    "Specifies the agent's behavior when asking for review on artifacts, which are documents it creates to enable a richer conversation experience.": "指定智能体在请求审查产物文档（用于提供更丰富对话体验的生成文档）时的行为方式。",
+    "Let the agent access past conversations to inform its responses.": "允许智能体访问历史会话以辅助生成更准确的回复。",
+    "Open files in the background if the agent creates or edits them": "当智能体创建或编辑文件时在后台自动打开这些文件",
+    "Open the agent panel on window reload": "重新加载窗口时自动打开智能体面板",
+    "Custom Context Menus": "自定义右键菜单",
+    "Replace the default browser right-click menu with quick actions.": "使用快捷操作菜单替换默认的浏览器右键菜单。",
+    "Configure the default width of markdown artifacts.": "配置 Markdown 产物文档的默认显示宽度。",
+    "Fill": "铺满",
+    "Show suggestions when typing in the editor": "在编辑器中输入代码时显示补全建议",
+    "Predict the location of your next edit and navigate you there with a tab keypress.": "预测您下一次编辑的位置，按 Tab 键即可快速跳转至该处。",
+    "Quickly add and update imports with a tab keypress.": "按 Tab 键快速添加并更新导入语句（Imports）。",
+    "Set the speed of tab suggestions": "设置 Tab 补全建议的触发速度",
+    "Fast": "快速",
+    "Slow": "慢速",
+    "Highlight newly inserted text after accepting a Tab completion.": "接受 Tab 补全后高亮显示新插入的文本。",
+    "Path to the Chrome/Chromium executable. Leave empty for auto-detection.": "Chrome/Chromium 可执行文件的路径。留空则自动探测。",
+    "Absolute path to the Chrome/Chromium executable": "Chrome/Chromium 可执行文件的绝对路径",
+    "Custom path for the browser user profile directory. Leave empty for default (~/.gemini/antigravity-browser-profile).": "浏览器用户配置目录的自定义路径。留空则使用默认值（~/.gemini/antigravity-browser-profile）。",
+    "Browser CDP Port": "浏览器 CDP 端口",
+    "Port number for Chrome DevTools Protocol remote debugging. Leave empty for default (9222).": "用于 Chrome DevTools Protocol 远程调试的端口号。留空则使用默认值（9222）。",
+    "Show \"Edit\" and \"Chat\" buttons when selecting text in the editor.": "在编辑器中选中文本时显示“编辑”与“对话”浮动按钮。",
+    "Include default customizations, such as default skills.": "包含默认自定义项（例如内置默认技能）。",
+    "Show a floating notification card when background conversations need your input. Answer questions, approve commands, and grant permissions without leaving your current conversation. Share feedback at go/inline-actions-feedback.": "当后台会话需要您的输入时显示浮动通知卡片。无需离开当前会话即可回答问题、批准命令并授予权限。",
+    "Default Workspace VCS": "默认工作区版本控制系统 (VCS)",
+    "VCS used when creating a new workspace, including workspaces generated based off your initial prompt.": "创建新工作区（包括根据您的初始提示词生成的工作区）时使用的版本控制系统。"
   },
   "patterns": [
     {
@@ -3532,6 +3662,74 @@
     {
       "regex": "^Select\\s+model,\\s*current:\\s*(.+)$",
       "replacement": "选择模型，当前：$1"
+    },
+    {
+      "regex": "^You have (\\d+) conversations in progress\\. Updating will interrupt them, and they will automatically resume once the update completes\\.$",
+      "replacement": "您当前有 $1 个正在进行的会话。更新将暂时中断这些会话，并在更新完成后自动恢复。"
+    },
+    {
+      "regex": "^You have (\\d+) conversations in progress\\. Updating will cancel them and you'll need to manually restart them\\.$",
+      "replacement": "您当前有 $1 个正在进行的会话。更新将取消这些会话，更新后您需要手动重新开始。"
+    },
+    {
+      "regex": "^Set up (.+)$",
+      "replacement": "设置 $1"
+    },
+    {
+      "regex": "^Review permissions for (.+)$",
+      "replacement": "审查 $1 的权限"
+    },
+    {
+      "regex": "^(.+) needs a few details from you before it can run\\.$",
+      "replacement": "$1 运行前需要您补充几项详细信息。"
+    },
+    {
+      "regex": "^Agents created by (.+) run in a dedicated (?:project|workspace) with its own permissions, which you can change anytime in the (?:project|workspace) settings page\\. On top of those defaults, (.+) requests the access below\\.$",
+      "replacement": "由 $1 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。除默认权限外，$2 还请求以下访问权限。"
+    },
+    {
+      "regex": "^Agents created by (.+) run in a dedicated (?:project|workspace) with its own permissions, which you can change anytime in the (?:project|workspace) settings page\\.$",
+      "replacement": "由 $1 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。"
+    },
+    {
+      "regex": "^On top of those defaults, (.+) requests the access below\\.$",
+      "replacement": "除默认权限外，$1 还请求以下访问权限。"
+    },
+    {
+      "regex": "^Failed to load skills:\\s*(.+)$",
+      "replacement": "加载技能失败：$1"
+    },
+    {
+      "regex": "^Failed to scan skills config file:\\s*(.+)$",
+      "replacement": "扫描技能配置文件失败：$1"
+    },
+    {
+      "regex": "^Failed to load page (\\d+):\\s*(.+)$",
+      "replacement": "加载第 $1 页失败：$2"
+    },
+    {
+      "regex": "^Failed to load text layer for page (\\d+):\\s*(.+)$",
+      "replacement": "加载第 $1 页的文本图层失败：$2"
+    },
+    {
+      "regex": "^Text layer render failed:\\s*(.+)$",
+      "replacement": "文本图层渲染失败：$1"
+    },
+    {
+      "regex": "^Failed to initialize text layer:\\s*(.+)$",
+      "replacement": "初始化文本图层失败：$1"
+    },
+    {
+      "regex": "^Tool Definition:\\s*(.+)$",
+      "replacement": "工具定义：$1"
+    },
+    {
+      "regex": "^Invocation:\\s*(.+)$",
+      "replacement": "调用：$1"
+    },
+    {
+      "regex": "^Agent permissions preset selector, current:\\s*(.+)$",
+      "replacement": "智能体权限预设选择器，当前：$1"
     }
   ]
 }
