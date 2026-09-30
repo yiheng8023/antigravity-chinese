@@ -1,5 +1,25 @@
 [
   {
+    "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Thinking\\)$",
+    "replacement": "$1（思考）"
+  },
+  {
+    "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Medium\\)$",
+    "replacement": "$1（中等）"
+  },
+  {
+    "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Low\\)$",
+    "replacement": "$1（低）"
+  },
+  {
+    "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(High\\)$",
+    "replacement": "$1（高）"
+  },
+  {
+    "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Max\\)$",
+    "replacement": "$1（最大）"
+  },
+  {
     "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
     "replacement": "已思考 $1 小时 $2 分 $3 秒"
   },

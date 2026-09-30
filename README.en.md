@@ -15,11 +15,16 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.7** (fully adapted for Antigravity **v2.18.1**).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.8** (fully adapted for Antigravity **v2.18.1**).
 
 ---
 
 ## 🌟 Key Features & Engineering Design
+
+- 🎯 **Model Selector Harmonization & CJK Spacing Guard**:
+  - Publication-grade standard: Brand model names (`Gemini`, `Claude`, `GPT-OSS`) remain 100% authentic English proper nouns, while capability modifiers and status tags are completely harmonized into idiomatic Simplified Chinese (`Limited time` ➔ `限时`, `(Thinking)` ➔ `（思考）`, `(Medium)` ➔ `（中等）`, and sub-menu `低 / 中 / 高` tiers strictly aligned).
+  - Deep support for dynamically fetched model quota descriptions ("Within each group, models share a weekly limit and a 5-hour limit...") and quota parameters.
+  - Smart CJK typographic spacing guard prevents alphanumeric and Chinese characters from clumping together in selected model badges (e.g. `Gemini 3.8 Flash 高`).
 
 - ⚡ **Dual-Mode Synergy Architecture**:
   - **Mode 1 (Deep ASAR Physical Injection)**: Deeply patches the ASAR archive for 100% native localization covering system tray (`tray.js`), menus (`menu.js`), and UI DOM.

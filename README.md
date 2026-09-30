@@ -15,11 +15,16 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.7**，全面适配 Antigravity **v2.18.1** 升级）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.8**，全面适配 Antigravity **v2.18.1** 升级）。
 
 ---
 
 ## 🌟 核心特性与设计哲学
+
+- 🎯 **模型选择器规范化统一与中西文排版优化 (Model Selector Harmonization & CJK Spacing)**：
+  - 坚持“模型原名归英文，功能状态归中文”的出版级规范：模型品牌原名（`Gemini`、`Claude`、`GPT-OSS`）100% 保持纯英文专有名词，能力修饰词与状态标签全量统一规范化中文化（`Limited time` ➔ `限时`，`(Thinking)` ➔ `（思考）`，`(Medium)` ➔ `（中等）`，二级菜单 `低 / 中 / 高` 严格对齐）；
+  - 深度支持“模型与用量”动态网络拉取配额长篇说明（“在每个分组中，各模型共享周限额与 5 小时限额...”）及各维度限额状态；
+  - 引入中西文混排“盘古之白”排版守卫，智能消除底栏选中模型与思考强度间的文字黏连（`Gemini 3.8 Flash 高`）。
 
 - ⚡ **原生双模互补架构 (Dual-Mode Synergy Architecture)**：
   - **Mode 1（ASAR 深度持久化注入）**：通过 Electron ASAR 深度注入，实现系统托盘（`tray.js`）、主菜单（`menu.js`）、系统退出弹窗与界面 DOM 的 100% 原生全景汉化；

@@ -1,6 +1,6 @@
 {
   "version": "3.3.7",
-  "buildTime": "2026-09-30T03:01:53.204Z",
+  "buildTime": "2026-09-30T22:42:29.363Z",
   "exact": {
     "\"Always Proceed\"": "“总是直接继续”",
     "+ Add Folder": "+ 添加文件夹",
@@ -763,6 +763,9 @@
     "Learn more.": "了解更多。",
     "Leave a comment": "留下评论",
     "Light": "浅色",
+    "Limited time": "限时",
+    "Limited Time": "限时",
+    "limited time": "限时",
     "Line Height": "行高",
     "Listed in Your Config": "在您的配置中列出",
     "Load Global Rules": "加载全局规则",
@@ -3236,9 +3239,37 @@
     "Open Browser Setup": "打开浏览器设置",
     "Browser Configuration Required": "需要配置浏览器",
     "The agent will wait for you to install the browser extension.": "智能体将等待您完成浏览器扩展程序的安装。",
-    "Launching the browser...": "正在启动浏览器..."
+    "Launching the browser...": "正在启动浏览器...",
+    "Within each group, models share a weekly limit and a 5-hour limit. Quota is consumed proportionally to the cost of the tokens. Thus, limits will last longer with shorter tasks or using more cost-effective models. The 5-hour limit smooths out aggregate demand to fairly distribute global capacity across all users, while your weekly limit is tied directly to your individual tier.": "在每个分组中，各模型共享周限额与 5 小时限额。配额消耗与 Token 成本成正比。因此，执行较短任务或使用性价比更高的模型可延长限额的使用周期。5 小时限额用于平滑总体请求峰值，以在所有用户之间公平分配全球算力；而周限额则直接与您所属的订阅套餐等级挂钩。",
+    "Weekly limit": "周限额",
+    "5-hour limit": "5 小时限额",
+    "5-Hour Limit": "5 小时限额",
+    "Weekly Limit": "周限额",
+    "Resets in": "重置于",
+    "Resets at": "重置于",
+    "Quota limits": "配额上限"
   },
   "patterns": [
+    {
+      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Thinking\\)$",
+      "replacement": "$1（思考）"
+    },
+    {
+      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Medium\\)$",
+      "replacement": "$1（中等）"
+    },
+    {
+      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Low\\)$",
+      "replacement": "$1（低）"
+    },
+    {
+      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(High\\)$",
+      "replacement": "$1（高）"
+    },
+    {
+      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Max\\)$",
+      "replacement": "$1（最大）"
+    },
     {
       "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
       "replacement": "已思考 $1 小时 $2 分 $3 秒"

@@ -281,6 +281,13 @@
     if (translated !== null && translated !== trimmed) {
       var leadingSpace = original.match(/^\s*/)[0];
       var trailingSpace = original.match(/\s*$/)[0];
+      // 盘古之白排版优化：若前一个兄弟节点以英数结尾且当前译文以汉字开头，自动补齐规范空格
+      if (!leadingSpace && node.previousSibling) {
+        var prevText = (node.previousSibling.textContent || '').trim();
+        if (/[a-zA-Z0-9]$/.test(prevText) && /^[\u4e00-\u9fa5]/.test(translated)) {
+          leadingSpace = ' ';
+        }
+      }
       node.nodeValue = leadingSpace + translated + trailingSpace;
       node._agyOriginal = node.nodeValue; // 记录翻译后的值，防止重复处理
     } else {
