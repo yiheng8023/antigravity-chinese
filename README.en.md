@@ -15,11 +15,15 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.8** (fully adapted for Antigravity **v2.18.1**).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.9** (fully adapted for Antigravity **v2.18.1**).
 
 ---
 
 ## 🌟 Key Features & Engineering Design
+
+- 📝 **Selection Quote Toolbar Localization**:
+  - Accurately captures floating action bars upon highlighting message text, resolving boundaries for isolated command keywords and shortcuts into canonical `引用 Ctrl+L`.
+  - Multi-tier dictionary sources (`dict/src/`) and compilation pipelines fully aligned against regression.
 
 - 🎯 **Model Selector Harmonization & CJK Spacing Guard**:
   - Publication-grade standard: Brand model names (`Gemini`, `Claude`, `GPT-OSS`) remain 100% authentic English proper nouns, while capability modifiers and status tags are completely harmonized into idiomatic Simplified Chinese (`Limited time` ➔ `限时`, `(Thinking)` ➔ `（思考）`, `(Medium)` ➔ `（中等）`, and sub-menu `低 / 中 / 高` tiers strictly aligned).

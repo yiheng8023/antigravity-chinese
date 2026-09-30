@@ -1,6 +1,6 @@
 {
-  "version": "3.3.7",
-  "buildTime": "2026-09-30T22:42:29.363Z",
+  "version": "3.3.8",
+  "buildTime": "2026-09-30T23:21:49.741Z",
   "exact": {
     "\"Always Proceed\"": "“总是直接继续”",
     "+ Add Folder": "+ 添加文件夹",
@@ -1038,6 +1038,8 @@
     "Quick Start": "快速入门",
     "Quit": "退出",
     "Quit Antigravity": "退出 Antigravity",
+    "Quote": "引用",
+    "Quote Ctrl+L": "引用 Ctrl+L",
     "Quote Selection": "引用选中文本",
     "Ran": "已运行",
     "Ran command": "已运行命令",

@@ -15,11 +15,15 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.8**，全面适配 Antigravity **v2.18.1** 升级）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.9**，全面适配 Antigravity **v2.18.1** 升级）。
 
 ---
 
 ## 🌟 核心特性与设计哲学
+
+- 📝 **选中文本引用工具栏精准补齐 (Selection Quote Toolbar Localization)**：
+  - 精准捕获会话选中文本时弹出的悬浮快捷工具栏，消除单字词与热键拆分边界盲区，规范中文化为 `引用 Ctrl+L`；
+  - 词典分层源（`dict/src/`）与编译管线全链路闭环，防回滚、防覆盖。
 
 - 🎯 **模型选择器规范化统一与中西文排版优化 (Model Selector Harmonization & CJK Spacing)**：
   - 坚持“模型原名归英文，功能状态归中文”的出版级规范：模型品牌原名（`Gemini`、`Claude`、`GPT-OSS`）100% 保持纯英文专有名词，能力修饰词与状态标签全量统一规范化中文化（`Limited time` ➔ `限时`，`(Thinking)` ➔ `（思考）`，`(Medium)` ➔ `（中等）`，二级菜单 `低 / 中 / 高` 严格对齐）；
