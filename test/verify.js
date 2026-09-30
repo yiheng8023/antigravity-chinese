@@ -259,6 +259,23 @@ win.__AGY_TRANSLATE_EL__(mockFragmentSpan);
 assert(mockFragmentSpan.textContent === '所有定时任务均以 Flash 模型运行。', 'React 碎片化模板容器联合自愈为整句通过！');
 assert(mockFragmentSpan.childNodes.length === 3, '联合自愈保持子节点树结构稳定 (length: 3)');
 
+// 验证跨内联元素语序重排自愈 ("Also includes", " ", <span>Global Permissions</span>, " ", "when working in this project.")
+const mockPermContainer = win.document.createElement('span');
+mockPermContainer.appendChild(win.document.createTextNode('Also includes'));
+mockPermContainer.appendChild(win.document.createTextNode(' '));
+const mockGlobalPermLink = win.document.createElement('span');
+mockGlobalPermLink.textContent = 'Global Permissions';
+mockPermContainer.appendChild(mockGlobalPermLink);
+mockPermContainer.appendChild(win.document.createTextNode(' '));
+mockPermContainer.appendChild(win.document.createTextNode('when working in this project.'));
+win.document.body.appendChild(mockPermContainer);
+
+win.__AGY_TRANSLATE_EL__(mockPermContainer);
+assert(mockPermContainer.textContent === '在此项目中工作时，也包含全局权限。', '跨内联元素语序重排自愈通过："Also includes [Global Permissions] when working in this project." -> "在此项目中工作时，也包含全局权限。"');
+assert(mockGlobalPermLink.textContent === '全局权限', '内联可点击 <span>Global Permissions</span> 独立翻译且 DOM 引用完好保留');
+assert(translate('toString') === null && translate('constructor') === null, 'Object.prototype 原型链同名属性防碰撞断言通过');
+
+
 
 
 console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');

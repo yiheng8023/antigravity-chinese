@@ -1154,5 +1154,101 @@
   {
     "regex": "^Agent permissions preset selector, current:\\s*(.+)$",
     "replacement": "智能体权限预设选择器，当前：$1"
+  },
+  {
+    "regex": "^([\\d,]+)\\s*\\/\\s*([\\d,]+)\\s*tokens\\s*\\(([\\d.]+%)\\)$",
+    "replacement": "$1 / $2 个 Token ($3)"
+  },
+  {
+    "regex": "^\\(([\\d,]+)\\s*tokens\\)\\s*([\\d.]+%)$",
+    "replacement": "($1 个 Token) $2"
+  },
+  {
+    "regex": "^\\(([\\d,]+)\\s*tokens\\)$",
+    "replacement": "($1 个 Token)"
+  },
+  {
+    "regex": "^Unused capacity:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "未用容量：$1 个 Token"
+  },
+  {
+    "regex": "^Rules:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "规则：$1 个 Token"
+  },
+  {
+    "regex": "^Skills:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "技能：$1 个 Token"
+  },
+  {
+    "regex": "^Subagents:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "子智能体：$1 个 Token"
+  },
+  {
+    "regex": "^MCP Tools:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "MCP 工具：$1 个 Token"
+  },
+  {
+    "regex": "^MCP Servers:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "MCP 服务：$1 个 Token"
+  },
+  {
+    "regex": "^System Prompt:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "系统提示词：$1 个 Token"
+  },
+  {
+    "regex": "^Customizations:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "自定义扩展：$1 个 Token"
+  },
+  {
+    "regex": "^Other Customizations:\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "其他自定义扩展：$1 个 Token"
+  },
+  {
+    "regex": "^(.+):\\s*([\\d,]+)\\s*tokens$",
+    "replacement": "$1：$2 个 Token"
+  },
+  {
+    "regex": "^(\\d+)\\s+demoted$",
+    "replacement": "$1 项已降级"
+  },
+  {
+    "regex": "^(\\d+)\\s+excluded$",
+    "replacement": "$1 项已排除"
+  },
+  {
+    "regex": "^(\\d+)\\s+tools?\\s+excluded$",
+    "replacement": "已排除 $1 个工具"
+  },
+  {
+    "regex": "^(\\d+)\\s+tools$",
+    "replacement": "$1 个工具"
+  },
+  {
+    "regex": "^Show\\s+(\\d+)\\s+breakdowns?$",
+    "replacement": "显示 $1 项明细"
+  },
+  {
+    "regex": "^(\\d+)\\s+rules?\\s+exceeded the rules budget and (?:was|were) demoted from full inline content to a file-path pointer\\.$",
+    "replacement": "$1 条规则超出规则预算，已从完整内联内容降级为文件路径指针。"
+  },
+  {
+    "regex": "^(\\d+)\\s+items?\\s+in\\s+(.+?)\\s+exceeded the customization budget and (?:was|were) excluded from context\\.$",
+    "replacement": "$2 中的 $1 个项目超出自定义扩展预算，已从上下文中排除。"
+  },
+  {
+    "regex": "^Exceeded the rules token budget\\. Full rule content \\(([\\d,]+)\\s*tokens\\) was replaced with a lightweight file-path pointer in context\\.$",
+    "replacement": "已超出规则 Token 预算。完整规则内容（$1 个 Token）已在上下文中替换为轻量级文件路径指针。"
+  },
+  {
+    "regex": "^All tools in this MCP server \\(([\\d,]+)\\s*tokens\\) exceeded the customization budget and were excluded from context\\.$",
+    "replacement": "此 MCP 服务中的所有工具（$1 个 Token）均超出自定义扩展预算，已从上下文中排除。"
+  },
+  {
+    "regex": "^(\\d+)\\s+tools?\\s+in this MCP server \\(([\\d,]+)\\s*tokens\\) exceeded the customization budget and were excluded from context\\.$",
+    "replacement": "此 MCP 服务中的 $1 个工具（$2 个 Token）超出自定义扩展预算，已从上下文中排除。"
+  },
+  {
+    "regex": "^Exceeded the customization token budget \\(([\\d,]+)\\s*tokens\\) and was excluded from context\\.$",
+    "replacement": "已超出自定义扩展 Token 预算（$1 个 Token），已从上下文中排除。"
   }
 ]

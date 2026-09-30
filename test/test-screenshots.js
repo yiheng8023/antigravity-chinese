@@ -259,7 +259,32 @@ const goldenCases = [
   { input: "Select billing model", expected: "选择计费模式" },
   { input: "Open in Built-in Browser", expected: "在内置浏览器中打开" },
   { input: "You have 3 conversations in progress. Updating will interrupt them, and they will automatically resume once the update completes.", expected: "您当前有 3 个正在进行的会话。更新将暂时中断这些会话，并在更新完成后自动恢复。" },
-  { input: "Agents created by GitHub Helper run in a dedicated project with its own permissions, which you can change anytime in the project settings page. On top of those defaults, GitHub Helper requests the access below.", expected: "由 GitHub Helper 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。除默认权限外，GitHub Helper 还请求以下访问权限。" }
+  { input: "Agents created by GitHub Helper run in a dedicated project with its own permissions, which you can change anytime in the project settings page. On top of those defaults, GitHub Helper requests the access below.", expected: "由 GitHub Helper 创建的智能体将在专属工作区中运行并拥有独立权限，您可以随时在设置页面中更改。除默认权限外，GitHub Helper 还请求以下访问权限。" },
+
+  // Screenshot 17 & 18: Customizations Token Usage Breakdown & Builtin Skills (media_1790717382150.png & media_1790717413152.png)
+  { input: "The breakdown below shows token usage from customizations like rules, skills, and MCP. If a budget is exceeded, large rules are demoted to path pointers and large customizations are excluded automatically.", expected: "下方的明细展示了来自规则、技能及 MCP 等自定义扩展的 Token 占用情况。如果超出预算，大型规则将自动降级为路径指针，大型自定义扩展将被自动排除。" },
+  { input: "Other Customizations", expected: "其他自定义扩展" },
+  { input: "5,785 / 20,000 tokens (28.9%)", expected: "5,785 / 20,000 个 Token (28.9%)" },
+  { input: "2,864 / 20,000 tokens (14.3%)", expected: "2,864 / 20,000 个 Token (14.3%)" },
+  { input: "(5,785 tokens) 28.9%", expected: "(5,785 个 Token) 28.9%" },
+  { input: "(5,785 tokens)", expected: "(5,785 个 Token)" },
+  { input: "Rules: 5,785 tokens", expected: "规则：5,785 个 Token" },
+  { input: "MCP Tools: 2,864 tokens", expected: "MCP 工具：2,864 个 Token" },
+  { input: "Show 1 breakdown", expected: "显示 1 项明细" },
+  { input: "Show 3 breakdowns", expected: "显示 3 项明细" },
+  { input: "Hide breakdown", expected: "隐藏明细" },
+  { input: "2 demoted", expected: "2 项已降级" },
+  { input: "3 excluded", expected: "3 项已排除" },
+  { input: "4 tools excluded", expected: "已排除 4 个工具" },
+  { input: "12 tools", expected: "12 个工具" },
+  { input: "Hide tools", expected: "隐藏工具" },
+  { input: "Exceeded the rules token budget. Full rule content (5,785 tokens) was replaced with a lightweight file-path pointer in context.", expected: "已超出规则 Token 预算。完整规则内容（5,785 个 Token）已在上下文中替换为轻量级文件路径指针。" },
+  { input: "Exceeded the customization token budget (2,864 tokens) and was excluded from context.", expected: "已超出自定义扩展 Token 预算（2,864 个 Token），已从上下文中排除。" },
+  { input: 'Interactive guide to design and create a scheduled background automation. Use this skill when the user wants to create an automated or recurring scheduled task (e.g. "summarize my emails every morning", "every Monday send me a to-do list"). Also triggered by the /automation slash command.', expected: '设计并创建后台定时自动化任务的交互式指南。当用户希望创建自动或周期性执行的定时任务（例如“每天早上汇总我的邮件”、“每周一发送待办清单”）时使用此技能，也可通过 /automation 斜杠命令触发。' },
+  { input: "How to manage and create plugins — namespaced bundles of skills, agents, rules, MCP servers and hooks that install, enable and disable as a single unit. Use this skill when the user wants to enable, disable, install or uninstall a plugin, when they want to create a new plugin, or when a new customization should be packaged into a plugin rather than left loose. Also triggered by the /plugin slash command. Don't use for the underlying customization system itself — discovery roots, loading priority, or authoring a standalone skill, agent, rule, hook or MCP server outside a plugin; see the customizations guide skill for those.", expected: "管理与创建插件的完整指南——插件是将技能、智能体、规则、MCP 服务与钩子打包在命名空间下的组合包，可作为整体安装、启用或禁用。当用户需要管理或创建插件时使用此技能（也可通过 /plugin 斜杠命令触发）。" },
+  { input: "Untitled Conversation", expected: "无标题会话" },
+  { input: "Plan Review Policy", expected: "计划审查策略" },
+  { input: "Expand (shift+click to expand every level below)", expected: "展开（按住 Shift 点击可展开下方所有层级）" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

@@ -27,13 +27,6 @@
       };
     });
 
-    var sortedExactKeys = Object.keys(exactDict).sort(function (a, b) {
-      return b.length - a.length;
-    });
-    var phraseKeys = sortedExactKeys.filter(function (k) {
-      return k.indexOf(' ') !== -1 || k.length >= 12;
-    });
-
     var translatedValues = {};
     for (var k in exactDict) {
       if (exactDict.hasOwnProperty(k)) {
@@ -66,6 +59,8 @@
       return str.replace(/\s+/g, ' ').trim();
     }
 
+    var hasOwn = Object.prototype.hasOwnProperty;
+
     function translateSingleUnit(rawStr) {
       if (!rawStr || typeof rawStr !== 'string') return null;
       var normalized = normalizeWhitespace(rawStr);
@@ -75,7 +70,7 @@
         return translationCache.get(normalized);
       }
 
-      if (exactDict[normalized]) {
+      if (hasOwn.call(exactDict, normalized)) {
         return cacheAndReturn(normalized, exactDict[normalized]);
       }
 
@@ -83,7 +78,7 @@
         return cacheAndReturn(normalized, null);
       }
 
-      if (translatedValues[normalized]) {
+      if (hasOwn.call(translatedValues, normalized)) {
         return cacheAndReturn(normalized, null);
       }
 
@@ -110,16 +105,16 @@
       if (punctuationMatch) {
         var base = punctuationMatch[1].trim();
         var punc = punctuationMatch[2];
-        if (exactDict[base]) {
+        if (hasOwn.call(exactDict, base)) {
           return cacheAndReturn(normalized, exactDict[base] + (punc === ':' ? '：' : punc));
         }
       }
 
-      var hotkeyMatch = normalized.match(/^([\w\s\-\/]+?)\s*(\((?:Ctrl|Cmd|Alt|Shift)\+[^\)]+\)|\b(?:Ctrl|Cmd|Alt|Shift)\+[\w;:,\\/+\-]+)$/i);
+      var hotkeyMatch = normalized.match(/^([\w\s\-\/]+?)\s*(\((?:Ctrl|Cmd|Alt|Shift)\+[^\s\)]+\)|\b(?:Ctrl|Cmd|Alt|Shift)\+[\w;:,\\/+\-]+)$/i);
       if (hotkeyMatch) {
         var cmdBase = hotkeyMatch[1].trim();
         var hotkey = hotkeyMatch[2].trim();
-        if (exactDict[cmdBase]) {
+        if (hasOwn.call(exactDict, cmdBase)) {
           return cacheAndReturn(normalized, exactDict[cmdBase] + (hotkey.charAt(0) === '(' ? ' ' + hotkey : ' ' + hotkey));
         }
       }
@@ -127,6 +122,7 @@
       if (normalized.indexOf('. ') !== -1 || normalized.indexOf('! ') !== -1 || normalized.indexOf('? ') !== -1 || normalized.indexOf('。') !== -1) {
         var sentences = normalized.split(/([.!?]\s+|[。！？]\s*)/);
         var anyTranslated = false;
+        var allTranslated = true;
         var translatedParts = [];
         for (var sIdx = 0; sIdx < sentences.length; sIdx++) {
           var part = sentences[sIdx];
@@ -135,18 +131,24 @@
             translatedParts.push(part.replace(/\.\s*/g, '。 '));
             continue;
           }
-          var transPart = exactDict[trimmedPart] || exactDict[trimmedPart + '.'];
+          var transPart = (hasOwn.call(exactDict, trimmedPart) ? exactDict[trimmedPart] : null) ||
+                          (hasOwn.call(exactDict, trimmedPart + '.') ? exactDict[trimmedPart + '.'] : null);
           if (!transPart) {
             for (var pIdx = 0; pIdx < patterns.length; pIdx++) {
               if (patterns[pIdx].regex.test(trimmedPart)) {
                 transPart = trimmedPart.replace(patterns[pIdx].regex, patterns[pIdx].replacement);
+                for (var pi2 = 0; pi2 < patterns.length; pi2++) {
+                  if (patterns[pi2].regex.test(transPart)) {
+                    transPart = transPart.replace(patterns[pi2].regex, patterns[pi2].replacement);
+                  }
+                }
                 break;
               }
             }
           }
           if (!transPart) {
             var pMatch = trimmedPart.match(/^([\w\s\-\/]+)([:：…\.？\?!！]+)$/);
-            if (pMatch && exactDict[pMatch[1].trim()]) {
+            if (pMatch && hasOwn.call(exactDict, pMatch[1].trim())) {
               transPart = exactDict[pMatch[1].trim()] + (pMatch[2] === ':' ? '：' : pMatch[2]);
             }
           }
@@ -154,29 +156,15 @@
             anyTranslated = true;
             translatedParts.push(transPart);
           } else {
+            allTranslated = false;
             translatedParts.push(part);
           }
         }
-        if (anyTranslated) {
+        if (anyTranslated && allTranslated) {
           return cacheAndReturn(normalized, translatedParts.join('').replace(/([。！？])[。！？.]*\s*/g, '$1 ').trim());
         }
       }
 
-      var processed = normalized;
-      if (processed.indexOf(' ') === -1 && processed.length < 12) {
-        return cacheAndReturn(normalized, null);
-      }
-
-      var modified = false;
-      for (var j = 0; j < phraseKeys.length; j++) {
-        var key = phraseKeys[j];
-        if (processed.indexOf(key) !== -1) {
-          processed = processed.split(key).join(exactDict[key]);
-          modified = true;
-        }
-      }
-
-      if (modified) return cacheAndReturn(normalized, processed);
       return cacheAndReturn(normalized, null);
     }
 
@@ -375,6 +363,37 @@
             }
             return;
           }
+        }
+      } else {
+        // 跨内联元素语序重排自愈：针对 "Also includes" + <span>Global Permissions</span> + "when working in this project."
+        var alsoNode = null;
+        var whenNode = null;
+        var scanCur = first;
+        while (scanCur) {
+          if (scanCur.nodeType === 3 && scanCur.nodeValue) {
+            var tVal = scanCur.nodeValue.trim();
+            if (tVal === 'Also includes' || tVal === '也包含') {
+              alsoNode = scanCur;
+            } else if (alsoNode && (tVal === 'when working in this project.' || tVal === '在此项目中工作时。')) {
+              whenNode = scanCur;
+              break;
+            }
+          }
+          scanCur = scanCur.nextSibling;
+        }
+        if (alsoNode && whenNode) {
+          alsoNode.nodeValue = '在此项目中工作时，也包含';
+          alsoNode._agyOriginal = alsoNode.nodeValue;
+          var between = alsoNode.nextSibling;
+          while (between && between !== whenNode) {
+            if (between.nodeType === 3 && !between.nodeValue.trim()) {
+              between.nodeValue = '';
+              between._agyOriginal = '';
+            }
+            between = between.nextSibling;
+          }
+          whenNode.nodeValue = '。';
+          whenNode._agyOriginal = whenNode.nodeValue;
         }
       }
     }

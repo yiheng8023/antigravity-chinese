@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.6** (fully adapted for Antigravity **v2.18.1**).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.7** (fully adapted for Antigravity **v2.18.1**).
 
 ---
 
@@ -28,17 +28,20 @@ A high-performance, reversible Chinese localization patch and lifecycle manager 
   - Deeply supports Windows clients connecting to WSL (Ubuntu, etc.) Linux environments.
   - Natively translates application menus `Connect to WSL` and `Reopen Locally`.
   - Injects translations for main-process dialogs, including missing WSL distros and cross-filesystem `/mnt` performance warnings.
-- 🧩 **2.18.1 Full Feature Coverage, Composite Alert De-fragmentation & 10 Plugins + 131 Skills**:
+- 🧩 **2.18.1 Full Feature Coverage, Inline DOM Reordering & 10 Plugins + 131 Skills**:
   - Complete localization for **2.18.1** modules: Trajectory Debug View (`Open Trajectory Debug View`), declared subagent permissions review modal (`declared-permissions-modal`), plugin OAuth authentication & customization token budget warnings, per-conversation telemetry toggles, enterprise billing model picker (`Select billing model`), built-in browser, and the full PDF Viewer toolbar.
-  - Surgical healing for JSX composite alerts (e.g. `plan-command-fyi-alert`), avoiding global single-word ambiguity while producing clean Chinese sentences.
+  - Surgical healing for JSX composite alerts (e.g. `plan-command-fyi-alert`) and inline DOM sentence reordering (e.g. `Also includes <span>Global Permissions</span> when working in this project.` ➔ `在此项目中工作时，也包含全局权限。`), restructuring split text nodes into natural Chinese word order while preserving inline element event listeners.
   - Complete localization for baseline/model quota banners (`Baseline model quota reached`), AI Credits & Overages alerts (`Insufficient AI Credits`), and error notification cards, including multi-sentence splitting and full-width punctuation normalization after inline `<a>` links.
-  - Comprehensive publication-grade translations for the 10 official plugins in `Build with Antigravity Plugins` (Android CLI, Chrome DevTools, Data Agent Kit, Dart and Flutter, Firebase, Gemini API, Google Maps Platform, Modern Web Guidance, Google Antigravity SDK, Science) and all **131 official `SKILL.md` / `agents` / `rules` descriptions**.
+  - Comprehensive publication-grade translations for the 10 official plugins in `Build with Antigravity Plugins` (Android CLI, Chrome DevTools, Data Agent Kit, Dart and Flutter, Firebase, Gemini API, Google Maps Platform, Modern Web Guidance, Google Antigravity SDK, Science) and all **local & built-in `SKILL.md` / `agents` / `rules` descriptions** (including multi-line YAML `>-` / `|` block scalars).
+- 🛡️ **Zero False-Positive Engine & Full-Sentence Conservation**:
+  - Abolishes blind substring replacement (`phraseKeys`) and upgrades multi-sentence splitting to strict `allTranslated` conservation, eliminating half-English/half-Chinese hybrids and inflated coverage illusions.
+  - Enforces `Object.prototype.hasOwnProperty` prototype guards (protecting against `toString` / `constructor` collisions) and strict hotkey parenthesis matching (preventing spaced descriptive parentheses from being misclassified as keyboard shortcuts).
 - 🏗️ **Three-Tier Dictionary Compiler & Security Gates**:
   - Modularized source layout: `dict/src/core/` (atomic pure terms), `dict/src/rules/` (cascading regexes), `dict/src/ctx/` (context-scoped entries: `permissions.json`, `settings.json`, `plugins.json`).
   - Built-in **ASCII Key Barrier** (guards against Chinese intermediate key fragments), **Capture-Group Invariant Guard** (syntax compilation and `$1..$N` conservation), and **Duplicate Key Conflict Guard**, producing a unified `dist/zh-CN.bundle.json` with seamless backward compatibility.
 - 🎯 **Single-Source Truth & Golden Snapshots**:
   - Core runtime extracts a stateless calculation factory `createI18nEngine` eliminating shadow duplicates across test suites and drift tools.
-  - 200 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
+  - 209 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
 - **High-Performance Low-Overhead Runtime Architecture**: Eliminates uncontrolled `requestIdleCallback` spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal filters and a 100ms throttle valve keep intensive streaming dialogues and virtual scrolling smooth and responsive.
 - **Option Floating Tooltips & Delivery Strategies Coverage**: Fully covers dynamic floating tooltips across Settings (e.g. Queued Messages options: `Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`, `Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`), terminal auto-execution policies, artifact review policies, and Strict Mode descriptions.
 - **Multi-TextNode Coalescing Self-Healing**: Resolves upstream React split-node fragmentations (e.g. `"All ", e, "s run as Flash."` split into sibling TextNodes causing plural suffix leftovers) with atomic full-sentence coalescence while strictly preserving virtual DOM node topology and reference integrity.
@@ -114,21 +117,21 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 
 ## 🧪 Automated Testing & CI Verification
 
-The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **350+ assertions**:
+The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **370+ assertions**:
 
 ```bash
-# Run all automated test suites (aggregating 8 full-fidelity test suites, 350+ assertions)
+# Run all automated test suites (aggregating 8 full-fidelity test suites, 370+ assertions)
 npm test
 ```
 
 - **Dictionary Lint & Syntax Sanitization (`test/test-lint.js`)**: Validates dictionary JSON structure, formatting compliance, and syntax health.
-- **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 115 assertions covering critical DOM paths, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
-- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 200 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
+- **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 118 assertions covering critical DOM paths, inline DOM reordering self-healing, false-positive prevention, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
+- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 209 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
 - **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
 - **Menu, Tray & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 2,573 exact entries and 289 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,235 exact entries and 313 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 
 ---
 
@@ -138,14 +141,15 @@ Facing frequent Antigravity updates, the core evolution direction is building a 
 
 ```mermaid
 flowchart LR
-    A[Upstream Update] -->|tools/drift-detector.js| B[Drift Detection]
-    B --> C[Identify New & Stale Terms]
+    A[Upstream Update] -->|tools/drift-detector.js| B[800-Char Paragraph & YAML Skill Scan]
+    B --> C[False-Positive Guard & New Phrase Detection]
     C -->|AI Context Translation| D[Generate Candidate Diff PR]
     D -->|npm test| E[Automated DOM & Regression Testing]
     E --> F[Human Review & Merge]
 ```
 
-- **Three-Tier Metrics**: `npm run scan:drift` outputs total observed candidates, exact match coverage, and rule-assisted coverage.
+- **800-Char Paragraph & Multi-Line YAML Skill Scanner**: `npm run scan:drift` extracts long UI paragraphs up to 800 characters and parses both single-line and multi-line YAML (`>-` / `|`) skill descriptions across `~/.gemini/antigravity/builtin` and `~/.gemini/config/plugins`.
+- **False-Positive Hybrid Guard (`[False-Positive Guard]`)**: Automatically intercepts any partially translated output containing 2+ consecutive untranslated English words, ensuring coverage metrics are 100% authentic.
 - **Stale Rule Detection**: Identifies historical entries in the dictionary that are no longer observed upstream (`exactKeys - observed`), providing cleanup leads.
 - **Reduced Maintenance Cost**: Replaces manual verification with automated diff extraction and regression testing.
 
@@ -180,21 +184,21 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (2,573 exact entries + 289 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,235 exact entries + 313 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
-│   ├── i18n-runtime.js               # Zero-lag preload runtime injection engine (DOM negative tags & createI18nEngine factory)
+│   ├── i18n-runtime.js               # Zero-lag preload runtime engine (zero false-positives, inline DOM reordering & createI18nEngine)
 │   └── cdp-client.js                 # Zero-dependency RFC 6455 CDP WebSocket client (no-unpack hot-mount protocol layer)
 ├── plugins/
 │   └── chinese-toolkit/              # Antigravity official Chinese agent community plugin
 │       ├── rules/                    # Agent Chinese interaction rules (chinese-interaction-rules.md)
 │       ├── skills/                   # Localization diagnostic skills (i18n-diagnostics)
 │       └── plugin.json               # Antigravity plugin manifest specification
-├── test/                             # Automated full-fidelity regression test suites (8 suites, 350+ assertions)
+├── test/                             # Automated full-fidelity regression test suites (8 suites, 370+ assertions)
 │   ├── test-lint.js                  # Dictionary lint & syntax health checks
-│   ├── verify.js                     # 115 JSDOM state machine and runtime performance assertions
-│   ├── test-screenshots.js          # 200 strictEqual golden truth assertions + 20 invariant fuzzing tests
+│   ├── verify.js                     # 118 JSDOM state machine, inline reordering, and runtime performance assertions
+│   ├── test-screenshots.js          # 209 strictEqual golden truth assertions + 20 invariant fuzzing tests
 │   ├── test-cdp.js                   # Zero-dependency RFC 6455 CDP protocol bidirectional tests
 │   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
 │   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
@@ -202,7 +206,7 @@ antigravity-chinese/
 │   └── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
 ├── tools/                            # Compiler, reverse engineering, diff analysis & drift detection toolchain
 │   ├── build-dict.js                 # Three-tier dictionary compiler (ASCII key gate & capture group conservation)
-│   ├── drift-detector.js             # Upstream version text & candidate drift detector (npm run scan:drift)
+│   ├── drift-detector.js             # Upstream 800-char paragraph, YAML skill & false-positive drift detector (npm run scan:drift)
 │   ├── build-full-dict.js            # Full dictionary automated builder and deduplication tool
 │   └── gap-analysis.js               # Translation coverage gap & missed item automated analyzer
 ├── docs/assets/sponsoring/           # Sponsorship & community assets
