@@ -284,7 +284,13 @@ const goldenCases = [
   { input: "How to manage and create plugins — namespaced bundles of skills, agents, rules, MCP servers and hooks that install, enable and disable as a single unit. Use this skill when the user wants to enable, disable, install or uninstall a plugin, when they want to create a new plugin, or when a new customization should be packaged into a plugin rather than left loose. Also triggered by the /plugin slash command. Don't use for the underlying customization system itself — discovery roots, loading priority, or authoring a standalone skill, agent, rule, hook or MCP server outside a plugin; see the customizations guide skill for those.", expected: "管理与创建插件的完整指南——插件是将技能、智能体、规则、MCP 服务与钩子打包在命名空间下的组合包，可作为整体安装、启用或禁用。当用户需要管理或创建插件时使用此技能（也可通过 /plugin 斜杠命令触发）。" },
   { input: "Untitled Conversation", expected: "无标题会话" },
   { input: "Plan Review Policy", expected: "计划审查策略" },
-  { input: "Expand (shift+click to expand every level below)", expected: "展开（按住 Shift 点击可展开下方所有层级）" }
+  { input: "Expand (shift+click to expand every level below)", expected: "展开（按住 Shift 点击可展开下方所有层级）" },
+
+  // Screenshot: Project Entrypoint Tooltips (media_1790864222648.png & media_1790864231396.png)
+  { input: "Select a folder.", expected: "选择一个文件夹。" },
+  { input: "Instantly create a new project and folder to start building.", expected: "即刻创建新项目和文件夹以开始构建。" },
+  { input: "Create a new project using normal folders and/or citc workspaces.", expected: "使用常规文件夹和/或 CitC 工作区创建新项目。" },
+  { input: "Work in a CitC workspace.", expected: "在 CitC 工作区中工作。" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);
