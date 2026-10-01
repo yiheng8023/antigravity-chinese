@@ -26,7 +26,7 @@
 | 🖥️ **桌面客户端 (Desktop App 2.0)** | 独立 Electron 客户端，包含全局看板、白板与 Aux Pane | ASAR 深度注入 / CDP 免解包热挂载 + IPC 上下文菜单拦截 | 🟢 **100% 满血就绪** |
 | 🧩 **IDE 扩展 (VS Code Extension)** | 嵌入宿主 IDE 的智能补全、命令、设置面板与侧边栏聊天 | `package.json` 映射 + Webview 本地微反向代理深度注入 | 🟢 **100% 满血就绪** |
 | 💻 **第一方独立 IDE (Antigravity IDE)** | 基于 Code-OSS 深度定制的独立 AI-first IDE | 官方中文语言包适配 + 内置组件同源对齐 | 🟡 **架构对齐/弹性探测** |
-| ⚡ **终端命令行 (Antigravity CLI `agy`)** | 极客终端交互与自动化批处理 | 遵循“输入英文，输出中文”准则，帮助手册与向导本地化 | 🟢 **规范确立/持续演进** |
+| ⚡ **终端命令行 (Antigravity CLI `agy`)** | 极客终端交互与自动化批处理 | 坚持极客工程准则：保持官方原生英文与数字签名完整性，杜绝 TUI 字符网格错位与管道脚本兼容风险 | 🛡️ **原生保留 / 免干扰设计** |
 | 🔌 **智能体插件与技能生态 (Plugins & Skills)** | 官方 10 大目录插件与 131 项 `SKILL.md` 描述 | 双源 YAML 与 JSDoc 出版级中文化 | 🟢 **100% 满血就绪** |
 
 > [!NOTE] **多端解耦与弹性探测哲学 (Elastic Probing Guarantee)**：

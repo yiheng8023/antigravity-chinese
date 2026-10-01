@@ -171,6 +171,7 @@ function getAgyI18nProxyTemplate() {
  */
 const http = require('http');
 const net = require('net');
+const zlib = require('zlib');
 const fs = require('fs');
 const path = require('path');
 
@@ -210,27 +211,46 @@ function startProxy() {
     }
 
     const reqUrl = new URL(req.url, 'http://127.0.0.1');
+    const proxyHeaders = { ...req.headers };
+    proxyHeaders.host = targetParsed.host;
+
+    // 核心防御 1：强制目标服务器以未压缩明文返回，杜绝二进制乱码拼接与解压崩溃
+    delete proxyHeaders['accept-encoding'];
+
     const options = {
       hostname: targetParsed.hostname,
       port: targetParsed.port,
       path: reqUrl.pathname + reqUrl.search,
       method: req.method,
-      headers: { ...req.headers, host: targetParsed.host }
+      headers: proxyHeaders
     };
 
     const proxyReq = http.request(options, (targetRes) => {
       const isHtml = (targetRes.headers['content-type'] || '').includes('text/html');
       if (isHtml && req.method === 'GET') {
-        let body = '';
-        targetRes.on('data', (chunk) => { body += chunk; });
+        const chunks = [];
+        targetRes.on('data', (chunk) => { chunks.push(chunk); });
         targetRes.on('end', () => {
+          let buffer = Buffer.concat(chunks);
+
+          // 核心防御 2：万一目标服务强制返回压缩格式，自动双向解压
+          const encoding = (targetRes.headers['content-encoding'] || '').toLowerCase();
+          if (encoding === 'gzip') {
+            try { buffer = zlib.gunzipSync(buffer); } catch (_) {}
+          } else if (encoding === 'deflate') {
+            try { buffer = zlib.inflateSync(buffer); } catch (_) {}
+          }
+
+          let body = buffer.toString('utf-8');
           const bundle = getBundleScript();
           const scriptTag = '\\n<script>\\n' + bundle + '\\n</script>\\n';
           const modified = body.includes('<head>')
             ? body.replace('<head>', '<head>' + scriptTag)
             : (scriptTag + body);
+
           const headers = { ...targetRes.headers };
           delete headers['content-length'];
+          delete headers['content-encoding'];
           delete headers['transfer-encoding'];
           headers['content-length'] = Buffer.byteLength(modified, 'utf-8');
           res.writeHead(targetRes.statusCode, headers);
@@ -294,12 +314,25 @@ function getProxiedUrls(serverUrl, fullUrlString) {
     return { serverUrl, fullUrlString };
   }
 
-  const proxyBase = 'http://127.0.0.1:' + proxyPort + '/';
-  const proxiedFullUrl = fullUrlString.replace(serverUrl, proxyBase);
-  return {
-    serverUrl: proxyBase,
-    fullUrlString: proxiedFullUrl
-  };
+  // 核心防御 3：使用 WHATWG URL 规范重构，绝对规避双斜杠或末尾路径丢失
+  try {
+    const parsedTarget = new URL(serverUrl);
+    const parsedFull = new URL(fullUrlString);
+    const proxyBase = 'http://127.0.0.1:' + proxyPort + (parsedTarget.pathname.endsWith('/') ? parsedTarget.pathname : parsedTarget.pathname + '/');
+    parsedFull.protocol = 'http:';
+    parsedFull.hostname = '127.0.0.1';
+    parsedFull.port = String(proxyPort);
+    return {
+      serverUrl: proxyBase,
+      fullUrlString: parsedFull.toString()
+    };
+  } catch (_) {
+    const proxyBase = 'http://127.0.0.1:' + proxyPort + '/';
+    return {
+      serverUrl: proxyBase,
+      fullUrlString: fullUrlString.replace(serverUrl, proxyBase)
+    };
+  }
 }
 
 startProxy();

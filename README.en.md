@@ -26,7 +26,7 @@ A high-performance, reversible Chinese localization suite and lifecycle manager 
 | 🖥️ **Desktop App (Antigravity 2.0)** | Standalone Electron app with boards, chat canvas & Aux Pane | ASAR physical injection / CDP zero-disk mount + IPC native menu interception | 🟢 **100% Production Ready** |
 | 🧩 **IDE Extensions (VS Code Extension)** | Embedded editor assistant, commands, settings panel & sidebar chat | `package.json` mapping + Webview micro reverse proxy deep injection | 🟢 **100% Production Ready** |
 | 💻 **Standalone IDE (Antigravity IDE)** | AI-first IDE built on Code-OSS / VS Code | Official Chinese language pack support + core engine alignment | 🟡 **Architectural Alignment** |
-| ⚡ **Terminal CLI (`agy`)** | Terminal interactive TUI & workflow scripting | Enforcing "English input, Chinese output" for help docs & survey prompts | 🟢 **Standardized / Roadmap** |
+| ⚡ **Terminal CLI (`agy`)** | Geek terminal interaction & workflow scripting | Adhering to hacker engineering principles: preserving native English & Google digital signature integrity, preventing TUI grid displacement & pipeline incompatibilities | 🛡️ **Native Preservation / Zero-Interference** |
 | 🔌 **Plugins & Skills (`SKILL.md`)** | 10 official catalog plugins & 131 built-in skills/agents | Dual-source YAML & JSDoc publication-grade localization | 🟢 **100% Production Ready** |
 
 > [!NOTE] **Decoupled Architecture & Elastic Probing Guarantee**:
