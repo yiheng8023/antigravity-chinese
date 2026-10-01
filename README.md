@@ -15,11 +15,21 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.9**，全面适配 Antigravity **v2.18.1** 升级）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.10**，全面深度适配 Antigravity **v2.19.1** 升级）。
 
 ---
 
 ## 🌟 核心特性与设计哲学
+
+- 🚀 **Antigravity v2.19.1 全景深度适配与全新特性汉化 (v2.19.1 Adaptation & New Features)**：
+  - **内置技能扩展**：全量出版级深度汉化 2.19.1 全新引入的 `ui-extension`（构建、打包、运行与调试 UI 扩展，在侧边栏面板中渲染交互式 Web 面板）与 `ui-plugin-navigation`（UI 插件侧边栏面板导航与一键胶囊按钮）；
+  - **右侧抽屉栏全新 Goals 目标面板**：原生适配 Aux Pane 全新第一级栏目 `Goals`（目标），与子智能体、后台任务、产物、修改文件平齐对齐；
+  - **智能体工作耗时动态正则群**：引入 `Worked for ...`（已工作 $1 秒/分/时/天）与 `Stopped after ...`（在 $1 停止）多阶梯动态级联正则；
+  - **产物与文档打印导出增强**：适配产物操作栏新增的 `Export as PDF`（导出为 PDF）、`Failed to print document:`（打印文档失败：）与 `Download SVG`（下载 SVG）；
+  - **全局命令搜索与索引状态**：适配全局命令面板新 Placeholder `Search tabs, files, plugins, subagents, artifacts, tasks...`、`Search file contents...` 及搜索未完成索引提示；
+  - **通知首选项与系统权限**：收录全新的通知偏好设置弹窗（`Notification Preferences` 与 `Allow Gemini to notify you...`）；
+  - **对话派生警告与图表守卫**：适配 `Fork warning`（分支警告）、`The server returned no conversation to fork into` 及 Mermaid 饼图数据异常提示；
+  - **版本频道标签**：适配标题栏与顶栏新增的 `Insiders`（体验版）与 `Autopush`（自动推送版）标识。
 
 - 📝 **选中文本引用工具栏精准补齐 (Selection Quote Toolbar Localization)**：
   - 精准捕获会话选中文本时弹出的悬浮快捷工具栏，消除单字词与热键拆分边界盲区，规范中文化为 `引用 Ctrl+L`；
@@ -140,7 +150,7 @@ npm test
 - **菜单、托盘与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,235 条词条与 313 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,283 条词条与 320 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 
 ---
 
@@ -193,7 +203,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (3,235 精确词条 + 313 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (3,283 精确词条 + 320 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动

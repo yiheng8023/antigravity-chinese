@@ -365,5 +365,9 @@
   "Enable fine-grained GitHub permissions and define the org, repository, and resource-level access the agent is allowed to use.": "启用细粒度 GitHub 权限，并定义允许智能体使用的组织、仓库及资源级访问权限。",
   "+ Add Organization policy": "+ 添加组织策略",
   "GitHub Permissions": "GitHub 权限",
-  "Manage fine-grained permissions for GitHub.": "管理 GitHub 的细粒度访问权限。"
+  "Manage fine-grained permissions for GitHub.": "管理 GitHub 的细粒度访问权限。",
+  "Allow Gemini to notify you when the agent needs your attention or completes a task.": "允许 Gemini 在智能体需要您关注或完成任务时发送系统通知。",
+  "Allow Gemini to notify you when the agent needs your attention or completes a task": "允许 Gemini 在智能体需要您关注或完成任务时发送系统通知",
+  "Choose whether to be notified when the agent needs your attention or completes a task.": "选择是否在智能体需要您关注或完成任务时接收通知。",
+  "Choose whether to be notified when the agent needs your attention or completes a task": "选择是否在智能体需要您关注或完成任务时接收通知"
 }

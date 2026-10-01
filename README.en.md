@@ -15,11 +15,21 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.9** (fully adapted for Antigravity **v2.18.1**).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.10** (fully adapted for Antigravity **v2.19.1**).
 
 ---
 
 ## 🌟 Key Features & Engineering Design
+
+- 🚀 **Antigravity v2.19.1 Full Adaptation & New Features Localization**:
+  - **Built-in Skill Extensions**: Publication-grade localization for 2.19.1 new built-in skills: `ui-extension` (Build, package, run, and debug UI extensions for interactive side-pane web panels) and `ui-plugin-navigation` (Discover UI plugin panels and surface one-click pill buttons).
+  - **Aux Pane Goals Panel**: Native support for the brand new first-class `Goals` tab in the Aux Pane, seamlessly aligned with subagents, background tasks, artifacts, and modified files.
+  - **Dynamic Execution Time Regex Group**: Introduced cascading regex patterns for agent runtime states: `Worked for ...` (worked for $1 s/m/h/d) and `Stopped after ...` (stopped after $1).
+  - **Artifact & Document PDF Export**: Full support for new artifact action bar tools: `Export as PDF`, `Failed to print document:`, and `Download SVG`.
+  - **Global Command Search & Indexing Alerts**: Updated palette placeholders (`Search tabs, files, plugins, subagents, artifacts, tasks...`, `Search file contents...`) and ongoing indexing notices.
+  - **Notification Preferences & System Permissions**: Covered new notification preference dialogs (`Notification Preferences` & `Allow Gemini to notify you...`).
+  - **Conversation Forking & Charting Guardrails**: Localized `Fork warning`, missing fork destination errors, and Mermaid empty pie chart exceptions.
+  - **Channel Badges**: Supported titlebar and header release channel badges for `Insiders` and `Autopush`.
 
 - 📝 **Selection Quote Toolbar Localization**:
   - Accurately captures floating action bars upon highlighting message text, resolving boundaries for isolated command keywords and shortcuts into canonical `引用 Ctrl+L`.
@@ -140,7 +150,7 @@ npm test
 - **Menu, Tray & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,235 exact entries and 313 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,283 exact entries and 320 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 
 ---
 
@@ -193,7 +203,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (3,235 exact entries + 313 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,283 exact entries + 320 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines

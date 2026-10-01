@@ -424,5 +424,17 @@
   "Saves to the .agent/agents/ directory in your current workspace. This script can be version controlled and shared with your team.": "保存至当前工作区的 .agent/agents/ 目录中。此脚本可纳入版本控制并与团队共享。",
   "Select a workspace to save agent scripts to your workspace.": "选择一个工作区以保存智能体脚本。",
   "skills and rules": "技能与规则",
-  "custom agents": "自定义智能体"
+  "custom agents": "自定义智能体",
+  "Build, package, run, and debug UI extensions for Antigravity: interactive web panels that render in the side pane, served by a Node.js sidecar using the built-in Sidecar SDK.": "构建、打包、运行与调试 Antigravity 的 UI 扩展：在侧边栏面板中渲染交互式 Web 面板，由使用内置 Sidecar SDK 的 Node.js sidecar 提供服务。",
+  "Build, package, run, and debug UI extensions for Antigravity: interactive web panels that render in the side pane, served by a Node.js sidecar using the built-in Sidecar SDK": "构建、打包、运行与调试 Antigravity 的 UI 扩展：在侧边栏面板中渲染交互式 Web 面板，由使用内置 Sidecar SDK 的 Node.js sidecar 提供服务",
+  "Discover UI plugin panels relevant to the current task and surface a one-click pill in chat to open (toggle) them in the side pane. Use when a running UI plugin's panel would help with what the user is doing, or right after the user enables a new UI plugin pane and a shortcut to open it is handy.": "发现与当前任务相关的 UI 插件面板，并在对话中呈现一键胶囊按钮以便在侧边栏面板中快速打开（切换）它们。当正在运行的 UI 插件面板有助于用户操作，或者用户刚启用新的 UI 插件面板需要便捷快捷方式时使用。",
+  "Discover UI plugin panels relevant to the current task and surface a one-click pill in chat to open (toggle) them in the side pane. Use when a running UI plugin's panel would help with what the user is doing, or right after the user enables a new UI plugin pane and a shortcut to open it is handy": "发现与当前任务相关的 UI 插件面板，并在对话中呈现一键胶囊按钮以便在侧边栏面板中快速打开（切换）它们。当正在运行的 UI 插件面板有助于用户操作，或者用户刚启用新的 UI 插件面板需要便捷快捷方式时使用",
+  "Building UI Extensions": "构建 UI 扩展",
+  "UI Plugin Navigation": "UI 插件导航",
+  "UI extension": "UI 扩展",
+  "UI plugins": "UI 插件",
+  "UI plugin": "UI 插件",
+  "side pane": "侧边栏面板",
+  "Side pane": "侧边栏面板",
+  "Side Pane": "侧边栏面板"
 }

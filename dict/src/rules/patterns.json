@@ -1270,5 +1270,13 @@
   {
     "regex": "^Exceeded the customization token budget \\(([\\d,]+)\\s*tokens\\) and was excluded from context\\.$",
     "replacement": "已超出自定义扩展 Token 预算（$1 个 Token），已从上下文中排除。"
+  },
+  {
+    "regex": "^Worked\\s+for\\s+(\\d+)\\s*d\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+    "replacement": "已工作 $1 天 $2 小时 $3 分钟"
+  },
+  {
+    "regex": "^Stopped\\s+after\\s+(\\d+)\\s*d\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
+    "replacement": "在 $1 天 $2 小时 $3 分钟后停止"
   }
 ]

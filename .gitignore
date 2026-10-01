@@ -24,6 +24,8 @@ tools/gap-result.txt
 tools/drift-report.json
 tools/upstream_*/
 tools/*_new_strings.json
+tools/*_uncovered*.json
+tools/v2.19_*.json
 
 # OS & IDE
 .DS_Store
