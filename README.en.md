@@ -87,7 +87,7 @@ A high-performance, reversible Chinese localization suite and lifecycle manager 
   - Built-in **ASCII Key Barrier** (guards against Chinese intermediate key fragments), **Capture-Group Invariant Guard** (syntax compilation and `$1..$N` conservation), and **Duplicate Key Conflict Guard**, producing a unified `dist/zh-CN.bundle.json` with seamless backward compatibility.
 - 🎯 **Single-Source Truth & Golden Snapshots**:
   - Core runtime extracts a stateless calculation factory `createI18nEngine` eliminating shadow duplicates across test suites and drift tools.
-  - 209 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
+  - 227 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
 - **High-Performance Low-Overhead Runtime Architecture**: Eliminates uncontrolled `requestIdleCallback` spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal filters and a 100ms throttle valve keep intensive streaming dialogues and virtual scrolling smooth and responsive.
 - **Option Floating Tooltips & Delivery Strategies Coverage**: Fully covers dynamic floating tooltips across Settings (e.g. Queued Messages options: `Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`, `Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`), terminal auto-execution policies, artifact review policies, and Strict Mode descriptions.
 - **Multi-TextNode Coalescing Self-Healing**: Resolves upstream React split-node fragmentations (e.g. `"All ", e, "s run as Flash."` split into sibling TextNodes causing plural suffix leftovers) with atomic full-sentence coalescence while strictly preserving virtual DOM node topology and reference integrity.
@@ -109,8 +109,8 @@ Before installing the patch, make sure your environment meets the following requ
 2. **Node.js Runtime Environment**:
    - **Node.js (>= 18.x)** with `npm` and `npx` (Fully compatible with Node 18/20/22/24+ LTS releases).
    - Run `node -v` and `npx -v` in your terminal to verify. If not installed, download the LTS release from [Node.js Official Website](https://nodejs.org/).
-3. **Google Antigravity Installed**:
-   - Official **Google Antigravity 2.0** desktop client installed.
+3. **Antigravity Ecosystem Components Installed**:
+   - Ensure the official **Google Antigravity 2.0** desktop client or the **VS Code Official Extension** (`google.google-antigravity`) is installed. The installer adheres to elastic probing, automatically identifying installed components and injecting patches accurately while quietly skipping uninstalled environments.
 4. **Automated Process Lock & Guard**:
    - Built-in cross-platform process guard automatically detects and safely releases client file locks during installation and restoration.
 
@@ -121,9 +121,11 @@ Before installing the patch, make sure your environment meets the following requ
 ### Method 1: Scripts (Recommended for Daily Use)
 
 #### Windows
-- **Install Patch**: Double-click [`install.bat`](install.bat) (Runs pre-flight health check, safely releases file locks, and installs UI patch + community agent plugin)
-- **Self-Healing Launch**: Double-click [`launch.bat`](launch.bat) (Auto-detects upstream updates, re-patches, and launches)
-- **Restore English**: Double-click [`uninstall.bat`](uninstall.bat)
+- **Full Ecosystem All-in-One Installation (Recommended)**: Double-click [`install.bat`](install.bat) (Runs pre-flight health check, multi-surface elastic probing, and simultaneously localizes Desktop client, official agent plugin, and VS Code extension)
+- **VS Code Extension Dedicated Installation**: Double-click [`install-vscode.bat`](install-vscode.bat) (Patches VS Code extension UI and injects Webview micro-proxy)
+- **VS Code Extension Dedicated Restoration**: Double-click [`restore-vscode.bat`](restore-vscode.bat) (Restores VS Code extension to official English state losslessly)
+- **Self-Healing Launch**: Double-click [`launch.bat`](launch.bat) (Auto-detects upstream updates, re-patches, and launches client)
+- **Full Ecosystem Restore English**: Double-click [`uninstall.bat`](uninstall.bat) (Safe anti-downgrade factory rollback)
 
 #### macOS / Linux
 - **Install Patch**: Run `./install.sh`
@@ -134,28 +136,33 @@ Before installing the patch, make sure your environment meets the following requ
 ### Method 2: CLI Command Line Manager
 
 ```bash
-# 1. Check current client and localization status
+# 1. Check full ecosystem (Desktop client, community plugin, VS Code extension) status
 node cli.js status
 
 # 2. Run comprehensive pre-flight health checks (Node version, NPX tools, ASAR path, file locks)
 node cli.js check
 
-# 3. One-click install (auto-backup and injection)
+# 3. One-click full ecosystem install (auto multi-surface probing, backup and injection)
 node cli.js install
 
-# 4. Install Antigravity Chinese Agent Community Plugin
+# 4. Standalone install / restore / inspect VS Code extension localization
+node cli.js install:vscode   # Localize VS Code extension only
+node cli.js restore:vscode   # Restore VS Code extension only
+node cli.js status:vscode    # Check VS Code extension status
+
+# 5. Install Antigravity official Chinese agent community plugin
 node cli.js install-plugin
 
-# 5. Self-healing launch (auto-detects upstream updates, re-patches, and launches client)
+# 6. Self-healing launch (auto-detects upstream updates, re-patches, and launches client)
 node cli.js launch
 
-# 6. Background watcher daemon mode (listens for upstream updates and auto-patches)
+# 7. Background watcher daemon mode (listens for upstream updates and auto-patches)
 node cli.js watch
 
-# 7. One-click restore to official English version
+# 8. Full ecosystem one-click restore to official English version
 node cli.js restore
 
-# 8. Specify custom installation path
+# 9. Specify custom installation path
 node cli.js install --path "/path/to/antigravity/resources/app.asar"
 ```
 
@@ -163,7 +170,7 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 
 ## 🧪 Automated Testing & CI Verification
 
-The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **370+ assertions**:
+The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **390+ assertions**:
 
 ```bash
 # Run all automated test suites (aggregating 9 full-fidelity test suites, 390+ assertions)
@@ -172,12 +179,12 @@ npm test
 
 - **Dictionary Lint & Syntax Sanitization (`test/test-lint.js`)**: Validates dictionary JSON structure, formatting compliance, and syntax health.
 - **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 118 assertions covering critical DOM paths, inline DOM reordering self-healing, false-positive prevention, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
-- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 209 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
+- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 227 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
 - **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
 - **Menu, Tray, Native Context Menu & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration, native context menu IPC interception, and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,287 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,300 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 - **VS Code Extension Lifecycle, Webview Proxy & Anti-Corruption Verification (`test/test-vscode-patch.js`)**: 14 assertions covering extension probing, initial injection, command/setting/viewer localization, Webview micro reverse proxy interception, `i18n-bundle.js` asset generation, dual-backup anti-corruption, and full atomic rollback.
 
 ---
@@ -231,7 +238,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (3,283 exact entries + 320 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,300 exact entries + 321 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
@@ -245,7 +252,7 @@ antigravity-chinese/
 ├── test/                             # Automated full-fidelity regression test suites (9 suites, 390+ assertions)
 │   ├── test-lint.js                  # Dictionary lint & syntax health checks
 │   ├── verify.js                     # 118 JSDOM state machine, inline reordering, and runtime performance assertions
-│   ├── test-screenshots.js          # 209 strictEqual golden truth assertions + 20 invariant fuzzing tests
+│   ├── test-screenshots.js          # 227 strictEqual golden truth assertions + 20 invariant fuzzing tests
 │   ├── test-cdp.js                   # Zero-dependency RFC 6455 CDP protocol bidirectional tests
 │   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
 │   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
@@ -260,9 +267,11 @@ antigravity-chinese/
 │   └── gap-analysis.js               # Translation coverage gap & missed item automated analyzer
 ├── docs/assets/sponsoring/           # Sponsorship & community assets
 ├── cli.js                            # Cross-platform lifecycle CLI (detect, backup, extract, inject, pack, restore)
-├── install.bat / install.sh          # One-click installation scripts (installs UI patch + community plugin)
+├── install.bat / install.sh          # Full ecosystem one-click install scripts (auto multi-surface probing & sync)
+├── install-vscode.bat                # VS Code extension dedicated one-click install script
+├── restore-vscode.bat                # VS Code extension dedicated one-click restore script
 ├── launch.bat                        # Self-healing launcher (second-level drift check and launch)
-├── uninstall.bat / uninstall.sh      # One-click restore scripts (safe anti-downgrade rollback)
+├── uninstall.bat / uninstall.sh      # Full ecosystem one-click restore scripts (safe anti-downgrade rollback)
 ├── package.json                      # Project configuration & npm scripts
 ├── LICENSE                           # MIT License
 └── README.md / README.en.md          # Bilingual documentation

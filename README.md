@@ -87,7 +87,7 @@
   - 配备 **ASCII Key 阻断门禁**（物理杜绝中文残片混入 Key）、**捕获组守恒门禁**（语法编译与 `$1..$N` 严格对齐）、**重复 Key 冲突守卫**，编译生成单一发布包 `dist/zh-CN.bundle.json` 并平滑向后兼容。
 - 🎯 **真理单源解耦与黄金语义真断言 (Single-Source Truth & Golden Snapshots)**：
   - 核心运行时抽离无状态计算工厂 `createI18nEngine`，全仓消灭一切测试与工具中的影子副本；
-  - 全量 209 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
+  - 全量 227 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
 - **低开销高响应渲染架构 (High-Performance Runtime Architecture)**：阻断 `requestIdleCallback` 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路；悬浮 Portal 门禁与 100ms 节流阀，确保长对话消息流与高频虚拟滚动下保持平滑流畅。
 - **深层选项悬浮气泡与执行策略全量覆盖 (Option Tooltips & Delivery Strategies)**：全量收录排队消息策略悬浮气泡提示（`Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`、`Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`）以及终端自动执行、产物审查模式、严格模式等深层选项的动态说明。
 - **行内纯文本容器联合自愈 (Multi-TextNode Coalescing Self-Healing)**：针对上游 React 模板碎片化拆分（如 `"All ", e, "s run as Flash."` 拆分为多个兄弟 TextNode 导致英文复数残片），在保持虚拟 DOM 节点引用稳定不报错的前提下，整句提纯联合自愈。
@@ -109,8 +109,8 @@
 2. **Node.js 基础运行环境**：
    - 系统中需安装 **Node.js (>= 18.x)** 及附带的 **npm / npx** 工具（向下兼容 Node 18/20/22/24 等所有 LTS 版本）。
    - 验证方式：在终端运行 `node -v` 和 `npx -v`。若未安装，请前往 [Node.js 官方网站](https://nodejs.org/) 下载安装 LTS 版本。
-3. **已安装 Antigravity 客户端**：
-   - 确保本机已安装官方 **Google Antigravity 2.0** 桌面客户端。
+3. **已安装 Antigravity 生态组件**：
+   - 确保本机已安装官方 **Google Antigravity 2.0** 桌面客户端，或已安装 **VS Code 官方扩展**（`google.google-antigravity`）。安装器遵循弹性探测原则，自动识别已安装组件并精准注入，未安装的环境自动跳过。
 4. **进程占用与文件锁守护**：
    - 安装器内置跨平台进程守护，执行安装时将自动检测并安全释放客户端文件锁。
 
@@ -121,9 +121,11 @@
 ### 方式一：一键脚本（推荐日常使用）
 
 #### Windows
-- **安装汉化**：双击运行 [`install.bat`](install.bat)（自动执行前置健康预检、安全释放文件占用并一键双装客户端 UI 汉化 + 社区智能体插件）
-- **自愈启动**：双击运行 [`launch.bat`](launch.bat)（自动检测版本覆盖并重新注入后启动）
-- **恢复英文**：双击运行 [`uninstall.bat`](uninstall.bat)
+- **全生态全家桶安装（推荐）**：双击运行 [`install.bat`](install.bat)（自动执行全维健康预检、多端弹性探测，一次性同步完成桌面客户端、官方智能体插件与 VS Code 扩展的全量汉化）
+- **VS Code 扩展独立安装**：双击运行 [`install-vscode.bat`](install-vscode.bat)（仅对 VS Code 扩展注入全景汉化与 Webview 微代理）
+- **VS Code 扩展独立还原**：双击运行 [`restore-vscode.bat`](restore-vscode.bat)（一键无损还原 VS Code 官方英文原版）
+- **自愈启动**：双击运行 [`launch.bat`](launch.bat)（自动检测版本覆盖并重新注入后拉起客户端）
+- **全生态恢复英文**：双击运行 [`uninstall.bat`](uninstall.bat)（安全防降级一键出厂复原）
 
 #### macOS / Linux
 - **安装汉化**：在终端运行 `./install.sh`
@@ -134,28 +136,33 @@
 ### 方式二：CLI 命令行管理器
 
 ```bash
-# 1. 查看当前客户端及汉化状态
+# 1. 查看全生态（客户端、社区插件、VS Code 扩展）汉化状态
 node cli.js status
 
 # 2. 执行前置环境全维健康预检 (Node 弹性版本、NPX 工具、客户端路径与进程锁)
 node cli.js check
 
-# 3. 一键安装汉化（自动备份并注入）
+# 3. 一键全生态安装汉化（自动多端探测、备份并注入）
 node cli.js install
 
-# 4. 安装 Antigravity 官方中文智能体插件
+# 4. 独立安装 / 还原 / 查看 VS Code 扩展汉化
+node cli.js install:vscode   # 仅汉化 VS Code 扩展
+node cli.js restore:vscode   # 仅还原 VS Code 扩展
+node cli.js status:vscode    # 查看 VS Code 扩展状态
+
+# 5. 安装 Antigravity 官方中文智能体插件
 node cli.js install-plugin
 
-# 5. 自愈启动（自动检测版本覆盖并重新注入后拉起客户端）
+# 6. 自愈启动（自动检测版本覆盖并重新注入后拉起客户端）
 node cli.js launch
 
-# 6. 后台守护模式（监听官方更新并自动完成重新汉化）
+# 7. 后台守护模式（监听官方更新并自动完成重新汉化）
 node cli.js watch
 
-# 7. 一键还原回官方英文原版
+# 8. 全生态一键还原回官方英文原版
 node cli.js restore
 
-# 8. 指定自定义客户端路径安装
+# 9. 指定自定义客户端路径安装
 node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 ```
 
@@ -172,12 +179,12 @@ npm test
 
 - **词库格式与语法排毒 (`test/test-lint.js`)**：检测词库 JSON 格式合规性与基础语法健康度。
 - **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 118 项断言，验证关键 DOM 路径翻译准确性、跨内联元素语序重排自愈、半英半中假阳性阻断、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
-- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 209 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
+- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 227 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
 - **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
 - **菜单、托盘、原生上下文右键与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入、原生上下文右键菜单 IPC 拦截与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,287 条词条与 321 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,300 条词条与 321 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 - **VS Code 扩展生命周期、Webview 代理与防污染测试 (`test/test-vscode-patch.js`)**：14 项断言覆盖扩展探测、首次注入、命令/配置/查看器全量汉化、Webview 本地微反向代理拦截注入、`i18n-bundle.js` 资产生成、二次安装双备份绝对防污染、以及原子还原全回归。
 
 ---
@@ -231,7 +238,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (3,283 精确词条 + 320 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (3,300 精确词条 + 321 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动
@@ -245,7 +252,7 @@ antigravity-chinese/
 ├── test/                             # 自动化全真回归测试套件 (9 大套件 390+ 断言)
 │   ├── test-lint.js                  # 词库格式与语法排毒校验
 │   ├── verify.js                     # 118 项 JSDOM 状态机、内联语序重排与运行时性能断言
-│   ├── test-screenshots.js          # 209 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
+│   ├── test-screenshots.js          # 227 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
 │   ├── test-cdp.js                   # 零依赖 RFC 6455 CDP 协议层双向通信测试
 │   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
 │   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言
@@ -260,9 +267,11 @@ antigravity-chinese/
 │   └── gap-analysis.js               # 覆盖率差量与漏项自动化分析器
 ├── docs/assets/sponsoring/           # 赞助与社区资产
 ├── cli.js                            # 跨平台生命周期管理 CLI (探测、备份、解包、注入、打包、防降级还原)
-├── install.bat / install.sh          # 一键安装脚本 (默认双装 UI 补丁 + 官方插件)
+├── install.bat / install.sh          # 全生态一键安装脚本 (多端探测、同步汉化客户端 + 插件 + VS Code 扩展)
+├── install-vscode.bat                # VS Code 扩展专属一键安装脚本
+├── restore-vscode.bat                # VS Code 扩展专属一键还原脚本
 ├── launch.bat                        # 自愈启动脚本 (秒级自愈检测并拉起客户端)
-├── uninstall.bat / uninstall.sh      # 一键还原脚本 (安全防降级出厂复原)
+├── uninstall.bat / uninstall.sh      # 全生态一键还原脚本 (安全防降级出厂复原)
 ├── package.json                      # 项目配置与 npm scripts
 ├── LICENSE                           # MIT 开源许可证
 └── README.md / README.en.md          # 中英双语说明文档
