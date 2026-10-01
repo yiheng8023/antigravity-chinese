@@ -242,7 +242,7 @@ antigravity-chinese/
 │       ├── rules/                    # Agent Chinese interaction rules (chinese-interaction-rules.md)
 │       ├── skills/                   # Localization diagnostic skills (i18n-diagnostics)
 │       └── plugin.json               # Antigravity plugin manifest specification
-├── test/                             # Automated full-fidelity regression test suites (8 suites, 370+ assertions)
+├── test/                             # Automated full-fidelity regression test suites (9 suites, 390+ assertions)
 │   ├── test-lint.js                  # Dictionary lint & syntax health checks
 │   ├── verify.js                     # 118 JSDOM state machine, inline reordering, and runtime performance assertions
 │   ├── test-screenshots.js          # 209 strictEqual golden truth assertions + 20 invariant fuzzing tests
@@ -250,8 +250,10 @@ antigravity-chinese/
 │   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
 │   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
 │   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
-│   └── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
+│   ├── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
+│   └── test-vscode-patch.js          # 14 VS Code extension patching, Webview proxy & atomic rollback assertions
 ├── tools/                            # Compiler, reverse engineering, diff analysis & drift detection toolchain
+│   ├── ultimate-consistency-audit.js # Ultimate global consistency & quality deep audit analyzer (npm run audit)
 │   ├── build-dict.js                 # Three-tier dictionary compiler (ASCII key gate & capture group conservation)
 │   ├── drift-detector.js             # Upstream 800-char paragraph, YAML skill & false-positive drift detector (npm run scan:drift)
 │   ├── build-full-dict.js            # Full dictionary automated builder and deduplication tool

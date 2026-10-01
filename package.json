@@ -11,7 +11,8 @@
   },
   "scripts": {
     "build:dict": "node tools/build-dict.js",
-    "test": "node test/test-lint.js && node test/verify.js && node test/test-screenshots.js && node test/test-cdp.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js && node test/test-vscode-patch.js",
+    "audit": "node tools/ultimate-consistency-audit.js",
+    "test": "node test/test-lint.js && node test/verify.js && node test/test-screenshots.js && node test/test-cdp.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js && node test/test-vscode-patch.js && node tools/ultimate-consistency-audit.js",
     "test:verify": "node test/verify.js",
     "test:screenshots": "node test/test-screenshots.js",
     "test:cdp": "node test/test-cdp.js",

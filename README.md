@@ -242,7 +242,7 @@ antigravity-chinese/
 │       ├── rules/                    # 智能体中文交互规则 (chinese-interaction-rules.md)
 │       ├── skills/                   # 本地化诊断技能 (i18n-diagnostics)
 │       └── plugin.json               # 插件规范清单配置文件
-├── test/                             # 自动化全真回归测试套件 (8 大套件 370+ 断言)
+├── test/                             # 自动化全真回归测试套件 (9 大套件 390+ 断言)
 │   ├── test-lint.js                  # 词库格式与语法排毒校验
 │   ├── verify.js                     # 118 项 JSDOM 状态机、内联语序重排与运行时性能断言
 │   ├── test-screenshots.js          # 209 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
@@ -250,8 +250,10 @@ antigravity-chinese/
 │   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
 │   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言
 │   ├── test-detector-live.js         # 真实宿主系统 0 参数无参安装路径探测断言
-│   └── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
+│   ├── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
+│   └── test-vscode-patch.js          # 14 项 VS Code 扩展补丁、Webview 代理与原子回滚断言
 ├── tools/                            # 自动化编译、逆向与漂移检测工具链
+│   ├── ultimate-consistency-audit.js # 全生态终极全局一致性与质量深度体检分析器 (npm run audit)
 │   ├── build-dict.js                 # 三层词典构建编译器 (ASCII Key 阻断、捕获组守恒门禁)
 │   ├── drift-detector.js             # 上游 800 字符长段落 + YAML 技能与假阳性拦截检测器 (npm run scan:drift)
 │   ├── build-full-dict.js            # 全量词典自动化去重与辅助工具
