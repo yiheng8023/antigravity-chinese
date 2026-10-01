@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.12**，全面深度适配 Antigravity **v2.19.1** 升级）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.13**，全面深度适配 Antigravity **v2.19.1** 升级）。
 
 ---
 
@@ -24,7 +24,7 @@
 | 生态终端形态 (Surfaces) | 定位与核心职责 | 中文化实现机制 | 当前支持状态 |
 | :--- | :--- | :--- | :---: |
 | 🖥️ **桌面客户端 (Desktop App 2.0)** | 独立 Electron 客户端，包含全局看板、白板与 Aux Pane | ASAR 深度注入 / CDP 免解包热挂载 + IPC 上下文菜单拦截 | 🟢 **100% 满血就绪** |
-| 🧩 **IDE 扩展 (VS Code Extension)** | 嵌入宿主 IDE 的智能补全、命令与侧边栏聊天 | `package.json` 命令与设置映射 / Webview 语义同源对齐 | 🟢 **已收录/解耦支持** |
+| 🧩 **IDE 扩展 (VS Code Extension)** | 嵌入宿主 IDE 的智能补全、命令与侧边栏聊天 | `package.json` 命令与设置映射 / 纯净备份与原子还原 | 🟢 **100% 满血就绪** |
 | 💻 **第一方独立 IDE (Antigravity IDE)** | 基于 Code-OSS 深度定制的独立 AI-first IDE | 官方中文语言包适配 + 内置组件同源对齐 | 🟡 **架构对齐/弹性探测** |
 | ⚡ **终端命令行 (Antigravity CLI `agy`)** | 极客终端交互与自动化批处理 | 遵循“输入英文，输出中文”准则，帮助手册与向导本地化 | 🟢 **规范确立/持续演进** |
 | 🔌 **智能体插件与技能生态 (Plugins & Skills)** | 官方 10 大目录插件与 131 项 `SKILL.md` 描述 | 双源 YAML 与 JSDoc 出版级中文化 | 🟢 **100% 满血就绪** |
@@ -35,6 +35,11 @@
 ---
 
 ## 🌟 核心特性与设计哲学
+
+- 🧩 **VS Code 官方扩展全景汉化与独立生命周期管理 (VS Code Extension Localization & Lifecycle)**：
+  - **解耦式自适应路径探测**：自动智能探测本机 `~/.vscode/extensions/google.google-antigravity-*` 安装路径，未安装时优雅静默跳过；
+  - **命令、配置与自定义编辑器 100% 出版级汉化**：全面汉化全部 10 项命令（`Add Selection to Chat` ➔ `将选中文本添加到对话`、`Accept All Changes` ➔ `接受所有更改`、`Open Antigravity Settings` ➔ `打开 Antigravity 设置` 等）、全部 9 项核心配置描述（后台服务器端口、内联差异 CodeLens、遥测、后台编辑自动接受等）及产物文档/设置查看器；
+  - **双向原子还原与防污染备份保证**：自动生成 `package.json.bak` 纯净备份，配备专属脚本 [`install-vscode.bat`](install-vscode.bat) / `npm run install:vscode` 与 [`restore-vscode.bat`](restore-vscode.bat) / `npm run restore:vscode`，重复安装绝不污染官方备份，一秒无损回滚。
 
 - 🖱️ **原生右键上下文与级联二级子菜单全景拦截 (Native Context Menu & Cascading Submenu Interception)**：
   - **操作系统级右键与级联子菜单 IPC 动态拦截**：针对左侧会话历史列表（`Rename`、`Mark Unread`、`Copy`、`Split`、`Archive`、`Delete`）与文本输入框上下文菜单（`Cut`、`Copy`、`Paste`、`Select All`）由 Electron 主进程原生创建（`Menu.buildFromTemplate`）且 DOM `MutationObserver` 无法触达的底层机制，在主进程 IPC 调度层（`ipcHandlers.js`）精准注入字典映射拦截器，原生右键一级菜单 100% 出版级汉化；
@@ -160,7 +165,7 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 本项目引入极其严苛的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（聚合 8 大全真测试套件，共 370+ 项真理断言）
+# 运行全套自动化测试（聚合 9 大全真测试套件，共 380+ 项真理断言）
 npm test
 ```
 
@@ -172,6 +177,7 @@ npm test
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
 - **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,287 条词条与 321 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **VS Code 扩展生命周期与防污染测试 (`test/test-vscode-patch.js`)**：8 项断言覆盖扩展探测、首次注入、命令/配置/查看器全量汉化、二次安装幂等、官方纯净备份绝对防污染、以及原子还原回归。
 
 ---
 

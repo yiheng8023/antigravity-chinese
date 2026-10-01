@@ -14,6 +14,12 @@ const { execSync } = require('child_process');
 const PROJECT_ROOT = __dirname;
 const DICT_PATH = path.join(PROJECT_ROOT, 'dict', 'zh-CN.json');
 const RUNTIME_PATH = path.join(PROJECT_ROOT, 'core', 'i18n-runtime.js');
+const {
+  findVsCodeExtensionDir,
+  isVsCodeExtensionPatched,
+  installVsCodePatch,
+  restoreVsCodePatch
+} = require('./core/vscode-patch');
 
 // Platform paths
 function getCandidateAsarPaths(platform = os.platform(), homedir = os.homedir()) {
@@ -1164,6 +1170,44 @@ if (require.main === module) {
     case 'uninstall':
       restore(customPath);
       break;
+    case 'install:vscode':
+    case 'install-vscode':
+    case 'vscode:install': {
+      console.log('📦 正在为 VS Code 扩展 (Google Antigravity) 注入中文本地化...');
+      const res = installVsCodePatch(customPath);
+      if (res.success) {
+        console.log(`✅ ${res.message}`);
+      } else {
+        console.error(`❌ ${res.message}`);
+        process.exit(1);
+      }
+      break;
+    }
+    case 'restore:vscode':
+    case 'restore-vscode':
+    case 'vscode:restore': {
+      console.log('🔄 正在还原 VS Code 扩展 (Google Antigravity) 至官方英文原版...');
+      const res = restoreVsCodePatch(customPath);
+      if (res.success) {
+        console.log(`✅ ${res.message}`);
+      } else {
+        console.error(`❌ ${res.message}`);
+        process.exit(1);
+      }
+      break;
+    }
+    case 'status:vscode':
+    case 'vscode:status': {
+      const extDir = findVsCodeExtensionDir(customPath);
+      if (!extDir) {
+        console.log('ℹ️ 未检测到 VS Code 的 Google Antigravity 扩展目录。');
+      } else {
+        const patched = isVsCodeExtensionPatched(extDir);
+        console.log(`📁 扩展路径: ${extDir}`);
+        console.log(`🌐 汉化状态: ${patched ? '✅ 已汉化 (Patched)' : '⚪ 原生未汉化 (Unpatched)'}`);
+      }
+      break;
+    }
     case 'check':
     case 'preflight':
       console.log('=== 执行前置环境全维健康预检 (Pre-flight Health Check) ===\n');
@@ -1191,21 +1235,24 @@ if (require.main === module) {
     case 'help':
     default:
       console.log(`
-Antigravity 客户端中文汉化管理器 (Antigravity Chinese Toolkit)
+Antigravity 全生态中文本地化套件 (Antigravity Chinese Universal Suite)
 
 用法:
   node cli.js install              # 一键安装客户端 UI 汉化（自动执行前置预检并注入）
-  node cli.js check                # 前置环境全维健康预检 (Node 弹性版本、NPX、客户端路径与进程)
-  node cli.js install-plugin       # 一键安装 Antigravity 官方中文智能体插件
-  node cli.js uninstall-plugin     # 卸载官方中文智能体插件
   node cli.js restore              # 一键还原客户端（恢复官方英文原版）
   node cli.js status               # 检测当前客户端与汉化状态
+  node cli.js install:vscode       # 一键安装 VS Code 扩展 (Google Antigravity) 中文汉化
+  node cli.js restore:vscode       # 一键还原 VS Code 扩展（恢复官方英文原版）
+  node cli.js status:vscode        # 检测当前 VS Code 扩展汉化状态
+  node cli.js install-plugin       # 一键安装 Antigravity 官方中文智能体插件
+  node cli.js uninstall-plugin     # 卸载官方中文智能体插件
+  node cli.js check                # 前置环境全维健康预检 (Node 弹性版本、NPX、客户端路径与进程)
   node cli.js launch               # 自愈启动（自动检测版本覆盖并重打补丁后启动）
   node cli.js watch                # 守护模式（后台监听官方更新，发现覆盖自动重新汉化）
-  node cli.js --path <dir>         # 指定自定义客户端路径
+  node cli.js --path <dir>         # 指定自定义客户端或扩展路径
 
 选项:
-  --path <path>    指定 Antigravity 的安装目录或 app.asar 路径
+  --path <path>    指定 Antigravity 的安装目录、app.asar 或 VS Code 扩展路径
   --with-plugin    在执行 install 时同步安装官方插件
 `);
       break;
@@ -1226,5 +1273,9 @@ module.exports = {
   patchIpcHandlersFile,
   confirmCloseClient,
   closeAntigravitySafely,
-  isProtectedEnvironment
+  isProtectedEnvironment,
+  findVsCodeExtensionDir,
+  isVsCodeExtensionPatched,
+  installVsCodePatch,
+  restoreVsCodePatch
 };

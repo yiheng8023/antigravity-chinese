@@ -1,6 +1,6 @@
 {
   "name": "antigravity-chinese",
-  "version": "3.3.12",
+  "version": "3.3.13",
   "description": "Google Antigravity 全生态轻量级中文本地化套件 (Universal Localization Suite for Google Antigravity Ecosystem: Desktop App, IDE & Extensions, CLI)",
   "main": "cli.js",
   "engines": {
@@ -11,7 +11,7 @@
   },
   "scripts": {
     "build:dict": "node tools/build-dict.js",
-    "test": "node test/test-lint.js && node test/verify.js && node test/test-screenshots.js && node test/test-cdp.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js",
+    "test": "node test/test-lint.js && node test/verify.js && node test/test-screenshots.js && node test/test-cdp.js && node test/test-menu-and-titles.js && node test/test-asar-lifecycle.js && node test/test-detector-live.js && node test/test-proofread-integrity.js && node test/test-vscode-patch.js",
     "test:verify": "node test/verify.js",
     "test:screenshots": "node test/test-screenshots.js",
     "test:cdp": "node test/test-cdp.js",
@@ -19,13 +19,17 @@
     "test:asar": "node test/test-asar-lifecycle.js",
     "test:detector": "node test/test-detector-live.js",
     "test:proofread": "node test/test-proofread-integrity.js",
+    "test:vscode": "node test/test-vscode-patch.js",
     "scan:drift": "node tools/drift-detector.js",
     "status": "node cli.js status",
+    "status:vscode": "node cli.js status:vscode",
     "install-patch": "node cli.js install",
+    "install:vscode": "node cli.js install:vscode",
     "install:plugin": "node cli.js install-plugin",
     "uninstall:plugin": "node cli.js uninstall-plugin",
     "launch": "node cli.js launch",
-    "restore": "node cli.js restore"
+    "restore": "node cli.js restore",
+    "restore:vscode": "node cli.js restore:vscode"
   },
   "keywords": [
     "chinese",
