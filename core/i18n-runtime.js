@@ -579,16 +579,23 @@
 
     if (el.matches) {
       try {
-        return el.matches('[role="tooltip"], [data-floating-ui-portal], .popover, .tooltip, .context-view, .monaco-hover');
+        if (el.matches('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-radix-popper-content-wrapper], [data-side], [data-align], .popover, .tooltip, .context-view, .monaco-hover, .animate-slideIn, [class*="z-["]')) {
+          return true;
+        }
       } catch (e) {}
     }
     var role = el.getAttribute ? el.getAttribute('role') : '';
-    if (role === 'tooltip') return true;
-    if (el.hasAttribute && el.hasAttribute('data-floating-ui-portal')) return true;
+    if (role === 'tooltip' || role === 'menu' || role === 'dialog') return true;
+    if (el.hasAttribute && (el.hasAttribute('data-floating-ui-portal') || el.hasAttribute('data-side') || el.hasAttribute('data-align'))) return true;
     if (cls) {
-      if (cls.indexOf('popover') !== -1 || cls.indexOf('tooltip') !== -1 || cls.indexOf('context-view') !== -1 || cls.indexOf('monaco-hover') !== -1) {
+      if (cls.indexOf('popover') !== -1 || cls.indexOf('tooltip') !== -1 || cls.indexOf('context-view') !== -1 || cls.indexOf('monaco-hover') !== -1 || cls.indexOf('animate-slideIn') !== -1 || cls.indexOf('z-[') !== -1) {
         return true;
       }
+    }
+    if (doc && el.parentElement === doc.body) {
+      var style = el.style || {};
+      if (style.position === 'fixed' || style.position === 'absolute') return true;
+      if (cls && (cls.indexOf('fixed') !== -1 || cls.indexOf('absolute') !== -1)) return true;
     }
     return false;
   }
@@ -627,7 +634,7 @@
           if (last && last.previousElementSibling && isFloatingElement(last.previousElementSibling)) {
             translateElement(last.previousElementSibling);
           }
-          var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [data-floating-ui-portal], .popover, .tooltip, .context-view, .monaco-hover') : null;
+          var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-side], [data-align], .popover, .tooltip, .context-view, .monaco-hover, .animate-slideIn, [class*="z-["]') : null;
           if (tooltips && tooltips.length > 0) {
             for (var tIdx = 0; tIdx < tooltips.length; tIdx++) {
               translateElement(tooltips[tIdx]);
@@ -671,6 +678,8 @@
 
       doc.addEventListener('pointerenter', onHoverAction, { capture: true, passive: true });
       doc.addEventListener('mouseover', onHoverAction, { capture: true, passive: true });
+      doc.addEventListener('pointerdown', onHoverAction, { capture: true, passive: true });
+      doc.addEventListener('contextmenu', onHoverAction, { capture: true, passive: true });
     } catch (e) {}
   }
 

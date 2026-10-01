@@ -1278,5 +1278,9 @@
   {
     "regex": "^Stopped\\s+after\\s+(\\d+)\\s*d\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m$",
     "replacement": "在 $1 天 $2 小时 $3 分钟后停止"
+  },
+  {
+    "regex": "^Send\\s+feedback\\s+as\\s+(.+)$",
+    "replacement": "以 $1 身份发送反馈"
   }
 ]

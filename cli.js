@@ -262,6 +262,38 @@ function patchIpcHandlersFile(ipcFilePath) {
   for (const r of replacements) {
     content = content.split(r.from).join(r.to);
   }
+
+  // 深度注入：原生右键上下文菜单（Native Context Menu）多语言拦截守卫
+  const contextMenuHeader = 'function buildContextMenuTemplate(items, onSelect) {';
+  if (content.includes(contextMenuHeader) && !content.includes('__AGY_CONTEXT_MENU_MAP__')) {
+    const injection = `
+const __AGY_CONTEXT_MENU_MAP__ = {
+  'Cut': '剪切',
+  'Copy': '复制',
+  'Paste': '粘贴',
+  'Select All': '全选',
+  'Rename': '重命名',
+  'Mark Unread': '标记为未读',
+  'Mark Read': '标记为已读',
+  'Split': '拆分',
+  'Fork': '分支',
+  'Archive': '归档',
+  'Delete': '删除',
+  'View Debug': '查看调试信息',
+  'Share': '分享',
+  'Copy Path': '复制路径',
+  'Undo': '撤销',
+  'Redo': '重做'
+};
+function __agyTranslateContextLabel__(lbl) {
+  if (!lbl || typeof lbl !== 'string') return lbl;
+  return __AGY_CONTEXT_MENU_MAP__[lbl] || lbl;
+}
+`;
+    content = injection + content;
+    content = content.split("label: item.label ?? ''").join("label: __agyTranslateContextLabel__(item.label ?? '')");
+  }
+
   fs.writeFileSync(ipcFilePath, content, 'utf-8');
 }
 

@@ -2077,5 +2077,7 @@
   "Search file contents": "搜索文件内容",
   "Search tabs, files, plugins, subagents, artifacts, tasks...": "搜索标签页、文件、插件、子智能体、产物文档、任务...",
   "Search is still indexing your conversations, so results may be incomplete.": "搜索服务仍在为您的对话建立索引，结果可能不完整。",
-  "Search is still indexing your conversations, so results may be incomplete": "搜索服务仍在为您的对话建立索引，结果可能不完整"
+  "Search is still indexing your conversations, so results may be incomplete": "搜索服务仍在为您的对话建立索引，结果可能不完整",
+  "Keyboard shortcuts for quick navigation and control.": "用于快速导航与控制的键盘快捷键。",
+  "Keyboard shortcuts for quick navigation and control": "用于快速导航与控制的键盘快捷键"
 }

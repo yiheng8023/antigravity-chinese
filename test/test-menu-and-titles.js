@@ -158,6 +158,18 @@ const mockIpcContent = `
 dialog.showMessageBox({
     message: 'Folder is on the Windows filesystem',
 });
+function buildContextMenuTemplate(items, onSelect) {
+    return items.map((item) => {
+        if (item.type === 'submenu') {
+            return {
+                label: item.label ?? '',
+            };
+        }
+        return {
+            label: item.label ?? '',
+        };
+    });
+}
 `;
 
 const mockWslContent = `
@@ -205,6 +217,7 @@ const trayTests = [
   { name: 'tray.js 动态数量更新逻辑已汉化', pass: patchedTray.includes("${count} 个正在运行的智能体") && patchedTray.includes("'无正在运行的智能体'") },
   { name: 'menu.js WSL 连接与返回本地菜单项已汉化', pass: patchedMenu.includes("label: '连接到 WSL'") && patchedMenu.includes("label: '在本地重新打开'") },
   { name: 'ipcHandlers.js WSL 文件系统弹窗已汉化', pass: patchedIpc.includes("message: '文件夹位于 Windows 文件系统上'") },
+  { name: 'ipcHandlers.js 原生右键上下文菜单拦截与词典映射已注入', pass: patchedIpc.includes('__AGY_CONTEXT_MENU_MAP__') && patchedIpc.includes("label: __agyTranslateContextLabel__(item.label ?? '')") },
   { name: 'wsl.js 性能警告与错误提示已汉化', pass: patchedWsl.includes("此文件夹位于 Windows 文件系统上") && patchedWsl.includes("此位置无法在 WSL 中打开：") }
 ];
 

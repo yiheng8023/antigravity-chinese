@@ -15,11 +15,16 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.10** (fully adapted for Antigravity **v2.19.1**).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.11** (fully adapted for Antigravity **v2.19.1**).
 
 ---
 
 ## 🌟 Key Features & Engineering Design
+
+- 🖱️ **Native Context Menu & Tooltip Topology Interception (Native Context Menu & Tooltip Coverage)**:
+  - **OS-Level Native Context Menu IPC Interception**: Left-hand conversation history items (`Rename`, `Mark Unread`, `Copy`, `Split`, `Archive`, `Delete`) and input context menus (`Cut`, `Copy`, `Paste`, `Select All`) are natively spawned by the Electron main process via `Menu.buildFromTemplate` and unreachable by renderer DOM `MutationObserver`. We inject dictionary mapping interceptors directly into the main-process IPC dispatcher (`ipcHandlers.js`) for 100% native context menu localization.
+  - **Radix / Popper Floating Tooltip Topological Adaptation**: Re-architected floating element fast-path gates in `core/i18n-runtime.js` to deeply support high-z-index containers (`.animate-slideIn`, `[data-side]`, `[data-align]`, and `z-[7000]`), triggering instantaneous translation on `pointerdown` and `contextmenu` to eliminate lingering English tooltips (`Copy` ➔ `复制`).
+  - **Shortcut Subtitles & Dynamic Sentences**: Complete localization for keyboard shortcuts sub-headers (`Keyboard shortcuts for quick navigation and control.`) and dynamic user email feedback sentences (`Send feedback as ...`).
 
 - 🚀 **Antigravity v2.19.1 Full Adaptation & New Features Localization**:
   - **Built-in Skill Extensions**: Publication-grade localization for 2.19.1 new built-in skills: `ui-extension` (Build, package, run, and debug UI extensions for interactive side-pane web panels) and `ui-plugin-navigation` (Discover UI plugin panels and surface one-click pill buttons).
@@ -147,10 +152,10 @@ npm test
 - **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 118 assertions covering critical DOM paths, inline DOM reordering self-healing, false-positive prevention, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
 - **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 209 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
 - **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
-- **Menu, Tray & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
+- **Menu, Tray, Native Context Menu & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration, native context menu IPC interception, and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,283 exact entries and 320 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,285 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 
 ---
 
