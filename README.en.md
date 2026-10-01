@@ -15,14 +15,15 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.11** (fully adapted for Antigravity **v2.19.1**).
+A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.12** (fully adapted for Antigravity **v2.19.1**).
 
 ---
 
 ## 🌟 Key Features & Engineering Design
 
-- 🖱️ **Native Context Menu & Tooltip Topology Interception (Native Context Menu & Tooltip Coverage)**:
+- 🖱️ **Native Context Menu & Cascading Submenu Interception (Native Context Menu & Cascading Submenu Interception)**:
   - **OS-Level Native Context Menu IPC Interception**: Left-hand conversation history items (`Rename`, `Mark Unread`, `Copy`, `Split`, `Archive`, `Delete`) and input context menus (`Cut`, `Copy`, `Paste`, `Select All`) are natively spawned by the Electron main process via `Menu.buildFromTemplate` and unreachable by renderer DOM `MutationObserver`. We inject dictionary mapping interceptors directly into the main-process IPC dispatcher (`ipcHandlers.js`) for 100% native context menu localization.
+  - **Multi-Level Cascading Submenu Coverage & Dynamic Dictionary Fusion**: Full topological coverage for `Copy` submenus (`Conversation Name` ➔ `会话名称`, `Conversation ID` ➔ `会话 ID`, `Project Name` ➔ `项目名称`, `Copy Relative Path` ➔ `复制相对路径`, etc.) and `Split` submenus (`Split Right` ➔ `向右拆分`, `Split Down` ➔ `向下拆分`, `Replace With New` ➔ `替换为新会话`), dynamically fusing all high-frequency dictionary tags under 40 characters to eliminate every native menu blindspot.
   - **Radix / Popper Floating Tooltip Topological Adaptation**: Re-architected floating element fast-path gates in `core/i18n-runtime.js` to deeply support high-z-index containers (`.animate-slideIn`, `[data-side]`, `[data-align]`, and `z-[7000]`), triggering instantaneous translation on `pointerdown` and `contextmenu` to eliminate lingering English tooltips (`Copy` ➔ `复制`).
   - **Shortcut Subtitles & Dynamic Sentences**: Complete localization for keyboard shortcuts sub-headers (`Keyboard shortcuts for quick navigation and control.`) and dynamic user email feedback sentences (`Send feedback as ...`).
 
@@ -155,7 +156,7 @@ npm test
 - **Menu, Tray, Native Context Menu & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration, native context menu IPC interception, and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,285 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,287 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 
 ---
 

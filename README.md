@@ -15,14 +15,15 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.11**，全面深度适配 Antigravity **v2.19.1** 升级）。
+专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.12**，全面深度适配 Antigravity **v2.19.1** 升级）。
 
 ---
 
 ## 🌟 核心特性与设计哲学
 
-- 🖱️ **原生右键上下文菜单与 Tooltip 浮层全景拦截 (Native Context Menu & Tooltip Coverage)**：
-  - **操作系统级右键菜单 IPC 动态拦截**：针对左侧会话历史列表（`Rename`、`Mark Unread`、`Copy`、`Split`、`Archive`、`Delete`）与文本输入框上下文菜单（`Cut`、`Copy`、`Paste`、`Select All`）由 Electron 主进程原生创建（`Menu.buildFromTemplate`）且 DOM `MutationObserver` 无法触达的底层机制，在主进程 IPC 调度层（`ipcHandlers.js`）精准注入字典映射拦截器，实现原生右键菜单 100% 出版级汉化；
+- 🖱️ **原生右键上下文与级联二级子菜单全景拦截 (Native Context Menu & Cascading Submenu Interception)**：
+  - **操作系统级右键与级联子菜单 IPC 动态拦截**：针对左侧会话历史列表（`Rename`、`Mark Unread`、`Copy`、`Split`、`Archive`、`Delete`）与文本输入框上下文菜单（`Cut`、`Copy`、`Paste`、`Select All`）由 Electron 主进程原生创建（`Menu.buildFromTemplate`）且 DOM `MutationObserver` 无法触达的底层机制，在主进程 IPC 调度层（`ipcHandlers.js`）精准注入字典映射拦截器，原生右键一级菜单 100% 出版级汉化；
+  - **多层级级联子菜单（Submenu）深度拓扑覆盖与全词库短语动态融合**：深度覆盖 `Copy` 二级子菜单（`Conversation Name` ➔ `会话名称`、`Conversation ID` ➔ `会话 ID`、`Project Name` ➔ `项目名称`、`Copy Relative Path` ➔ `复制相对路径`、`Copy Markdown` ➔ `复制 Markdown` 等）及 `Split` 二级子菜单（`Split Right` ➔ `向右拆分`、`Split Down` ➔ `向下拆分`、`Replace With New` ➔ `替换为新会话` 等），并在主进程初始化时自动动态融合全部 `<= 40` 字符的高频 UI 标签字典，彻底消除原生级联菜单任何漏项死角；
   - **Radix / Popper 悬浮气泡拓扑自适应**：重构 `core/i18n-runtime.js` 悬浮元素快速扫描门禁，深度兼容 `bA` / `cA` 高层级定位容器（`.animate-slideIn`、`[data-side]`、`[data-align]` 及 `z-[7000]`），并在 `pointerdown` / `contextmenu` 阶段瞬时触发捕获，彻底攻克代码与路径复制浮层气泡（`Copy` ➔ `复制`）遗留盲区；
   - **快捷键说明与动态长句覆盖**：收录快捷键面板副标题（`Keyboard shortcuts for quick navigation and control.`）及带动态邮箱的用户反馈长句（`Send feedback as ...`）。
 
@@ -155,7 +156,7 @@ npm test
 - **菜单、托盘、原生上下文右键与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入、原生上下文右键菜单 IPC 拦截与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,285 条词条与 321 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,287 条词条与 321 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 
 ---
 

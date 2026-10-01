@@ -265,31 +265,94 @@ function patchIpcHandlersFile(ipcFilePath) {
 
   // 深度注入：原生右键上下文菜单（Native Context Menu）多语言拦截守卫
   const contextMenuHeader = 'function buildContextMenuTemplate(items, onSelect) {';
-  if (content.includes(contextMenuHeader) && !content.includes('__AGY_CONTEXT_MENU_MAP__')) {
+  if (content.includes(contextMenuHeader)) {
+    // 动态聚合词典中所有的短 UI 标签，实现原生右键菜单全量覆盖
+    const baseMenuMap = {
+      // 基础编辑与文本操作
+      'Cut': '剪切',
+      'Copy': '复制',
+      'Paste': '粘贴',
+      'Select All': '全选',
+      'Undo': '撤销',
+      'Redo': '重做',
+
+      // 会话与项目上下文
+      'Rename': '重命名',
+      'Mark Unread': '标记为未读',
+      'Mark Read': '标记为已读',
+      'Split': '拆分',
+      'Fork': '分支',
+      'Archive': '归档',
+      'Delete': '删除',
+      'View Debug': '查看调试信息',
+      'Share': '分享',
+      'Pin': '置顶',
+      'Unpin': '取消置顶',
+      'Duplicate': '创建副本',
+
+      // 复制二级子菜单 (Copy Submenu)
+      'Conversation Name': '会话名称',
+      'Conversation ID': '会话 ID',
+      'Project Name': '项目名称',
+      'Project ID': '项目 ID',
+      'File Path': '文件路径',
+      'Relative Path': '相对路径',
+      'Branch Name': '分支名称',
+      'Commit Hash': '提交哈希',
+      'Copy Path': '复制路径',
+      'Copy Relative Path': '复制相对路径',
+      'Copy Link': '复制链接',
+      'Copy Markdown': '复制 Markdown',
+      'Copy Content': '复制内容',
+
+      // 拆分二级子菜单 (Split Submenu)
+      'Split Right': '向右拆分',
+      'Split Down': '向下拆分',
+      'Split Up': '向上拆分',
+      'Split Left': '向左拆分',
+      'Replace With New': '替换为新会话',
+
+      // 标签页与窗口管理
+      'Close': '关闭',
+      'Close Others': '关闭其他',
+      'Close to the Right': '关闭右侧',
+      'Close Saved': '关闭已保存',
+      'Close All': '全部关闭',
+      'Open in New Window': '在新窗口中打开',
+      'Open in Browser': '在浏览器中打开',
+      'Show in Explorer': '在文件资源管理器中显示',
+      'Reveal in File Explorer': '在文件资源管理器中显示'
+    };
+
+    // 尝试融合编译好的 zh-CN 字典短词条
+    const mergedMap = {};
+    const bundleJsonPath = path.join(__dirname, 'dict', 'zh-CN.json');
+    if (fs.existsSync(bundleJsonPath)) {
+      try {
+        const d = JSON.parse(fs.readFileSync(bundleJsonPath, 'utf-8'));
+        if (d && d.exact) {
+          for (const [k, v] of Object.entries(d.exact)) {
+            if (k.length > 0 && k.length <= 40 && typeof v === 'string') {
+              mergedMap[k] = v;
+            }
+          }
+        }
+      } catch (_) {}
+    }
+    Object.assign(mergedMap, baseMenuMap);
+
     const injection = `
-const __AGY_CONTEXT_MENU_MAP__ = {
-  'Cut': '剪切',
-  'Copy': '复制',
-  'Paste': '粘贴',
-  'Select All': '全选',
-  'Rename': '重命名',
-  'Mark Unread': '标记为未读',
-  'Mark Read': '标记为已读',
-  'Split': '拆分',
-  'Fork': '分支',
-  'Archive': '归档',
-  'Delete': '删除',
-  'View Debug': '查看调试信息',
-  'Share': '分享',
-  'Copy Path': '复制路径',
-  'Undo': '撤销',
-  'Redo': '重做'
-};
+const __AGY_CONTEXT_MENU_MAP__ = ${JSON.stringify(mergedMap)};
 function __agyTranslateContextLabel__(lbl) {
   if (!lbl || typeof lbl !== 'string') return lbl;
   return __AGY_CONTEXT_MENU_MAP__[lbl] || lbl;
 }
 `;
+    // 若已注入过旧版本，先剥离
+    const existingInjectionRegex = /\n?const __AGY_CONTEXT_MENU_MAP__ = [\s\S]*?function __agyTranslateContextLabel__[\s\S]*?\n}\n/g;
+    if (existingInjectionRegex.test(content)) {
+      content = content.replace(existingInjectionRegex, '');
+    }
     content = injection + content;
     content = content.split("label: item.label ?? ''").join("label: __agyTranslateContextLabel__(item.label ?? '')");
   }

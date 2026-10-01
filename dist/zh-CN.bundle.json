@@ -1,6 +1,6 @@
 {
-  "version": "3.3.10",
-  "buildTime": "2026-10-01T03:25:38.323Z",
+  "version": "3.3.11",
+  "buildTime": "2026-10-01T03:43:54.981Z",
   "exact": {
     "\"Always Proceed\"": "“总是直接继续”",
     "+ Add Folder": "+ 添加文件夹",
@@ -1270,8 +1270,10 @@
     "Split Conversation Horizontally": "水平分屏会话",
     "Split Conversation Vertically": "垂直分屏会话",
     "Split Diff": "分屏差异",
-    "Split Down": "向下分屏",
-    "Split Right": "向右分屏",
+    "Split Down": "向下拆分",
+    "Split Left": "向左拆分",
+    "Split Right": "向右拆分",
+    "Split Up": "向上拆分",
     "Split Terminal": "分屏终端",
     "Stable": "稳定版",
     "Staged Changes": "暂存的更改",
