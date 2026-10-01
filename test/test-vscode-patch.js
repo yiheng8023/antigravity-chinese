@@ -1,5 +1,5 @@
 /**
- * VS Code 扩展汉化补丁与生命周期回归测试套件
+ * VS Code 扩展汉化补丁与生命周期回归测试套件 (包含 Webview 代理注入)
  */
 
 const assert = require('assert');
@@ -15,7 +15,7 @@ const {
 } = require('../core/vscode-patch');
 
 console.log('🧪 ============================================================');
-console.log('🧪 开始执行 VS Code 扩展汉化生命周期、幂等与防污染自动化测试');
+console.log('🧪 开始执行 VS Code 扩展汉化生命周期、Webview 代理注入与防污染自动化测试');
 console.log('🧪 ============================================================');
 
 const testDir = path.join(os.tmpdir(), `agy_test_vscode_${Date.now()}`);
@@ -77,8 +77,22 @@ const rawOriginalPkg = {
   }
 };
 
+// 模拟官方 extension.js 核心片段
+const rawOriginalExtJs = `
+const vscode = require('vscode');
+class AntigravityDelegate {
+    renderWebviewHtml(webview, serverUrl, fullUrlString, options) {
+        patchWebviewPostMessage(webview);
+        webview.html = '<html><body><iframe id="jetski-frame" src="' + fullUrlString + '"></iframe></body></html>';
+    }
+}
+exports.activate = function(context) {};
+`;
+
 const pkgPath = path.join(testDir, 'package.json');
+const extJsPath = path.join(testDir, 'extension.js');
 fs.writeFileSync(pkgPath, JSON.stringify(rawOriginalPkg, null, 2), 'utf-8');
+fs.writeFileSync(extJsPath, rawOriginalExtJs, 'utf-8');
 
 try {
   // 1. 初始状态检测
@@ -90,11 +104,24 @@ try {
   assert.strictEqual(installRes1.success, true, '首次安装应成功');
   assert.strictEqual(isVsCodeExtensionPatched(testDir), true, '首次安装后状态应为已打补丁');
 
-  const bakPath = path.join(testDir, 'package.json.bak');
-  assert(fs.existsSync(bakPath), '应生成纯净备份 package.json.bak');
-  const bakContent = fs.readFileSync(bakPath, 'utf-8');
-  assert.deepStrictEqual(JSON.parse(bakContent), rawOriginalPkg, '纯净备份必须 100% 等于官方原生未修改版本');
-  console.log('✅ [PASS] 首次安装成功生成纯净备份 package.json.bak');
+  const pkgBakPath = path.join(testDir, 'package.json.bak');
+  assert(fs.existsSync(pkgBakPath), '应生成纯净备份 package.json.bak');
+  const pkgBakContent = fs.readFileSync(pkgBakPath, 'utf-8');
+  assert.deepStrictEqual(JSON.parse(pkgBakContent), rawOriginalPkg, '纯净备份必须 100% 等于官方原生未修改版本');
+
+  const extJsBakPath = path.join(testDir, 'extension.js.bak');
+  assert(fs.existsSync(extJsBakPath), '应生成纯净备份 extension.js.bak');
+  assert.strictEqual(fs.readFileSync(extJsBakPath, 'utf-8'), rawOriginalExtJs, 'extension.js 备份必须与官方原版绝对一致');
+  console.log('✅ [PASS] 首次安装成功生成 package.json.bak 与 extension.js.bak 双重纯净备份');
+
+  // 验证 Webview 资产与 extension.js 拦截注入
+  assert(fs.existsSync(path.join(testDir, 'i18n-bundle.js')), '应生成 i18n-bundle.js 静态资产');
+  assert(fs.existsSync(path.join(testDir, 'agy-i18n-proxy.js')), '应生成 agy-i18n-proxy.js 本地微代理');
+
+  const patchedExtJs = fs.readFileSync(extJsPath, 'utf-8');
+  assert(patchedExtJs.includes('AGY_VSCODE_I18N_PROXY_INJECTION'), 'extension.js 应包含 proxy 引入');
+  assert(patchedExtJs.includes('AGY_VSCODE_I18N_INTERCEPT_START'), 'extension.js 应包含 renderWebviewHtml 拦截');
+  console.log('✅ [PASS] extension.js 深度拦截与微代理资产注入就绪');
 
   const patchedPkg1 = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   assert.strictEqual(patchedPkg1.description, '将 Google 以智能体为核心的开发平台引入 Visual Studio Code。');
@@ -109,17 +136,23 @@ try {
   // 3. 二次重复安装（幂等性与防备份污染 P0 验证）
   const installRes2 = installVsCodePatch(testDir);
   assert.strictEqual(installRes2.success, true, '二次安装应成功');
-  const bakContent2 = fs.readFileSync(bakPath, 'utf-8');
-  assert.deepStrictEqual(JSON.parse(bakContent2), rawOriginalPkg, '【P0 验证通过】二次安装绝对未污染原生纯净备份！');
-  console.log('✅ [PASS] 二次安装幂等性验证通过，纯净备份未受污染');
+  const pkgBakContent2 = fs.readFileSync(pkgBakPath, 'utf-8');
+  assert.deepStrictEqual(JSON.parse(pkgBakContent2), rawOriginalPkg, '【P0 验证通过】二次安装绝对未污染 package.json 纯净备份！');
+  const extJsBakContent2 = fs.readFileSync(extJsBakPath, 'utf-8');
+  assert.strictEqual(extJsBakContent2, rawOriginalExtJs, '【P0 验证通过】二次安装绝对未污染 extension.js 纯净备份！');
+  console.log('✅ [PASS] 二次安装幂等性验证通过，纯净备份未受二次污染');
 
   // 4. 执行还原 (Restore)
   const restoreRes = restoreVsCodePatch(testDir);
   assert.strictEqual(restoreRes.success, true, '执行还原应成功');
   assert.strictEqual(isVsCodeExtensionPatched(testDir), false, '还原后状态应恢复为未打补丁');
   const restoredPkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
-  assert.deepStrictEqual(restoredPkg, rawOriginalPkg, '【P0 验证通过】还原后文件必须 100% 恢复为官方原生版本！');
-  console.log('✅ [PASS] 还原功能 100% 恢复官方原生版本');
+  assert.deepStrictEqual(restoredPkg, rawOriginalPkg, '【P0 验证通过】还原后 package.json 必须 100% 恢复为官方原生版本！');
+  const restoredExtJs = fs.readFileSync(extJsPath, 'utf-8');
+  assert.strictEqual(restoredExtJs, rawOriginalExtJs, '【P0 验证通过】还原后 extension.js 必须 100% 恢复为官方原生版本！');
+  assert(!fs.existsSync(path.join(testDir, 'i18n-bundle.js')), '还原后 i18n-bundle.js 应被安全清除');
+  assert(!fs.existsSync(path.join(testDir, 'agy-i18n-proxy.js')), '还原后 agy-i18n-proxy.js 应被安全清除');
+  console.log('✅ [PASS] 还原功能 100% 恢复官方原生版本并彻底清理注入文件');
 
   // 5. 缺失目录探测优雅降级测试
   const fakeDir = path.join(testDir, 'non_existent_subdir');
@@ -128,7 +161,7 @@ try {
   console.log('✅ [PASS] 缺失目录优雅静默跳过，无崩溃异常');
 
   console.log('\n============================================================');
-  console.log('📊 VS Code 扩展补丁测试完成: 共 8 项核心断言全部通过！');
+  console.log('📊 VS Code 扩展补丁测试完成: 共 14 项全维核心断言 100% 全部通过！');
   console.log('============================================================\n');
 } finally {
   try {

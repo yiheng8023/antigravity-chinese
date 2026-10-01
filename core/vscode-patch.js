@@ -1,6 +1,12 @@
 /**
  * Antigravity VS Code Extension 本地化补丁与生命周期管理器
  * Universal Localization Manager for Google Antigravity VS Code Extension
+ * 
+ * 核心功能：
+ * 1. package.json 命令列表、配置项描述与自定义查看器全景汉化与备份还原
+ * 2. Webview 内嵌 iframe 本地轻量反向代理 (Micro Reverse Proxy) 注入
+ * 3. 动态生成 i18n-bundle.js（含完整词典与极速 DOM 监听引擎）与 agy-i18n-proxy.js
+ * 4. extension.js 的 renderWebviewHtml 双向无损拦截与纯净原子回滚
  */
 
 const fs = require('fs');
@@ -95,10 +101,18 @@ function isVsCodeExtensionPatched(extDir) {
   try {
     const raw = fs.readFileSync(pkgPath, 'utf-8');
     const pkg = JSON.parse(raw);
-    return Boolean(pkg.__antigravity_chinese_patched);
-  } catch (_) {
-    return false;
+    if (Boolean(pkg.__antigravity_chinese_patched)) return true;
+  } catch (_) {}
+
+  const extJsPath = path.join(extDir, 'extension.js');
+  if (fs.existsSync(extJsPath)) {
+    try {
+      const extJs = fs.readFileSync(extJsPath, 'utf-8');
+      if (extJs.includes('AGY_VSCODE_I18N_PROXY_INJECTION')) return true;
+    } catch (_) {}
   }
+
+  return false;
 }
 
 /**
@@ -121,6 +135,231 @@ function getVsCodeFullMap() {
     } catch (_) {}
   }
   return map;
+}
+
+/**
+ * 生成打包后的汉化 bundle 脚本（包含全局词典与极速 DOM 注入运行时）
+ * @returns {string}
+ */
+function getI18nBundleScript() {
+  const dictPath = path.join(__dirname, '..', 'dict', 'zh-CN.json');
+  const runtimePath = path.join(__dirname, 'i18n-runtime.js');
+
+  const dictContent = fs.existsSync(dictPath) ? fs.readFileSync(dictPath, 'utf-8') : '{}';
+  const runtimeContent = fs.existsSync(runtimePath) ? fs.readFileSync(runtimePath, 'utf-8') : '';
+
+  return `// --- Antigravity VS Code Webview i18n Bundle ---
+(function() {
+  try {
+    window.__AGY_I18N_DATA__ = ${dictContent.trim()};
+    ${runtimeContent}
+  } catch(e) {
+    console.error('[AGY-i18n] Runtime Injection Error:', e);
+  }
+})();
+`;
+}
+
+/**
+ * 生成本地微型反向代理 (Micro Reverse Proxy) 源码
+ * @returns {string}
+ */
+function getAgyI18nProxyTemplate() {
+  return `/**
+ * Antigravity VS Code Webview i18n Micro Reverse Proxy
+ * Local reverse proxy to inject Chinese localization runtime into Language Server Webview iframe
+ */
+const http = require('http');
+const net = require('net');
+const fs = require('fs');
+const path = require('path');
+
+let proxyServer = null;
+let proxyPort = 0;
+let currentTargetUrl = '';
+let cachedBundleContent = null;
+
+function getBundleScript() {
+  if (cachedBundleContent) return cachedBundleContent;
+  const bundlePath = path.join(__dirname, 'i18n-bundle.js');
+  if (fs.existsSync(bundlePath)) {
+    cachedBundleContent = fs.readFileSync(bundlePath, 'utf-8');
+  } else {
+    cachedBundleContent = '';
+  }
+  return cachedBundleContent;
+}
+
+function startProxy() {
+  if (proxyServer && proxyPort > 0) return proxyPort;
+
+  proxyServer = http.createServer((req, res) => {
+    if (!currentTargetUrl) {
+      res.writeHead(503, { 'Content-Type': 'text/plain' });
+      res.end('Antigravity target server not set');
+      return;
+    }
+
+    let targetParsed;
+    try {
+      targetParsed = new URL(currentTargetUrl);
+    } catch (_) {
+      res.writeHead(500, { 'Content-Type': 'text/plain' });
+      res.end('Invalid target server URL: ' + currentTargetUrl);
+      return;
+    }
+
+    const reqUrl = new URL(req.url, 'http://127.0.0.1');
+    const options = {
+      hostname: targetParsed.hostname,
+      port: targetParsed.port,
+      path: reqUrl.pathname + reqUrl.search,
+      method: req.method,
+      headers: { ...req.headers, host: targetParsed.host }
+    };
+
+    const proxyReq = http.request(options, (targetRes) => {
+      const isHtml = (targetRes.headers['content-type'] || '').includes('text/html');
+      if (isHtml && req.method === 'GET') {
+        let body = '';
+        targetRes.on('data', (chunk) => { body += chunk; });
+        targetRes.on('end', () => {
+          const bundle = getBundleScript();
+          const scriptTag = '\\n<script>\\n' + bundle + '\\n</script>\\n';
+          const modified = body.includes('<head>')
+            ? body.replace('<head>', '<head>' + scriptTag)
+            : (scriptTag + body);
+          const headers = { ...targetRes.headers };
+          delete headers['content-length'];
+          delete headers['transfer-encoding'];
+          headers['content-length'] = Buffer.byteLength(modified, 'utf-8');
+          res.writeHead(targetRes.statusCode, headers);
+          res.end(modified);
+        });
+      } else {
+        res.writeHead(targetRes.statusCode, targetRes.headers);
+        targetRes.pipe(res);
+      }
+    });
+
+    proxyReq.on('error', (err) => {
+      if (!res.headersSent) {
+        res.writeHead(502, { 'Content-Type': 'text/plain' });
+      }
+      res.end('AGY Proxy Error: ' + err.message);
+    });
+
+    req.pipe(proxyReq);
+  });
+
+  proxyServer.on('upgrade', (req, clientSocket, head) => {
+    if (!currentTargetUrl) {
+      clientSocket.destroy();
+      return;
+    }
+    const targetParsed = new URL(currentTargetUrl);
+    const targetSocket = net.connect(targetParsed.port, targetParsed.hostname, () => {
+      targetSocket.write(
+        req.method + ' ' + req.url + ' HTTP/' + req.httpVersion + '\\r\\n' +
+        Object.entries(req.headers).map(([k, v]) => k + ': ' + v).join('\\r\\n') +
+        '\\r\\n\\r\\n'
+      );
+      if (head && head.length > 0) targetSocket.write(head);
+      targetSocket.pipe(clientSocket);
+      clientSocket.pipe(targetSocket);
+    });
+
+    targetSocket.on('error', () => clientSocket.destroy());
+    clientSocket.on('error', () => targetSocket.destroy());
+  });
+
+  proxyServer.listen(0, '127.0.0.1', () => {
+    if (proxyServer && proxyServer.address()) {
+      proxyPort = proxyServer.address().port;
+    }
+  });
+
+  return proxyPort;
+}
+
+function getProxiedUrls(serverUrl, fullUrlString) {
+  if (!serverUrl) return { serverUrl, fullUrlString };
+  currentTargetUrl = serverUrl;
+
+  if (!proxyServer || !proxyPort) {
+    startProxy();
+  }
+
+  if (!proxyPort) {
+    return { serverUrl, fullUrlString };
+  }
+
+  const proxyBase = 'http://127.0.0.1:' + proxyPort + '/';
+  const proxiedFullUrl = fullUrlString.replace(serverUrl, proxyBase);
+  return {
+    serverUrl: proxyBase,
+    fullUrlString: proxiedFullUrl
+  };
+}
+
+startProxy();
+
+module.exports = {
+  startProxy,
+  getProxiedUrls
+};
+`;
+}
+
+/**
+ * 修补 extension.js，注入本地反向代理对 renderWebviewHtml 的拦截
+ * @param {string} extDir 扩展根目录
+ * @returns {{ success: boolean, message?: string }}
+ */
+function patchExtensionJs(extDir) {
+  const extJsPath = path.join(extDir, 'extension.js');
+  const extJsBakPath = path.join(extDir, 'extension.js.bak');
+  if (!fs.existsSync(extJsPath)) return { success: true };
+
+  // 1. 建立纯净备份
+  if (!fs.existsSync(extJsBakPath)) {
+    fs.copyFileSync(extJsPath, extJsBakPath);
+  }
+
+  let content = fs.readFileSync(extJsBakPath, 'utf-8');
+
+  // 2. 检查并注入 renderWebviewHtml 拦截
+  const targetSignature = 'renderWebviewHtml(webview, serverUrl, fullUrlString, options) {';
+  if (!content.includes(targetSignature)) {
+    return { success: false, message: '未在 extension.js 中匹配到 renderWebviewHtml 签名' };
+  }
+
+  const proxyRequireHeader = `// --- AGY_VSCODE_I18N_PROXY_INJECTION_START ---
+let __agyI18nProxy = null;
+try {
+  __agyI18nProxy = require('./agy-i18n-proxy.js');
+} catch (_) {}
+// --- AGY_VSCODE_I18N_PROXY_INJECTION_END ---
+`;
+
+  const interceptionCode = `${targetSignature}
+        // --- AGY_VSCODE_I18N_INTERCEPT_START ---
+        try {
+          if (!__agyI18nProxy) {
+            __agyI18nProxy = require('./agy-i18n-proxy.js');
+          }
+          if (__agyI18nProxy && typeof __agyI18nProxy.getProxiedUrls === 'function') {
+            const __proxied = __agyI18nProxy.getProxiedUrls(serverUrl, fullUrlString);
+            serverUrl = __proxied.serverUrl;
+            fullUrlString = __proxied.fullUrlString;
+          }
+        } catch (_) {}
+        // --- AGY_VSCODE_I18N_INTERCEPT_END ---`;
+
+  content = proxyRequireHeader + content.replace(targetSignature, interceptionCode);
+
+  fs.writeFileSync(extJsPath, content, 'utf-8');
+  return { success: true };
 }
 
 /**
@@ -199,11 +438,24 @@ function installVsCodePatch(customDir) {
     }
   }
 
-  // 4. 注入标记并写回
+  // 4. 注入标记并写回 package.json
   pkg.__antigravity_chinese_patched = true;
   pkg.__antigravity_chinese_version = require('../package.json').version;
-
   fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, '\t') + '\n', 'utf-8');
+
+  // 5. 生成并写入 Webview 注入资产 (i18n-bundle.js & agy-i18n-proxy.js)
+  const bundleScript = getI18nBundleScript();
+  fs.writeFileSync(path.join(extDir, 'i18n-bundle.js'), bundleScript, 'utf-8');
+
+  const proxyScript = getAgyI18nProxyTemplate();
+  fs.writeFileSync(path.join(extDir, 'agy-i18n-proxy.js'), proxyScript, 'utf-8');
+
+  // 6. 修补 extension.js 中的 Webview iframe 代理重定向
+  const extJsResult = patchExtensionJs(extDir);
+  if (!extJsResult.success) {
+    console.warn(`⚠️ [VS Code 扩展警告] extension.js 深度拦截注入遇到提示: ${extJsResult.message}`);
+  }
+
   fs.writeFileSync(
     metaPath,
     JSON.stringify({ patched: true, timestamp: Date.now(), extDir }, null, 2),
@@ -212,7 +464,7 @@ function installVsCodePatch(customDir) {
 
   return {
     success: true,
-    message: `成功为 VS Code 扩展注入全景中文本地化: ${extDir}`,
+    message: `成功为 VS Code 扩展注入全景中文本地化 (package.json + Webview i18n Proxy): ${extDir}`,
     extDir
   };
 }
@@ -233,20 +485,34 @@ function restoreVsCodePatch(customDir) {
 
   const pkgPath = path.join(extDir, 'package.json');
   const bakPath = path.join(extDir, 'package.json.bak');
+  const extJsPath = path.join(extDir, 'extension.js');
+  const extJsBakPath = path.join(extDir, 'extension.js.bak');
   const metaPath = path.join(extDir, '.antigravity_vscode_meta.json');
+  const bundlePath = path.join(extDir, 'i18n-bundle.js');
+  const proxyPath = path.join(extDir, 'agy-i18n-proxy.js');
 
-  if (!fs.existsSync(bakPath)) {
-    // 检查是否被打过补丁
-    if (isVsCodeExtensionPatched(extDir)) {
-      return { success: false, message: '未找到官方原版备份 package.json.bak，无法还原。' };
-    }
-    return { success: true, message: '扩展当前为官方原生状态，无需还原。' };
+  let restoredAny = false;
+
+  // 1. 还原 package.json
+  if (fs.existsSync(bakPath)) {
+    fs.copyFileSync(bakPath, pkgPath);
+    restoredAny = true;
   }
 
-  fs.copyFileSync(bakPath, pkgPath);
-  try {
-    fs.unlinkSync(metaPath);
-  } catch (_) {}
+  // 2. 还原 extension.js
+  if (fs.existsSync(extJsBakPath)) {
+    fs.copyFileSync(extJsBakPath, extJsPath);
+    restoredAny = true;
+  }
+
+  // 3. 安全清理注入资产
+  try { if (fs.existsSync(bundlePath)) fs.unlinkSync(bundlePath); } catch (_) {}
+  try { if (fs.existsSync(proxyPath)) fs.unlinkSync(proxyPath); } catch (_) {}
+  try { if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath); } catch (_) {}
+
+  if (!restoredAny && !isVsCodeExtensionPatched(extDir)) {
+    return { success: true, message: '扩展当前为官方原生状态，无需还原。' };
+  }
 
   return {
     success: true,
@@ -259,5 +525,8 @@ module.exports = {
   isVsCodeExtensionPatched,
   installVsCodePatch,
   restoreVsCodePatch,
+  patchExtensionJs,
+  getAgyI18nProxyTemplate,
+  getI18nBundleScript,
   VSCODE_TRANSLATION_MAP
 };

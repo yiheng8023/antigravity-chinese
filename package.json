@@ -1,6 +1,6 @@
 {
   "name": "antigravity-chinese",
-  "version": "3.3.13",
+  "version": "3.3.14",
   "description": "Google Antigravity 全生态轻量级中文本地化套件 (Universal Localization Suite for Google Antigravity Ecosystem: Desktop App, IDE & Extensions, CLI)",
   "main": "cli.js",
   "engines": {

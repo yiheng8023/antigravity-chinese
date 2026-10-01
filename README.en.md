@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.13** (fully adapted for Antigravity **v2.19.1**).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.14** (fully adapted for Antigravity **v2.19.1**).
 
 ---
 
@@ -24,7 +24,7 @@ A high-performance, reversible Chinese localization suite and lifecycle manager 
 | Surface (Ecosystem) | Architecture & Role | Localization Mechanism | Support Status |
 | :--- | :--- | :--- | :---: |
 | 🖥️ **Desktop App (Antigravity 2.0)** | Standalone Electron app with boards, chat canvas & Aux Pane | ASAR physical injection / CDP zero-disk mount + IPC native menu interception | 🟢 **100% Production Ready** |
-| 🧩 **IDE Extensions (VS Code Extension)** | Embedded editor assistant, commands, settings & sidebar chat | `package.json` command/settings mapping / pristine backup & atomic rollback | 🟢 **100% Production Ready** |
+| 🧩 **IDE Extensions (VS Code Extension)** | Embedded editor assistant, commands, settings panel & sidebar chat | `package.json` mapping + Webview micro reverse proxy deep injection | 🟢 **100% Production Ready** |
 | 💻 **Standalone IDE (Antigravity IDE)** | AI-first IDE built on Code-OSS / VS Code | Official Chinese language pack support + core engine alignment | 🟡 **Architectural Alignment** |
 | ⚡ **Terminal CLI (`agy`)** | Terminal interactive TUI & workflow scripting | Enforcing "English input, Chinese output" for help docs & survey prompts | 🟢 **Standardized / Roadmap** |
 | 🔌 **Plugins & Skills (`SKILL.md`)** | 10 official catalog plugins & 131 built-in skills/agents | Dual-source YAML & JSDoc publication-grade localization | 🟢 **100% Production Ready** |
@@ -36,10 +36,11 @@ A high-performance, reversible Chinese localization suite and lifecycle manager 
 
 ## 🌟 Key Features & Engineering Design
 
-- 🧩 **VS Code Extension Full Localization & Dedicated Lifecycle Management (VS Code Extension Localization & Lifecycle)**:
-  - **Decoupled Adaptive Path Detection**: Automatically discovers `~/.vscode/extensions/google.google-antigravity-*` installation paths, gracefully skipping with zero side effects when uninstalled.
+- 🧩 **VS Code Extension Full Localization & Webview Deep Injection (VS Code Extension Full Localization & Webview Proxy)**:
+  - **Unified One-Click Suite Installation**: Whether double-clicking [`install.bat`](install.bat) or running `node cli.js install`, the installer performs automatic multi-surface probing and synchronizes full localization across Desktop App, official agent plugins, and the VS Code extension without requiring separate scripts.
+  - **Conquering Webview iframe Language Islands**: To solve the challenge of `Antigravity Settings` and the sidebar chat panel being rendered by a background Language Server Webview iframe without Electron preload script access, an ultra-lightweight local reverse proxy (`agy-i18n-proxy.js`) is injected in-memory with `i18n-bundle.js`, making settings and chat views 100% native Chinese.
   - **100% Publication-Grade Localization for Commands, Settings & Editors**: Translates all 10 command palette entries (`Add Selection to Chat` ➔ `将选中文本添加到对话`, `Accept All Changes` ➔ `接受所有更改`, `Open Antigravity Settings` ➔ `打开 Antigravity 设置`, etc.), all 9 configuration descriptions (server port, inline diff CodeLens, telemetry, auto-accept pending edits, etc.), and custom artifact/settings viewers.
-  - **Bidirectional Atomic Rollback & Anti-Corruption Guarantee**: Automatically creates pristine `package.json.bak` backups, equipped with dedicated one-click scripts [`install-vscode.bat`](install-vscode.bat) / `npm run install:vscode` and [`restore-vscode.bat`](restore-vscode.bat) / `npm run restore:vscode`. Repeated installations will never pollute backups, guaranteeing instant lossless recovery.
+  - **Bidirectional Atomic Rollback & Dual Pristine Backups**: Automatically creates pristine `package.json.bak` and `extension.js.bak` backups, equipped with dedicated one-click scripts [`install-vscode.bat`](install-vscode.bat) / `npm run install:vscode` and [`restore-vscode.bat`](restore-vscode.bat) / `npm run restore:vscode`. Repeated installations will never pollute backups, guaranteeing instant lossless recovery.
 
 - 🖱️ **Native Context Menu & Cascading Submenu Interception (Native Context Menu & Cascading Submenu Interception)**:
   - **OS-Level Native Context Menu IPC Interception**: Left-hand conversation history items (`Rename`, `Mark Unread`, `Copy`, `Split`, `Archive`, `Delete`) and input context menus (`Cut`, `Copy`, `Paste`, `Select All`) are natively spawned by the Electron main process via `Menu.buildFromTemplate` and unreachable by renderer DOM `MutationObserver`. We inject dictionary mapping interceptors directly into the main-process IPC dispatcher (`ipcHandlers.js`) for 100% native context menu localization.
@@ -165,7 +166,7 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **370+ assertions**:
 
 ```bash
-# Run all automated test suites (aggregating 9 full-fidelity test suites, 380+ assertions)
+# Run all automated test suites (aggregating 9 full-fidelity test suites, 390+ assertions)
 npm test
 ```
 
@@ -177,7 +178,7 @@ npm test
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
 - **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,287 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
-- **VS Code Extension Lifecycle & Anti-Corruption Verification (`test/test-vscode-patch.js`)**: 8 assertions covering extension probing, initial injection, 100% command/setting/viewer localization, double-install idempotence, pristine backup anti-corruption, and atomic rollback.
+- **VS Code Extension Lifecycle, Webview Proxy & Anti-Corruption Verification (`test/test-vscode-patch.js`)**: 14 assertions covering extension probing, initial injection, command/setting/viewer localization, Webview micro reverse proxy interception, `i18n-bundle.js` asset generation, dual-backup anti-corruption, and full atomic rollback.
 
 ---
 

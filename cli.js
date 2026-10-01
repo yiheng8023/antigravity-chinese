@@ -928,6 +928,14 @@ function status(customPath) {
   const pluginDir = getGlobalPluginTargetDir();
   const hasPlugin = fs.existsSync(path.join(pluginDir, 'plugin.json'));
   console.log(`• 社区插件:     ${hasPlugin ? '🟢 已就绪 (Rules & Skills 激活)' : '⚪ 未安装'}`);
+
+  const vsExtDir = findVsCodeExtensionDir(customPath);
+  if (vsExtDir) {
+    const vsPatched = isVsCodeExtensionPatched(vsExtDir);
+    console.log(`• VS Code 扩展: ${vsPatched ? '🟢 已安装全景汉化 (含 Webview 代理)' : '⚪ 原生未修改状态'} (${vsExtDir})`);
+  } else {
+    console.log('• VS Code 扩展: ⚪ 未检测到本机扩展');
+  }
   console.log('');
 }
 
@@ -1154,6 +1162,21 @@ if (require.main === module) {
       if (args.includes('--with-plugin')) {
         installPlugin();
       }
+      // 弹性自适应联动：自动检测并为本机 VS Code 扩展注入全景汉化
+      try {
+        const vsExtDir = findVsCodeExtensionDir(customPath);
+        if (vsExtDir) {
+          console.log('\n📦 [全家桶联动] 检测到本机 VS Code 扩展，正在同步注入全景中文本地化...');
+          const vsRes = installVsCodePatch(vsExtDir);
+          if (vsRes.success) {
+            console.log(`✅ [全家桶联动] ${vsRes.message}`);
+          } else {
+            console.warn(`⚠️ [全家桶联动] ${vsRes.message}`);
+          }
+        }
+      } catch (vsErr) {
+        console.warn('⚠️ [全家桶联动] VS Code 扩展注入跳过:', vsErr.message);
+      }
       break;
     case 'apply-staged':
       applyStagedWhenUnlocked(customPath);
@@ -1169,6 +1192,17 @@ if (require.main === module) {
     case 'restore':
     case 'uninstall':
       restore(customPath);
+      // 弹性自适应联动：自动检测并恢复本机 VS Code 扩展至官方原生
+      try {
+        const vsExtDir = findVsCodeExtensionDir(customPath);
+        if (vsExtDir && isVsCodeExtensionPatched(vsExtDir)) {
+          console.log('\n🔄 [全家桶联动] 检测到本机 VS Code 扩展处于汉化状态，正在同步还原官方英文原版...');
+          const vsRes = restoreVsCodePatch(vsExtDir);
+          if (vsRes.success) {
+            console.log(`✅ [全家桶联动] ${vsRes.message}`);
+          }
+        }
+      } catch (_) {}
       break;
     case 'install:vscode':
     case 'install-vscode':
