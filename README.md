@@ -1,4 +1,4 @@
-# Google Antigravity 中文汉化工具包 (Antigravity Chinese Toolkit)
+# Google Antigravity 全生态中文本地化套件 (Antigravity Chinese Universal Suite)
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&label=CI&logo=github" alt="CI Status"></a>
@@ -15,7 +15,22 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity 2.0** 桌面客户端（Windows / macOS / Linux）打造的高性能、可逆式中文本地化补丁与生命周期管理器（当前版本 **v3.3.12**，全面深度适配 Antigravity **v2.19.1** 升级）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.12**，全面深度适配 Antigravity **v2.19.1** 升级）。
+
+---
+
+### 🌐 全生态多端矩阵支持状态 (Ecosystem Support Matrix)
+
+| 生态终端形态 (Surfaces) | 定位与核心职责 | 中文化实现机制 | 当前支持状态 |
+| :--- | :--- | :--- | :---: |
+| 🖥️ **桌面客户端 (Desktop App 2.0)** | 独立 Electron 客户端，包含全局看板、白板与 Aux Pane | ASAR 深度注入 / CDP 免解包热挂载 + IPC 上下文菜单拦截 | 🟢 **100% 满血就绪** |
+| 🧩 **IDE 扩展 (VS Code Extension)** | 嵌入宿主 IDE 的智能补全、命令与侧边栏聊天 | `package.json` 命令与设置映射 / Webview 语义同源对齐 | 🟢 **已收录/解耦支持** |
+| 💻 **第一方独立 IDE (Antigravity IDE)** | 基于 Code-OSS 深度定制的独立 AI-first IDE | 官方中文语言包适配 + 内置组件同源对齐 | 🟡 **架构对齐/弹性探测** |
+| ⚡ **终端命令行 (Antigravity CLI `agy`)** | 极客终端交互与自动化批处理 | 遵循“输入英文，输出中文”准则，帮助手册与向导本地化 | 🟢 **规范确立/持续演进** |
+| 🔌 **智能体插件与技能生态 (Plugins & Skills)** | 官方 10 大目录插件与 131 项 `SKILL.md` 描述 | 双源 YAML 与 JSDoc 出版级中文化 | 🟢 **100% 满血就绪** |
+
+> [!NOTE] **多端解耦与弹性探测哲学 (Elastic Probing Guarantee)**：
+> 本工具包遵循严格的“物理隔离与弹性探测”原则。若您本地仅安装了桌面客户端或 VS Code，安装脚本将仅精准对已安装的组件生效，未安装的环境（如第一方独立 IDE、JetBrains 等）将被自动静默跳过，绝不产生任何冲突、报错或副作用！
 
 ---
 

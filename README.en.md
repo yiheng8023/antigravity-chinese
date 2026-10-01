@@ -1,4 +1,4 @@
-# Google Antigravity Chinese Localization Toolkit
+# Google Antigravity Universal Chinese Suite (Antigravity Chinese Universal Suite)
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&label=CI&logo=github" alt="CI Status"></a>
@@ -15,7 +15,22 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization patch and lifecycle manager designed for **Google Antigravity 2.0** desktop clients (Windows, macOS, and Linux), currently at version **v3.3.12** (fully adapted for Antigravity **v2.19.1**).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.12** (fully adapted for Antigravity **v2.19.1**).
+
+---
+
+### 🌐 Ecosystem Support Matrix
+
+| Surface (Ecosystem) | Architecture & Role | Localization Mechanism | Support Status |
+| :--- | :--- | :--- | :---: |
+| 🖥️ **Desktop App (Antigravity 2.0)** | Standalone Electron app with boards, chat canvas & Aux Pane | ASAR physical injection / CDP zero-disk mount + IPC native menu interception | 🟢 **100% Production Ready** |
+| 🧩 **IDE Extensions (VS Code Extension)** | Embedded editor assistant, commands, settings & sidebar chat | `package.json` command/settings mapping / Webview alignment | 🟢 **Captured / Decoupled** |
+| 💻 **Standalone IDE (Antigravity IDE)** | AI-first IDE built on Code-OSS / VS Code | Official Chinese language pack support + core engine alignment | 🟡 **Architectural Alignment** |
+| ⚡ **Terminal CLI (`agy`)** | Terminal interactive TUI & workflow scripting | Enforcing "English input, Chinese output" for help docs & survey prompts | 🟢 **Standardized / Roadmap** |
+| 🔌 **Plugins & Skills (`SKILL.md`)** | 10 official catalog plugins & 131 built-in skills/agents | Dual-source YAML & JSDoc publication-grade localization | 🟢 **100% Production Ready** |
+
+> [!NOTE] **Decoupled Architecture & Elastic Probing Guarantee**:
+> The toolkit adheres strictly to the principle of "physical isolation and elastic probing". If only the Desktop App or VS Code is installed locally, the installer will target only available components and gracefully skip uninstalled surfaces (such as the standalone IDE or JetBrains) with zero side-effects or errors.
 
 ---
 
