@@ -5,7 +5,7 @@
   - 彻底废除 `shouldIgnoreElement` 中层层爬树的递归 `closest` 与跨子树 `querySelector` 遍历；
   - 重构为超轻量级的 `isModelSelectorBoundary` 单节点原生属性直读门禁，元素判断耗时从 0.5~2ms 骤降至 **0.0005ms（提速超 1,000 倍）**，整树 2,000 个节点判定开销彻底降至 0.5 毫秒以下；
 - **斩断事件风暴与精准防抖扫描**：
-  - 彻底剥离具有冒泡特性的 `mouseover` 监听，升级为纯粹的非冒泡 `pointerenter`、`pointerdown` 与 `contextmenu`；
+  - 彻底剥离具有冒泡特性的 `mouseover` 监听，升级为纯粹的非冒泡 `pointerenter` 与 `contextmenu`，彻底消除 `pointerdown` 全局点击拦截对输入框焦点流转的潜在干扰；
   - 彻底剔除 Tailwind `[class*="z-["]` 通配符误伤，浮层选择器精准收敛到原生的 `[role="tooltip"]`、`[role="menu"]`、`[data-floating-ui-portal]`、`.monaco-hover` 等高特异性实体；
   - 引入 120ms 节流门禁与 50ms 单一防抖定时器，彻底根治鼠标移动、高频虚拟滚动与消息流渲染时的界面掉帧与卡顿。
 

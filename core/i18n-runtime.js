@@ -690,7 +690,6 @@
       };
 
       doc.addEventListener('pointerenter', onHoverAction, { capture: true, passive: true });
-      doc.addEventListener('pointerdown', onHoverAction, { capture: true, passive: true });
       doc.addEventListener('contextmenu', onHoverAction, { capture: true, passive: true });
     } catch (e) {}
   }

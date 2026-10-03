@@ -90,7 +90,7 @@
   - 全量 227 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 5 大类（包含模型规格免汉化 11 项断言、思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
 - ⚡ **低开销高响应极速渲染架构 (Ultra-High Performance Runtime Architecture)**：
   - 废除深层递归 `closest` 与跨树 `querySelector` 遍历，升级为**单节点纯属性 $O(1)$ 判定门禁**，元素检查耗时从 0.5~2ms 骤降至 0.0005ms（提速超 1,000 倍）；
-  - 阻断冒泡型 `mouseover` 事件风暴，采用非冒泡 `pointerenter` + 120ms 节流阀 + 50ms 单一防抖浮层扫描，彻底剔除 Tailwind `z-[` 类名误伤，彻底消除长对话消息流、虚拟滚动与鼠标移动时的界面掉帧与卡顿；
+  - 阻断冒泡型 `mouseover` 事件风暴并彻底剥离全局 `pointerdown` 点击拦截，采用纯粹的非冒泡 `pointerenter` + 120ms 节流阀 + 50ms 单一防抖浮层扫描，彻底剔除 Tailwind `z-[` 类名误伤与对原生输入框焦点流转的潜在干扰，彻底消除长对话消息流、虚拟滚动与鼠标移动时的界面掉帧与卡顿；
   - 阻断 `requestIdleCallback` 50~60Hz 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路。
 - **深层选项悬浮气泡与执行策略全量覆盖 (Option Tooltips & Delivery Strategies)**：全量收录排队消息策略悬浮气泡提示（`Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`、`Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`）以及终端自动执行、产物审查模式、严格模式等深层选项的动态说明。
 - **行内纯文本容器联合自愈 (Multi-TextNode Coalescing Self-Healing)**：针对上游 React 模板碎片化拆分（如 `"All ", e, "s run as Flash."` 拆分为多个兄弟 TextNode 导致英文复数残片），在保持虚拟 DOM 节点引用稳定不报错的前提下，整句提纯联合自愈。
