@@ -262,12 +262,10 @@ antigravity-chinese/
 │   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
 │   ├── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
 │   └── test-vscode-patch.js          # 14 VS Code extension patching, Webview proxy & atomic rollback assertions
-├── tools/                            # Compiler, reverse engineering, diff analysis & drift detection toolchain
+├── tools/                            # Compiler, consistency audit & drift detection toolchain
 │   ├── ultimate-consistency-audit.js # Ultimate global consistency & quality deep audit analyzer (npm run audit)
 │   ├── build-dict.js                 # Three-tier dictionary compiler (ASCII key gate & capture group conservation)
-│   ├── drift-detector.js             # Upstream 800-char paragraph, YAML skill & false-positive drift detector (npm run scan:drift)
-│   ├── build-full-dict.js            # Full dictionary automated builder and deduplication tool
-│   └── gap-analysis.js               # Translation coverage gap & missed item automated analyzer
+│   └── drift-detector.js             # Upstream 800-char paragraph, YAML skill & false-positive drift detector (npm run scan:drift)
 ├── docs/assets/sponsoring/           # Sponsorship & community assets
 ├── cli.js                            # Cross-platform lifecycle CLI (detect, backup, extract, inject, pack, restore)
 ├── install.bat / install.sh          # Full ecosystem one-click install scripts (auto multi-surface probing & sync)

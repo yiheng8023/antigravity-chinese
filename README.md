@@ -262,12 +262,10 @@ antigravity-chinese/
 │   ├── test-detector-live.js         # 真实宿主系统 0 参数无参安装路径探测断言
 │   ├── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
 │   └── test-vscode-patch.js          # 14 项 VS Code 扩展补丁、Webview 代理与原子回滚断言
-├── tools/                            # 自动化编译、逆向与漂移检测工具链
+├── tools/                            # 自动化编译、一致性体检与漂移检测工具链
 │   ├── ultimate-consistency-audit.js # 全生态终极全局一致性与质量深度体检分析器 (npm run audit)
 │   ├── build-dict.js                 # 三层词典构建编译器 (ASCII Key 阻断、捕获组守恒门禁)
-│   ├── drift-detector.js             # 上游 800 字符长段落 + YAML 技能与假阳性拦截检测器 (npm run scan:drift)
-│   ├── build-full-dict.js            # 全量词典自动化去重与辅助工具
-│   └── gap-analysis.js               # 覆盖率差量与漏项自动化分析器
+│   └── drift-detector.js             # 上游 800 字符长段落 + YAML 技能与假阳性拦截检测器 (npm run scan:drift)
 ├── docs/assets/sponsoring/           # 赞助与社区资产
 ├── cli.js                            # 跨平台生命周期管理 CLI (探测、备份、解包、注入、打包、防降级还原)
 ├── install.bat / install.sh          # 全生态一键安装脚本 (多端探测、同步汉化客户端 + 插件 + VS Code 扩展)
