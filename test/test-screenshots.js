@@ -362,4 +362,23 @@ for (const tc of toleranceFuzz) {
 }
 console.log('✅ [PASS] 标点与快捷键容差变异测试通过 (3/3)');
 
+// 5. 模型选择器与模型规格原样保留断言 (不汉化)
+const modelSpecs = [
+  "Low",
+  "Medium",
+  "High",
+  "Fast",
+  "Limited",
+  "Limited time",
+  "Limited Time",
+  "Gemini 3.8 Flash",
+  "Claude Sonnet 4.6 (Thinking)",
+  "Claude Opus 4.6 (Thinking)",
+  "GPT-OSS 120B (Medium)"
+];
+for (const spec of modelSpecs) {
+  assert.strictEqual(engine.translate(spec), null, `Model spec should NOT be translated: ${spec}`);
+}
+console.log(`✅ [PASS] 模型选择器模型列表信息不汉化断言通过 (${modelSpecs.length}/${modelSpecs.length})`);
+
 console.log('\n🎉 [单源黄金语义与模糊测试] 全部通过！无影子副本，真理单源闭环！\n');

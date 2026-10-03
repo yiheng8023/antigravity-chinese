@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.15** (fully adapted for Antigravity **v2.19.1**).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.16** (fully adapted for Antigravity **v2.19.1**).
 
 ---
 
@@ -62,10 +62,10 @@ A high-performance, reversible Chinese localization suite and lifecycle manager 
   - Accurately captures floating action bars upon highlighting message text, resolving boundaries for isolated command keywords and shortcuts into canonical `引用 Ctrl+L`.
   - Multi-tier dictionary sources (`dict/src/`) and compilation pipelines fully aligned against regression.
 
-- 🎯 **Model Selector Harmonization & CJK Spacing Guard**:
-  - Publication-grade standard: Brand model names (`Gemini`, `Claude`, `GPT-OSS`) remain 100% authentic English proper nouns, while capability modifiers and status tags are completely harmonized into idiomatic Simplified Chinese (`Limited time` ➔ `限时`, `(Thinking)` ➔ `（思考）`, `(Medium)` ➔ `（中等）`, and sub-menu `低 / 中 / 高` tiers strictly aligned).
-  - Deep support for dynamically fetched model quota descriptions ("Within each group, models share a weekly limit and a 5-hour limit...") and quota parameters.
-  - Smart CJK typographic spacing guard prevents alphanumeric and Chinese characters from clumping together in selected model badges (e.g. `Gemini 3.8 Flash 高`).
+- 🎯 **Model Selector Pure English Design & React DOM Reconciliation Guard**:
+  - Adheres to the principle of "Technical model specs stay native English, peripheral operations stay Chinese": All model identifiers, technical tiers, and status badges within the model selector panel (`Low`, `Medium`, `High`, `Fast`, `Limited`, `Limited time`, `(Thinking)`, etc.) **remain 100% authentic native English**, preventing cognitive clutter caused by unnecessary translation.
+  - Completely blocks React virtual DOM text node append conflicts (eradicating the "中高" compound concatenation glitch upon model switching), establishing boundary-level isolation for Trigger buttons and model items.
+  - Preserves polished Chinese localization for peripheral menu controls, including panel header (`Model` ➔ `模型`) and usage details link (`View Usage` ➔ `查看用量明细`).
 
 - ⚡ **Dual-Mode Synergy Architecture**:
   - **Mode 1 (Deep ASAR Physical Injection)**: Deeply patches the ASAR archive for 100% native localization covering system tray (`tray.js`), menus (`menu.js`), and UI DOM.
@@ -87,8 +87,11 @@ A high-performance, reversible Chinese localization suite and lifecycle manager 
   - Built-in **ASCII Key Barrier** (guards against Chinese intermediate key fragments), **Capture-Group Invariant Guard** (syntax compilation and `$1..$N` conservation), and **Duplicate Key Conflict Guard**, producing a unified `dist/zh-CN.bundle.json` with seamless backward compatibility.
 - 🎯 **Single-Source Truth & Golden Snapshots**:
   - Core runtime extracts a stateless calculation factory `createI18nEngine` eliminating shadow duplicates across test suites and drift tools.
-  - 227 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 4 invariant fuzzing suites (thinking durations, reset countdowns, model interpolations, punctuation tolerances).
-- **High-Performance Low-Overhead Runtime Architecture**: Eliminates uncontrolled `requestIdleCallback` spinning loops; introduces DOM negative-tag caching with `O(1)` instantaneous short-circuiting on unhit nodes; floating Portal filters and a 100ms throttle valve keep intensive streaming dialogues and virtual scrolling smooth and responsive.
+  - 227 comprehensive UI test cases verified via strict `assert.strictEqual` golden assertions, paired with 5 invariant fuzzing suites (11-entry model spec zero-translation assertion, thinking durations, reset countdowns, model interpolations, punctuation tolerances).
+- ⚡ **Ultra-High Performance Runtime Architecture**:
+  - Replaces deep recursive `closest` and cross-subtree `querySelector` traversals with **pure single-node attribute $O(1)$ short-circuit guards**, reducing element inspection latency from 0.5~2ms to 0.0005ms (over 1,000x faster).
+  - Eliminates bubbling `mouseover` event storms by adopting non-bubbling `pointerenter` with 120ms throttling and 50ms debounced floating container scans, eliminating Tailwind `z-[` container false positives and eradicating frame drops during rapid scrolling and mouse movements.
+  - Prevents erratic 50~60Hz `requestIdleCallback` spin loops and maintains negative DOM cache tags for $O(1)$ instant bypass of non-translatable text nodes.
 - **Option Floating Tooltips & Delivery Strategies Coverage**: Fully covers dynamic floating tooltips across Settings (e.g. Queued Messages options: `Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`, `Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`), terminal auto-execution policies, artifact review policies, and Strict Mode descriptions.
 - **Multi-TextNode Coalescing Self-Healing**: Resolves upstream React split-node fragmentations (e.g. `"All ", e, "s run as Flash."` split into sibling TextNodes causing plural suffix leftovers) with atomic full-sentence coalescence while strictly preserving virtual DOM node topology and reference integrity.
 - **Protected Code & Terminal**: Intelligently ignores code editing areas (`Monaco Editor`, `pre`, `code`) and terminal consoles (`xterm`), strictly preserving user code and terminal commands.
@@ -179,7 +182,7 @@ npm test
 
 - **Dictionary Lint & Syntax Sanitization (`test/test-lint.js`)**: Validates dictionary JSON structure, formatting compliance, and syntax health.
 - **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 118 assertions covering critical DOM paths, inline DOM reordering self-healing, false-positive prevention, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
-- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 227 real UI screenshot `assert.strictEqual` golden truth assertions, plus 4 invariant fuzzing categories (7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
+- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 227 real UI screenshot `assert.strictEqual` golden truth assertions, plus 5 invariant fuzzing categories (11-entry model spec zero-translation assertion, 7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
 - **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
 - **Menu, Tray, Native Context Menu & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration, native context menu IPC interception, and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).

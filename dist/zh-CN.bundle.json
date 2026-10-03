@@ -1,6 +1,6 @@
 {
-  "version": "3.3.14",
-  "buildTime": "2026-10-01T14:19:58.847Z",
+  "version": "3.3.16",
+  "buildTime": "2026-10-03T15:06:36.747Z",
   "exact": {
     "\"Always Proceed\"": "“总是直接继续”",
     "+ Add Folder": "+ 添加文件夹",
@@ -763,9 +763,6 @@
     "Learn more.": "了解更多。",
     "Leave a comment": "留下评论",
     "Light": "浅色",
-    "Limited time": "限时",
-    "Limited Time": "限时",
-    "limited time": "限时",
     "Line Height": "行高",
     "Listed in Your Config": "在您的配置中列出",
     "Load Global Rules": "加载全局规则",
@@ -1982,9 +1979,6 @@
     "Search past worktrees...": "搜索历史工作树...",
     "No environments found": "未找到环境",
     "Configure Branches": "配置分支",
-    "Low": "低",
-    "Medium": "中",
-    "High": "高",
     "Run in your current workspace": "在当前工作区中运行",
     "Run in a new worktree": "在新建工作树 (Worktree) 中运行",
     "Workspaces are not available for this project": "此项目不支持工作区",
@@ -3197,7 +3191,6 @@
     "Predict the location of your next edit and navigate you there with a tab keypress.": "预测您下一次编辑的位置，按 Tab 键即可快速跳转至该处。",
     "Quickly add and update imports with a tab keypress.": "按 Tab 键快速添加并更新导入语句（Imports）。",
     "Set the speed of tab suggestions": "设置 Tab 补全建议的触发速度",
-    "Fast": "快速",
     "Slow": "慢速",
     "Highlight newly inserted text after accepting a Tab completion.": "接受 Tab 补全后高亮显示新插入的文本。",
     "Path to the Chrome/Chromium executable. Leave empty for auto-detection.": "Chrome/Chromium 可执行文件的路径。留空则自动探测。",
@@ -3304,26 +3297,6 @@
     "Quota limits": "配额上限"
   },
   "patterns": [
-    {
-      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Thinking\\)$",
-      "replacement": "$1（思考）"
-    },
-    {
-      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Medium\\)$",
-      "replacement": "$1（中等）"
-    },
-    {
-      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Low\\)$",
-      "replacement": "$1（低）"
-    },
-    {
-      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(High\\)$",
-      "replacement": "$1（高）"
-    },
-    {
-      "regex": "^([a-zA-Z0-9.\\-_ ]+?)\\s*\\(Max\\)$",
-      "replacement": "$1（最大）"
-    },
     {
       "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
       "replacement": "已思考 $1 小时 $2 分 $3 秒"

@@ -218,10 +218,31 @@
 
   var TRANSLATABLE_ATTRS = ['title', 'placeholder', 'aria-label', 'data-tooltip', 'alt', 'aria-description'];
 
+  function isModelSelectorBoundary(elem) {
+    if (!elem || elem.nodeType !== 1) return false;
+    var testId = elem.getAttribute ? elem.getAttribute('data-testid') : null;
+    if (testId) {
+      if (testId === 'model-selector-trigger' ||
+          testId === 'model-selector-item' ||
+          testId === 'model-selector-effort-option' ||
+          testId === 'model-selector-effort-group' ||
+          testId === 'model-selector-list') {
+        return true;
+      }
+    }
+    if (elem.hasAttribute && elem.hasAttribute('data-effort')) {
+      return true;
+    }
+    return false;
+  }
+
   function shouldIgnoreElement(el) {
     if (!el || el.nodeType !== 1) return false;
     if (IGNORED_TAGS[el.tagName]) return true;
     if (el.isContentEditable) return true;
+
+    // 模型选择器相关边界元素及其子元素保持英文原样（纯属性 O(1) 短路）
+    if (isModelSelectorBoundary(el)) return true;
 
     var className = typeof el.className === 'string' ? el.className : '';
     if (className) {
@@ -230,10 +251,11 @@
       }
     }
 
-    // 向上检查最近3层祖先，防止子元素在被保护区域内
+    // 向上检查最近 3 层祖先，防止子文本/图标元素在受保护区域（如 trigger/item 内部）
     var ancestor = el.parentElement;
     for (var depth = 0; ancestor && depth < 3; depth++) {
       if (IGNORED_TAGS[ancestor.tagName]) return true;
+      if (isModelSelectorBoundary(ancestor)) return true;
       var ancestorClass = typeof ancestor.className === 'string' ? ancestor.className : '';
       if (ancestorClass) {
         for (var ci = 0; ci < IGNORED_CLASSES.length; ci++) {
@@ -579,23 +601,18 @@
 
     if (el.matches) {
       try {
-        if (el.matches('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-radix-popper-content-wrapper], [data-side], [data-align], .popover, .tooltip, .context-view, .monaco-hover, .animate-slideIn, [class*="z-["]')) {
+        if (el.matches('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-radix-popper-content-wrapper], .popover, .tooltip, .context-view, .monaco-hover')) {
           return true;
         }
       } catch (e) {}
     }
     var role = el.getAttribute ? el.getAttribute('role') : '';
     if (role === 'tooltip' || role === 'menu' || role === 'dialog') return true;
-    if (el.hasAttribute && (el.hasAttribute('data-floating-ui-portal') || el.hasAttribute('data-side') || el.hasAttribute('data-align'))) return true;
+    if (el.hasAttribute && (el.hasAttribute('data-floating-ui-portal') || el.hasAttribute('data-radix-popper-content-wrapper'))) return true;
     if (cls) {
-      if (cls.indexOf('popover') !== -1 || cls.indexOf('tooltip') !== -1 || cls.indexOf('context-view') !== -1 || cls.indexOf('monaco-hover') !== -1 || cls.indexOf('animate-slideIn') !== -1 || cls.indexOf('z-[') !== -1) {
+      if (cls.indexOf('popover') !== -1 || cls.indexOf('tooltip') !== -1 || cls.indexOf('context-view') !== -1 || cls.indexOf('monaco-hover') !== -1) {
         return true;
       }
-    }
-    if (doc && el.parentElement === doc.body) {
-      var style = el.style || {};
-      if (style.position === 'fixed' || style.position === 'absolute') return true;
-      if (cls && (cls.indexOf('fixed') !== -1 || cls.indexOf('absolute') !== -1)) return true;
     }
     return false;
   }
@@ -634,7 +651,7 @@
           if (last && last.previousElementSibling && isFloatingElement(last.previousElementSibling)) {
             translateElement(last.previousElementSibling);
           }
-          var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-side], [data-align], .popover, .tooltip, .context-view, .monaco-hover, .animate-slideIn, [class*="z-["]') : null;
+          var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-radix-popper-content-wrapper], .popover, .tooltip, .context-view, .monaco-hover') : null;
           if (tooltips && tooltips.length > 0) {
             for (var tIdx = 0; tIdx < tooltips.length; tIdx++) {
               translateElement(tooltips[tIdx]);
@@ -645,9 +662,9 @@
       }
 
       var onHoverAction = function (e) {
-        // 100ms 节流阀：阻断高频 mouseover 事件风暴与全树深搜，杜绝剧烈掉帧
+        // 120ms 节流阀：阻断高频事件风暴，杜绝掉帧卡顿
         var now = Date.now ? Date.now() : (+new Date());
-        if (now - lastHoverTime < 100) return;
+        if (now - lastHoverTime < 120) return;
         lastHoverTime = now;
 
         var target = e.target;
@@ -656,7 +673,7 @@
         try {
           if (target.nodeType === 1) {
             translateElement(target);
-            // 严禁对 #workbench / body 根容器递归全树深搜，防止 13ms+ 剧烈掉帧
+            // 严禁对 #workbench / body 根容器递归全树深搜，防止剧烈掉帧
             if (target.parentElement && !isWorkbenchOrRoot(target.parentElement)) {
               translateElement(target.parentElement);
             }
@@ -664,20 +681,15 @@
         } catch (e) {}
         reconnectObserver();
 
-        // 即时定向扫描浮动提示层
-        scanFloatingContainers();
-
-        // 异步微延迟再次定向扫描（捕获动态延迟 40ms 挂载的气泡），杜绝全局 safeFullScan() 引起的掉帧
-        if (!hoverScanTimer) {
-          hoverScanTimer = setTimeout(function () {
-            hoverScanTimer = null;
-            scanFloatingContainers();
-          }, 40);
-        }
+        // 防抖延迟定向扫描浮动提示层（捕获动态延迟 50ms 挂载的气泡）
+        if (hoverScanTimer) clearTimeout(hoverScanTimer);
+        hoverScanTimer = setTimeout(function () {
+          hoverScanTimer = null;
+          scanFloatingContainers();
+        }, 50);
       };
 
       doc.addEventListener('pointerenter', onHoverAction, { capture: true, passive: true });
-      doc.addEventListener('mouseover', onHoverAction, { capture: true, passive: true });
       doc.addEventListener('pointerdown', onHoverAction, { capture: true, passive: true });
       doc.addEventListener('contextmenu', onHoverAction, { capture: true, passive: true });
     } catch (e) {}

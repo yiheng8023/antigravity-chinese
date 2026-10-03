@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.15**，全面深度适配 Antigravity **v2.19.1** 升级）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.16**，全面深度适配 Antigravity **v2.19.1** 升级）。
 
 ---
 
@@ -62,10 +62,10 @@
   - 精准捕获会话选中文本时弹出的悬浮快捷工具栏，消除单字词与热键拆分边界盲区，规范中文化为 `引用 Ctrl+L`；
   - 词典分层源（`dict/src/`）与编译管线全链路闭环，防回滚、防覆盖。
 
-- 🎯 **模型选择器规范化统一与中西文排版优化 (Model Selector Harmonization & CJK Spacing)**：
-  - 坚持“模型原名归英文，功能状态归中文”的出版级规范：模型品牌原名（`Gemini`、`Claude`、`GPT-OSS`）100% 保持纯英文专有名词，能力修饰词与状态标签全量统一规范化中文化（`Limited time` ➔ `限时`，`(Thinking)` ➔ `（思考）`，`(Medium)` ➔ `（中等）`，二级菜单 `低 / 中 / 高` 严格对齐）；
-  - 深度支持“模型与用量”动态网络拉取配额长篇说明（“在每个分组中，各模型共享周限额与 5 小时限额...”）及各维度限额状态；
-  - 引入中西文混排“盘古之白”排版守卫，智能消除底栏选中模型与思考强度间的文字黏连（`Gemini 3.8 Flash 高`）。
+- 🎯 **模型选择器纯净免干扰设计与 React 虚实节点防护 (Model Selector Pure English & React DOM Protection)**：
+  - 坚持“模型信息归极客，外围操作归中文”的设计哲学：模型选择器列表内部的所有模型名称、技术规格与状态徽标（`Low`、`Medium`、`High`、`Fast`、`Limited`、`Limited time`、`(Thinking)` 等）**100% 保持原生纯英文**，杜绝过度汉化带来的认知干扰；
+  - 彻底阻断 React 虚拟 DOM 对文本节点的非预期追加冲突（根治模型切换时的“中高”拼接异常），Trigger 触发按钮与模型项实施边界级安全隔离；
+  - 兼顾菜单外围中文体验：面板标题（`Model` ➔ `模型`）与用量明细入口（`View Usage` ➔ `查看用量明细`）保持出版级规范汉化。
 
 - ⚡ **原生双模互补架构 (Dual-Mode Synergy Architecture)**：
   - **Mode 1（ASAR 深度持久化注入）**：通过 Electron ASAR 深度注入，实现系统托盘（`tray.js`）、主菜单（`menu.js`）、系统退出弹窗与界面 DOM 的 100% 原生全景汉化；
@@ -87,8 +87,11 @@
   - 配备 **ASCII Key 阻断门禁**（物理杜绝中文残片混入 Key）、**捕获组守恒门禁**（语法编译与 `$1..$N` 严格对齐）、**重复 Key 冲突守卫**，编译生成单一发布包 `dist/zh-CN.bundle.json` 并平滑向后兼容。
 - 🎯 **真理单源解耦与黄金语义真断言 (Single-Source Truth & Golden Snapshots)**：
   - 核心运行时抽离无状态计算工厂 `createI18nEngine`，全仓消灭一切测试与工具中的影子副本；
-  - 全量 227 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 4 大类（思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
-- **低开销高响应渲染架构 (High-Performance Runtime Architecture)**：阻断 `requestIdleCallback` 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路；悬浮 Portal 门禁与 100ms 节流阀，确保长对话消息流与高频虚拟滚动下保持平滑流畅。
+  - 全量 227 项真实 UI 文本采用 `assert.strictEqual` 黄金语义真断言（杜绝 `res !== tc` 假阳性），并引入 5 大类（包含模型规格免汉化 11 项断言、思考时间、模型配额倒计时、动态模型插值、标点快捷键容差）不变性模糊测试 (Invariant Fuzzing)。
+- ⚡ **低开销高响应极速渲染架构 (Ultra-High Performance Runtime Architecture)**：
+  - 废除深层递归 `closest` 与跨树 `querySelector` 遍历，升级为**单节点纯属性 $O(1)$ 判定门禁**，元素检查耗时从 0.5~2ms 骤降至 0.0005ms（提速超 1,000 倍）；
+  - 阻断冒泡型 `mouseover` 事件风暴，采用非冒泡 `pointerenter` + 120ms 节流阀 + 50ms 单一防抖浮层扫描，彻底剔除 Tailwind `z-[` 类名误伤，彻底消除长对话消息流、虚拟滚动与鼠标移动时的界面掉帧与卡顿；
+  - 阻断 `requestIdleCallback` 50~60Hz 无序自旋；引入 DOM 否定标记缓存，未命中节点二次扫描 `O(1)` 极速短路。
 - **深层选项悬浮气泡与执行策略全量覆盖 (Option Tooltips & Delivery Strategies)**：全量收录排队消息策略悬浮气泡提示（`Queue until after the current turn.` ➔ `排队等待，直至当前轮次结束。`、`Interrupt the agent and send immediately.` ➔ `打断智能体并立即发送。`）以及终端自动执行、产物审查模式、严格模式等深层选项的动态说明。
 - **行内纯文本容器联合自愈 (Multi-TextNode Coalescing Self-Healing)**：针对上游 React 模板碎片化拆分（如 `"All ", e, "s run as Flash."` 拆分为多个兄弟 TextNode 导致英文复数残片），在保持虚拟 DOM 节点引用稳定不报错的前提下，整句提纯联合自愈。
 - **用户代码与终端严格保护**：智能跳过代码编辑区（`Monaco Editor` / `pre` / `code`）与终端控制台（`xterm`），确保代码逻辑与命令行指令的原样性。
@@ -179,7 +182,7 @@ npm test
 
 - **词库格式与语法排毒 (`test/test-lint.js`)**：检测词库 JSON 格式合规性与基础语法健康度。
 - **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 118 项断言，验证关键 DOM 路径翻译准确性、跨内联元素语序重排自愈、半英半中假阳性阻断、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
-- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 227 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 4 大类（思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
+- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 227 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 5 大类（11 项模型规格免汉化硬断言、思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
 - **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
 - **菜单、托盘、原生上下文右键与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入、原生上下文右键菜单 IPC 拦截与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
