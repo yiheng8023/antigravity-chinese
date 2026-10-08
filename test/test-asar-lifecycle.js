@@ -27,6 +27,8 @@ const mockSrcDir = path.join(testDir, 'src_mock');
 const asarPath = path.join(resourcesDir, 'app.asar');
 const backupPath = path.join(resourcesDir, 'app.asar.bak');
 const cliPath = path.join(__dirname, '..', 'cli.js');
+const asarBin = path.join(__dirname, '..', 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
+const asarCli = fs.existsSync(asarBin) ? `"${asarBin}"` : 'npx -y @electron/asar@3.2.14';
 
 const mockPluginDir = path.join(testDir, 'mock_plugins', 'chinese-toolkit');
 process.env.AGY_PLUGIN_DIR = mockPluginDir;
@@ -81,7 +83,7 @@ fs.writeFileSync(path.join(mockSrcDir, 'dist', 'tray.js'), origTrayA, 'utf-8');
 
 try {
   // 2. 打包出真实的初始 app.asar (版本 A)
-  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
   assert(fs.existsSync(asarPath), '【阶段 1】初始版本 A app.asar 构建成功');
   assert(!isAsarPatched(asarPath), '初始版本 A 确认为原生未修改状态');
 
@@ -100,7 +102,7 @@ try {
   assert(!isAsarPatched(asarPath), '二次安装后执行 restore，成功恢复为未打补丁状态');
 
   const unpackDirA = path.join(testDir, 'unpack_A');
-  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirA}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} extract "${asarPath}" "${unpackDirA}"`, { stdio: 'ignore' });
   const restoredPreloadA = fs.readFileSync(path.join(unpackDirA, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadA === origPreloadA, '【P0 验证通过】二次安装后 restore 仍 100% 等于官方原版 A (未被已打补丁副本污染)');
   const restoredMainA = fs.readFileSync(path.join(unpackDirA, 'dist', 'main.js'), 'utf-8');
@@ -115,7 +117,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('api', { version: 'B_UPSTREAM_NEW' });
 `;
   fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadB, 'utf-8');
-  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
   assert(!isAsarPatched(asarPath), '官方新版本 B 已覆盖为原生未打补丁状态');
 
   // 在版本 B 上执行 install
@@ -131,7 +133,7 @@ contextBridge.exposeInMainWorld('api', { version: 'B_UPSTREAM_NEW' });
   assert(!isAsarPatched(asarPath), '版本 B restore 后恢复为未修改状态');
 
   const unpackDirB = path.join(testDir, 'unpack_B');
-  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirB}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} extract "${asarPath}" "${unpackDirB}"`, { stdio: 'ignore' });
   const restoredPreloadB = fs.readFileSync(path.join(unpackDirB, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadB === origPreloadB, '【P0 验证通过】版本 B 上打补丁并 restore 后 100% 等于新版本 B (绝未回退老版本 A)');
 
@@ -147,7 +149,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('api', { version: 'C_SILENT_UPGRADE_NEW' });
 `;
   fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadC, 'utf-8');
-  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
   assert(!isAsarPatched(asarPath), '官方新版本 C 已静默覆盖为原生未打补丁状态');
 
   // 此时直接执行 restore
@@ -155,7 +157,7 @@ contextBridge.exposeInMainWorld('api', { version: 'C_SILENT_UPGRADE_NEW' });
 
   // 验证当前 asar 仍 100% 为版本 C，绝未被旧 bak 降级覆盖！
   const unpackDirC = path.join(testDir, 'unpack_C');
-  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirC}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} extract "${asarPath}" "${unpackDirC}"`, { stdio: 'ignore' });
   const restoredPreloadC = fs.readFileSync(path.join(unpackDirC, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadC === origPreloadC, '【P1 验证通过】留存旧 bak 时官方静默推送新版 C，restore 成功阻止版本回退，完整保留版本 C！');
   // 7. 【AG-02 专项验证】历史遗留旧备份缺失 .fingerprint 时的自适应迁移与防降级防护
@@ -186,7 +188,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
 `;
   fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadD, 'utf-8');
-  execSync(`npx -y @electron/asar@3.2.14 pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
   assert(!isAsarPatched(asarPath), 'Case B: 官方版本 D 已就绪');
 
   // 此时无 fingerprint 文件，执行 restore
@@ -194,7 +196,7 @@ contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
 
   // 验证当前 asar 仍 100% 为版本 D，绝未被旧 bak 降级覆盖！
   const unpackDirD = path.join(testDir, 'unpack_D');
-  execSync(`npx -y @electron/asar@3.2.14 extract "${asarPath}" "${unpackDirD}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} extract "${asarPath}" "${unpackDirD}"`, { stdio: 'ignore' });
   const restoredPreloadD = fs.readFileSync(path.join(unpackDirD, 'dist', 'preload.js'), 'utf-8');
   assert(restoredPreloadD === origPreloadD, '【AG-02 Case B 验证通过】无 fingerprint 时官方静默推新版 D，restore 成功拦截降级，100% 保持官方新版 D！');
 

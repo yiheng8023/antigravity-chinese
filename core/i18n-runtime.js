@@ -82,8 +82,7 @@
         return cacheAndReturn(normalized, null);
       }
 
-      var cjkChars = normalized.match(/[\u4e00-\u9fa5]/g);
-      if (cjkChars && cjkChars.length >= 1 && !/[a-zA-Z]{2,}/.test(normalized)) {
+      if (/[\u4e00-\u9fa5]/.test(normalized) && !/[a-zA-Z]{2,}/.test(normalized)) {
         return cacheAndReturn(normalized, null);
       }
 
