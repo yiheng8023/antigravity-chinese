@@ -290,7 +290,32 @@ const goldenCases = [
   { input: "Select a folder.", expected: "选择一个文件夹。" },
   { input: "Instantly create a new project and folder to start building.", expected: "即刻创建新项目和文件夹以开始构建。" },
   { input: "Create a new project using normal folders and/or citc workspaces.", expected: "使用常规文件夹和/或 CitC 工作区创建新项目。" },
-  { input: "Work in a CitC workspace.", expected: "在 CitC 工作区中工作。" }
+  { input: "Work in a CitC workspace.", expected: "在 CitC 工作区中工作。" },
+
+  // Screenshot: Workspace Switcher & Review Submenu (media_1791480523869_ad8ec36d.png & media_1791480605474_1dfd6323.png)
+  { input: "Local", expected: "本地" },
+  { input: "Staged index changes and working tree changes", expected: "暂存区索引更改与工作区更改" },
+  { input: "Branch main", expected: "分支 main" },
+  { input: "All changes since origin/main", expected: "自 origin/main 以来的全部更改" },
+  { input: "Files modified by the agent in this conversation", expected: "智能体在此会话中修改的文件" },
+  { input: "Search conversations based on their contents", expected: "基于内容搜索会话" },
+  { input: "Advanced Search", expected: "高级搜索" },
+  { input: "(Archived)", expected: "（已归档）" },
+  { input: "File Viewer", expected: "文件查看器" },
+  { input: "File edits", expected: "文件编辑" },
+  { input: "Terminal commands", expected: "终端命令" },
+  { input: "File reads", expected: "文件读取" },
+
+  // Screenshot: Project Context Menu (media_1791481237904_46267255.png)
+  { input: "Show in File Explorer", expected: "在文件资源管理器中显示" },
+  { input: "Show in Finder", expected: "在访达中显示" },
+  { input: "Show in File Manager", expected: "在文件管理器中显示" },
+
+  // Screenshot: Automations Panel & Dialog (media_1791481363483_44a43e14.png & media_1791481374404_dcddfb30.png)
+  { input: "New Automation", expected: "新建自动化" },
+  { input: "Enter automation name...", expected: "输入自动化名称..." },
+  { input: "Add Automation", expected: "添加自动化" },
+  { input: "No automations configured.", expected: "尚未配置任何自动化任务。" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

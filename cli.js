@@ -326,8 +326,13 @@ function patchIpcHandlersFile(ipcFilePath) {
       'Close All': '全部关闭',
       'Open in New Window': '在新窗口中打开',
       'Open in Browser': '在浏览器中打开',
+      'Show in File Explorer': '在文件资源管理器中显示',
       'Show in Explorer': '在文件资源管理器中显示',
-      'Reveal in File Explorer': '在文件资源管理器中显示'
+      'Reveal in File Explorer': '在文件资源管理器中显示',
+      'Open in File Explorer': '在文件资源管理器中打开',
+      'Show in Finder': '在访达中显示',
+      'Reveal in Finder': '在访达中显示',
+      'Show in File Manager': '在文件管理器中显示'
     };
 
     // 尝试融合编译好的 zh-CN 字典短词条

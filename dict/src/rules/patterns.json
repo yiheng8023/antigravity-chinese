@@ -1262,5 +1262,13 @@
   {
     "regex": "^Send\\s+feedback\\s+as\\s+(.+)$",
     "replacement": "以 $1 身份发送反馈"
+  },
+  {
+    "regex": "^Branch\\s+([a-zA-Z0-9_\\-\\.\\/]+)$",
+    "replacement": "分支 $1"
+  },
+  {
+    "regex": "^All changes since\\s+(.+)$",
+    "replacement": "自 $1 以来的全部更改"
   }
 ]
