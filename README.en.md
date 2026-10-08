@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.17** (fully adapted for Antigravity **v2.21.0**).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.18** (fully adapted for Antigravity **v2.21.0**).
 
 ---
 
