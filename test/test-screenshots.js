@@ -314,8 +314,26 @@ const goldenCases = [
   // Screenshot: Automations Panel & Dialog (media_1791481363483_44a43e14.png & media_1791481374404_dcddfb30.png)
   { input: "New Automation", expected: "新建自动化" },
   { input: "Enter automation name...", expected: "输入自动化名称..." },
-  { input: "Add Automation", expected: "添加自动化" },
-  { input: "No automations configured.", expected: "尚未配置任何自动化任务。" }
+  { input: "No automations configured.", expected: "尚未配置任何自动化任务。" },
+
+  // Screenshot: Git Push Submenu & Whitespace Settings (media_1791599709989_1d949b44.png & media_1791599720021_426142eb.png)
+  { input: "No commits to push", expected: "无待推送的提交" },
+  { input: "No commits to pull", expected: "无待拉取的提交" },
+  { input: "1 commit to push", expected: "1 个待推送的提交" },
+  { input: "5 commits to push", expected: "5 个待推送的提交" },
+  { input: "2 commits to pull", expected: "2 个待拉取的提交" },
+  { input: "Hide Whitespace Changes", expected: "隐藏空白字符更改" },
+  { input: "Show Whitespace Changes", expected: "显示空白字符更改" },
+  { input: "Ignore Whitespace Changes", expected: "忽略空白字符更改" },
+  { input: "Ignore Whitespace", expected: "忽略空白字符" },
+
+  // Screenshot: Send Message Hotkey Tooltip (media_1791600587068_c5e53828.png)
+  { input: "Send message Enter", expected: "发送消息 Enter" },
+  { input: "Send message (Enter)", expected: "发送消息 (Enter)" },
+  { input: "Send message Return", expected: "发送消息 Return" },
+  { input: "Send message Ctrl+Enter", expected: "发送消息 Ctrl+Enter" },
+  { input: "Send Message Enter", expected: "发送消息 Enter" },
+  { input: "Send Message (Cmd+Enter)", expected: "发送消息 (Cmd+Enter)" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

@@ -2121,6 +2121,28 @@
     "You've reached the maximum number of turns for this battle. End battle mode to continue.": "您已达到本次对决的最大轮次上限。请结束对决模式以继续。",
     "Your Plan": "当前方案",
     "Your Plan: Google AI Pro": "当前方案：Google AI Pro",
+    "No commits to push": "无待推送的提交",
+    "No commits to pull": "无待拉取的提交",
+    "Hide Whitespace Changes": "隐藏空白字符更改",
+    "Show Whitespace Changes": "显示空白字符更改",
+    "Ignore Whitespace Changes": "忽略空白字符更改",
+    "Ignore Whitespace": "忽略空白字符",
+    "Send message Enter": "发送消息 Enter",
+    "Send message (Enter)": "发送消息 (Enter)",
+    "Send message Return": "发送消息 Return",
+    "Send message (Return)": "发送消息 (Return)",
+    "Send message Ctrl+Enter": "发送消息 Ctrl+Enter",
+    "Send message (Ctrl+Enter)": "发送消息 (Ctrl+Enter)",
+    "Send message Cmd+Enter": "发送消息 Cmd+Enter",
+    "Send message (Cmd+Enter)": "发送消息 (Cmd+Enter)",
+    "Send Message Enter": "发送消息 Enter",
+    "Send Message (Enter)": "发送消息 (Enter)",
+    "Send Message Return": "发送消息 Return",
+    "Send Message (Return)": "发送消息 (Return)",
+    "Send Message Ctrl+Enter": "发送消息 Ctrl+Enter",
+    "Send Message (Ctrl+Enter)": "发送消息 (Ctrl+Enter)",
+    "Send Message Cmd+Enter": "发送消息 Cmd+Enter",
+    "Send Message (Cmd+Enter)": "发送消息 (Cmd+Enter)",
     "\"Allow remote debugging for this browser instance\"": "“为此浏览器实例允许远程调试”",
     "1 task running": "1 个运行中的任务",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",
@@ -4612,6 +4634,22 @@
     {
       "regex": "^All changes since\\s+(.+)$",
       "replacement": "自 $1 以来的全部更改"
+    },
+    {
+      "regex": "^(\\d+)\\s+commits?\\s+to\\s+push$",
+      "replacement": "$1 个待推送的提交"
+    },
+    {
+      "regex": "^(\\d+)\\s+commits?\\s+to\\s+pull$",
+      "replacement": "$1 个待拉取的提交"
+    },
+    {
+      "regex": "^Send\\s+[mM]essage\\s+(Enter|Return|Ctrl\\+Enter|Cmd\\+Enter|↵)$",
+      "replacement": "发送消息 $1"
+    },
+    {
+      "regex": "^Send\\s+[mM]essage\\s+\\((Enter|Return|Ctrl\\+Enter|Cmd\\+Enter|↵)\\)$",
+      "replacement": "发送消息 ($1)"
     }
   ]
 }

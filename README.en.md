@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.18** (fully adapted for Antigravity **v2.21.0**).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.19** (fully adapted for Antigravity **v2.22.0**).
 
 ---
 
@@ -182,12 +182,12 @@ npm test
 
 - **Dictionary Lint & Syntax Sanitization (`test/test-lint.js`)**: Validates dictionary JSON structure, formatting compliance, and syntax health.
 - **DOM Translation & Performance Short-Circuiting (`test/verify.js`)**: Uses JSDOM to verify 118 assertions covering critical DOM paths, inline DOM reordering self-healing, false-positive prevention, Monaco Editor & terminal protection, zero-lag DOM negative-tag caching with O(1) short-circuiting, and floating Portal gate thresholds.
-- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 227 real UI screenshot `assert.strictEqual` golden truth assertions, plus 5 invariant fuzzing categories (11-entry model spec zero-translation assertion, 7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
+- **Single-Source Truth & Golden Snapshots (`test/test-screenshots.js`)**: Abolishes shadow implementations completely and directly taps into `createI18nEngine`, covering 260 real UI screenshot `assert.strictEqual` golden truth assertions, plus 5 invariant fuzzing categories (11-entry model spec zero-translation assertion, 7 thought timing, 7 countdowns, 3 model interpolations, 3 punctuation shortcuts).
 - **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
 - **Menu, Tray, Native Context Menu & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration, native context menu IPC interception, and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
 - **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,300 exact entries and 321 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,361 exact entries and 322 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
 - **VS Code Extension Lifecycle, Webview Proxy & Anti-Corruption Verification (`test/test-vscode-patch.js`)**: 14 assertions covering extension probing, initial injection, command/setting/viewer localization, Webview micro reverse proxy interception, `i18n-bundle.js` asset generation, dual-backup anti-corruption, and full atomic rollback.
 
 ---
@@ -241,7 +241,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (3,339 exact entries + 318 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,361 exact entries + 322 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines

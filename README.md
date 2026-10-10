@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.18**，全面深度适配 Antigravity **v2.21.0** 升级）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.19**，全面深度适配 Antigravity **v2.22.0** 升级）。
 
 ---
 
@@ -182,12 +182,12 @@ npm test
 
 - **词库格式与语法排毒 (`test/test-lint.js`)**：检测词库 JSON 格式合规性与基础语法健康度。
 - **核心 DOM 注入与性能短路断言 (`test/verify.js`)**：使用 JSDOM 模拟真实渲染环境，包含 118 项断言，验证关键 DOM 路径翻译准确性、跨内联元素语序重排自愈、半英半中假阳性阻断、Monaco Editor 与终端保护、零卡顿 DOM 否定标记短路与悬浮 Portal 门禁阈值。
-- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 227 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 5 大类（11 项模型规格免汉化硬断言、思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
+- **真理单源黄金语义断言与不变性模糊测试 (`test/test-screenshots.js`)**：全仓废除影子复刻，直连核心 `createI18nEngine` 计算工厂，覆盖 260 项真实 UI 截图 `assert.strictEqual` 黄金语义真断言，外加 5 大类（11 项模型规格免汉化硬断言、思考时间 7 组、模型配额倒计时 7 组、动态模型插值 3 组、标点快捷键 3 组）不变性模糊测试 (Invariant Fuzzing)。
 - **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
 - **菜单、托盘、原生上下文右键与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入、原生上下文右键菜单 IPC 拦截与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
 - **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,300 条词条与 321 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,361 条词条与 322 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
 - **VS Code 扩展生命周期、Webview 代理与防污染测试 (`test/test-vscode-patch.js`)**：14 项断言覆盖扩展探测、首次注入、命令/配置/查看器全量汉化、Webview 本地微反向代理拦截注入、`i18n-bundle.js` 资产生成、二次安装双备份绝对防污染、以及原子还原全回归。
 
 ---
@@ -241,7 +241,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (3,339 精确词条 + 318 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (3,361 精确词条 + 322 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动

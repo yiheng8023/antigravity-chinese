@@ -1270,5 +1270,21 @@
   {
     "regex": "^All changes since\\s+(.+)$",
     "replacement": "自 $1 以来的全部更改"
+  },
+  {
+    "regex": "^(\\d+)\\s+commits?\\s+to\\s+push$",
+    "replacement": "$1 个待推送的提交"
+  },
+  {
+    "regex": "^(\\d+)\\s+commits?\\s+to\\s+pull$",
+    "replacement": "$1 个待拉取的提交"
+  },
+  {
+    "regex": "^Send\\s+[mM]essage\\s+(Enter|Return|Ctrl\\+Enter|Cmd\\+Enter|↵)$",
+    "replacement": "发送消息 $1"
+  },
+  {
+    "regex": "^Send\\s+[mM]essage\\s+\\((Enter|Return|Ctrl\\+Enter|Cmd\\+Enter|↵)\\)$",
+    "replacement": "发送消息 ($1)"
   }
 ]
