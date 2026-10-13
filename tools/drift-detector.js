@@ -160,6 +160,17 @@ function scanBuiltinAndPluginSkills() {
             uncoveredSkills.push({ file: full, description: norm, status: trans ? 'half_translated' : 'untranslated' });
           }
         }
+      } else if (entry.name === 'plugin.json') {
+        try {
+          const pj = JSON.parse(fs.readFileSync(full, 'utf8'));
+          if (pj.description && !/[\u4e00-\u9fa5]/.test(pj.description)) {
+            const norm = engine.normalizeWhitespace(pj.description);
+            const trans = emulateTranslation(norm);
+            if (!trans || trans.type === 'false_positive') {
+              uncoveredSkills.push({ file: full, description: norm, status: trans ? 'half_translated' : 'untranslated' });
+            }
+          }
+        } catch {}
       }
     }
   }

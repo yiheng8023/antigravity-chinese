@@ -369,5 +369,23 @@
   "Allow Gemini to notify you when the agent needs your attention or completes a task.": "允许 Gemini 在智能体需要您关注或完成任务时发送系统通知。",
   "Allow Gemini to notify you when the agent needs your attention or completes a task": "允许 Gemini 在智能体需要您关注或完成任务时发送系统通知",
   "Choose whether to be notified when the agent needs your attention or completes a task.": "选择是否在智能体需要您关注或完成任务时接收通知。",
-  "Choose whether to be notified when the agent needs your attention or completes a task": "选择是否在智能体需要您关注或完成任务时接收通知"
+  "Choose whether to be notified when the agent needs your attention or completes a task": "选择是否在智能体需要您关注或完成任务时接收通知",
+  "This project overrides your global permission settings.": "此项目已覆盖您的全局权限设置。",
+  "This workspace overrides your global permission settings.": "此工作区已覆盖您的全局权限设置。",
+  "Failed to save project settings: ": "保存项目设置失败：",
+  "Failed to save settings: ": "保存设置失败：",
+  "Permission Details": "权限详情",
+  "A comma-separated list like repo-a, repo-b, or * for all.": "以逗号分隔的列表（如 repo-a, repo-b），或填 * 代表全部。",
+  "Grant the selected actions on the listed issue numbers — a comma-separated list like 1, 2, 3, or * for all.": "对列出的议题 (Issue) 编号授予所选操作权限——以逗号分隔的列表（如 1, 2, 3），或填 * 代表全部。",
+  "Grant the selected actions on the listed pull request numbers — a comma-separated list like 1, 2, 3, or * for all.": "对列出的拉取请求 (PR) 编号授予所选操作权限——以逗号分隔的列表（如 1, 2, 3），或填 * 代表全部。",
+  "Grant the selected actions on the listed branch names — a comma-separated list like main, dev, prod (glob patterns like fix-* allowed), or * for all.": "对列出的分支名称授予所选操作权限——以逗号分隔的列表（如 main, dev, prod，支持 fix-* 等通配符），或填 * 代表全部。",
+  "Allow reading workflow runs (list, view, watch) across the whole repository.": "允许在整个代码仓库范围内读取工作流运行记录（列出、查看、监控）。",
+  "Each rule lets the agent run the listed workflow files on the listed refs — each a comma-separated list like ci.yml, deploy.yml and main, dev (glob patterns like fix-* allowed), or * for all. Both fields must be set for a rule to grant anything.": "每条规则允许智能体在指定的分支引用上运行指定的工作流文件——均使用逗号分隔列表，如 ci.yml, deploy.yml 与 main, dev（支持 fix-* 等通配符），或填 * 代表全部。两个字段必须同时填写方能生效。",
+  "A comma-separated list like org-a, org-b, or * for all.": "以逗号分隔的列表（如 org-a, org-b），或填 * 代表全部。",
+  "Agent permissions preset selector, current: Request Review": "智能体权限预设选择器，当前：请求审查",
+  "Agent permissions preset selector, current: Default": "智能体权限预设选择器，当前：默认",
+  "Agent permissions preset selector, current: Turbo": "智能体权限预设选择器，当前：极速",
+  "Agent permissions preset selector, current: Autonomous": "智能体权限预设选择器，当前：自主模式"
 }
+
+

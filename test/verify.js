@@ -377,6 +377,18 @@ const monacoHoverEl = win.document.createElement('div');
 monacoHoverEl.className = 'monaco-hover fade-in';
 assert(isFloating(monacoHoverEl), 'isFloatingElement 准确放行 .monaco-hover');
 
+// 6. 历史会话下线通知横幅（跨内联图标与子元素）DOM 翻译验证
+const historyBanner = win.document.createElement('div');
+historyBanner.innerHTML =
+  '<span class="font-medium text-foreground">This page is going away soon</span>' +
+  '<span id="hb-search">Search conversations with <svg aria-label="search"></svg> in the top left.</span>' +
+  '<span id="hb-archived">View archived in the sidebar <span class="whitespace-nowrap">(<svg aria-label="filter"></svg> menu)</span>.</span>';
+win.document.body.appendChild(historyBanner);
+win.__AGY_TRANSLATE_EL__(historyBanner);
+assert(historyBanner.children[0].textContent === '此页面即将下线', '历史会话横幅标题准确汉化为“此页面即将下线”');
+assert(historyBanner.querySelector('#hb-search').textContent === '可通过左上角的  图标搜索会话。', '历史会话横幅搜索提示跨内联图标准确汉化');
+assert(historyBanner.querySelector('#hb-archived').textContent === '可在侧边栏查看已归档会话 ( 菜单)。', '历史会话横幅归档提示跨内联图标与句末句号准确汉化');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

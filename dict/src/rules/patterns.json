@@ -568,7 +568,7 @@
     "replacement": "更新于 $1"
   },
   {
-    "regex": "^Created\\s+(.*)$",
+    "regex": "^Created\\s+(?!worker\\b)(.*)$",
     "replacement": "创建于 $1"
   },
   {
@@ -1286,5 +1286,70 @@
   {
     "regex": "^Send\\s+[mM]essage\\s+\\((Enter|Return|Ctrl\\+Enter|Cmd\\+Enter|↵)\\)$",
     "replacement": "发送消息 ($1)"
+  },
+  {
+    "regex": "^Playback speed ([0-9.]+)x$",
+    "replacement": "播放倍速 $1x"
+  },
+  {
+    "regex": "^Zoom (\\d+)%, reset to fit$",
+    "replacement": "缩放 $1%，点击重置为适应屏幕"
+  },
+  {
+    "regex": "^Enlarged media:\\s*(.+)$",
+    "replacement": "放大查看媒体：$1"
+  },
+  {
+    "regex": "^Fix with Agent:\\s*(.+)$",
+    "replacement": "使用智能体修复：$1"
+  },
+  {
+    "regex": "^Error restarting (.+?):\\s*(.+)$",
+    "replacement": "重启 $1 时出错：$2"
+  },
+  {
+    "regex": "^Zipping\\s+(.+?)(?:…|\\.\\.\\.)?$",
+    "replacement": "正在压缩 $1…"
+  },
+  {
+    "regex": "^Could not attach folder \"(.+?)\":\\s*Folder is empty$",
+    "replacement": "无法附加文件夹“$1”：文件夹为空"
+  },
+  {
+    "regex": "^Could not attach folder \"(.+?)\":\\s*Folder has more than 1000 files$",
+    "replacement": "无法附加文件夹“$1”：文件夹包含超过 1000 个文件"
+  },
+  {
+    "regex": "^Could not attach folder \"(.+?)\":\\s*Folder is larger than 20MB$",
+    "replacement": "无法附加文件夹“$1”：文件夹大小超过 20MB"
+  },
+  {
+    "regex": "^Could not attach folder \"(.+?)\":\\s*(.+)$",
+    "replacement": "无法附加文件夹“$1”：$2"
+  },
+  {
+    "regex": "^Could not open folder:\\s*(.+)$",
+    "replacement": "无法打开文件夹：$1"
+  },
+  {
+    "regex": "^Search for \"(.+?)\" in the Marketplace$",
+    "replacement": "在扩展市场中搜索“$1”"
+  },
+  {
+    "regex": "^No plugins found for \"(.+?)\"\\.$",
+    "replacement": "未找到与“$1”相关的插件。"
+  },
+  {
+    "regex": "^(\\d+) matching bundles?$",
+    "replacement": "$1 个匹配的组合包"
+  },
+  {
+    "regex": "^Get Anything Done with\\s+(.+)$",
+    "replacement": "借助 $1 搞定一切"
+  },
+  {
+    "regex": "^Select\\s+(.+?)\\s+Theme$",
+    "replacement": "选择 $1 主题"
   }
 ]
+

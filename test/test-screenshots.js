@@ -104,7 +104,7 @@ const goldenCases = [
   { input: "Proceed in Sandbox", expected: "在沙箱中执行" },
   { input: "Require Review", expected: "需要复核" },
   { input: "Vetted (Preview)", expected: "已审查 (预览)" },
-  { input: "Turbo", expected: "Turbo 极速" },
+  { input: "Turbo", expected: "极速" },
   { input: "Always Proceed", expected: "总是直接继续" },
   { input: 'Warning: "Always Proceed" is enabled without sandbox protection. This is very dangerous and we do not recommend doing this.', expected: '警告：“总是直接继续”在无沙箱保护的情况下已启用。这非常危险，我们不建议这样做。' },
 
@@ -333,7 +333,39 @@ const goldenCases = [
   { input: "Send message Return", expected: "发送消息 Return" },
   { input: "Send message Ctrl+Enter", expected: "发送消息 Ctrl+Enter" },
   { input: "Send Message Enter", expected: "发送消息 Enter" },
-  { input: "Send Message (Cmd+Enter)", expected: "发送消息 (Cmd+Enter)" }
+  { input: "Send Message (Cmd+Enter)", expected: "发送消息 (Cmd+Enter)" },
+
+  // v2.23.0 Core Features: Full-screen Media Viewer, Permissions Picker, Folder/Zip Attachments, MCP Fix with Agent & Onboarding
+  { input: "Playback speed (< / >)", expected: "播放倍速 (< / >)" },
+  { input: "Playback speed 1.5x", expected: "播放倍速 1.5x" },
+  { input: "Zoom 150%, reset to fit", expected: "缩放 150%，点击重置为适应屏幕" },
+  { input: "Enlarged media: demo.mp4", expected: "放大查看媒体：demo.mp4" },
+  { input: "Download video", expected: "下载视频" },
+  { input: "Missing Folders", expected: "缺失文件夹" },
+  { input: "This project overrides your global permission settings.", expected: "此项目已覆盖您的全局权限设置。" },
+  { input: "Fix with Agent", expected: "使用智能体修复" },
+  { input: "Fix with Agent: github-mcp", expected: "使用智能体修复：github-mcp" },
+  { input: "Error restarting github-mcp: connection refused", expected: "重启 github-mcp 时出错：connection refused" },
+  { input: "Enable this plugin to use this prompt", expected: "启用此插件以使用该提示词" },
+  { input: "Install this plugin to use this prompt", expected: "安装此插件以使用该提示词" },
+  { input: "Search for \"gdocs\" in the Marketplace", expected: "在扩展市场中搜索“gdocs”" },
+  { input: "No plugins found for \"gdocs\".", expected: "未找到与“gdocs”相关的插件。" },
+  { input: "Folder has more than 1000 files", expected: "文件夹包含超过 1000 个文件" },
+  { input: "Zipping src…", expected: "正在压缩 src…" },
+  { input: "Could not attach folder \"node_modules\": Folder has more than 1000 files", expected: "无法附加文件夹“node_modules”：文件夹包含超过 1000 个文件" },
+  { input: "Custom Order", expected: "自定义顺序" },
+  { input: "What best describes you?", expected: "哪一项最符合您的身份？" },
+  { input: "General work", expected: "通用办公" },
+
+  // Screenshot: Permissions Picker Turbo & History Page Deprecation Banner (media_1791871554270_ee97639b.png & media_1791871725385_158c7378.png)
+  { input: "Agent permissions preset selector, current: Turbo", expected: "智能体权限预设选择器，当前：极速" },
+  { input: "This page is going away soon", expected: "此页面即将下线" },
+  { input: "Search conversations with", expected: "可通过左上角的" },
+  { input: "in the top left.", expected: "图标搜索会话。" },
+  { input: "View archived in the sidebar", expected: "可在侧边栏查看已归档会话" },
+  { input: "menu)", expected: "菜单)" },
+  { input: "Drop to add to group", expected: "拖放以添加至分组" },
+  { input: "Collapse All", expected: "全部折叠" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);
