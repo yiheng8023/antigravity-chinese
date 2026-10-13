@@ -6,8 +6,11 @@ package-lock.json
 *.asar
 *.asar.bak
 *.asar.new
+*.asar.staged
+*.asar.swap-old
 __asar_temp_unpack__/
 preload.js
+RELEASE_NOTES_*.md
 
 # Internal analysis artifacts & upstream dumps
 tools/*.txt

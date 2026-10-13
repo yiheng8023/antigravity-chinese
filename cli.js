@@ -748,9 +748,13 @@ function install(customPath) {
       process.exit(1);
     }
 
-    // 成功替换后，安全清理暂存原版
+    // 成功替换后，安全清理暂存原版与可能残留的预注入包
     if (fs.existsSync(swapOldAsar)) {
       try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
+    }
+    const residualStagedAsar = path.join(resourcesDir, 'app.asar.staged');
+    if (fs.existsSync(residualStagedAsar)) {
+      try { fs.rmSync(residualStagedAsar, { force: true }); } catch (_) {}
     }
 
     // 写入汉化元数据指纹 (Hash/Manifest 根治架构)
@@ -803,6 +807,7 @@ function restore(customPath) {
   const resourcesDir = path.dirname(asarPath);
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
   const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+  const stagedPath = path.join(resourcesDir, 'app.asar.staged');
 
   if (!fs.existsSync(backupPath)) {
     console.error(`❌ 未找到安全备份文件: ${backupPath}，无法自动还原。`);
@@ -837,6 +842,7 @@ function restore(customPath) {
     if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
     if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
+    if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
     uninstallPlugin();
     console.log('\n✅ 客户端版本安全保护完成，当前官方全新原生版本已完整保留！\n');
     return;
@@ -848,6 +854,7 @@ function restore(customPath) {
     if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
     if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
+    if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
     uninstallPlugin();
     console.log('✅ 已清理污染的历史备份，完整保留当前官方原生客户端。\n');
     return;
@@ -883,8 +890,9 @@ function restore(customPath) {
     }
     if (copyErr) throw copyErr;
 
-    // 清除元数据
+    // 清除元数据与可能残留的预注入包
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
+    if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
 
     // 2. ASAR 成功还原后，安全同步卸载社区插件
     uninstallPlugin();

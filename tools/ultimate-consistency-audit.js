@@ -256,6 +256,25 @@ check('VS Code 扩展微代理模板核心防御机制具备 (GZIP 解压与 WHA
   return true;
 });
 
+check('仓库零过程产物与临时垃圾残留 (Zero Process Artifacts & Leftovers)', () => {
+  const rootEntries = fs.readdirSync(ROOT_DIR);
+  const forbiddenRoot = rootEntries.filter(name =>
+    /^RELEASE_NOTES_.*\.md$/i.test(name) ||
+    name === 'preload.js' ||
+    name === '__asar_temp_unpack__' ||
+    /\.asar(\.|$)/i.test(name)
+  );
+  if (forbiddenRoot.length > 0) {
+    return { ok: false, message: `根目录存在临时过程残留: ${forbiddenRoot.join(', ')}` };
+  }
+  const testEntries = fs.readdirSync(path.join(ROOT_DIR, 'test'));
+  const forbiddenTest = testEntries.filter(name => /^debug.*\.js$/i.test(name));
+  if (forbiddenTest.length > 0) {
+    return { ok: false, message: `test/ 目录存在临时调试脚本残留: ${forbiddenTest.join(', ')}` };
+  }
+  return true;
+});
+
 // ==========================================================================
 // 体检总结与健康指数评分
 // ==========================================================================
