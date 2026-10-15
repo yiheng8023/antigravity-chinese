@@ -160,8 +160,26 @@ try {
   assert.strictEqual(failRes.success, false);
   console.log('✅ [PASS] 缺失目录优雅静默跳过，无崩溃异常');
 
+  // 6. 验证全新 1.8.0+ 压缩混淆版 extension.js 弹性适配注入
+  const minifiedDir = path.join(os.tmpdir(), `agy_test_vscode_min_${Date.now()}`);
+  try {
+    fs.mkdirSync(minifiedDir, { recursive: true });
+    const minPkg = { ...rawOriginalPkg, version: "1.8.0" };
+    const minExtJs = `function foo(){};renderWebviewHtml(a,b,c,d){bu(a);a.html='<html></html>';};exports.activate=foo;`;
+    fs.writeFileSync(path.join(minifiedDir, 'package.json'), JSON.stringify(minPkg, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(minifiedDir, 'extension.js'), minExtJs, 'utf-8');
+
+    const minRes = installVsCodePatch(minifiedDir);
+    assert.strictEqual(minRes.success, true, '压缩混淆版 1.8.0 注入应成功');
+    const patchedMinJs = fs.readFileSync(path.join(minifiedDir, 'extension.js'), 'utf-8');
+    assert(patchedMinJs.includes('__agyI18nProxy.getProxiedUrls(b, c)'), '应自动捕获压缩变量 b, c 并完成代理重定向');
+    console.log('✅ [PASS] 1.8.0+ 压缩混淆版 renderWebviewHtml(a,b,c,d) 弹性捕获与代理重定向验证通过');
+  } finally {
+    try { fs.rmSync(minifiedDir, { recursive: true, force: true }); } catch (_) {}
+  }
+
   console.log('\n============================================================');
-  console.log('📊 VS Code 扩展补丁测试完成: 共 14 项全维核心断言 100% 全部通过！');
+  console.log('📊 VS Code 扩展补丁测试完成: 共 15 项全维核心断言 100% 全部通过！');
   console.log('============================================================\n');
 } finally {
   try {

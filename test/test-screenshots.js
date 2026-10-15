@@ -364,8 +364,15 @@ const goldenCases = [
   { input: "in the top left.", expected: "图标搜索会话。" },
   { input: "View archived in the sidebar", expected: "可在侧边栏查看已归档会话" },
   { input: "menu)", expected: "菜单)" },
-  { input: "Drop to add to group", expected: "拖放以添加至分组" },
-  { input: "Collapse All", expected: "全部折叠" }
+  { input: "Collapse All", expected: "全部折叠" },
+  { input: "Customize Sections", expected: "自定义分区" },
+  { input: "Customize sections", expected: "自定义分区" },
+  { input: "Links", expected: "链接" },
+  { input: "Toggle sidebar", expected: "切换侧边栏" },
+  { input: "Toggle Sidebar", expected: "切换侧边栏" },
+  { input: "Close sidebar", expected: "关闭侧边栏" },
+  { input: "Show sidebar", expected: "显示侧边栏" },
+  { input: "Hide sidebar", expected: "隐藏侧边栏" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

@@ -46,6 +46,8 @@ const VSCODE_TRANSLATION_MAP = {
     "启用内联代码差异标记与 CodeLens。禁用后将回退为在并排对比标签页中显示更改。",
   "Auto-accept pending edits in background files when sending a new chat message.":
     "发送新对话消息时，自动接受后台文件中待处理的代码编辑。",
+  "Auto-accept pending edits in background files when sending a new chat message. When off, nothing pending is accepted on your behalf: a review stays open across turns and later edits to the file add to it, and you are notified when reviews from earlier turns are still open.":
+    "在发送新对话消息时，自动接受后台文件中待决的修改。关闭时，将不会代表您自动接受任何待决更改：审查将在多轮对话间保持打开，对该文件的后续修改会追加到其中，且当上一轮审查仍处于打开状态时会向您发送通知。",
   "Automatically open files in the editor when the agent proposes edits.":
     "当智能体建议修改代码时，自动在编辑器中打开相应文件。",
   "Base URL for CLI downloads (used for testing and internal overrides).":
@@ -361,11 +363,14 @@ function patchExtensionJs(extDir) {
 
   let content = fs.readFileSync(extJsBakPath, 'utf-8');
 
-  // 2. 检查并注入 renderWebviewHtml 拦截
-  const targetSignature = 'renderWebviewHtml(webview, serverUrl, fullUrlString, options) {';
-  if (!content.includes(targetSignature)) {
+  // 2. 检查并注入 renderWebviewHtml 拦截（弹性兼容未压缩版与 1.8.0+ 压缩混淆版）
+  const sigRegex = /renderWebviewHtml\s*\(\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*\)\s*\{/;
+  const sigMatch = content.match(sigRegex);
+  if (!sigMatch) {
     return { success: false, message: '未在 extension.js 中匹配到 renderWebviewHtml 签名' };
   }
+
+  const [matchedSignature, paramWebview, paramServerUrl, paramFullUrl] = sigMatch;
 
   const proxyRequireHeader = `// --- AGY_VSCODE_I18N_PROXY_INJECTION_START ---
 let __agyI18nProxy = null;
@@ -375,21 +380,21 @@ try {
 // --- AGY_VSCODE_I18N_PROXY_INJECTION_END ---
 `;
 
-  const interceptionCode = `${targetSignature}
+  const interceptionCode = `${matchedSignature}
         // --- AGY_VSCODE_I18N_INTERCEPT_START ---
         try {
           if (!__agyI18nProxy) {
             __agyI18nProxy = require('./agy-i18n-proxy.js');
           }
           if (__agyI18nProxy && typeof __agyI18nProxy.getProxiedUrls === 'function') {
-            const __proxied = __agyI18nProxy.getProxiedUrls(serverUrl, fullUrlString);
-            serverUrl = __proxied.serverUrl;
-            fullUrlString = __proxied.fullUrlString;
+            const __proxied = __agyI18nProxy.getProxiedUrls(${paramServerUrl}, ${paramFullUrl});
+            ${paramServerUrl} = __proxied.serverUrl;
+            ${paramFullUrl} = __proxied.fullUrlString;
           }
         } catch (_) {}
         // --- AGY_VSCODE_I18N_INTERCEPT_END ---`;
 
-  content = proxyRequireHeader + content.replace(targetSignature, interceptionCode);
+  content = proxyRequireHeader + content.replace(matchedSignature, interceptionCode);
 
   fs.writeFileSync(extJsPath, content, 'utf-8');
   return { success: true };

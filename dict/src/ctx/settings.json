@@ -259,7 +259,10 @@
   "This conversation is in a different workspace.": "此会话位于其他工作区中。",
   "This project is associated with a different workspace.": "此项目关联了其他工作区。",
   "Show less": "收起",
-  "Customize sections": "自定义分组",
+  "Customize sections": "自定义分区",
+  "Customize Sections": "自定义分区",
+  "Customize section": "自定义分区",
+  "Customize Section": "自定义分区",
   "Sidecar feature is not available.": "Sidecar 辅助容器功能不可用。",
   "[/automation](slashCommand;automation) Guide me through creating an automated task": "[/automation](slashCommand;automation) 引导我创建一项自动化任务",
   "Hide Thumbnail Sidebar": "隐藏缩略图侧边栏",
@@ -435,6 +438,7 @@
   "Pay As You Go": "按量计费 (Pay As You Go)",
   "Managed by Enterprise Gateway": "由企业网关 (Enterprise Gateway) 托管",
   "United States": "美国",
-  "Europe": "欧洲"
+  "Europe": "欧洲",
+  "Auto-accept pending edits in background files when sending a new chat message. When off, nothing pending is accepted on your behalf: a review stays open across turns and later edits to the file add to it, and you are notified when reviews from earlier turns are still open.": "在发送新对话消息时，自动接受后台文件中待决的修改。关闭时，将不会代表您自动接受任何待决更改：审查将在多轮对话间保持打开，对该文件的后续修改会追加到其中，且当上一轮审查仍处于打开状态时会向您发送通知。"
 }
 

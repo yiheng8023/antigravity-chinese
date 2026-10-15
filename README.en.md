@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.20** (fully adapted for Antigravity **v2.23.0**).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.21** (fully adapted for Antigravity **v2.23.1** & VS Code extension **v1.8.0**).
 
 ---
 
@@ -241,7 +241,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (3,582 exact entries + 338 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,613 exact entries + 338 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
@@ -255,13 +255,13 @@ antigravity-chinese/
 ├── test/                             # Automated full-fidelity regression test suites (9 suites, 400+ assertions)
 │   ├── test-lint.js                  # Dictionary lint & syntax health checks
 │   ├── verify.js                     # 118 JSDOM state machine, inline reordering, and runtime performance assertions
-│   ├── test-screenshots.js          # 246 strictEqual golden truth assertions + 20 invariant fuzzing tests
+│   ├── test-screenshots.js          # 296 strictEqual golden truth assertions + 20 invariant fuzzing tests
 │   ├── test-cdp.js                   # Zero-dependency RFC 6455 CDP protocol bidirectional tests
 │   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
 │   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
 │   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
 │   ├── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
-│   └── test-vscode-patch.js          # 14 VS Code extension patching, Webview proxy & atomic rollback assertions
+│   └── test-vscode-patch.js          # 15 VS Code extension patching, Webview proxy & atomic rollback assertions
 ├── tools/                            # Compiler, consistency audit & drift detection toolchain
 │   ├── ultimate-consistency-audit.js # Ultimate global consistency & quality deep audit analyzer (npm run audit)
 │   ├── build-dict.js                 # Three-tier dictionary compiler (ASCII key gate & capture group conservation)
