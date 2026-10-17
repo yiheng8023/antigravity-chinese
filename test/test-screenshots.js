@@ -372,7 +372,20 @@ const goldenCases = [
   { input: "Toggle Sidebar", expected: "切换侧边栏" },
   { input: "Close sidebar", expected: "关闭侧边栏" },
   { input: "Show sidebar", expected: "显示侧边栏" },
-  { input: "Hide sidebar", expected: "隐藏侧边栏" }
+  { input: "Hide sidebar", expected: "隐藏侧边栏" },
+
+  // 2.24.0 Screenshots: Sort Projects, Auto Pin, Replace with New & Overview Panel (media_1792254518368_0358e14a.png & media_1792254580614_1cea623d.png)
+  { input: "Sort Projects", expected: "项目排序" },
+  { input: "Sort projects", expected: "项目排序" },
+  { input: "Auto Pin", expected: "自动置顶" },
+  { input: "Auto pin", expected: "自动置顶" },
+  { input: "Replace with New", expected: "替换为新会话" },
+  { input: "Replace with new", expected: "替换为新会话" },
+  { input: "Authentication expired", expected: "身份验证已过期" },
+  { input: "Log back in", expected: "重新登录" },
+  { input: "Toggle Maximize Auxiliary Pane", expected: "切换辅助面板最大化" },
+  { input: "Toggle Overview Panel", expected: "切换概览面板" },
+  { input: "Overview Panel", expected: "概览面板" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

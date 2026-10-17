@@ -317,6 +317,10 @@ function patchIpcHandlersFile(ipcFilePath) {
       'Split Up': '向上拆分',
       'Split Left': '向左拆分',
       'Replace With New': '替换为新会话',
+      'Replace with New': '替换为新会话',
+      'Replace with new': '替换为新会话',
+      'Move to Group': '移动到分组',
+      'Move to group': '移动到分组',
 
       // 标签页与窗口管理
       'Close': '关闭',

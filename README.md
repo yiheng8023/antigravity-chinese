@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.21**，全面深度适配 Antigravity **v2.23.1** 客户端升级与 VS Code 扩展 **v1.8.0** 混淆重构）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.22**，全面深度适配 Antigravity **v2.24.0** 客户端升级与 VS Code 扩展 **v1.8.0** 混淆重构）。
 
 ---
 
@@ -241,7 +241,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (3,613 精确词条 + 338 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (3,665 精确词条 + 338 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动
@@ -255,7 +255,7 @@ antigravity-chinese/
 ├── test/                             # 自动化全真回归测试套件 (9 大套件 400+ 断言)
 │   ├── test-lint.js                  # 词库格式与语法排毒校验
 │   ├── verify.js                     # 118 项 JSDOM 状态机、内联语序重排与运行时性能断言
-│   ├── test-screenshots.js          # 296 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
+│   ├── test-screenshots.js          # 306 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
 │   ├── test-cdp.js                   # 零依赖 RFC 6455 CDP 协议层双向通信测试
 │   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
 │   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言
