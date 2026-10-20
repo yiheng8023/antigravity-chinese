@@ -121,7 +121,8 @@ try {
   const patchedExtJs = fs.readFileSync(extJsPath, 'utf-8');
   assert(patchedExtJs.includes('AGY_VSCODE_I18N_PROXY_INJECTION'), 'extension.js 应包含 proxy 引入');
   assert(patchedExtJs.includes('AGY_VSCODE_I18N_INTERCEPT_START'), 'extension.js 应包含 renderWebviewHtml 拦截');
-  console.log('✅ [PASS] extension.js 深度拦截与微代理资产注入就绪');
+  assert.doesNotThrow(() => { new Function(patchedExtJs); }, '修补后的 extension.js 必须具备 100% 语法合法性');
+  console.log('✅ [PASS] extension.js 深度拦截与微代理资产注入就绪 (语法合法性验证通过)');
 
   const patchedPkg1 = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
   assert.strictEqual(patchedPkg1.description, '将 Google 以智能体为核心的开发平台引入 Visual Studio Code。');
@@ -165,7 +166,7 @@ try {
   try {
     fs.mkdirSync(minifiedDir, { recursive: true });
     const minPkg = { ...rawOriginalPkg, version: "1.8.0" };
-    const minExtJs = `function foo(){};renderWebviewHtml(a,b,c,d){bu(a);a.html='<html></html>';};exports.activate=foo;`;
+    const minExtJs = `const dummy={renderWebviewHtml(a,b,c,d){bu(a);a.html='<html></html>';}};exports.activate=function(){};`;
     fs.writeFileSync(path.join(minifiedDir, 'package.json'), JSON.stringify(minPkg, null, 2), 'utf-8');
     fs.writeFileSync(path.join(minifiedDir, 'extension.js'), minExtJs, 'utf-8');
 
@@ -173,7 +174,8 @@ try {
     assert.strictEqual(minRes.success, true, '压缩混淆版 1.8.0 注入应成功');
     const patchedMinJs = fs.readFileSync(path.join(minifiedDir, 'extension.js'), 'utf-8');
     assert(patchedMinJs.includes('__agyI18nProxy.getProxiedUrls(b, c)'), '应自动捕获压缩变量 b, c 并完成代理重定向');
-    console.log('✅ [PASS] 1.8.0+ 压缩混淆版 renderWebviewHtml(a,b,c,d) 弹性捕获与代理重定向验证通过');
+    assert.doesNotThrow(() => { new Function(patchedMinJs); }, '修补后的压缩混淆代码必须绝对合法，严禁丢失换行符导致后续逻辑被单行注释误伤！');
+    console.log('✅ [PASS] 1.8.0+ 压缩混淆版 renderWebviewHtml(a,b,c,d) 弹性捕获与语法无损性验证通过');
   } finally {
     try { fs.rmSync(minifiedDir, { recursive: true, force: true }); } catch (_) {}
   }

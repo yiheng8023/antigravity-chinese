@@ -380,8 +380,8 @@ try {
 // --- AGY_VSCODE_I18N_PROXY_INJECTION_END ---
 `;
 
-  const interceptionCode = `${matchedSignature}
-        // --- AGY_VSCODE_I18N_INTERCEPT_START ---
+  const interceptionCode = `${matchedSignature}\n` +
+`        // --- AGY_VSCODE_I18N_INTERCEPT_START ---
         try {
           if (!__agyI18nProxy) {
             __agyI18nProxy = require('./agy-i18n-proxy.js');
@@ -392,7 +392,8 @@ try {
             ${paramFullUrl} = __proxied.fullUrlString;
           }
         } catch (_) {}
-        // --- AGY_VSCODE_I18N_INTERCEPT_END ---`;
+        // --- AGY_VSCODE_I18N_INTERCEPT_END ---
+`;
 
   content = proxyRequireHeader + content.replace(matchedSignature, interceptionCode);
 
