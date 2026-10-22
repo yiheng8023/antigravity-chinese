@@ -389,6 +389,24 @@ assert(historyBanner.children[0].textContent === '此页面即将下线', '历�
 assert(historyBanner.querySelector('#hb-search').textContent === '可通过左上角的  图标搜索会话。', '历史会话横幅搜索提示跨内联图标准确汉化');
 assert(historyBanner.querySelector('#hb-archived').textContent === '可在侧边栏查看已归档会话 ( 菜单)。', '历史会话横幅归档提示跨内联图标与句末句号准确汉化');
 
+// 7. 验证 v2.25.0 与 v1.9.0 新增核心词条与查看器体系
+console.log('\n--- 4.10 验证 v2.25.0 与 v1.9.0 新增特性汉化 ---');
+assert(translate('Sidebar Updates') === '侧边栏更新', '"Sidebar Updates" -> "侧边栏更新"');
+assert(translate('Show or Hide Plugins') === '显示或隐藏插件', '"Show or Hide Plugins" -> "显示或隐藏插件"');
+assert(translate('Sidecar View') === 'Sidecar 视图', '"Sidecar View" -> "Sidecar 视图"');
+assert(translate('Creating Sidecar') === '正在创建 Sidecar', '"Creating Sidecar" -> "正在创建 Sidecar"');
+assert(translate('Auto-assignment not configured') === '未配置自动分配', '"Auto-assignment not configured" -> "未配置自动分配"');
+assert(translate('Create Cloud Project') === '创建云端项目', '"Create Cloud Project" -> "创建云端项目"');
+assert(translate('License Required') === '需要许可证', '"License Required" -> "需要许可证"');
+assert(translate('Manage License') === '管理许可证', '"Manage License" -> "管理许可证"');
+assert(translate('View Stacked Diff') === '查看堆叠差异', '"View Stacked Diff" -> "查看堆叠差异"');
+assert(translate('Artifact Viewer') === '产物查看器', '"Artifact Viewer" -> "产物查看器"');
+assert(translate('Selected model does not support this media type') === '所选模型不支持此媒体类型', '多模态不支持提示汉化通过');
+assert(translate('Accept Focused Change') === '接受当前选中的更改', '"Accept Focused Change" -> "接受当前选中的更改"');
+assert(translate('Manage Data Sharing & Telemetry') === '管理数据共享与遥测', '"Manage Data Sharing & Telemetry" -> "管理数据共享与遥测"');
+assert(translate('Show system notifications when your action is needed or the agent finishes.') === '当需要您采取操作或智能体完成任务时，显示系统通知。', '智能体系统通知描述汉化通过');
+assert(translate('Play a sound when your action is needed or the agent finishes.') === '当需要您采取操作或智能体完成任务时，播放提示音。', '智能体提示音描述汉化通过');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

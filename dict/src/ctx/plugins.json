@@ -471,7 +471,10 @@
   "Loading skills…": "正在加载技能…",
   "Customizations & Skills": "自定义扩展与技能",
   "Build applications with the Gemini Interactions API and Live API, including text, image, video, and speech generation, managed agents, and real-time multimodal streaming.": "使用 Gemini Interactions API 和 Live API 构建应用，涵盖文本、图像、视频与语音生成、托管智能体以及实时多模态流式传输。",
-  "Build applications with the Gemini Interactions API and Live API, including text, image, video, and speech generation, managed agents, and real-time multimodal streaming": "使用 Gemini Interactions API 和 Live API 构建应用，涵盖文本、图像、视频与语音生成、托管智能体以及实时多模态流式传输"
+  "Build applications with the Gemini Interactions API and Live API, including text, image, video, and speech generation, managed agents, and real-time multimodal streaming": "使用 Gemini Interactions API 和 Live API 构建应用，涵盖文本、图像、视频与语音生成、托管智能体以及实时多模态流式传输",
+  "Uses Chrome DevTools MCP for inspecting, debugging, and testing cookies, session state, authentication issues, and cookie consent compliance. Use when diagnosing 401/403 errors, authentication redirects, session expiration, Cookie/Set-Cookie header issues, cookie banner consent conformance, or third-party cookie/SameSite/Partitioned cookie warnings.": "使用 Chrome DevTools MCP 检查、调试和测试 Cookie、会话状态、身份验证问题以及 Cookie 同意合规性。适用于诊断 401/403 错误、身份验证重定向、会话过期、Cookie/Set-Cookie 标头问题、Cookie 横幅授权合规性或第三方 Cookie/SameSite/Partitioned 警告。",
+  "Diagnoses and resolves memory leaks in JavaScript/Node.js applications. Use when a user reports high memory usage, OOM errors, or wants to capture, compare, or inspect heap snapshots with Chrome DevTools MCP memory tools.": "诊断并解决 JavaScript / Node.js 应用程序中的内存泄漏。适用于用户报告高内存占用、OOM 内存溢出错误，或需要使用 Chrome DevTools MCP 内存工具捕获、比对或检查堆快照 (Heap Snapshots)。",
+  "Search tool for modern web development best practices. MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks. Do NOT skip — web APIs evolve rapidly and training weights contain obsolete patterns.": "现代 Web 开发最佳实践搜索工具。强制要求：针对所有 HTML/CSS 及客户端 JS 任务必须首先执行此工具。请勿跳过 —— Web API 演进迅速，训练权重可能包含已过时的模式。"
 }
 
 

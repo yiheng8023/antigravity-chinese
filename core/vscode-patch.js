@@ -31,8 +31,11 @@ const VSCODE_TRANSLATION_MAP = {
   "Focus Antigravity Panel": "聚焦 Antigravity 面板",
   "Accept All Changes": "接受所有更改",
   "Reject All Changes": "拒绝所有更改",
+  "Accept Focused Change": "接受当前选中的更改",
+  "Reject Focused Change": "拒绝当前选中的更改",
   "Toggle Inline Diff": "切换内联差异显示",
   "Open Antigravity Settings": "打开 Antigravity 设置",
+  "Manage Data Sharing & Telemetry": "管理数据共享与遥测",
   "Provide Feedback": "提供反馈",
 
   // 配置项描述 (Configuration Properties)
@@ -40,6 +43,12 @@ const VSCODE_TRANSLATION_MAP = {
     "Antigravity 后台服务器（`agy --hub`）的端口号。保留为 0 将自动分配临时可用端口。",
   "Timeout in milliseconds to wait for the Antigravity backend language server to start up and pass health checks.":
     "等待 Antigravity 后台语言服务器启动并通过健康检查的超时时间（毫秒）。",
+  "Automatically restart the Antigravity backend (`agy --hub`) when it stops unexpectedly mid-session, with bounded exponential backoff (at most 3 restarts per 10 minutes). When off, or once the restart budget is exhausted, the chat view shows an error with a manual retry button.":
+    "当 Antigravity 后台（`agy --hub`）在会话中意外停止时自动重启，采用有界指数退避策略（10 分钟内最多重启 3 次）。关闭时，或重启配额耗尽后，对话视图将显示带有手动重试按钮的错误提示。",
+  "Interval in milliseconds between post-startup `/healthz` liveness probes of the Antigravity backend while the window is focused (4x longer when unfocused). Three consecutive missed probes mark the backend as hung; with `antigravity.autoRecover` on it is then restarted. Set to 0 to disable the heartbeat.":
+    "窗口获得焦点时，对 Antigravity 后台启动后进行 `/healthz` 活跃度探测的间隔时间（毫秒，失去焦点时延长为 4 倍）。连续 3 次探测失败将把后台标记为挂起；开启 `antigravity.autoRecover` 时将自动重启。设为 0 可禁用心跳探测。",
+  "Telemetry is now controlled by the **Enable Telemetry** switch in Antigravity Settings → Account ([open](command:antigravity.openTelemetrySettings)). This setting no longer has any effect beyond keeping extension usage metrics off if set to `false`.":
+    "遥测现已由 Antigravity 设置 → 账户中的“启用遥测”开关控制（[打开](command:antigravity.openTelemetrySettings)）。若设置为 `false`，此设置除保持扩展使用指标关闭外，不再具有任何效果。",
   "Enable sending client-side product telemetry and usage metrics to Google Cloudmill to help improve Antigravity.":
     "启用向 Google 发送客户端产品遥测与使用指标，以协助持续改进 Antigravity。",
   "Enable inline diff decorations and CodeLenses. When disabled, falls back to opening changes in a side-by-side diff tab.":

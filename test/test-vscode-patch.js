@@ -161,27 +161,52 @@ try {
   assert.strictEqual(failRes.success, false);
   console.log('✅ [PASS] 缺失目录优雅静默跳过，无崩溃异常');
 
-  // 6. 验证全新 1.8.0+ 压缩混淆版 extension.js 弹性适配注入
+  // 6. 验证全新 1.8.0 / 1.9.0+ 压缩混淆版 extension.js 弹性适配注入与新增配置命令汉化
   const minifiedDir = path.join(os.tmpdir(), `agy_test_vscode_min_${Date.now()}`);
   try {
     fs.mkdirSync(minifiedDir, { recursive: true });
-    const minPkg = { ...rawOriginalPkg, version: "1.8.0" };
+    const minPkg = {
+      ...rawOriginalPkg,
+      version: "1.9.0",
+      contributes: {
+        ...rawOriginalPkg.contributes,
+        commands: [
+          ...rawOriginalPkg.contributes.commands,
+          { command: "antigravity.inlineDiff.acceptFocusedHunk", title: "Accept Focused Change" },
+          { command: "antigravity.openTelemetrySettings", title: "Manage Data Sharing & Telemetry" }
+        ],
+        configuration: {
+          properties: {
+            ...rawOriginalPkg.contributes.configuration.properties,
+            "antigravity.autoRecover": {
+              type: "boolean",
+              description: "Automatically restart the Antigravity backend (`agy --hub`) when it stops unexpectedly mid-session, with bounded exponential backoff (at most 3 restarts per 10 minutes). When off, or once the restart budget is exhausted, the chat view shows an error with a manual retry button."
+            }
+          }
+        }
+      }
+    };
     const minExtJs = `const dummy={renderWebviewHtml(a,b,c,d){bu(a);a.html='<html></html>';}};exports.activate=function(){};`;
     fs.writeFileSync(path.join(minifiedDir, 'package.json'), JSON.stringify(minPkg, null, 2), 'utf-8');
     fs.writeFileSync(path.join(minifiedDir, 'extension.js'), minExtJs, 'utf-8');
 
     const minRes = installVsCodePatch(minifiedDir);
-    assert.strictEqual(minRes.success, true, '压缩混淆版 1.8.0 注入应成功');
+    assert.strictEqual(minRes.success, true, '压缩混淆版 1.9.0 注入应成功');
     const patchedMinJs = fs.readFileSync(path.join(minifiedDir, 'extension.js'), 'utf-8');
     assert(patchedMinJs.includes('__agyI18nProxy.getProxiedUrls(b, c)'), '应自动捕获压缩变量 b, c 并完成代理重定向');
     assert.doesNotThrow(() => { new Function(patchedMinJs); }, '修补后的压缩混淆代码必须绝对合法，严禁丢失换行符导致后续逻辑被单行注释误伤！');
-    console.log('✅ [PASS] 1.8.0+ 压缩混淆版 renderWebviewHtml(a,b,c,d) 弹性捕获与语法无损性验证通过');
+    
+    const patchedMinPkg = JSON.parse(fs.readFileSync(path.join(minifiedDir, 'package.json'), 'utf-8'));
+    assert(patchedMinPkg.contributes.commands.some(c => c.title === '接受当前选中的更改'), '1.9.0 新命令 Accept Focused Change 成功汉化');
+    assert(patchedMinPkg.contributes.commands.some(c => c.title === '管理数据共享与遥测'), '1.9.0 新命令 Manage Data Sharing & Telemetry 成功汉化');
+    assert(patchedMinPkg.contributes.configuration.properties['antigravity.autoRecover'].description.includes('当 Antigravity 后台'), '1.9.0 新配置 autoRecover 描述成功汉化');
+    console.log('✅ [PASS] 1.8.0 / 1.9.0+ 压缩混淆版 renderWebviewHtml(a,b,c,d) 弹性捕获与新增命令配置全量汉化通过');
   } finally {
     try { fs.rmSync(minifiedDir, { recursive: true, force: true }); } catch (_) {}
   }
 
   console.log('\n============================================================');
-  console.log('📊 VS Code 扩展补丁测试完成: 共 15 项全维核心断言 100% 全部通过！');
+  console.log('📊 VS Code 扩展补丁测试完成: 共 18 项全维核心断言 100% 全部通过！');
   console.log('============================================================\n');
 } finally {
   try {
