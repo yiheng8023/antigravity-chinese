@@ -407,6 +407,26 @@ assert(translate('Manage Data Sharing & Telemetry') === '管理数据共享与�
 assert(translate('Show system notifications when your action is needed or the agent finishes.') === '当需要您采取操作或智能体完成任务时，显示系统通知。', '智能体系统通知描述汉化通过');
 assert(translate('Play a sound when your action is needed or the agent finishes.') === '当需要您采取操作或智能体完成任务时，播放提示音。', '智能体提示音描述汉化通过');
 
+// 8. 验证老宋实测四大关键漏项与 v2.26.0 核心演进断言
+console.log('\n--- 4.11 验证 v2.26.0 与老宋实测四大漏项汉化 ---');
+assert(translate('No extensions available') === '暂无可用扩展', '"No extensions available" -> "暂无可用扩展"');
+assert(translate('Search tabs, files, extensions, subagents, artifacts, tasks...') === '搜索标签页、文件、扩展、子智能体、产物、任务...', '快速打开多功能搜索栏占位符汉化通过');
+assert(translate('Give Feedback') === '提供反馈', '"Give Feedback" -> "提供反馈"');
+assert(translate('Click to respond to the questions.') === '点击以回答问题。', '问卷交互卡片提示汉化通过');
+assert(translate('Cancel Questionnaire and Stop the Agent') === '取消问卷并停止智能体', '取消问卷按钮汉化通过');
+assert(translate('Voice Mode') === '语音模式', '"Voice Mode" -> "语音模式"');
+assert(translate('Voice engine address') === '语音引擎地址', '"Voice engine address" -> "语音引擎地址"');
+assert(translate('Stage and amend all changes into the current commit') === '暂存并追加合并所有更改至当前提交', 'Git Amend 操作描述汉化通过');
+assert(translate('New Remote Project') === '新建远程项目', '"New Remote Project" -> "新建远程项目"');
+assert(translate('New models have been enabled for you!') === '已为您启用新模型！', '新模型启用通知汉化通过');
+
+// 验证跨内联元素（含 span 包装或混合态）自愈
+const nestedSpanContainer = win.document.createElement('div');
+nestedSpanContainer.innerHTML = '<span>也包含</span> <span>全局权限</span> <span>when working in this project.</span> <a href="#">了解更多。</a>';
+win.document.body.appendChild(nestedSpanContainer);
+win.__AGY_TRANSLATE_EL__(nestedSpanContainer);
+assert(nestedSpanContainer.textContent.includes('在此项目中工作时，也包含') && nestedSpanContainer.textContent.includes('全局权限') && !nestedSpanContainer.textContent.includes('when working in this project'), '嵌套 span 场景下跨内联元素语序自愈彻底消灭英文残留');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

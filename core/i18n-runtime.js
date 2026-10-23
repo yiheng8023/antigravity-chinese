@@ -393,34 +393,53 @@
           }
         }
       } else {
-        // 跨内联元素语序重排自愈：针对 "Also includes" + <span>Global Permissions</span> + "when working in this project."
+        // 跨内联元素语序重排自愈：针对 "Also includes" / "Includes" + <span>Global Permissions</span> + "when working in this project."
         var alsoNode = null;
         var whenNode = null;
         var scanCur = first;
+
+        function getDirectTextNode(n) {
+          if (!n) return null;
+          if (n.nodeType === 3) return n;
+          if (n.nodeType === 1 && n.childNodes.length === 1 && n.firstChild && n.firstChild.nodeType === 3) {
+            return n.firstChild;
+          }
+          return null;
+        }
+
         while (scanCur) {
-          if (scanCur.nodeType === 3 && scanCur.nodeValue) {
-            var tVal = scanCur.nodeValue.trim();
-            if (tVal === 'Also includes' || tVal === '也包含') {
-              alsoNode = scanCur;
-            } else if (alsoNode && (tVal === 'when working in this project.' || tVal === '在此项目中工作时。')) {
-              whenNode = scanCur;
+          var tn = getDirectTextNode(scanCur);
+          if (tn && tn.nodeValue) {
+            var tVal = tn.nodeValue.trim();
+            if (/^(?:Also\s+includes|Includes|也包含|包含)$/i.test(tVal)) {
+              alsoNode = tn;
+            } else if (alsoNode && (tVal.indexOf('when working in this project') !== -1 || tVal.indexOf('在此项目中工作时') !== -1)) {
+              whenNode = tn;
               break;
             }
           }
           scanCur = scanCur.nextSibling;
         }
         if (alsoNode && whenNode) {
-          alsoNode.nodeValue = '在此项目中工作时，也包含';
+          var alsoText = alsoNode.nodeValue.trim();
+          var prefix = (alsoText.indexOf('也') !== -1 || alsoText.indexOf('Also') !== -1) ? '在此项目中工作时，也包含' : '在此项目中工作时包含';
+          alsoNode.nodeValue = prefix;
           alsoNode._agyOriginal = alsoNode.nodeValue;
-          var between = alsoNode.nextSibling;
-          while (between && between !== whenNode) {
+
+          // 清理两者之间的空白节点
+          var alsoContainer = alsoNode.parentNode === el ? alsoNode : alsoNode.parentNode;
+          var whenContainer = whenNode.parentNode === el ? whenNode : whenNode.parentNode;
+          var between = alsoContainer.nextSibling;
+          while (between && between !== whenContainer) {
             if (between.nodeType === 3 && !between.nodeValue.trim()) {
               between.nodeValue = '';
               between._agyOriginal = '';
             }
             between = between.nextSibling;
           }
-          whenNode.nodeValue = '。';
+
+          var cleanedWhen = whenNode.nodeValue.replace(/when\s+working\s+in\s+this\s+project[。.]?/gi, '').replace(/在此项目中工作时[。.]?/g, '').trim();
+          whenNode.nodeValue = cleanedWhen ? ('。 ' + cleanedWhen) : '。';
           whenNode._agyOriginal = whenNode.nodeValue;
         }
       }
