@@ -317,6 +317,20 @@
     }
   }
 
+  // 深度穿透获取首个纯文本子节点（单例通用穿透辅助，避免在热路径循环中重复创建闭包分配）
+  function getFirstDirectTextNode(n) {
+    var cur = n;
+    while (cur) {
+      if (cur.nodeType === 3) return cur;
+      if (cur.nodeType === 1 && cur.childNodes.length === 1) {
+        cur = cur.firstChild;
+      } else {
+        break;
+      }
+    }
+    return null;
+  }
+
   function translateElement(el, scanId) {
     if (!el || el.nodeType !== 1) return;
     if (shouldIgnoreElement(el)) return;
@@ -398,17 +412,8 @@
         var whenNode = null;
         var scanCur = first;
 
-        function getDirectTextNode(n) {
-          if (!n) return null;
-          if (n.nodeType === 3) return n;
-          if (n.nodeType === 1 && n.childNodes.length === 1 && n.firstChild && n.firstChild.nodeType === 3) {
-            return n.firstChild;
-          }
-          return null;
-        }
-
         while (scanCur) {
-          var tn = getDirectTextNode(scanCur);
+          var tn = getFirstDirectTextNode(scanCur);
           if (tn && tn.nodeValue) {
             var tVal = tn.nodeValue.trim();
             if (/^(?:Also\s+includes|Includes|也包含|包含)$/i.test(tVal)) {

@@ -280,6 +280,10 @@ function startProxy() {
       res.end('AGY Proxy Error: ' + err.message);
     });
 
+    req.on('error', (err) => {
+      proxyReq.destroy(err);
+    });
+
     req.pipe(proxyReq);
   });
 
@@ -288,7 +292,13 @@ function startProxy() {
       clientSocket.destroy();
       return;
     }
-    const targetParsed = new URL(currentTargetUrl);
+    let targetParsed;
+    try {
+      targetParsed = new URL(currentTargetUrl);
+    } catch (_) {
+      clientSocket.destroy();
+      return;
+    }
     const targetSocket = net.connect(targetParsed.port, targetParsed.hostname, () => {
       targetSocket.write(
         req.method + ' ' + req.url + ' HTTP/' + req.httpVersion + '\\r\\n' +
@@ -302,6 +312,8 @@ function startProxy() {
 
     targetSocket.on('error', () => clientSocket.destroy());
     clientSocket.on('error', () => targetSocket.destroy());
+    targetSocket.on('close', () => clientSocket.destroy());
+    clientSocket.on('close', () => targetSocket.destroy());
   });
 
   proxyServer.listen(0, '127.0.0.1', () => {

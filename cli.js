@@ -341,10 +341,9 @@ function patchIpcHandlersFile(ipcFilePath) {
 
     // 尝试融合编译好的 zh-CN 字典短词条
     const mergedMap = {};
-    const bundleJsonPath = path.join(__dirname, 'dict', 'zh-CN.json');
-    if (fs.existsSync(bundleJsonPath)) {
+    if (fs.existsSync(DICT_PATH)) {
       try {
-        const d = JSON.parse(fs.readFileSync(bundleJsonPath, 'utf-8'));
+        const d = JSON.parse(fs.readFileSync(DICT_PATH, 'utf-8'));
         if (d && d.exact) {
           for (const [k, v] of Object.entries(d.exact)) {
             if (k.length > 0 && k.length <= 40 && typeof v === 'string') {
@@ -973,14 +972,37 @@ function isAsarPatched(asarPath) {
       } catch (e) {}
     }
 
-    // 2. 【兜底判据】全量 30MB 预加载标记签名检索
+    // 2. 【兜底判据】流式滑动窗口签名检索（最大 512KB 缓冲区，杜绝 30MB 堆外大内存分配）
     const fd = fs.openSync(asarPath, 'r');
     const stat = fs.fstatSync(fd);
-    const readLen = Math.min(stat.size, 30 * 1024 * 1024);
-    const buf = Buffer.alloc(readLen);
-    fs.readSync(fd, buf, 0, readLen, 0);
-    fs.closeSync(fd);
-    return buf.includes(Buffer.from('Antigravity Chinese Localization Injection'));
+    const targetSig = Buffer.from('Antigravity Chinese Localization Injection');
+    const CHUNK_SIZE = 512 * 1024;
+    const OVERLAP = targetSig.length;
+    const maxScanSize = Math.min(stat.size, 30 * 1024 * 1024);
+    let offset = 0;
+    let found = false;
+    const buf = Buffer.alloc(CHUNK_SIZE + OVERLAP);
+
+    try {
+      while (offset < maxScanSize) {
+        const bytesToRead = Math.min(CHUNK_SIZE, maxScanSize - offset);
+        const bytesRead = fs.readSync(fd, buf, 0, bytesToRead, offset);
+        if (bytesRead <= 0) break;
+        if (buf.subarray(0, bytesRead).includes(targetSig)) {
+          found = true;
+          break;
+        }
+        if (bytesRead < bytesToRead) break;
+        offset += bytesToRead;
+        // 如果不是最后一块，将末尾 OVERLAP 字节回退，防止签名被块边界切断
+        if (offset < maxScanSize && offset >= OVERLAP) {
+          offset -= OVERLAP;
+        }
+      }
+    } finally {
+      fs.closeSync(fd);
+    }
+    return found;
   } catch (e) {
     return false;
   }

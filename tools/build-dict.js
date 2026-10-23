@@ -77,12 +77,12 @@ function getReferencedGroups(replacementStr) {
   };
 }
 
-// 1. 加载并校验 exact 词典
+// 1. 加载并校验 exact 词典 (源文件显式排序，保障跨平台确定性构建 Deterministic Build)
 const exactDict = {};
 const exactSources = [
   ...fs.readdirSync(CORE_DIR).map(f => path.join(CORE_DIR, f)),
   ...fs.readdirSync(CTX_DIR).map(f => path.join(CTX_DIR, f))
-].filter(f => f.endsWith('.json'));
+].filter(f => f.endsWith('.json')).sort((a, b) => a.localeCompare(b));
 
 console.log(`📂 发现 exact 词典源文件: ${exactSources.length} 个`);
 for (const file of exactSources) {
@@ -108,9 +108,12 @@ for (const file of exactSources) {
   }
 }
 
-// 2. 加载并校验 patterns 规则
+// 2. 加载并校验 patterns 规则 (源文件显式排序，保障跨平台确定性构建 Deterministic Build)
 const allPatterns = [];
-const ruleSources = fs.readdirSync(RULES_DIR).filter(f => f.endsWith('.json')).map(f => path.join(RULES_DIR, f));
+const ruleSources = fs.readdirSync(RULES_DIR)
+  .filter(f => f.endsWith('.json'))
+  .sort((a, b) => a.localeCompare(b))
+  .map(f => path.join(RULES_DIR, f));
 console.log(`📂 发现 rules 规则源文件: ${ruleSources.length} 个`);
 
 for (const file of ruleSources) {
