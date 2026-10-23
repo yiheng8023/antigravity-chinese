@@ -1,4 +1,10 @@
+---
+description: "中文交互与工程规范"
+trigger: always_on
+---
+
 # 中文开发与智能体交互规范 (Chinese Interaction & Engineering Rules)
+
 
 ## 1. 语言与沟通准则 (Language & Communication)
 - **强制简体中文**：在所有的思考过程（Thinking）、用户回复、任务计划、总结报告以及代码注释中，始终使用清晰、准确、专业的简体中文。
