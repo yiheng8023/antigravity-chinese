@@ -482,6 +482,22 @@ win.document.body.appendChild(searchInput);
 win.__AGY_TRANSLATE_EL__(searchInput);
 assert(searchInput.getAttribute('placeholder') === '搜索标签页、文件、扩展、子智能体、产物、命令...', 'input placeholder 属性节点动态汉化通过');
 
+// 13. 验证老宋实测快捷键、会话轮次大纲导航轨与时间轴悬浮卡片断言
+console.log('\n--- 4.16 验证老宋实测快捷键与会话大纲时间轴导航轨汉化 ---');
+assert(translate('Search shortcuts...') === '搜索快捷键...', '"Search shortcuts..." -> "搜索快捷键..."');
+assert(translate('New Tab') === '新建标签页', '"New Tab" -> "新建标签页"');
+assert(translate('Reopen Closed Tab') === '重新打开关闭的标签页', '"Reopen Closed Tab" -> "重新打开关闭的标签页"');
+assert(translate('Move Conversation Up') === '上移会话', '"Move Conversation Up" -> "上移会话"');
+assert(translate('Move Conversation Down') === '下移会话', '"Move Conversation Down" -> "下移会话"');
+assert(translate('7 turns') === '7 个轮次', '"7 turns" -> "7 个轮次"');
+assert(translate('1 turn') === '1 个轮次', '"1 turn" -> "1 个轮次"');
+assert(translate('Turn 4') === '第 4 轮', '"Turn 4" -> "第 4 轮"');
+assert(translate('Turn 12') === '第 12 轮', '"Turn 12" -> "第 12 轮"');
+assert(translate('39 of 41') === '第 39 轮（共 41 轮）', '"39 of 41" -> "第 39 轮（共 41 轮）"');
+assert(translate('(2 image attachments)') === '(2 个图片附件)', '"(2 image attachments)" -> "(2 个图片附件)"');
+assert(translate('(1 image attachment)') === '(1 个图片附件)', '"(1 image attachment)" -> "(1 个图片附件)"');
+assert(translate('when working in this project.') === '在此项目中工作时。', '项目专属说明单独出现时的兜底汉化');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

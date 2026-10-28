@@ -1,6 +1,6 @@
 {
   "version": "3.3.28",
-  "buildTime": "2026-10-28T07:14:36.480Z",
+  "buildTime": "2026-10-28T07:39:29.895Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -2488,6 +2488,10 @@
     "Search tabs, files, extensions, subagents, artifacts, commands": "搜索标签页、文件、扩展、子智能体、产物、命令",
     "Search tabs, files, extensions, subagents, artifacts, command...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
     "Search tabs, files, extensions, subagents, artifacts, command": "搜索标签页、文件、扩展、子智能体、产物、命令",
+    "when working in these conversations.": "在此类会话中工作时。",
+    "when working in these conversations": "在此类会话中工作时",
+    "Includes Global Permissions when working in this project.": "在此项目中工作时包含全局权限。",
+    "Includes Global Permissions when working in this project": "在此项目中工作时包含全局权限",
     "\"Allow remote debugging for this browser instance\"": "“为此浏览器实例允许远程调试”",
     "1 task running": "1 个运行中的任务",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",
@@ -3819,9 +3823,57 @@
     "Choose where links open by default when clicked.": "选择点击链接时的默认打开方式。",
     "Choose where links open by default when clicked": "选择点击链接时的默认打开方式",
     "External Browser": "外部浏览器",
-    "External browser": "外部浏览器"
+    "External browser": "外部浏览器",
+    "Search shortcuts...": "搜索快捷键...",
+    "Search shortcuts": "搜索快捷键",
+    "New Tab": "新建标签页",
+    "Reopen Closed Tab": "重新打开关闭的标签页",
+    "Move Conversation Up": "上移会话",
+    "Move conversation up": "上移会话",
+    "Move Conversation Down": "下移会话",
+    "Move conversation down": "下移会话"
   },
   "patterns": [
+    {
+      "regex": "^(\\d+)\\s+turns?$",
+      "replacement": "$1 个轮次"
+    },
+    {
+      "regex": "^(?:Turn|turn)\\s+(\\d+)$",
+      "replacement": "第 $1 轮"
+    },
+    {
+      "regex": "^(\\d+)\\s+of\\s+(\\d+)$",
+      "replacement": "第 $1 轮（共 $2 轮）"
+    },
+    {
+      "regex": "^\\((\\d+)\\s+image\\s+attachments?\\)$",
+      "replacement": "($1 个图片附件)"
+    },
+    {
+      "regex": "^(\\d+)\\s+image\\s+attachments?$",
+      "replacement": "$1 个图片附件"
+    },
+    {
+      "regex": "^\\((\\d+)\\s+attachments?\\)$",
+      "replacement": "($1 个附件)"
+    },
+    {
+      "regex": "^(\\d+)\\s+attachments?$",
+      "replacement": "$1 个附件"
+    },
+    {
+      "regex": "^\\((\\d+)\\s+file\\s+attachments?\\)$",
+      "replacement": "($1 个文件附件)"
+    },
+    {
+      "regex": "^(\\d+)\\s+file\\s+attachments?$",
+      "replacement": "$1 个文件附件"
+    },
+    {
+      "regex": "^Search shortcuts\\.{0,3}$",
+      "replacement": "搜索快捷键..."
+    },
     {
       "regex": "^Background Commands\\s+(\\d+)\\s*>$",
       "replacement": "后台命令 $1 >"

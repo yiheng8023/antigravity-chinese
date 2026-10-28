@@ -1,5 +1,45 @@
 [
   {
+    "regex": "^(\\d+)\\s+turns?$",
+    "replacement": "$1 个轮次"
+  },
+  {
+    "regex": "^(?:Turn|turn)\\s+(\\d+)$",
+    "replacement": "第 $1 轮"
+  },
+  {
+    "regex": "^(\\d+)\\s+of\\s+(\\d+)$",
+    "replacement": "第 $1 轮（共 $2 轮）"
+  },
+  {
+    "regex": "^\\((\\d+)\\s+image\\s+attachments?\\)$",
+    "replacement": "($1 个图片附件)"
+  },
+  {
+    "regex": "^(\\d+)\\s+image\\s+attachments?$",
+    "replacement": "$1 个图片附件"
+  },
+  {
+    "regex": "^\\((\\d+)\\s+attachments?\\)$",
+    "replacement": "($1 个附件)"
+  },
+  {
+    "regex": "^(\\d+)\\s+attachments?$",
+    "replacement": "$1 个附件"
+  },
+  {
+    "regex": "^\\((\\d+)\\s+file\\s+attachments?\\)$",
+    "replacement": "($1 个文件附件)"
+  },
+  {
+    "regex": "^(\\d+)\\s+file\\s+attachments?$",
+    "replacement": "$1 个文件附件"
+  },
+  {
+    "regex": "^Search shortcuts\\.{0,3}$",
+    "replacement": "搜索快捷键..."
+  },
+  {
     "regex": "^Background Commands\\s+(\\d+)\\s*>$",
     "replacement": "后台命令 $1 >"
   },

@@ -2484,5 +2484,9 @@
   "Search tabs, files, extensions, subagents, artifacts, commands...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
   "Search tabs, files, extensions, subagents, artifacts, commands": "搜索标签页、文件、扩展、子智能体、产物、命令",
   "Search tabs, files, extensions, subagents, artifacts, command...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
-  "Search tabs, files, extensions, subagents, artifacts, command": "搜索标签页、文件、扩展、子智能体、产物、命令"
+  "Search tabs, files, extensions, subagents, artifacts, command": "搜索标签页、文件、扩展、子智能体、产物、命令",
+  "when working in these conversations.": "在此类会话中工作时。",
+  "when working in these conversations": "在此类会话中工作时",
+  "Includes Global Permissions when working in this project.": "在此项目中工作时包含全局权限。",
+  "Includes Global Permissions when working in this project": "在此项目中工作时包含全局权限"
 }

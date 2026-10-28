@@ -458,5 +458,13 @@
   "Choose where links open by default when clicked.": "选择点击链接时的默认打开方式。",
   "Choose where links open by default when clicked": "选择点击链接时的默认打开方式",
   "External Browser": "外部浏览器",
-  "External browser": "外部浏览器"
+  "External browser": "外部浏览器",
+  "Search shortcuts...": "搜索快捷键...",
+  "Search shortcuts": "搜索快捷键",
+  "New Tab": "新建标签页",
+  "Reopen Closed Tab": "重新打开关闭的标签页",
+  "Move Conversation Up": "上移会话",
+  "Move conversation up": "上移会话",
+  "Move Conversation Down": "下移会话",
+  "Move conversation down": "下移会话"
 }
