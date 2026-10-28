@@ -173,7 +173,7 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 
 ## 🧪 Automated Testing & CI Verification
 
-The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20) covering **390+ assertions**:
+The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20/22) covering **390+ assertions**:
 
 ```bash
 # Run all automated test suites (aggregating 9 full-fidelity test suites, 390+ assertions)

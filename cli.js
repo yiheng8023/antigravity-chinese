@@ -477,7 +477,7 @@ function patchTrayFile(trayFilePath) {
   fs.writeFileSync(trayFilePath, content, 'utf-8');
 }
 
-const MIN_NODE_VERSION = 16;
+const MIN_NODE_VERSION = 18;
 
 function runPreflightCheck(customPath) {
   const checks = [];

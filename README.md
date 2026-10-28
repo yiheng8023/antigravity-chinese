@@ -173,7 +173,7 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 
 ## 🧪 自动化测试与质量保证 (Testing & Verification)
 
-本项目引入极其严苛的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20），避免人工经验验证带来的遗漏：
+本项目引入极其严苛的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20/22），避免人工经验验证带来的遗漏：
 
 ```bash
 # 运行全套自动化测试（聚合 9 大全真测试套件，共 390+ 项真理断言）
