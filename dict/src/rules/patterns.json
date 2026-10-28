@@ -1350,6 +1350,34 @@
   {
     "regex": "^Select\\s+(.+?)\\s+Theme$",
     "replacement": "选择 $1 主题"
+  },
+  {
+    "regex": "^(\\d+(?:\\.\\d+)?)%\\s+left$",
+    "replacement": "剩余 $1%"
+  },
+  {
+    "regex": "^(\\d+)\\s*h\\s+limit$",
+    "replacement": "$1 小时限额"
+  },
+  {
+    "regex": "^(\\d+)\\s*d\\s+limit$",
+    "replacement": "$1 天限额"
+  },
+  {
+    "regex": "^(\\d+)\\s*m\\s+limit$",
+    "replacement": "$1 分钟限额"
+  },
+  {
+    "regex": "^(\\d+)\\s*s\\s+limit$",
+    "replacement": "$1 秒限额"
+  },
+  {
+    "regex": "^(\\d+)\\s*h\\s+rate\\s+limit$",
+    "replacement": "$1 小时速率限制"
+  },
+  {
+    "regex": "^(\\d+)\\s*d\\s+rate\\s+limit$",
+    "replacement": "$1 天速率限制"
   }
 ]
 

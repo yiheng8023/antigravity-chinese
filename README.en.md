@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.26** (fully adapted for Antigravity **v2.26.0**, inline sentence reordering self-healing, hot-path DOM closure elimination, 512KB ASAR streaming scan & hardened VS Code proxy leak defenses).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.27** (fully adapted for Antigravity **v2.27.0**, self-healing inline reordering in standalone conversation list, model usage quota popup, dynamic remaining percentage regex, 5h limits & WSL provisioning splash).
 
 ---
 

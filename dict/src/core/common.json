@@ -2453,7 +2453,11 @@
   "Failed to start host bridge server:": "启动宿主桥接服务失败：",
   "Failed to close host bridge server:": "关闭宿主桥接服务失败：",
   "Failed to close session connections:": "关闭会话连接失败：",
-  "Language Server process is not running.": "语言服务器进程未在运行。"
+  "Language Server process is not running.": "语言服务器进程未在运行。",
+  "Usage": "用量",
+  "5h limit": "5 小时限额",
+  "5h limit.": "5 小时限额。",
+  "5h rate limit": "5 小时速率限制"
 }
 
 

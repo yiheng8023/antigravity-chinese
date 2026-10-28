@@ -407,9 +407,10 @@
           }
         }
       } else {
-        // 跨内联元素语序重排自愈：针对 "Also includes" / "Includes" + <span>Global Permissions</span> + "when working in this project."
+        // 跨内联元素语序重排自愈：针对 "Also includes" / "Includes" + <span>Global Permissions</span> + "when working in this project." / "when working in these conversations."
         var alsoNode = null;
         var whenNode = null;
+        var isConvScope = false;
         var scanCur = first;
 
         while (scanCur) {
@@ -418,8 +419,13 @@
             var tVal = tn.nodeValue.trim();
             if (/^(?:Also\s+includes|Includes|也包含|包含)$/i.test(tVal)) {
               alsoNode = tn;
-            } else if (alsoNode && (tVal.indexOf('when working in this project') !== -1 || tVal.indexOf('在此项目中工作时') !== -1)) {
+            } else if (alsoNode && (/when\s+working\s+in\s+these\s+conversations/i.test(tVal) || tVal.indexOf('在此类会话中工作时') !== -1)) {
               whenNode = tn;
+              isConvScope = true;
+              break;
+            } else if (alsoNode && (/when\s+working\s+in\s+this\s+project/i.test(tVal) || tVal.indexOf('在此项目中工作时') !== -1)) {
+              whenNode = tn;
+              isConvScope = false;
               break;
             }
           }
@@ -427,7 +433,9 @@
         }
         if (alsoNode && whenNode) {
           var alsoText = alsoNode.nodeValue.trim();
-          var prefix = (alsoText.indexOf('也') !== -1 || alsoText.indexOf('Also') !== -1) ? '在此项目中工作时，也包含' : '在此项目中工作时包含';
+          var isAlso = alsoText.indexOf('也') !== -1 || alsoText.indexOf('Also') !== -1;
+          var scopePrefix = isConvScope ? '在此类会话中工作时' : '在此项目中工作时';
+          var prefix = isAlso ? (scopePrefix + '，也包含') : (scopePrefix + '包含');
           alsoNode.nodeValue = prefix;
           alsoNode._agyOriginal = alsoNode.nodeValue;
 
@@ -443,7 +451,10 @@
             between = between.nextSibling;
           }
 
-          var cleanedWhen = whenNode.nodeValue.replace(/when\s+working\s+in\s+this\s+project[。.]?/gi, '').replace(/在此项目中工作时[。.]?/g, '').trim();
+          var cleanedWhen = whenNode.nodeValue
+            .replace(/when\s+working\s+in\s+(?:this\s+project|these\s+conversations)[。.]?/gi, '')
+            .replace(/(?:在此项目中工作时|在此类会话中工作时)[。.]?/g, '')
+            .trim();
           whenNode.nodeValue = cleanedWhen ? ('。 ' + cleanedWhen) : '。';
           whenNode._agyOriginal = whenNode.nodeValue;
         }

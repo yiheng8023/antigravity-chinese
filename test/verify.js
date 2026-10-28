@@ -434,6 +434,22 @@ assert(translate('Downloading the Antigravity binary…') === '正在下载 Anti
 assert(translate('Update: Mode') === '更新策略', '"Update: Mode" -> "更新策略"');
 assert(translate('Language Server process is not running.') === '语言服务器进程未在运行。', '语言服务器未运行提示汉化通过');
 
+// 10. 验证老宋实测漏项（配额用量、剩余百分比、5小时限额与未归属项目会话语序自愈）
+console.log('\n--- 4.13 验证老宋实测四大核心漏项攻坚断言 ---');
+assert(translate('Usage') === '用量', '"Usage" -> "用量"');
+assert(translate('97% left') === '剩余 97%', '"97% left" -> "剩余 97%"');
+assert(translate('91% left') === '剩余 91%', '"91% left" -> "剩余 91%"');
+assert(translate('100% left') === '剩余 100%', '"100% left" -> "剩余 100%"');
+assert(translate('5h limit') === '5 小时限额', '"5h limit" -> "5 小时限额"');
+assert(translate('12h limit') === '12 小时限额', '"12h limit" -> "12 小时限额"');
+assert(translate('Inherits your Global Permissions when working in these conversations.') === '在此类会话中工作时，继承您的全局权限。', '会话列表继承全局权限下拉描述汉化通过');
+
+const convSpanContainer = win.document.createElement('div');
+convSpanContainer.innerHTML = '<span>包含</span> <span>全局权限</span> <span>when working in these conversations.</span> <a href="#">了解更多。</a>';
+win.document.body.appendChild(convSpanContainer);
+win.__AGY_TRANSLATE_EL__(convSpanContainer);
+assert(convSpanContainer.textContent.includes('在此类会话中工作时包含') && convSpanContainer.textContent.includes('全局权限') && !convSpanContainer.textContent.includes('when working in these conversations'), '会话列表场景下跨内联元素语序自愈彻底消灭英文残留');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

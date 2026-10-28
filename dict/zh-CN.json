@@ -2455,6 +2455,10 @@
     "Failed to close host bridge server:": "关闭宿主桥接服务失败：",
     "Failed to close session connections:": "关闭会话连接失败：",
     "Language Server process is not running.": "语言服务器进程未在运行。",
+    "Usage": "用量",
+    "5h limit": "5 小时限额",
+    "5h limit.": "5 小时限额。",
+    "5h rate limit": "5 小时速率限制",
     "\"Allow remote debugging for this browser instance\"": "“为此浏览器实例允许远程调试”",
     "1 task running": "1 个运行中的任务",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",
@@ -2710,6 +2714,10 @@
     "Inherits your Global Permissions when working in this project.": "在此项目中工作时，继承您的全局权限。",
     "Inherits your global permissions when working in this project": "在此项目中工作时，继承您的全局权限",
     "Inherits your global permissions when working in this project.": "在此项目中工作时，继承您的全局权限。",
+    "Inherits your Global Permissions when working in these conversations": "在此类会话中工作时，继承您的全局权限",
+    "Inherits your Global Permissions when working in these conversations.": "在此类会话中工作时，继承您的全局权限。",
+    "Inherits your global permissions when working in these conversations": "在此类会话中工作时，继承您的全局权限",
+    "Inherits your global permissions when working in these conversations.": "在此类会话中工作时，继承您的全局权限。",
     "Also includes Global Permissions": "也包含全局权限",
     "Also includes Global Permissions.": "也包含全局权限。",
     "Also includes global permissions": "也包含全局权限",
@@ -2719,6 +2727,11 @@
     "Also includes global permissions when working in this project": "在此项目中工作时也包含全局权限",
     "Also includes global permissions when working in this project.": "在此项目中工作时也包含全局权限。",
     "Also includes Global Permissions when working in this project. Learn more.": "在此项目中工作时也包含全局权限。了解更多。",
+    "Also includes Global Permissions when working in these conversations": "在此类会话中工作时也包含全局权限",
+    "Also includes Global Permissions when working in these conversations.": "在此类会话中工作时也包含全局权限。",
+    "Also includes global permissions when working in these conversations": "在此类会话中工作时也包含全局权限",
+    "Also includes global permissions when working in these conversations.": "在此类会话中工作时也包含全局权限。",
+    "Also includes Global Permissions when working in these conversations. Learn more.": "在此类会话中工作时也包含全局权限。了解更多。",
     "Search tasks...": "搜索任务...",
     "Search tasks": "搜索任务",
     "No scheduled tasks configured.": "尚未配置任何定时任务。",
@@ -5122,6 +5135,34 @@
     {
       "regex": "^Select\\s+(.+?)\\s+Theme$",
       "replacement": "选择 $1 主题"
+    },
+    {
+      "regex": "^(\\d+(?:\\.\\d+)?)%\\s+left$",
+      "replacement": "剩余 $1%"
+    },
+    {
+      "regex": "^(\\d+)\\s*h\\s+limit$",
+      "replacement": "$1 小时限额"
+    },
+    {
+      "regex": "^(\\d+)\\s*d\\s+limit$",
+      "replacement": "$1 天限额"
+    },
+    {
+      "regex": "^(\\d+)\\s*m\\s+limit$",
+      "replacement": "$1 分钟限额"
+    },
+    {
+      "regex": "^(\\d+)\\s*s\\s+limit$",
+      "replacement": "$1 秒限额"
+    },
+    {
+      "regex": "^(\\d+)\\s*h\\s+rate\\s+limit$",
+      "replacement": "$1 小时速率限制"
+    },
+    {
+      "regex": "^(\\d+)\\s*d\\s+rate\\s+limit$",
+      "replacement": "$1 天速率限制"
     }
   ]
 }
