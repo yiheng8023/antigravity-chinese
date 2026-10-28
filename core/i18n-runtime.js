@@ -407,56 +407,99 @@
           }
         }
       } else {
-        // 跨内联元素语序重排自愈：针对 "Also includes" / "Includes" + <span>Global Permissions</span> + "when working in this project." / "when working in these conversations."
-        var alsoNode = null;
+        // 跨内联元素语序重排自愈（终极拓扑自愈引擎）：针对 "Also includes" / "Includes" / "Inherits" + <span>Global Permissions</span> + "when working in this project." / "when working in these conversations."
+        // 彻底解决 React 组件层级嵌套与分片导致的单链断裂问题
         var whenNode = null;
         var isConvScope = false;
-        var scanCur = first;
 
-        while (scanCur) {
-          var tn = getFirstDirectTextNode(scanCur);
-          if (tn && tn.nodeValue) {
-            var tVal = tn.nodeValue.trim();
-            if (/^(?:Also\s+includes|Includes|也包含|包含)$/i.test(tVal)) {
-              alsoNode = tn;
-            } else if (alsoNode && (/when\s+working\s+in\s+these\s+conversations/i.test(tVal) || tVal.indexOf('在此类会话中工作时') !== -1)) {
-              whenNode = tn;
-              isConvScope = true;
-              break;
-            } else if (alsoNode && (/when\s+working\s+in\s+this\s+project/i.test(tVal) || tVal.indexOf('在此项目中工作时') !== -1)) {
-              whenNode = tn;
-              isConvScope = false;
-              break;
+        // 步骤 1：全子树搜索包含 when working 的关键后置修饰节点
+        function collectAllTextNodes(rootNode, outList) {
+          if (!rootNode) return;
+          if (rootNode.nodeType === 3) {
+            outList.push(rootNode);
+            return;
+          }
+          if (rootNode.nodeType === 1) {
+            var c = rootNode.firstChild;
+            while (c) {
+              collectAllTextNodes(c, outList);
+              c = c.nextSibling;
             }
           }
-          scanCur = scanCur.nextSibling;
         }
-        if (alsoNode && whenNode) {
-          var alsoText = alsoNode.nodeValue.trim();
-          var isAlso = alsoText.indexOf('也') !== -1 || alsoText.indexOf('Also') !== -1;
-          var scopePrefix = isConvScope ? '在此类会话中工作时' : '在此项目中工作时';
-          var prefix = isAlso ? (scopePrefix + '，也包含') : (scopePrefix + '包含');
-          alsoNode.nodeValue = prefix;
-          alsoNode._agyOriginal = alsoNode.nodeValue;
 
-          // 清理两者之间的空白节点
-          var alsoContainer = alsoNode.parentNode === el ? alsoNode : alsoNode.parentNode;
-          var whenContainer = whenNode.parentNode === el ? whenNode : whenNode.parentNode;
-          var between = alsoContainer.nextSibling;
-          while (between && between !== whenContainer) {
-            if (between.nodeType === 3 && !between.nodeValue.trim()) {
-              between.nodeValue = '';
-              between._agyOriginal = '';
+        var allSubTexts = [];
+        collectAllTextNodes(el, allSubTexts);
+
+        for (var sti = 0; sti < allSubTexts.length; sti++) {
+          var checkNode = allSubTexts[sti];
+          var checkVal = checkNode.nodeValue || '';
+          if (/when\s+working\s+in\s+these\s+conversations/i.test(checkVal) || checkVal.indexOf('在此类会话中工作时') !== -1) {
+            whenNode = checkNode;
+            isConvScope = true;
+            break;
+          }
+          if (/when\s+working\s+in\s+this\s+project/i.test(checkVal) || checkVal.indexOf('在此项目中工作时') !== -1) {
+            whenNode = checkNode;
+            isConvScope = false;
+            break;
+          }
+        }
+
+        if (whenNode) {
+          // 步骤 2：在 whenNode 之前的文本节点中拓扑查找动作前缀词 (Includes / Also includes / Inherits / 包含 / 也包含 / 继承)
+          var prefixNode = null;
+          for (var pti = 0; pti < allSubTexts.length; pti++) {
+            var candNode = allSubTexts[pti];
+            if (candNode === whenNode) break;
+            var candVal = candNode.nodeValue ? candNode.nodeValue.trim() : '';
+            if (/^(?:Also\s+includes|Includes|Inherits?|也包含|包含|继承)(?:\s+your)?$/i.test(candVal)) {
+              prefixNode = candNode;
+              break;
             }
-            between = between.nextSibling;
           }
 
-          var cleanedWhen = whenNode.nodeValue
-            .replace(/when\s+working\s+in\s+(?:this\s+project|these\s+conversations)[。.]?/gi, '')
-            .replace(/(?:在此项目中工作时|在此类会话中工作时)[。.]?/g, '')
-            .trim();
-          whenNode.nodeValue = cleanedWhen ? ('。 ' + cleanedWhen) : '。';
-          whenNode._agyOriginal = whenNode.nodeValue;
+          var scopePrefix = isConvScope ? '在此类会话中工作时' : '在此项目中工作时';
+
+          if (prefixNode) {
+            var pText = prefixNode.nodeValue.trim();
+            var isAlso = /also|也/i.test(pText);
+            var isInherit = /inherit|继承/i.test(pText);
+            var conn = '包含';
+            if (isAlso) conn = '，也包含';
+            else if (isInherit) conn = '，继承';
+
+            prefixNode.nodeValue = scopePrefix + conn;
+            prefixNode._agyOriginal = prefixNode.nodeValue;
+
+            // 清理 prefixNode 与 whenNode 之间的纯空白子节点，保证中文排版紧凑无多余空格
+            var clearStart = false;
+            for (var bi = 0; bi < allSubTexts.length; bi++) {
+              var bNode = allSubTexts[bi];
+              if (bNode === prefixNode) {
+                clearStart = true;
+                continue;
+              }
+              if (bNode === whenNode) break;
+              if (clearStart && bNode.nodeType === 3 && !bNode.nodeValue.trim()) {
+                bNode.nodeValue = '';
+                bNode._agyOriginal = '';
+              }
+            }
+
+            var cleanedWhen = whenNode.nodeValue
+              .replace(/when\s+working\s+in\s+(?:this\s+project|these\s+conversations)[。.]?/gi, '')
+              .replace(/(?:在此项目中工作时|在此类会话中工作时)[。.]?/g, '')
+              .trim();
+            whenNode.nodeValue = cleanedWhen ? ('。 ' + cleanedWhen) : '。';
+            whenNode._agyOriginal = whenNode.nodeValue;
+          } else {
+            // 步骤 3：绝对安全兜底——若因特殊层级未能关联 prefixNode，直接就地物理汉化 whenNode，绝不留英文死角！
+            whenNode.nodeValue = whenNode.nodeValue
+              .replace(/when\s+working\s+in\s+these\s+conversations/gi, '在此类会话中工作时')
+              .replace(/when\s+working\s+in\s+this\s+project/gi, '在此项目中工作时');
+            whenNode._agyOriginal = whenNode.nodeValue;
+          }
         }
       }
     }

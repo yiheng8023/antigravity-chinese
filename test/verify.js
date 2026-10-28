@@ -498,6 +498,13 @@ assert(translate('(2 image attachments)') === '(2 个图片附件)', '"(2 image 
 assert(translate('(1 image attachment)') === '(1 个图片附件)', '"(1 image attachment)" -> "(1 个图片附件)"');
 assert(translate('when working in this project.') === '在此项目中工作时。', '项目专属说明单独出现时的兜底汉化');
 
+// 14. 验证极端跨层级多节点语序拓扑重组自愈断言
+const multiLayerContainer = win.document.createElement('div');
+multiLayerContainer.innerHTML = '<div><span>包含</span></div><div><a href="#">全局权限</a></div><div>when working in these conversations. <a href="#">了解更多。</a></div>';
+win.document.body.appendChild(multiLayerContainer);
+win.__AGY_TRANSLATE_EL__(multiLayerContainer);
+assert(multiLayerContainer.textContent.includes('在此类会话中工作时包含') && multiLayerContainer.textContent.includes('全局权限') && !multiLayerContainer.textContent.includes('when working in these conversations'), '极端跨层级多节点拓扑重排自愈彻底消灭英文残留');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');
