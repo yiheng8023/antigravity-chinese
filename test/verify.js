@@ -450,6 +450,16 @@ win.document.body.appendChild(convSpanContainer);
 win.__AGY_TRANSLATE_EL__(convSpanContainer);
 assert(convSpanContainer.textContent.includes('在此类会话中工作时包含') && convSpanContainer.textContent.includes('全局权限') && !convSpanContainer.textContent.includes('when working in these conversations'), '会话列表场景下跨内联元素语序自愈彻底消灭英文残留');
 
+// 11. 验证 v2.28.0 Script Jail 安全沙箱与连接隔离断言
+console.log('\n--- 4.14 验证 v2.28.0 Script Jail 安全沙箱与连接隔离汉化 ---');
+assert(translate('Script aborted by host') === '脚本已被宿主中止', '沙箱中止提示汉化');
+assert(translate('Script execution failed') === '脚本执行失败', '沙箱执行失败提示汉化');
+assert(translate('Worker execution failed') === 'Worker 执行失败', 'Worker 异常提示汉化');
+assert(translate('Script execution has already finished') === '脚本执行已完成', '沙箱已结束提示汉化');
+assert(translate('Script return value is not JSON-serializable') === '脚本返回值无法被 JSON 序列化', '序列化报错汉化');
+assert(translate('Script jail WebContents was destroyed') === '脚本沙箱 WebContents 已销毁', '沙箱容器销毁提示汉化');
+assert(translate('Unauthorized script-jail sender: subframe cannot invoke script jail') === '未授权的脚本沙箱发送方：子框架无法调用脚本沙箱', '子框架权限阻断汉化');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');
