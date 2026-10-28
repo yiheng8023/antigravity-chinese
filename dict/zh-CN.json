@@ -2476,6 +2476,16 @@
     "Unauthorized script-jail sender: WebContents is missing or destroyed": "未授权的脚本沙箱发送方：WebContents 缺失或已销毁",
     "Unauthorized script-jail sender: subframe cannot invoke script jail": "未授权的脚本沙箱发送方：子框架无法调用脚本沙箱",
     "Unauthorized script-jail sender: WebContents is not an active Hub BrowserWindow": "未授权的脚本沙箱发送方：WebContents 不是活动状态的 Hub BrowserWindow",
+    "Local Checkout": "本地检出",
+    "Local checkout": "本地检出",
+    "Remote Checkout": "远程检出",
+    "Remote checkout": "远程检出",
+    "This Computer": "此电脑",
+    "Background Commands": "后台命令",
+    "Search tabs, files, extensions, subagents, artifacts, commands...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
+    "Search tabs, files, extensions, subagents, artifacts, commands": "搜索标签页、文件、扩展、子智能体、产物、命令",
+    "Search tabs, files, extensions, subagents, artifacts, command...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
+    "Search tabs, files, extensions, subagents, artifacts, command": "搜索标签页、文件、扩展、子智能体、产物、命令",
     "\"Allow remote debugging for this browser instance\"": "“为此浏览器实例允许远程调试”",
     "1 task running": "1 个运行中的任务",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",
@@ -3798,9 +3808,34 @@
     "Managed by Enterprise Gateway": "由企业网关 (Enterprise Gateway) 托管",
     "United States": "美国",
     "Europe": "欧洲",
-    "Auto-accept pending edits in background files when sending a new chat message. When off, nothing pending is accepted on your behalf: a review stays open across turns and later edits to the file add to it, and you are notified when reviews from earlier turns are still open.": "在发送新对话消息时，自动接受后台文件中待决的修改。关闭时，将不会代表您自动接受任何待决更改：审查将在多轮对话间保持打开，对该文件的后续修改会追加到其中，且当上一轮审查仍处于打开状态时会向您发送通知。"
+    "Auto-accept pending edits in background files when sending a new chat message. When off, nothing pending is accepted on your behalf: a review stays open across turns and later edits to the file add to it, and you are notified when reviews from earlier turns are still open.": "在发送新对话消息时，自动接受后台文件中待决的修改。关闭时，将不会代表您自动接受任何待决更改：审查将在多轮对话间保持打开，对该文件的后续修改会追加到其中，且当上一轮审查仍处于打开状态时会向您发送通知。",
+    "Built-In Browser": "内置浏览器",
+    "Built-in Browser": "内置浏览器",
+    "Configure link opening and built-in browser preferences.": "配置链接打开方式与内置浏览器偏好设置。",
+    "Configure link opening and built-in browser preferences": "配置链接打开方式与内置浏览器偏好设置",
+    "Open Links In": "链接打开方式",
+    "Choose where links open by default when clicked.": "选择点击链接时的默认打开方式。",
+    "Choose where links open by default when clicked": "选择点击链接时的默认打开方式",
+    "External Browser": "外部浏览器",
+    "External browser": "外部浏览器"
   },
   "patterns": [
+    {
+      "regex": "^Background Commands\\s+(\\d+)\\s*>$",
+      "replacement": "后台命令 $1 >"
+    },
+    {
+      "regex": "^Background Commands\\s+(\\d+)$",
+      "replacement": "后台命令 $1"
+    },
+    {
+      "regex": "^Background Commands\\s*\\((\\d+)\\)$",
+      "replacement": "后台命令 ($1)"
+    },
+    {
+      "regex": "^Search tabs,\\s*files,\\s*(?:extensions,\\s*)?(?:plugins,\\s*)?subagents,\\s*artifacts,\\s*(?:commands|tasks)(?:\\.{0,3})?$",
+      "replacement": "搜索标签页、文件、扩展、子智能体、产物、命令..."
+    },
     {
       "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
       "replacement": "已思考 $1 小时 $2 分 $3 秒"

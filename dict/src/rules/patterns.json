@@ -1,5 +1,21 @@
 [
   {
+    "regex": "^Background Commands\\s+(\\d+)\\s*>$",
+    "replacement": "后台命令 $1 >"
+  },
+  {
+    "regex": "^Background Commands\\s+(\\d+)$",
+    "replacement": "后台命令 $1"
+  },
+  {
+    "regex": "^Background Commands\\s*\\((\\d+)\\)$",
+    "replacement": "后台命令 ($1)"
+  },
+  {
+    "regex": "^Search tabs,\\s*files,\\s*(?:extensions,\\s*)?(?:plugins,\\s*)?subagents,\\s*artifacts,\\s*(?:commands|tasks)(?:\\.{0,3})?$",
+    "replacement": "搜索标签页、文件、扩展、子智能体、产物、命令..."
+  },
+  {
     "regex": "^Thought\\s+for\\s+(\\d+)\\s*h\\s+(\\d+)\\s*m\\s+(\\d+(?:\\.\\d+)?)\\s*s$",
     "replacement": "已思考 $1 小时 $2 分 $3 秒"
   },
@@ -1380,4 +1396,3 @@
     "replacement": "$1 天速率限制"
   }
 ]
-

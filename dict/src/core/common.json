@@ -2474,5 +2474,15 @@
   "Script jail session has unexpected preload scripts registered": "脚本沙箱会话注册了非预期的预加载脚本",
   "Unauthorized script-jail sender: WebContents is missing or destroyed": "未授权的脚本沙箱发送方：WebContents 缺失或已销毁",
   "Unauthorized script-jail sender: subframe cannot invoke script jail": "未授权的脚本沙箱发送方：子框架无法调用脚本沙箱",
-  "Unauthorized script-jail sender: WebContents is not an active Hub BrowserWindow": "未授权的脚本沙箱发送方：WebContents 不是活动状态的 Hub BrowserWindow"
+  "Unauthorized script-jail sender: WebContents is not an active Hub BrowserWindow": "未授权的脚本沙箱发送方：WebContents 不是活动状态的 Hub BrowserWindow",
+  "Local Checkout": "本地检出",
+  "Local checkout": "本地检出",
+  "Remote Checkout": "远程检出",
+  "Remote checkout": "远程检出",
+  "This Computer": "此电脑",
+  "Background Commands": "后台命令",
+  "Search tabs, files, extensions, subagents, artifacts, commands...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
+  "Search tabs, files, extensions, subagents, artifacts, commands": "搜索标签页、文件、扩展、子智能体、产物、命令",
+  "Search tabs, files, extensions, subagents, artifacts, command...": "搜索标签页、文件、扩展、子智能体、产物、命令...",
+  "Search tabs, files, extensions, subagents, artifacts, command": "搜索标签页、文件、扩展、子智能体、产物、命令"
 }

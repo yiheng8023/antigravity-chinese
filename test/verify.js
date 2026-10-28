@@ -460,6 +460,28 @@ assert(translate('Script return value is not JSON-serializable') === '脚本返�
 assert(translate('Script jail WebContents was destroyed') === '脚本沙箱 WebContents 已销毁', '沙箱容器销毁提示汉化');
 assert(translate('Unauthorized script-jail sender: subframe cannot invoke script jail') === '未授权的脚本沙箱发送方：子框架无法调用脚本沙箱', '子框架权限阻断汉化');
 
+// 12. 验证老宋实测五大新漏项（工作树检出/此电脑/后台命令/搜索栏占位符/内置浏览器设置）
+console.log('\n--- 4.15 验证老宋实测五大新漏项专项攻坚断言 ---');
+assert(translate('Local Checkout') === '本地检出', '"Local Checkout" -> "本地检出"');
+assert(translate('This Computer') === '此电脑', '"This Computer" -> "此电脑"');
+assert(translate('Background Commands') === '后台命令', '"Background Commands" -> "后台命令"');
+assert(translate('Background Commands 44 >') === '后台命令 44 >', '"Background Commands 44 >" 正则汉化通过');
+assert(translate('Background Commands 44') === '后台命令 44', '"Background Commands 44" 正则汉化通过');
+assert(translate('Search tabs, files, extensions, subagents, artifacts, commands...') === '搜索标签页、文件、扩展、子智能体、产物、命令...', 'Aux Pane 搜索框完整占位符汉化通过');
+assert(translate('Search tabs, files, extensions, subagents, artifacts, commands') === '搜索标签页、文件、扩展、子智能体、产物、命令', '搜索框无省略号占位符汉化通过');
+assert(translate('Built-In Browser') === '内置浏览器', '"Built-In Browser" -> "内置浏览器"');
+assert(translate('Configure link opening and built-in browser preferences.') === '配置链接打开方式与内置浏览器偏好设置。', '内置浏览器偏好设置描述汉化通过');
+assert(translate('Open Links In') === '链接打开方式', '"Open Links In" -> "链接打开方式"');
+assert(translate('Choose where links open by default when clicked.') === '选择点击链接时的默认打开方式。', '链接打开方式说明汉化通过');
+assert(translate('External Browser') === '外部浏览器', '"External Browser" -> "外部浏览器"');
+
+// DOM 属性占位符测试
+const searchInput = win.document.createElement('input');
+searchInput.setAttribute('placeholder', 'Search tabs, files, extensions, subagents, artifacts, commands...');
+win.document.body.appendChild(searchInput);
+win.__AGY_TRANSLATE_EL__(searchInput);
+assert(searchInput.getAttribute('placeholder') === '搜索标签页、文件、扩展、子智能体、产物、命令...', 'input placeholder 属性节点动态汉化通过');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

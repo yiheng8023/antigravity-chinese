@@ -449,6 +449,14 @@
   "Managed by Enterprise Gateway": "由企业网关 (Enterprise Gateway) 托管",
   "United States": "美国",
   "Europe": "欧洲",
-  "Auto-accept pending edits in background files when sending a new chat message. When off, nothing pending is accepted on your behalf: a review stays open across turns and later edits to the file add to it, and you are notified when reviews from earlier turns are still open.": "在发送新对话消息时，自动接受后台文件中待决的修改。关闭时，将不会代表您自动接受任何待决更改：审查将在多轮对话间保持打开，对该文件的后续修改会追加到其中，且当上一轮审查仍处于打开状态时会向您发送通知。"
+  "Auto-accept pending edits in background files when sending a new chat message. When off, nothing pending is accepted on your behalf: a review stays open across turns and later edits to the file add to it, and you are notified when reviews from earlier turns are still open.": "在发送新对话消息时，自动接受后台文件中待决的修改。关闭时，将不会代表您自动接受任何待决更改：审查将在多轮对话间保持打开，对该文件的后续修改会追加到其中，且当上一轮审查仍处于打开状态时会向您发送通知。",
+  "Built-In Browser": "内置浏览器",
+  "Built-in Browser": "内置浏览器",
+  "Configure link opening and built-in browser preferences.": "配置链接打开方式与内置浏览器偏好设置。",
+  "Configure link opening and built-in browser preferences": "配置链接打开方式与内置浏览器偏好设置",
+  "Open Links In": "链接打开方式",
+  "Choose where links open by default when clicked.": "选择点击链接时的默认打开方式。",
+  "Choose where links open by default when clicked": "选择点击链接时的默认打开方式",
+  "External Browser": "外部浏览器",
+  "External browser": "外部浏览器"
 }
-
