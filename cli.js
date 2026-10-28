@@ -446,7 +446,16 @@ function patchWslFile(wslFilePath) {
   let content = fs.readFileSync(wslFilePath, 'utf-8');
   content = content.replace(/This folder is on the Windows filesystem\. Accessing it from WSL \(via \/mnt\) can be slow — for best performance keep projects inside the WSL filesystem\./g, '此文件夹位于 Windows 文件系统上。从 WSL 访问该目录（通过 /mnt）可能会较慢 —— 为获得最佳性能，建议将项目保留在 WSL 文件系统内。');
   content = content.replace(/This location cannot be opened in WSL:/g, '此位置无法在 WSL 中打开：');
+  content = content.replace(/Downloading the Antigravity binary(?:\u2026|\\u2026|\.{3})/g, '正在下载 Antigravity 二进制组件…');
+  content = content.replace(/Installing into \$\{distro\}(?:\u2026|\\u2026|\.{3})/g, '正在安装至 ${distro}…');
   fs.writeFileSync(wslFilePath, content, 'utf-8');
+}
+
+function patchProvisionSplashFile(splashFilePath) {
+  if (!fs.existsSync(splashFilePath)) return;
+  let content = fs.readFileSync(splashFilePath, 'utf-8');
+  content = content.replace(/Setting up WSL:\s*\$\{escapeHtml\(distro\)\}/g, '正在准备 WSL 环境：${escapeHtml(distro)}');
+  fs.writeFileSync(splashFilePath, content, 'utf-8');
 }
 
 function patchTrayFile(trayFilePath) {
@@ -661,6 +670,11 @@ function install(customPath) {
   const wslPath = path.join(tempExtractDir, 'dist', 'wsl.js');
   if (fs.existsSync(wslPath)) {
     patchWslFile(wslPath);
+  }
+
+  const splashPath = path.join(tempExtractDir, 'dist', 'provisionSplash.js');
+  if (fs.existsSync(splashPath)) {
+    patchProvisionSplashFile(splashPath);
   }
 
   // 4. Pack back
@@ -1343,6 +1357,7 @@ module.exports = {
   patchMainFile,
   patchTrayFile,
   patchWslFile,
+  patchProvisionSplashFile,
   patchIpcHandlersFile,
   confirmCloseClient,
   closeAntigravitySafely,

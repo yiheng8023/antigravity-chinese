@@ -2445,7 +2445,15 @@
   "Open preview in embedded pane": "在嵌入式窗格中打开预览",
   "Open in Preview": "在预览中打开",
   "Inline PDF preview is not available in this environment.": "当前环境下内联 PDF 预览不可用。",
-  "Preview is not available for this file type.": "此文件类型不支持预览。"
+  "Preview is not available for this file type.": "此文件类型不支持预览。",
+  "Setting up WSL:": "正在准备 WSL 环境：",
+  "Downloading the Antigravity binary…": "正在下载 Antigravity 二进制组件…",
+  "Installing into": "正在安装至",
+  "Update: Mode": "更新策略",
+  "Failed to start host bridge server:": "启动宿主桥接服务失败：",
+  "Failed to close host bridge server:": "关闭宿主桥接服务失败：",
+  "Failed to close session connections:": "关闭会话连接失败：",
+  "Language Server process is not running.": "语言服务器进程未在运行。"
 }
 
 

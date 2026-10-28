@@ -427,6 +427,13 @@ win.document.body.appendChild(nestedSpanContainer);
 win.__AGY_TRANSLATE_EL__(nestedSpanContainer);
 assert(nestedSpanContainer.textContent.includes('在此项目中工作时，也包含') && nestedSpanContainer.textContent.includes('全局权限') && !nestedSpanContainer.textContent.includes('when working in this project'), '嵌套 span 场景下跨内联元素语序自愈彻底消灭英文残留');
 
+// 9. 验证 v2.27.0 核心演进断言
+console.log('\n--- 4.12 验证 v2.27.0 新特性与 WSL 协同汉化 ---');
+assert(translate('Setting up WSL:') === '正在准备 WSL 环境：', '"Setting up WSL:" -> "正在准备 WSL 环境："');
+assert(translate('Downloading the Antigravity binary…') === '正在下载 Antigravity 二进制组件…', 'WSL 二进制下载状态汉化通过');
+assert(translate('Update: Mode') === '更新策略', '"Update: Mode" -> "更新策略"');
+assert(translate('Language Server process is not running.') === '语言服务器进程未在运行。', '语言服务器未运行提示汉化通过');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');

@@ -1,6 +1,6 @@
 {
   "version": "3.3.26",
-  "buildTime": "2026-10-23T21:10:43.074Z",
+  "buildTime": "2026-10-28T03:51:02.670Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -2449,6 +2449,14 @@
     "Open in Preview": "在预览中打开",
     "Inline PDF preview is not available in this environment.": "当前环境下内联 PDF 预览不可用。",
     "Preview is not available for this file type.": "此文件类型不支持预览。",
+    "Setting up WSL:": "正在准备 WSL 环境：",
+    "Downloading the Antigravity binary…": "正在下载 Antigravity 二进制组件…",
+    "Installing into": "正在安装至",
+    "Update: Mode": "更新策略",
+    "Failed to start host bridge server:": "启动宿主桥接服务失败：",
+    "Failed to close host bridge server:": "关闭宿主桥接服务失败：",
+    "Failed to close session connections:": "关闭会话连接失败：",
+    "Language Server process is not running.": "语言服务器进程未在运行。",
     "\"Allow remote debugging for this browser instance\"": "“为此浏览器实例允许远程调试”",
     "1 task running": "1 个运行中的任务",
     "A high-risk mode that disables all safety barriers. The agent operates with full system access, auto-executes all terminal commands, and reads or writes to all local files without review prompts.": "一种禁用所有安全屏障的高风险模式。智能体将以完全系统权限运行，自动执行所有终端命令，读写所有本地文件且不弹出审查提示。",

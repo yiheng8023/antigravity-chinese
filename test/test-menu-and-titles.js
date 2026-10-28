@@ -81,13 +81,14 @@ const allPassed = tests.every(Boolean);
 
 console.log('\n=== 验证主进程系统托盘协同注入与 WSL 补丁 ===');
 const os = require('os');
-const { patchMainFile, patchTrayFile, patchMenuFile, patchIpcHandlersFile, patchWslFile } = require('../cli');
+const { patchMainFile, patchTrayFile, patchMenuFile, patchIpcHandlersFile, patchWslFile, patchProvisionSplashFile } = require('../cli');
 
 const tmpMain = path.join(os.tmpdir(), `agy_test_main_${Date.now()}.js`);
 const tmpTray = path.join(os.tmpdir(), `agy_test_tray_${Date.now()}.js`);
 const tmpMenu = path.join(os.tmpdir(), `agy_test_menu_${Date.now()}.js`);
 const tmpIpc = path.join(os.tmpdir(), `agy_test_ipc_${Date.now()}.js`);
 const tmpWsl = path.join(os.tmpdir(), `agy_test_wsl_${Date.now()}.js`);
+const tmpSplash = path.join(os.tmpdir(), `agy_test_splash_${Date.now()}.js`);
 
 const mockMainContent = `
 (0, tray_1.createTray)([
@@ -175,8 +176,14 @@ function buildContextMenuTemplate(items, onSelect) {
 const mockWslContent = `
 const w = {
     warning: 'This folder is on the Windows filesystem. Accessing it from WSL (via /mnt) can be slow — for best performance keep projects inside the WSL filesystem.',
-    error: 'This location cannot be opened in WSL: ' + winPath
+    error: 'This location cannot be opened in WSL: ' + winPath,
+    dl: 'Downloading the Antigravity binary\\u2026',
+    inst: \`Installing into \${distro}…\`
 };
+`;
+
+const mockSplashContent = `
+<div>Setting up WSL: \${escapeHtml(distro)}</div>
 `;
 
 fs.writeFileSync(tmpMain, mockMainContent, 'utf-8');
@@ -184,18 +191,21 @@ fs.writeFileSync(tmpTray, mockTrayContent, 'utf-8');
 fs.writeFileSync(tmpMenu, mockMenuContent, 'utf-8');
 fs.writeFileSync(tmpIpc, mockIpcContent, 'utf-8');
 fs.writeFileSync(tmpWsl, mockWslContent, 'utf-8');
+fs.writeFileSync(tmpSplash, mockSplashContent, 'utf-8');
 
 patchMainFile(tmpMain);
 patchTrayFile(tmpTray);
 patchMenuFile(tmpMenu);
 patchIpcHandlersFile(tmpIpc);
 patchWslFile(tmpWsl);
+patchProvisionSplashFile(tmpSplash);
 
 const patchedMain = fs.readFileSync(tmpMain, 'utf-8');
 const patchedTray = fs.readFileSync(tmpTray, 'utf-8');
 const patchedMenu = fs.readFileSync(tmpMenu, 'utf-8');
 const patchedIpc = fs.readFileSync(tmpIpc, 'utf-8');
 const patchedWsl = fs.readFileSync(tmpWsl, 'utf-8');
+const patchedSplash = fs.readFileSync(tmpSplash, 'utf-8');
 
 try {
   fs.unlinkSync(tmpMain);
@@ -203,6 +213,7 @@ try {
   fs.unlinkSync(tmpMenu);
   fs.unlinkSync(tmpIpc);
   fs.unlinkSync(tmpWsl);
+  fs.unlinkSync(tmpSplash);
 } catch (e) {}
 
 const trayTests = [
@@ -219,7 +230,9 @@ const trayTests = [
   { name: 'ipcHandlers.js WSL 文件系统弹窗已汉化', pass: patchedIpc.includes("message: '文件夹位于 Windows 文件系统上'") },
   { name: 'ipcHandlers.js 原生右键上下文菜单拦截与词典映射已注入', pass: patchedIpc.includes('__AGY_CONTEXT_MENU_MAP__') && patchedIpc.includes("label: __agyTranslateContextLabel__(item.label ?? '')") },
   { name: 'ipcHandlers.js 原生右键二级子菜单映射包含会话名称与拆分方向', pass: patchedIpc.includes('"Conversation Name":"会话名称"') && patchedIpc.includes('"Split Right":"向右拆分"') && patchedIpc.includes('"Replace With New":"替换为新会话"') },
-  { name: 'wsl.js 性能警告与错误提示已汉化', pass: patchedWsl.includes("此文件夹位于 Windows 文件系统上") && patchedWsl.includes("此位置无法在 WSL 中打开：") }
+  { name: 'wsl.js 性能警告与错误提示已汉化', pass: patchedWsl.includes("此文件夹位于 Windows 文件系统上") && patchedWsl.includes("此位置无法在 WSL 中打开：") },
+  { name: 'wsl.js 下载与安装回调状态已汉化', pass: patchedWsl.includes("正在下载 Antigravity 二进制组件…") && patchedWsl.includes("正在安装至 ${distro}…") },
+  { name: 'provisionSplash.js 启动引导弹窗标题已汉化', pass: patchedSplash.includes("正在准备 WSL 环境：${escapeHtml(distro)}") }
 ];
 
 let trayAllPassed = true;
