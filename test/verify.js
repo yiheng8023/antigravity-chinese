@@ -271,7 +271,7 @@ mockPermContainer.appendChild(win.document.createTextNode('when working in this 
 win.document.body.appendChild(mockPermContainer);
 
 win.__AGY_TRANSLATE_EL__(mockPermContainer);
-assert(mockPermContainer.textContent === '在此项目中工作时，也包含全局权限。', '跨内联元素语序重排自愈通过："Also includes [Global Permissions] when working in this project." -> "在此项目中工作时，也包含全局权限。"');
+assert(mockPermContainer.textContent.includes('全局权限') && mockPermContainer.textContent.includes('在此项目中工作时') && !mockPermContainer.textContent.includes('when working'), '跨内联元素顺应宿主原版 DOM 汉化彻底消灭英文残留');
 assert(mockGlobalPermLink.textContent === '全局权限', '内联可点击 <span>Global Permissions</span> 独立翻译且 DOM 引用完好保留');
 assert(translate('toString') === null && translate('constructor') === null, 'Object.prototype 原型链同名属性防碰撞断言通过');
 
@@ -420,12 +420,12 @@ assert(translate('Stage and amend all changes into the current commit') === '暂
 assert(translate('New Remote Project') === '新建远程项目', '"New Remote Project" -> "新建远程项目"');
 assert(translate('New models have been enabled for you!') === '已为您启用新模型！', '新模型启用通知汉化通过');
 
-// 验证跨内联元素（含 span 包装或混合态）自愈
+// 验证跨内联元素（含 span 包装或混合态）汉化彻底消灭英文残留
 const nestedSpanContainer = win.document.createElement('div');
 nestedSpanContainer.innerHTML = '<span>也包含</span> <span>全局权限</span> <span>when working in this project.</span> <a href="#">了解更多。</a>';
 win.document.body.appendChild(nestedSpanContainer);
 win.__AGY_TRANSLATE_EL__(nestedSpanContainer);
-assert(nestedSpanContainer.textContent.includes('在此项目中工作时，也包含') && nestedSpanContainer.textContent.includes('全局权限') && !nestedSpanContainer.textContent.includes('when working in this project'), '嵌套 span 场景下跨内联元素语序自愈彻底消灭英文残留');
+assert(nestedSpanContainer.textContent.includes('全局权限') && nestedSpanContainer.textContent.includes('此项目') && !nestedSpanContainer.textContent.includes('when working in this project'), '嵌套 span 场景顺应宿主原版 DOM 汉化彻底消灭英文残留');
 
 // 9. 验证 v2.27.0 核心演进断言
 console.log('\n--- 4.12 验证 v2.27.0 新特性与 WSL 协同汉化 ---');
@@ -448,7 +448,78 @@ const convSpanContainer = win.document.createElement('div');
 convSpanContainer.innerHTML = '<span>包含</span> <span>全局权限</span> <span>when working in these conversations.</span> <a href="#">了解更多。</a>';
 win.document.body.appendChild(convSpanContainer);
 win.__AGY_TRANSLATE_EL__(convSpanContainer);
-assert(convSpanContainer.textContent.includes('在此类会话中工作时包含') && convSpanContainer.textContent.includes('全局权限') && !convSpanContainer.textContent.includes('when working in these conversations'), '会话列表场景下跨内联元素语序自愈彻底消灭英文残留');
+assert(convSpanContainer.textContent.includes('全局权限') && convSpanContainer.textContent.includes('此类会话') && !convSpanContainer.textContent.includes('when working in these conversations'), '会话列表顺应宿主原版 DOM 汉化消灭英文残留');
+
+// 真实 React JSX 兄弟 TextNode 拆分场景全量覆盖断言
+const projectSplitContainer = win.document.createElement('div');
+const pSpan = win.document.createElement('span');
+pSpan.textContent = '也包含';
+projectSplitContainer.appendChild(pSpan);
+projectSplitContainer.appendChild(win.document.createTextNode(' '));
+const pA = win.document.createElement('a');
+pA.textContent = '全局权限';
+projectSplitContainer.appendChild(pA);
+projectSplitContainer.appendChild(win.document.createTextNode(' '));
+// 场景 1: when working in + this project.
+const pTn1 = win.document.createTextNode('when working in ');
+projectSplitContainer.appendChild(pTn1);
+const pTn2 = win.document.createTextNode('this project.');
+projectSplitContainer.appendChild(pTn2);
+projectSplitContainer.appendChild(win.document.createTextNode(' '));
+const pMore = win.document.createElement('a');
+pMore.textContent = '了解更多。';
+projectSplitContainer.appendChild(pMore);
+win.document.body.appendChild(projectSplitContainer);
+win.__AGY_TRANSLATE_EL__(projectSplitContainer);
+assert(projectSplitContainer.textContent.includes('全局权限') && projectSplitContainer.textContent.includes('此项目') && !projectSplitContainer.textContent.includes('when working'), '项目设置 React 兄弟 TextNode 拆分顺应原版 DOM 汉化彻底消灭英文残留');
+
+// 场景 2: 现场抓包高精复现——when working + in this project. 拆分与多轮渲染幂等性断言
+const liveSplitContainer = win.document.createElement('div');
+const liveSpan = win.document.createElement('span');
+liveSpan.textContent = '也包含';
+liveSplitContainer.appendChild(liveSpan);
+liveSplitContainer.appendChild(win.document.createTextNode(' '));
+const liveA = win.document.createElement('a');
+liveA.textContent = '全局权限';
+liveSplitContainer.appendChild(liveA);
+liveSplitContainer.appendChild(win.document.createTextNode(' '));
+const liveTn1 = win.document.createTextNode('when working ');
+liveSplitContainer.appendChild(liveTn1);
+const liveTn2 = win.document.createTextNode('in this project.');
+liveSplitContainer.appendChild(liveTn2);
+liveSplitContainer.appendChild(win.document.createTextNode(' '));
+const liveMore = win.document.createElement('a');
+liveMore.textContent = '了解更多。';
+liveSplitContainer.appendChild(liveMore);
+win.document.body.appendChild(liveSplitContainer);
+// 连续执行三轮重排，确保幂等不退化
+for (let r = 0; r < 3; r++) {
+  win.__AGY_TRANSLATE_EL__(liveSplitContainer);
+}
+assert(liveSplitContainer.textContent.includes('全局权限') && !liveSplitContainer.textContent.includes('when working') && !/\bin\b/i.test(liveSplitContainer.textContent), '现场抓包拆分形态顺应宿主原版 DOM 汉化消灭残渣 in 且多轮渲染完美幂等');
+
+const convSplitContainer = win.document.createElement('div');
+const cSpan = win.document.createElement('span');
+cSpan.textContent = '也包含';
+convSplitContainer.appendChild(cSpan);
+convSplitContainer.appendChild(win.document.createTextNode(' '));
+const cA = win.document.createElement('a');
+cA.textContent = '全局权限';
+convSplitContainer.appendChild(cA);
+convSplitContainer.appendChild(win.document.createTextNode(' '));
+const cTn1 = win.document.createTextNode('when working ');
+convSplitContainer.appendChild(cTn1);
+const cTn2 = win.document.createTextNode('in these conversations.');
+convSplitContainer.appendChild(cTn2);
+convSplitContainer.appendChild(win.document.createTextNode(' '));
+const cMore = win.document.createElement('a');
+cMore.textContent = '了解更多。';
+convSplitContainer.appendChild(cMore);
+win.document.body.appendChild(convSplitContainer);
+for (let r = 0; r < 3; r++) {
+  win.__AGY_TRANSLATE_EL__(convSplitContainer);
+}
+assert(convSplitContainer.textContent.includes('全局权限') && !convSplitContainer.textContent.includes('when working') && !/\bin\b/i.test(convSplitContainer.textContent), '会话列表 React 兄弟 TextNode 拆分顺应原版 DOM 汉化消灭英文残留');
 
 // 11. 验证 v2.28.0 Script Jail 安全沙箱与连接隔离断言
 console.log('\n--- 4.14 验证 v2.28.0 Script Jail 安全沙箱与连接隔离汉化 ---');
@@ -498,12 +569,12 @@ assert(translate('(2 image attachments)') === '(2 个图片附件)', '"(2 image 
 assert(translate('(1 image attachment)') === '(1 个图片附件)', '"(1 image attachment)" -> "(1 个图片附件)"');
 assert(translate('when working in this project.') === '在此项目中工作时。', '项目专属说明单独出现时的兜底汉化');
 
-// 14. 验证极端跨层级多节点语序拓扑重组自愈断言
+// 14. 验证极端跨层级多节点汉化断言
 const multiLayerContainer = win.document.createElement('div');
 multiLayerContainer.innerHTML = '<div><span>包含</span></div><div><a href="#">全局权限</a></div><div>when working in these conversations. <a href="#">了解更多。</a></div>';
 win.document.body.appendChild(multiLayerContainer);
 win.__AGY_TRANSLATE_EL__(multiLayerContainer);
-assert(multiLayerContainer.textContent.includes('在此类会话中工作时包含') && multiLayerContainer.textContent.includes('全局权限') && !multiLayerContainer.textContent.includes('when working in these conversations'), '极端跨层级多节点拓扑重排自愈彻底消灭英文残留');
+assert(multiLayerContainer.textContent.includes('全局权限') && multiLayerContainer.textContent.includes('此类会话') && !multiLayerContainer.textContent.includes('when working in these conversations'), '极端跨层级多节点顺应宿主原版 DOM 汉化彻底消灭英文残留');
 
 // 15. 验证 2.28.2 历史会话下线、跨会话搜索与侧边栏归档引导气泡
 console.log('\n--- 4.17 验证 v2.28.2 跨会话搜索与侧边栏归档引导气泡汉化 ---');

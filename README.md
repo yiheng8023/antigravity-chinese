@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.30**，深度适配 Antigravity **v2.28.2** 架构演进：全量覆盖官方“历史会话”独立页面彻底下线并迁移至全局“跨会话搜索”(`Search Across Conversations`) 的重大产品调整，攻坚右下角全局更新引导气泡卡片与侧边栏归档过滤交互(`View archived in the sidebar`)，持续固化多端生态与高安全标准）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.31**，深度适配 Antigravity **v2.28.2** 架构演进：全量覆盖官方“跨会话搜索”(`Search Across Conversations`) 与侧边栏归档过滤交互，彻底消除项目与会话设置中权限说明从句英文残留，全面恪守“非侵入顺应宿主原版 DOM”的本地化职责边界，持续固化多端生态与出版级高可靠基线）。
 
 ---
 

@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.30** (fully adapted for Antigravity **v2.28.2** architecture evolution: complete coverage for the retirement of standalone Conversation History and migration to global Search Across Conversations, complete localization for the update tour callout popover & sidebar archive filtering, with continuous ecosystem synergy & strict security standards).
+A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.31** (fully adapted for Antigravity **v2.28.2** architecture evolution: complete coverage for global Search Across Conversations & sidebar archive filtering, complete elimination of permission explanation clause English residuals, fully adhering to non-invasive localization boundaries that respect host DOM structure, with continuous ecosystem synergy & publication-grade high-reliability standards).
 
 ---
 
