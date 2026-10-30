@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.32**，深度适配 Antigravity **v2.28.2** 架构演进：彻底根除 VS Code 扩展微代理 WebSocket 握手来源 403 跨域拦截与同源校验顽疾，全面升级 Origin / Host / Referer 目标重写与 CSWSH 防御击穿机制，持续固化多端生态协同与出版级高可靠基线）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器。当前版本 **v3.3.33**，面向 Antigravity **v2.28.2**：修复 VS Code 扩展升级后的备份回退、恢复失败误报与仅安装扩展时的一键入口；完善 CDP 超时与断线处理、代理解码与来源校验，以及深层代码区和可编辑区域保护。
 
 ---
 
@@ -176,7 +176,7 @@ node cli.js install --path "你的 Antigravity 安装目录或 app.asar 路径"
 本项目引入极其严苛的端到端自动化回归测试与跨平台 CI 矩阵（Windows / macOS / Ubuntu x Node 18/20/22），避免人工经验验证带来的遗漏：
 
 ```bash
-# 运行全套自动化测试（聚合 9 大全真测试套件，共 390+ 项真理断言）
+# 运行全套自动化测试（聚合 10 大全真测试套件，共 390+ 项断言）
 npm test
 ```
 
@@ -186,8 +186,9 @@ npm test
 - **零依赖 RFC 6455 协议层双向握手与通信断言 (`test/test-cdp.js`)**：基于原生 Node.js 内置模块测试 RFC 6455 WebSocket 握手认证、数据帧编解码、JSON-RPC 往返通信及优雅挥手关闭。
 - **菜单、托盘、原生上下文右键与自杀防御门禁 (`test/test-menu-and-titles.js`)**：严格确保单字词不误伤会话标题、主进程系统托盘协同注入、原生上下文右键菜单 IPC 拦截与原生退出确认弹窗安全，并在智能体会话（`ANTIGRAVITY_AGENT=1` 或 `AGY_NO_KILL=1`）下触发自杀防御门禁（拦截强杀宿主进程）。
 - **ASAR 全真生命周期与防降级演进测试 (`test/test-asar-lifecycle.js`)**：真实打包生成 ASAR 二进制包，包含 31 项全真断言，验证解包、注入、二次安装幂等、官方静默推送防降级熔断、两阶段原子回滚以及冷启动断电崩溃自愈。
-- **真实宿主无参路径探测实测 (`test/test-detector-live.js`)**：在真实 Ubuntu / macOS / Windows runner 上验证 0 参数自动路径探测。
-- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：11 项断言全量扫描 3,582 条词条与 338 组级联正则，保障 0 错别字（登录/账号/其他/按钮等）、全角标点排版规范、CCF 核心计算机学术术语及正则表达式编译安全。
+- **宿主无参路径探测实测 (`test/test-detector-live.js`)**：在 Ubuntu / macOS / Windows runner 的隔离临时目录中验证 0 参数自动路径探测，不写入本机客户端目录。
+- **边界回归 (`test/test-regressions.js`)**：验证扩展更新与失败回滚、CDP 连接生命周期与分片、代理压缩与来源校验、CLI 路径参数，以及深层代码区保护。
+- **出版级与学术级词库质检 (`test/test-proofread-integrity.js`)**：扫描完整词库与级联正则，检查常见错别字（登录/账号/其他/按钮等）、全角标点排版、计算机术语及正则表达式编译安全。
 - **VS Code 扩展生命周期、Webview 代理与防污染测试 (`test/test-vscode-patch.js`)**：14 项断言覆盖扩展探测、首次注入、命令/配置/查看器全量汉化、Webview 本地微反向代理拦截注入、`i18n-bundle.js` 资产生成、二次安装双备份绝对防污染、以及原子还原全回归。
 
 ---
@@ -241,7 +242,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (3,665 精确词条 + 338 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (3,896 精确词条 + 360 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动
@@ -252,7 +253,7 @@ antigravity-chinese/
 │       ├── rules/                    # 智能体中文交互规则 (chinese-interaction-rules.md)
 │       ├── skills/                   # 本地化诊断技能 (i18n-diagnostics)
 │       └── plugin.json               # 插件规范清单配置文件
-├── test/                             # 自动化全真回归测试套件 (9 大套件 400+ 断言)
+├── test/                             # 自动化全真回归测试套件 (10 大套件 400+ 断言)
 │   ├── test-lint.js                  # 词库格式与语法排毒校验
 │   ├── verify.js                     # 118 项 JSDOM 状态机、内联语序重排与运行时性能断言
 │   ├── test-screenshots.js          # 306 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
@@ -261,7 +262,8 @@ antigravity-chinese/
 │   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言
 │   ├── test-detector-live.js         # 真实宿主系统 0 参数无参安装路径探测断言
 │   ├── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
-│   └── test-vscode-patch.js          # 15 项 VS Code 扩展补丁、Webview 代理与原子回滚断言
+│   ├── test-vscode-patch.js          # VS Code 扩展补丁、Webview 代理与回滚断言
+│   └── test-regressions.js           # 更新、失败恢复、协议与 DOM 边界回归
 ├── tools/                            # 自动化编译、一致性体检与漂移检测工具链
 │   ├── ultimate-consistency-audit.js # 全生态终极全局一致性与质量深度体检分析器 (npm run audit)
 │   ├── build-dict.js                 # 三层词典构建编译器 (ASCII Key 阻断、捕获组守恒门禁)

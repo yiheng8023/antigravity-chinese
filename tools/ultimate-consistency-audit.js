@@ -69,10 +69,13 @@ check(`README.en.md 包含当前最新版本号 v${currentVersion}`, () => {
   return readmeEn.includes(`v${currentVersion}`);
 });
 
-check('中英文文档测试套件与断言统计一致 (9 大套件 390+ 项断言)', () => {
-  const zhHas9 = readmeZh.includes('9 大') || readmeZh.includes('9 大全真');
-  const enHas9 = readmeEn.includes('9 test') || readmeEn.includes('9 full') || readmeEn.includes('9 大') || readmeEn.includes('390+');
-  if (!zhHas9) return { ok: false, message: 'README.md 中测试套件数未更新为 9 大套件' };
+check('中英文文档测试套件数量与 npm test 一致', () => {
+  const suiteCount = (pkg.scripts.test.match(/\bnode\s+(?:--test\s+)?test\/[\w-]+\.js\b/g) || []).length;
+  const zhCount = readmeZh.match(/聚合\s+(\d+)\s+大/);
+  const enCount = readmeEn.match(/aggregating\s+(\d+)\s+full-fidelity test suites/);
+  if (!suiteCount || !zhCount || !enCount || Number(zhCount[1]) !== suiteCount || Number(enCount[1]) !== suiteCount) {
+    return { ok: false, message: `中英文 README 的测试套件数量必须与 npm test 的 ${suiteCount} 个入口一致` };
+  }
   return true;
 });
 

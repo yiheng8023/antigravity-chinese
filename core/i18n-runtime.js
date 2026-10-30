@@ -238,7 +238,8 @@
   function shouldIgnoreElement(el) {
     if (!el || el.nodeType !== 1) return false;
     if (IGNORED_TAGS[el.tagName]) return true;
-    if (el.isContentEditable) return true;
+    if (el.isContentEditable || el.getAttribute('contenteditable') === '' ||
+        el.getAttribute('contenteditable') === 'true' || el.getAttribute('contenteditable') === 'plaintext-only') return true;
 
     // 模型选择器相关边界元素及其子元素保持英文原样（纯属性 O(1) 短路）
     if (isModelSelectorBoundary(el)) return true;
@@ -250,11 +251,13 @@
       }
     }
 
-    // 向上检查最近 3 层祖先，防止子文本/图标元素在受保护区域（如 trigger/item 内部）
+    // MutationObserver 可以直接提交任意深度的子节点，保护边界必须检查到根。
     var ancestor = el.parentElement;
-    for (var depth = 0; ancestor && depth < 3; depth++) {
+    while (ancestor) {
       if (IGNORED_TAGS[ancestor.tagName]) return true;
       if (isModelSelectorBoundary(ancestor)) return true;
+      if (ancestor.isContentEditable || ancestor.getAttribute('contenteditable') === '' ||
+          ancestor.getAttribute('contenteditable') === 'true' || ancestor.getAttribute('contenteditable') === 'plaintext-only') return true;
       var ancestorClass = typeof ancestor.className === 'string' ? ancestor.className : '';
       if (ancestorClass) {
         for (var ci = 0; ci < IGNORED_CLASSES.length; ci++) {

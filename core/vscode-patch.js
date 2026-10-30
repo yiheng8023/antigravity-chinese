@@ -12,6 +12,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const crypto = require('crypto');
 
 // 高优先级精准精修词库映射
 const VSCODE_TRANSLATION_MAP = {
@@ -75,12 +76,15 @@ const VSCODE_TRANSLATION_MAP = {
  * @returns {string|null} 扩展根目录绝对路径，未找到时返回 null
  */
 function findVsCodeExtensionDir(customDir) {
+  function readExtension(dir) {
+    try {
+      const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf8'));
+      if (pkg.name !== 'google-antigravity' || (pkg.publisher && pkg.publisher !== 'google')) return null;
+      return { dir, version: String(pkg.version || '0.0.0') };
+    } catch (_) { return null; }
+  }
   if (customDir !== undefined && customDir !== null) {
-    if (fs.existsSync(customDir)) {
-      const pkg = path.join(customDir, 'package.json');
-      if (fs.existsSync(pkg)) return customDir;
-    }
-    return null;
+    return readExtension(customDir) ? customDir : null;
   }
 
   const home = os.homedir();
@@ -89,12 +93,18 @@ function findVsCodeExtensionDir(customDir) {
 
   try {
     const entries = fs.readdirSync(extBase);
-    const matches = entries.filter((e) => e.startsWith('google.google-antigravity-'));
+    const matches = entries.filter((e) => e.startsWith('google.google-antigravity-'))
+      .map(e => readExtension(path.join(extBase, e))).filter(Boolean);
     if (matches.length === 0) return null;
 
     // 按版本号自然排序，选取最高版本
-    matches.sort();
-    return path.join(extBase, matches[matches.length - 1]);
+    matches.sort((a, b) => {
+      const [aCore, aPre] = a.version.split(/-(.*)/);
+      const [bCore, bPre] = b.version.split(/-(.*)/);
+      return aCore.localeCompare(bCore, 'en', { numeric: true }) ||
+        (aPre === bPre ? 0 : aPre === undefined ? 1 : bPre === undefined ? -1 : aPre.localeCompare(bPre, 'en', { numeric: true }));
+    });
+    return matches[matches.length - 1].dir;
   } catch (_) {
     return null;
   }
@@ -192,6 +202,19 @@ let proxyReadyPromise = null;
 let currentTargetUrl = '';
 let cachedBundleContent = null;
 
+// 先校验浏览器来源，再为合法的本地 Webview 重写后端来源。
+function isAllowedOrigin(origin, targetOrigin) {
+  if (!origin) return true;
+  try {
+    const parsed = new URL(origin);
+    if (parsed.protocol === 'vscode-webview:') return true;
+    if (parsed.origin === targetOrigin) return true;
+    return parsed.protocol === 'http:' &&
+      ['127.0.0.1', 'localhost', '[::1]'].includes(parsed.hostname) &&
+      parsed.port === String(proxyPort);
+  } catch (_) { return false; }
+}
+
 function getBundleScript() {
   if (cachedBundleContent) return cachedBundleContent;
   const bundlePath = path.join(__dirname, 'i18n-bundle.js');
@@ -232,6 +255,12 @@ function startProxy() {
     const targetOrigin = targetParsed.origin;
     const targetPort = parseInt(targetParsed.port || (targetParsed.protocol === 'https:' ? '443' : '80'), 10);
 
+    if (!isAllowedOrigin(req.headers.origin, targetOrigin)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain' });
+      res.end('AGY Proxy: Origin not allowed');
+      return;
+    }
+
     const proxyHeaders = { ...req.headers };
     proxyHeaders.host = targetParsed.host;
 
@@ -267,10 +296,15 @@ function startProxy() {
 
           // 核心防御 3：万一目标服务强制返回压缩格式，自动双向解压
           const encoding = (targetRes.headers['content-encoding'] || '').toLowerCase();
-          if (encoding === 'gzip') {
-            try { buffer = zlib.gunzipSync(buffer); } catch (_) {}
-          } else if (encoding === 'deflate') {
-            try { buffer = zlib.inflateSync(buffer); } catch (_) {}
+          try {
+            if (encoding === 'gzip') buffer = zlib.gunzipSync(buffer);
+            else if (encoding === 'deflate') buffer = zlib.inflateSync(buffer);
+            else if (encoding === 'br') buffer = zlib.brotliDecompressSync(buffer);
+            else if (encoding && encoding !== 'identity') throw new Error('Unsupported content encoding');
+          } catch (_) {
+            res.writeHead(502, { 'Content-Type': 'text/plain' });
+            res.end('AGY Proxy Error: Unable to decode HTML response');
+            return;
           }
 
           let body = buffer.toString('utf-8');
@@ -343,6 +377,12 @@ function startProxy() {
     // 核心防御 4：完全重写并归一化 WebSocket 握手来源信息，彻底根治后端 403 Forbidden
     const proxyOrigin = 'http://127.0.0.1:' + proxyPort;
     const targetOrigin = targetParsed.origin;
+
+    if (!isAllowedOrigin(req.headers.origin, targetOrigin) ||
+        !isAllowedOrigin(req.headers['sec-websocket-origin'], targetOrigin)) {
+      clientSocket.end('HTTP/1.1 403 Forbidden\\r\\nConnection: close\\r\\nContent-Length: 0\\r\\n\\r\\n');
+      return;
+    }
 
     const targetHeaders = { ...req.headers };
     targetHeaders.host = targetParsed.host;
@@ -472,30 +512,17 @@ module.exports = {
 }
 
 /**
- * 修补 extension.js，注入本地反向代理对 renderWebviewHtml 的拦截
- * @param {string} extDir 扩展根目录
- * @returns {{ success: boolean, message?: string }}
+ * 在内存中生成补丁，匹配或语法验证失败时不写入扩展。
  */
-function patchExtensionJs(extDir) {
-  const extJsPath = path.join(extDir, 'extension.js');
-  const extJsBakPath = path.join(extDir, 'extension.js.bak');
-  if (!fs.existsSync(extJsPath)) return { success: true };
-
-  // 1. 建立纯净备份
-  if (!fs.existsSync(extJsBakPath)) {
-    fs.copyFileSync(extJsPath, extJsBakPath);
-  }
-
-  let content = fs.readFileSync(extJsBakPath, 'utf-8');
-
+function buildPatchedExtensionJs(content) {
   // 2. 检查并注入 renderWebviewHtml 拦截（弹性兼容未压缩版与 1.8.0+ 压缩混淆版）
   const sigRegex = /renderWebviewHtml\s*\(\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*\)\s*\{/;
   const sigMatch = content.match(sigRegex);
   if (!sigMatch) {
-    return { success: false, message: '未在 extension.js 中匹配到 renderWebviewHtml 签名' };
+    throw new Error('未在 extension.js 中匹配到 renderWebviewHtml 签名');
   }
 
-  const [matchedSignature, paramWebview, paramServerUrl, paramFullUrl] = sigMatch;
+  const [matchedSignature, , paramServerUrl, paramFullUrl] = sigMatch;
 
   const proxyRequireHeader = `// --- AGY_VSCODE_I18N_PROXY_INJECTION_START ---
 let __agyI18nProxy = null;
@@ -522,8 +549,78 @@ try {
 
   content = proxyRequireHeader + content.replace(matchedSignature, interceptionCode);
 
-  fs.writeFileSync(extJsPath, content, 'utf-8');
-  return { success: true };
+  // 保留原模块的 strict 指令语义。
+  if (/^(?:\s|\/\/[^\n]*(?:\n|$)|\/\*[\s\S]*?\*\/)*(['"])use strict\1\s*;/.test(content.slice(proxyRequireHeader.length))) {
+    content = '"use strict";\n' + content;
+  }
+  new Function(content);
+  return content;
+}
+
+function isInjectedJs(content) {
+  return content.includes('AGY_VSCODE_I18N_PROXY_INJECTION');
+}
+
+// 每个文件通过同目录 rename 替换；任一步失败时恢复本次写入前的内容。
+function commitFiles(files) {
+  const originals = new Map([...files.keys()].map(file =>
+    [file, fs.existsSync(file) ? fs.readFileSync(file) : null]));
+  const changed = [];
+  function replace(file, content) {
+    if (content === null) {
+      if (fs.existsSync(file)) fs.unlinkSync(file);
+      return;
+    }
+    const temporary = file + '.tmp-' + crypto.randomBytes(8).toString('hex');
+    try {
+      fs.writeFileSync(temporary, content);
+      fs.renameSync(temporary, file);
+    } finally {
+      if (fs.existsSync(temporary)) fs.unlinkSync(temporary);
+    }
+  }
+  try {
+    for (const [file, content] of files) {
+      replace(file, content);
+      changed.push(file);
+    }
+  } catch (err) {
+    const failures = [];
+    for (const file of changed.reverse()) {
+      try { replace(file, originals.get(file)); }
+      catch (_) { failures.push(path.basename(file)); }
+    }
+    if (failures.length) err.message += '; 回滚失败，请保留备份并检查: ' + failures.join(', ');
+    throw err;
+  }
+}
+
+function getPristineJs(extDir) {
+  const current = fs.readFileSync(path.join(extDir, 'extension.js'), 'utf8');
+  if (!isInjectedJs(current)) return current;
+  const backup = fs.readFileSync(path.join(extDir, 'extension.js.bak'), 'utf8');
+  if (isInjectedJs(backup)) throw new Error('extension.js 纯净备份已被补丁污染，无法安全操作');
+  const currentPkg = JSON.parse(fs.readFileSync(path.join(extDir, 'package.json'), 'utf8'));
+  const backupPkg = JSON.parse(fs.readFileSync(path.join(extDir, 'package.json.bak'), 'utf8'));
+  if (currentPkg.version !== backupPkg.version) throw new Error('扩展版本与备份不一致，拒绝使用旧版 extension.js');
+  return backup;
+}
+
+function patchExtensionJs(extDir) {
+  try {
+    const source = getPristineJs(extDir);
+    const patched = buildPatchedExtensionJs(source);
+    const files = new Map([
+      [path.join(extDir, 'extension.js.bak'), source],
+      [path.join(extDir, 'extension.js'), patched]
+    ]);
+    const pkgRaw = fs.readFileSync(path.join(extDir, 'package.json'), 'utf8');
+    if (!JSON.parse(pkgRaw).__antigravity_chinese_patched) {
+      files.set(path.join(extDir, 'package.json.bak'), pkgRaw);
+    }
+    commitFiles(files);
+    return { success: true };
+  } catch (err) { return { success: false, message: err.message }; }
 }
 
 /**
@@ -548,89 +645,80 @@ function installVsCodePatch(customDir) {
     return { success: false, message: `扩展 package.json 不存在: ${pkgPath}` };
   }
 
-  // 1. 若纯净备份不存在，立即创建官方原版备份
-  if (!fs.existsSync(bakPath)) {
-    fs.copyFileSync(pkgPath, bakPath);
-  }
-
-  // 2. 始终从备份或当前内容中解析原始结构
-  let sourceRaw = fs.readFileSync(bakPath, 'utf-8');
-  let pkg;
   try {
-    pkg = JSON.parse(sourceRaw);
+    // 未打补丁的当前文件代表新上游基线，不能被遗留备份覆盖。
+    const currentRaw = fs.readFileSync(pkgPath, 'utf8');
+    const currentPkg = JSON.parse(currentRaw);
+    const sourceRaw = currentPkg.__antigravity_chinese_patched
+      ? fs.readFileSync(bakPath, 'utf8') : currentRaw;
+    const pkg = JSON.parse(sourceRaw);
+    if (pkg.__antigravity_chinese_patched || pkg.version !== currentPkg.version) {
+      throw new Error('package.json 纯净备份污染或版本不一致，拒绝覆盖当前扩展');
+    }
+    const sourceJs = getPristineJs(extDir);
+    const patchedJs = buildPatchedExtensionJs(sourceJs);
+
+    const map = getVsCodeFullMap();
+
+    // 3. 递归汉化 contributes 核心字段
+    if (pkg.description && map[pkg.description]) {
+      pkg.description = map[pkg.description];
+    }
+
+    if (pkg.contributes) {
+      // 自定义编辑器
+      if (Array.isArray(pkg.contributes.customEditors)) {
+        for (const ed of pkg.contributes.customEditors) {
+          if (ed.displayName && map[ed.displayName]) {
+            ed.displayName = map[ed.displayName];
+          }
+        }
+      }
+
+      // 命令列表
+      if (Array.isArray(pkg.contributes.commands)) {
+        for (const cmd of pkg.contributes.commands) {
+          if (cmd.title && map[cmd.title]) {
+            cmd.title = map[cmd.title];
+          }
+        }
+      }
+
+      // 设置项
+      if (pkg.contributes.configuration && pkg.contributes.configuration.properties) {
+        const props = pkg.contributes.configuration.properties;
+        for (const prop of Object.values(props)) {
+          if (prop.description && map[prop.description]) {
+            prop.description = map[prop.description];
+          }
+          if (prop.deprecationMessage && map[prop.deprecationMessage]) {
+            prop.deprecationMessage = map[prop.deprecationMessage];
+          }
+        }
+      }
+    }
+
+    // 4. 注入标记并写回 package.json
+    pkg.__antigravity_chinese_patched = true;
+    pkg.__antigravity_chinese_version = require('../package.json').version;
+    commitFiles(new Map([
+      [bakPath, sourceRaw],
+      [path.join(extDir, 'extension.js.bak'), sourceJs],
+      [path.join(extDir, 'i18n-bundle.js'), getI18nBundleScript()],
+      [path.join(extDir, 'agy-i18n-proxy.js'), getAgyI18nProxyTemplate()],
+      [path.join(extDir, 'extension.js'), patchedJs],
+      [pkgPath, JSON.stringify(pkg, null, '\t') + '\n'],
+      [metaPath, JSON.stringify({ patched: true, timestamp: Date.now(), extDir }, null, 2)]
+    ]));
+
+    return {
+      success: true,
+      message: `成功为 VS Code 扩展注入全景中文本地化 (package.json + Webview i18n Proxy): ${extDir}`,
+      extDir
+    };
   } catch (err) {
-    return { success: false, message: `解析 package.json 失败: ${err.message}` };
+    return { success: false, message: `无法安全安装扩展补丁: ${err.message}`, extDir };
   }
-
-  const map = getVsCodeFullMap();
-
-  // 3. 递归汉化 contributes 核心字段
-  if (pkg.description && map[pkg.description]) {
-    pkg.description = map[pkg.description];
-  }
-
-  if (pkg.contributes) {
-    // 自定义编辑器
-    if (Array.isArray(pkg.contributes.customEditors)) {
-      for (const ed of pkg.contributes.customEditors) {
-        if (ed.displayName && map[ed.displayName]) {
-          ed.displayName = map[ed.displayName];
-        }
-      }
-    }
-
-    // 命令列表
-    if (Array.isArray(pkg.contributes.commands)) {
-      for (const cmd of pkg.contributes.commands) {
-        if (cmd.title && map[cmd.title]) {
-          cmd.title = map[cmd.title];
-        }
-      }
-    }
-
-    // 设置项
-    if (pkg.contributes.configuration && pkg.contributes.configuration.properties) {
-      const props = pkg.contributes.configuration.properties;
-      for (const prop of Object.values(props)) {
-        if (prop.description && map[prop.description]) {
-          prop.description = map[prop.description];
-        }
-        if (prop.deprecationMessage && map[prop.deprecationMessage]) {
-          prop.deprecationMessage = map[prop.deprecationMessage];
-        }
-      }
-    }
-  }
-
-  // 4. 注入标记并写回 package.json
-  pkg.__antigravity_chinese_patched = true;
-  pkg.__antigravity_chinese_version = require('../package.json').version;
-  fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, '\t') + '\n', 'utf-8');
-
-  // 5. 生成并写入 Webview 注入资产 (i18n-bundle.js & agy-i18n-proxy.js)
-  const bundleScript = getI18nBundleScript();
-  fs.writeFileSync(path.join(extDir, 'i18n-bundle.js'), bundleScript, 'utf-8');
-
-  const proxyScript = getAgyI18nProxyTemplate();
-  fs.writeFileSync(path.join(extDir, 'agy-i18n-proxy.js'), proxyScript, 'utf-8');
-
-  // 6. 修补 extension.js 中的 Webview iframe 代理重定向
-  const extJsResult = patchExtensionJs(extDir);
-  if (!extJsResult.success) {
-    console.warn(`⚠️ [VS Code 扩展警告] extension.js 深度拦截注入遇到提示: ${extJsResult.message}`);
-  }
-
-  fs.writeFileSync(
-    metaPath,
-    JSON.stringify({ patched: true, timestamp: Date.now(), extDir }, null, 2),
-    'utf-8'
-  );
-
-  return {
-    success: true,
-    message: `成功为 VS Code 扩展注入全景中文本地化 (package.json + Webview i18n Proxy): ${extDir}`,
-    extDir
-  };
 }
 
 /**
@@ -650,38 +738,31 @@ function restoreVsCodePatch(customDir) {
   const pkgPath = path.join(extDir, 'package.json');
   const bakPath = path.join(extDir, 'package.json.bak');
   const extJsPath = path.join(extDir, 'extension.js');
-  const extJsBakPath = path.join(extDir, 'extension.js.bak');
   const metaPath = path.join(extDir, '.antigravity_vscode_meta.json');
   const bundlePath = path.join(extDir, 'i18n-bundle.js');
   const proxyPath = path.join(extDir, 'agy-i18n-proxy.js');
 
-  let restoredAny = false;
-
-  // 1. 还原 package.json
-  if (fs.existsSync(bakPath)) {
-    fs.copyFileSync(bakPath, pkgPath);
-    restoredAny = true;
+  try {
+    const files = new Map();
+    const currentPkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+    if (currentPkg.__antigravity_chinese_patched) {
+      const backup = fs.readFileSync(bakPath, 'utf8');
+      const backupPkg = JSON.parse(backup);
+      if (backupPkg.name !== currentPkg.name || backupPkg.__antigravity_chinese_patched || backupPkg.version !== currentPkg.version) {
+        throw new Error('package.json 纯净备份污染或版本不一致');
+      }
+      files.set(pkgPath, backup);
+    }
+    if (fs.existsSync(extJsPath) && isInjectedJs(fs.readFileSync(extJsPath, 'utf8'))) {
+      files.set(extJsPath, getPristineJs(extDir));
+    }
+    // 全部备份验证通过后才写入或清理；干净的上游新文件原样保留。
+    for (const file of [bundlePath, proxyPath, metaPath]) files.set(file, null);
+    commitFiles(files);
+    return { success: true, message: `已安全恢复或保留 VS Code 扩展官方原生状态: ${extDir}` };
+  } catch (err) {
+    return { success: false, message: `无法安全还原扩展: ${err.message}` };
   }
-
-  // 2. 还原 extension.js
-  if (fs.existsSync(extJsBakPath)) {
-    fs.copyFileSync(extJsBakPath, extJsPath);
-    restoredAny = true;
-  }
-
-  // 3. 安全清理注入资产
-  try { if (fs.existsSync(bundlePath)) fs.unlinkSync(bundlePath); } catch (_) {}
-  try { if (fs.existsSync(proxyPath)) fs.unlinkSync(proxyPath); } catch (_) {}
-  try { if (fs.existsSync(metaPath)) fs.unlinkSync(metaPath); } catch (_) {}
-
-  if (!restoredAny && !isVsCodeExtensionPatched(extDir)) {
-    return { success: true, message: '扩展当前为官方原生状态，无需还原。' };
-  }
-
-  return {
-    success: true,
-    message: `成功恢复 VS Code 扩展至官方原生纯净状态: ${extDir}`
-  };
 }
 
 module.exports = {

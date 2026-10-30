@@ -72,16 +72,17 @@ function tryRecoverSwappedAsar(targetAsarPath) {
 
 function findAsarPath(customPath) {
   if (customPath) {
-    let resolved = path.resolve(customPath);
-    if (fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()) {
-      resolved = path.join(resolved, 'resources', 'app.asar');
+    const resolved = path.resolve(customPath);
+    const isDirectory = fs.existsSync(resolved) && fs.statSync(resolved).isDirectory();
+    const candidates = isDirectory ? [
+      path.join(resolved, 'resources', 'app.asar'),
+      path.join(resolved, 'app.asar'),
+      path.join(resolved, 'Contents', 'Resources', 'app.asar')
+    ] : [resolved];
+    for (const candidate of candidates) {
+      tryRecoverSwappedAsar(candidate);
+      if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return candidate;
     }
-    tryRecoverSwappedAsar(resolved);
-    if (fs.existsSync(resolved)) return resolved;
-
-    const candidateDirect = path.join(resolved, 'app.asar');
-    tryRecoverSwappedAsar(candidateDirect);
-    if (fs.existsSync(candidateDirect)) return candidateDirect;
 
     console.error(`❌ 指定路径未找到 app.asar: ${customPath}`);
     process.exit(1);
@@ -1204,33 +1205,46 @@ if (require.main === module) {
 
   let customPath = null;
   const pathArgIdx = args.indexOf('--path');
-  if (pathArgIdx !== -1 && args[pathArgIdx + 1]) {
+  if (pathArgIdx !== -1) {
+    if (!args[pathArgIdx + 1] || args[pathArgIdx + 1].startsWith('-')) {
+      console.error('❌ --path 后必须提供客户端或扩展路径。');
+      process.exit(1);
+    }
     customPath = args[pathArgIdx + 1];
   }
 
   switch (command) {
     case 'install':
-    case 'patch':
-      install(customPath);
+    case 'patch': {
+      const vsExtDir = findVsCodeExtensionDir(customPath);
+      const asarPath = customPath && vsExtDir ? null : findAsarPath(customPath);
+      if (asarPath) install(customPath);
+      else console.log('ℹ️ 未检测到桌面客户端，跳过桌面补丁。');
       if (args.includes('--with-plugin')) {
         installPlugin();
       }
       // 弹性自适应联动：自动检测并为本机 VS Code 扩展注入全景汉化
       try {
-        const vsExtDir = findVsCodeExtensionDir(customPath);
         if (vsExtDir) {
           console.log('\n📦 [全家桶联动] 检测到本机 VS Code 扩展，正在同步注入全景中文本地化...');
           const vsRes = installVsCodePatch(vsExtDir);
           if (vsRes.success) {
             console.log(`✅ [全家桶联动] ${vsRes.message}`);
           } else {
-            console.warn(`⚠️ [全家桶联动] ${vsRes.message}`);
+            console.error(`❌ [全家桶联动] ${vsRes.message}`);
+            process.exitCode = 1;
           }
         }
       } catch (vsErr) {
-        console.warn('⚠️ [全家桶联动] VS Code 扩展注入跳过:', vsErr.message);
+        console.error('❌ [全家桶联动] VS Code 扩展注入失败:', vsErr.message);
+        process.exitCode = 1;
+      }
+      if (!asarPath && !vsExtDir && !args.includes('--with-plugin')) {
+        console.error('❌ 未检测到可安装汉化补丁的客户端或 VS Code 扩展。');
+        process.exitCode = 1;
       }
       break;
+    }
     case 'apply-staged':
       applyStagedWhenUnlocked(customPath);
       break;
@@ -1243,20 +1257,29 @@ if (require.main === module) {
       uninstallPlugin();
       break;
     case 'restore':
-    case 'uninstall':
-      restore(customPath);
+    case 'uninstall': {
+      const vsExtDir = findVsCodeExtensionDir(customPath);
+      const asarPath = customPath && vsExtDir ? null : findAsarPath(customPath);
+      if (asarPath) restore(customPath);
+      else if (!customPath) uninstallPlugin();
       // 弹性自适应联动：自动检测并恢复本机 VS Code 扩展至官方原生
       try {
-        const vsExtDir = findVsCodeExtensionDir(customPath);
         if (vsExtDir && isVsCodeExtensionPatched(vsExtDir)) {
           console.log('\n🔄 [全家桶联动] 检测到本机 VS Code 扩展处于汉化状态，正在同步还原官方英文原版...');
           const vsRes = restoreVsCodePatch(vsExtDir);
           if (vsRes.success) {
             console.log(`✅ [全家桶联动] ${vsRes.message}`);
+          } else {
+            console.error(`❌ [全家桶联动] ${vsRes.message}`);
+            process.exitCode = 1;
           }
         }
-      } catch (_) {}
+      } catch (err) {
+        console.error('❌ [全家桶联动] VS Code 扩展还原失败:', err.message);
+        process.exitCode = 1;
+      }
       break;
+    }
     case 'install:vscode':
     case 'install-vscode':
     case 'vscode:install': {

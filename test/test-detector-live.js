@@ -21,12 +21,19 @@ function assert(condition, message) {
 }
 
 const platform = os.platform();
-const homedir = os.homedir();
-
+const testDir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-detector-'));
+const homedir = path.join(testDir, 'home');
+const originalHome = os.homedir;
+const originalExists = fs.existsSync;
+const originalLocalAppData = process.env.LOCALAPPDATA;
+const originalProgramFiles = process.env.ProgramFiles;
 let targetDummyAsar = null;
-let createdDirs = [];
 
 try {
+  // 保留真实平台和无参调用，将所有候选路径隔离到测试目录。
+  os.homedir = () => homedir;
+  process.env.LOCALAPPDATA = path.join(testDir, 'local-app-data');
+  process.env.ProgramFiles = path.join(testDir, 'program-files');
   if (platform === 'win32') {
     const localAppData = process.env.LOCALAPPDATA || path.join(homedir, 'AppData', 'Local');
     targetDummyAsar = path.join(localAppData, 'Programs', 'antigravity', 'resources', 'app.asar');
@@ -39,17 +46,14 @@ try {
 
   console.log(`📍 目标测试候选路径: ${targetDummyAsar}`);
 
-  const alreadyExisted = fs.existsSync(targetDummyAsar);
   const targetDir = path.dirname(targetDummyAsar);
-
-  if (!fs.existsSync(targetDir)) {
-    fs.mkdirSync(targetDir, { recursive: true });
-    createdDirs.push(targetDir);
-  }
-
-  if (!alreadyExisted) {
-    fs.writeFileSync(targetDummyAsar, 'DUMMY_ASAR_FOR_DETECTOR_TEST', 'utf-8');
-  }
+  fs.mkdirSync(targetDir, { recursive: true });
+  fs.writeFileSync(targetDummyAsar, 'DUMMY_ASAR_FOR_DETECTOR_TEST', 'utf-8');
+  // 系统级候选目录即使已安装客户端，也不能抢占本用例或触发冷启动恢复。
+  fs.existsSync = candidate => {
+    const resolved = path.resolve(candidate);
+    return resolved.startsWith(testDir + path.sep) && originalExists(candidate);
+  };
 
   // 执行真正的无参自动探测！(必须在真实 process.platform 下无参找到)
   const detected = findAsarPath();
@@ -62,23 +66,19 @@ try {
     `探测结果 "${detected}" 精确匹配系统默认安装路径 "${targetDummyAsar}"`
   );
 
-  // 清理临时测试文件
-  if (!alreadyExisted && fs.existsSync(targetDummyAsar)) {
-    fs.unlinkSync(targetDummyAsar);
-    console.log('🧹 已清理测试临时 dummy asar 文件');
-  }
-
-  // 逆向清理创建的临时目录（避免留下垃圾）
-  for (const dir of createdDirs) {
-    try {
-      if (fs.existsSync(dir) && fs.readdirSync(dir).length === 0) {
-        fs.rmdirSync(dir);
-      }
-    } catch (e) {}
-  }
 } catch (err) {
   console.error('❌ 测试运行异常:', err);
   failed++;
+} finally {
+  fs.existsSync = originalExists;
+  os.homedir = originalHome;
+  if (originalLocalAppData === undefined) delete process.env.LOCALAPPDATA;
+  else process.env.LOCALAPPDATA = originalLocalAppData;
+  if (originalProgramFiles === undefined) delete process.env.ProgramFiles;
+  else process.env.ProgramFiles = originalProgramFiles;
+  if (path.dirname(testDir) === path.resolve(os.tmpdir()) && path.basename(testDir).startsWith('agy-detector-')) {
+    fs.rmSync(testDir, { recursive: true, force: true });
+  }
 }
 
 console.log('\n============================================================');

@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager designed for the entire **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI), currently at version **v3.3.32** (fully adapted for Antigravity **v2.28.2** architecture evolution: complete elimination of VS Code extension micro-proxy WebSocket handshake origin 403 Forbidden issues, full upgrade of Origin / Host / Referer rewriting with CSWSH protection bypass, and continuous ecosystem synergy with publication-grade high-reliability standards).
+A high-performance, reversible Chinese localization suite and lifecycle manager for the **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI). Version **v3.3.33**, targeting Antigravity **v2.28.2**, fixes stale VS Code extension backups, misleading restore success, and extension-only installation. It also improves CDP timeouts and disconnect handling, proxy decoding and origin checks, and protection for deeply nested code and editable regions.
 
 ---
 
@@ -176,7 +176,7 @@ node cli.js install --path "/path/to/antigravity/resources/app.asar"
 The project includes an exceptionally rigorous end-to-end regression test suite and cross-platform CI matrix (Windows / macOS / Ubuntu x Node 18/20/22) covering **390+ assertions**:
 
 ```bash
-# Run all automated test suites (aggregating 9 full-fidelity test suites, 390+ assertions)
+# Run all automated test suites (aggregating 10 full-fidelity test suites, 390+ assertions)
 npm test
 ```
 
@@ -186,8 +186,9 @@ npm test
 - **Zero-Dependency RFC 6455 CDP WebSocket Protocol Verification (`test/test-cdp.js`)**: Validates handshake authentication, frame encoding/decoding, JSON-RPC roundtrip communication, and graceful socket shutdown using pure Node.js built-in modules.
 - **Menu, Tray, Native Context Menu & Suicide Prevention Gate (`test/test-menu-and-titles.js`)**: Ensures single-character words do not corrupt custom session titles, verifies main process system tray integration, native context menu IPC interception, and native dialog safety, and tests suicide prevention gates in agent environments (`ANTIGRAVITY_AGENT=1` or `AGY_NO_KILL=1`).
 - **ASAR Lifecycle & Upgrade Idempotence (`test/test-asar-lifecycle.js`)**: Builds real ASAR binary packages to test extraction, injection, double-install idempotence, upstream silent update anti-downgrade circuit breaker, two-phase staged rollback, and cold-boot crash recovery (31 full-fidelity assertions).
-- **Live Path Detector (`test/test-detector-live.js`)**: Validates 0-argument system path detection on real Ubuntu / macOS / Windows runners.
-- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: 11 assertions scanning all 3,582 exact entries and 338 cascade regexes for zero typos, full-width punctuation, standard CCF terminology, and safe regex compilation.
+- **Host Path Detector (`test/test-detector-live.js`)**: Validates 0-argument path detection in isolated temporary directories on Ubuntu / macOS / Windows runners without writing to installed clients.
+- **Boundary Regressions (`test/test-regressions.js`)**: Covers extension updates and rollback, CDP lifecycle and fragmentation, proxy compression and origin checks, CLI path arguments, and deeply nested code protection.
+- **Proofreading & Terminology Integrity (`test/test-proofread-integrity.js`)**: Scans the complete dictionary and cascade regexes for common typos, full-width punctuation, computer terminology, and safe regex compilation.
 - **VS Code Extension Lifecycle, Webview Proxy & Anti-Corruption Verification (`test/test-vscode-patch.js`)**: 14 assertions covering extension probing, initial injection, command/setting/viewer localization, Webview micro reverse proxy interception, `i18n-bundle.js` asset generation, dual-backup anti-corruption, and full atomic rollback.
 
 ---
@@ -241,7 +242,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (3,665 exact entries + 338 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,896 exact entries + 360 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
@@ -252,7 +253,7 @@ antigravity-chinese/
 │       ├── rules/                    # Agent Chinese interaction rules (chinese-interaction-rules.md)
 │       ├── skills/                   # Localization diagnostic skills (i18n-diagnostics)
 │       └── plugin.json               # Antigravity plugin manifest specification
-├── test/                             # Automated full-fidelity regression test suites (9 suites, 400+ assertions)
+├── test/                             # Automated full-fidelity regression test suites (10 suites, 400+ assertions)
 │   ├── test-lint.js                  # Dictionary lint & syntax health checks
 │   ├── verify.js                     # 118 JSDOM state machine, inline reordering, and runtime performance assertions
 │   ├── test-screenshots.js          # 306 strictEqual golden truth assertions + 20 invariant fuzzing tests
@@ -261,7 +262,8 @@ antigravity-chinese/
 │   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
 │   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
 │   ├── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
-│   └── test-vscode-patch.js          # 15 VS Code extension patching, Webview proxy & atomic rollback assertions
+│   ├── test-vscode-patch.js          # VS Code extension patch, Webview proxy & restore assertions
+│   └── test-regressions.js           # Updates, failure recovery, protocol & DOM boundary regressions
 ├── tools/                            # Compiler, consistency audit & drift detection toolchain
 │   ├── ultimate-consistency-audit.js # Ultimate global consistency & quality deep audit analyzer (npm run audit)
 │   ├── build-dict.js                 # Three-tier dictionary compiler (ASCII key gate & capture group conservation)

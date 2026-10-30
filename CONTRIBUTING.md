@@ -34,14 +34,13 @@
    ```
 
 3. **修改词库或代码**：
-   * 词库字典：编辑 [`dict/zh-CN.json`](dict/zh-CN.json)。
+   * 词库字典：编辑 `dict/src/` 中的分层源文件，然后运行 `npm run build:dict`，同步生成 `dict/zh-CN.json` 与 `dist/zh-CN.bundle.json`。请勿仅修改生成文件。
    * 运行时引擎：编辑 [`core/i18n-runtime.js`](core/i18n-runtime.js)。
    * CLI 工具：编辑 [`cli.js`](cli.js)。
 
 4. **运行本地自动化回归测试（必须全部 PASS）**：
    ```bash
-   node test/verify.js
-   node test/test-screenshots.js
+   npm test
    ```
    > 确保所有断言均为 `✅ [PASS]`，无报错或挂起。
 
