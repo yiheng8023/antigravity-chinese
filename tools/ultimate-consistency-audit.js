@@ -247,12 +247,14 @@ for (const rel of criticalFiles) {
   });
 }
 
-check('VS Code 扩展微代理模板核心防御机制具备 (GZIP 解压与 WHATWG URL)', () => {
+check('VS Code 扩展微代理模板核心防御机制具备 (GZIP 解压、WHATWG URL 与 WebSocket Origin 来源重写)', () => {
   const content = fs.readFileSync(vscodePatchPath, 'utf8');
   const hasGzip = content.includes('zlib.gunzipSync') && content.includes('accept-encoding');
   const hasWhatwg = content.includes('new URL(');
+  const hasOriginRewrite = content.includes('targetHeaders.origin = targetOrigin') && content.includes('x-forwarded-host');
   if (!hasGzip) return { ok: false, message: '缺失 GZIP 自动解压防御' };
   if (!hasWhatwg) return { ok: false, message: '缺失 WHATWG URL 规范重构' };
+  if (!hasOriginRewrite) return { ok: false, message: '缺失 WebSocket/HTTP Origin 来源重写防御' };
   return true;
 });
 

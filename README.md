@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.31**，深度适配 Antigravity **v2.28.2** 架构演进：全量覆盖官方“跨会话搜索”(`Search Across Conversations`) 与侧边栏归档过滤交互，彻底消除项目与会话设置中权限说明从句英文残留，全面恪守“非侵入顺应宿主原版 DOM”的本地化职责边界，持续固化多端生态与出版级高可靠基线）。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器（当前版本 **v3.3.32**，深度适配 Antigravity **v2.28.2** 架构演进：彻底根除 VS Code 扩展微代理 WebSocket 握手来源 403 跨域拦截与同源校验顽疾，全面升级 Origin / Host / Referer 目标重写与 CSWSH 防御击穿机制，持续固化多端生态协同与出版级高可靠基线）。
 
 ---
 
@@ -38,7 +38,7 @@
 
 - 🧩 **VS Code 官方扩展全景汉化与 Webview 深度注入闭环 (VS Code Extension Full Localization & Webview Proxy)**：
   - **统一一键全家桶安装**：无论双击根目录 [`install.bat`](install.bat) 还是运行 `node cli.js install`，安装器自动执行多端弹性探测，同步完成桌面客户端、官方智能体插件与 VS Code 扩展的全量汉化，绝不让用户在多个脚本间来回倒腾；
-  - **攻克 Webview iframe 语言孤岛**：针对 VS Code 中 `Antigravity Settings` 设置面板与右侧侧边栏聊天窗口由后台 Language Server Webview iframe 渲染且无 Electron preload 注入的难题，自研极轻量本地反向代理（`agy-i18n-proxy.js`），在内存中动态挂载 `i18n-bundle.js`，实现设置面板与聊天界面 100% 原生纯中文；
+  - **攻克 Webview iframe 语言孤岛与 WebSocket 403 来源根治**：针对 VS Code 中 `Antigravity Settings` 设置面板与右侧侧边栏聊天窗口由后台 Language Server Webview iframe 渲染且无 Electron preload 注入的难题，自研极轻量本地反向代理（`agy-i18n-proxy.js`），在内存中动态挂载 `i18n-bundle.js`，实现设置面板与聊天界面 100% 原生纯中文；同时彻底攻克代理层 WebSocket Upgrade 握手透传代理端口导致的 CSWSH 同源安全拦截 403 难题，实现 Origin、Host、Referer 与标准转发凭证的全自动目标重写，确保双向通信与状态流毫无阻碍；
   - **命令、配置与自定义编辑器 100% 出版级汉化**：全面汉化全部 10 项命令（`Add Selection to Chat` ➔ `将选中文本添加到对话`、`Accept All Changes` ➔ `接受所有更改`、`Open Antigravity Settings` ➔ `打开 Antigravity 设置` 等）、全部 9 项核心配置描述（后台服务器端口、内联差异 CodeLens、遥测、后台编辑自动接受等）及产物文档/设置查看器；
   - **双向原子还原与双重纯净备份**：自动生成 `package.json.bak` 与 `extension.js.bak` 双重纯净备份，配备专属脚本 [`install-vscode.bat`](install-vscode.bat) / `npm run install:vscode` 与 [`restore-vscode.bat`](restore-vscode.bat) / `npm run restore:vscode`，重复安装绝不污染官方备份，一秒无损回滚。
 

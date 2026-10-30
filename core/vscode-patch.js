@@ -188,6 +188,7 @@ const path = require('path');
 
 let proxyServer = null;
 let proxyPort = 0;
+let proxyReadyPromise = null;
 let currentTargetUrl = '';
 let cachedBundleContent = null;
 
@@ -204,8 +205,13 @@ function getBundleScript() {
 
 function startProxy() {
   if (proxyServer && proxyPort > 0) return proxyPort;
+  if (proxyServer && proxyServer.listening && proxyServer.address()) {
+    proxyPort = proxyServer.address().port;
+    return proxyPort;
+  }
 
-  proxyServer = http.createServer((req, res) => {
+  if (!proxyServer) {
+    proxyServer = http.createServer((req, res) => {
     if (!currentTargetUrl) {
       res.writeHead(503, { 'Content-Type': 'text/plain' });
       res.end('Antigravity target server not set');
@@ -222,15 +228,30 @@ function startProxy() {
     }
 
     const reqUrl = new URL(req.url, 'http://127.0.0.1');
+    const proxyOrigin = 'http://127.0.0.1:' + proxyPort;
+    const targetOrigin = targetParsed.origin;
+    const targetPort = parseInt(targetParsed.port || (targetParsed.protocol === 'https:' ? '443' : '80'), 10);
+
     const proxyHeaders = { ...req.headers };
     proxyHeaders.host = targetParsed.host;
 
     // 核心防御 1：强制目标服务器以未压缩明文返回，杜绝二进制乱码拼接与解压崩溃
     delete proxyHeaders['accept-encoding'];
 
+    // 核心防御 2：重写 HTTP 请求来源与防跨域检查，彻底对齐目标后端
+    if (proxyHeaders.origin) {
+      proxyHeaders.origin = targetOrigin;
+    }
+    if (proxyHeaders.referer) {
+      proxyHeaders.referer = proxyHeaders.referer.split(proxyOrigin).join(targetOrigin);
+    }
+    proxyHeaders['x-forwarded-host'] = req.headers.host || ('127.0.0.1:' + proxyPort);
+    proxyHeaders['x-forwarded-proto'] = targetParsed.protocol ? targetParsed.protocol.replace(':', '') : 'http';
+    proxyHeaders['x-forwarded-for'] = req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : '127.0.0.1';
+
     const options = {
       hostname: targetParsed.hostname,
-      port: targetParsed.port,
+      port: targetPort,
       path: reqUrl.pathname + reqUrl.search,
       method: req.method,
       headers: proxyHeaders
@@ -244,7 +265,7 @@ function startProxy() {
         targetRes.on('end', () => {
           let buffer = Buffer.concat(chunks);
 
-          // 核心防御 2：万一目标服务强制返回压缩格式，自动双向解压
+          // 核心防御 3：万一目标服务强制返回压缩格式，自动双向解压
           const encoding = (targetRes.headers['content-encoding'] || '').toLowerCase();
           if (encoding === 'gzip') {
             try { buffer = zlib.gunzipSync(buffer); } catch (_) {}
@@ -264,11 +285,27 @@ function startProxy() {
           delete headers['content-encoding'];
           delete headers['transfer-encoding'];
           headers['content-length'] = Buffer.byteLength(modified, 'utf-8');
+
+          // 逆向对齐 CORS 与重定向 Location
+          if (headers['access-control-allow-origin'] && headers['access-control-allow-origin'] !== '*') {
+            headers['access-control-allow-origin'] = req.headers.origin || '*';
+          }
+          if (headers.location && headers.location.includes(targetOrigin)) {
+            headers.location = headers.location.split(targetOrigin).join(proxyOrigin);
+          }
+
           res.writeHead(targetRes.statusCode, headers);
           res.end(modified);
         });
       } else {
-        res.writeHead(targetRes.statusCode, targetRes.headers);
+        const headers = { ...targetRes.headers };
+        if (headers['access-control-allow-origin'] && headers['access-control-allow-origin'] !== '*') {
+          headers['access-control-allow-origin'] = req.headers.origin || '*';
+        }
+        if (headers.location && headers.location.includes(targetOrigin)) {
+          headers.location = headers.location.split(targetOrigin).join(proxyOrigin);
+        }
+        res.writeHead(targetRes.statusCode, headers);
         targetRes.pipe(res);
       }
     });
@@ -299,10 +336,52 @@ function startProxy() {
       clientSocket.destroy();
       return;
     }
-    const targetSocket = net.connect(targetParsed.port, targetParsed.hostname, () => {
+
+    const targetPort = parseInt(targetParsed.port || (targetParsed.protocol === 'https:' ? '443' : '80'), 10);
+    const targetHost = targetParsed.hostname;
+
+    // 核心防御 4：完全重写并归一化 WebSocket 握手来源信息，彻底根治后端 403 Forbidden
+    const proxyOrigin = 'http://127.0.0.1:' + proxyPort;
+    const targetOrigin = targetParsed.origin;
+
+    const targetHeaders = { ...req.headers };
+    targetHeaders.host = targetParsed.host;
+
+    // 1. 重写 Origin 为目标后端来源，防止 CSWSH (Cross-Site WebSocket Hijacking) 跨域拦截
+    if (targetHeaders.origin) {
+      targetHeaders.origin = targetOrigin;
+    }
+    if (targetHeaders['sec-websocket-origin']) {
+      targetHeaders['sec-websocket-origin'] = targetOrigin;
+    }
+
+    // 2. 重写 Referer 来源为目标后端来源
+    if (targetHeaders.referer) {
+      targetHeaders.referer = targetHeaders.referer.split(proxyOrigin).join(targetOrigin);
+    }
+
+    // 3. 补充标准反向代理转发凭证
+    targetHeaders['x-forwarded-host'] = req.headers.host || ('127.0.0.1:' + proxyPort);
+    targetHeaders['x-forwarded-proto'] = targetParsed.protocol ? targetParsed.protocol.replace(':', '') : 'http';
+    targetHeaders['x-forwarded-for'] = req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : '127.0.0.1';
+
+    // 4. 健壮序列化 HTTP Upgrade 请求头报文（支持单值与数组形态）
+    const headerLines = [];
+    for (const [key, val] of Object.entries(targetHeaders)) {
+      if (val === undefined || val === null) continue;
+      if (Array.isArray(val)) {
+        for (const item of val) {
+          headerLines.push(key + ': ' + item);
+        }
+      } else {
+        headerLines.push(key + ': ' + val);
+      }
+    }
+
+    const targetSocket = net.connect(targetPort, targetHost, () => {
       targetSocket.write(
         req.method + ' ' + req.url + ' HTTP/' + req.httpVersion + '\\r\\n' +
-        Object.entries(req.headers).map(([k, v]) => k + ': ' + v).join('\\r\\n') +
+        headerLines.join('\\r\\n') +
         '\\r\\n\\r\\n'
       );
       if (head && head.length > 0) targetSocket.write(head);
@@ -316,13 +395,27 @@ function startProxy() {
     clientSocket.on('close', () => targetSocket.destroy());
   });
 
-  proxyServer.listen(0, '127.0.0.1', () => {
-    if (proxyServer && proxyServer.address()) {
-      proxyPort = proxyServer.address().port;
-    }
-  });
+    proxyReadyPromise = new Promise((resolve) => {
+      proxyServer.listen(0, '127.0.0.1', () => {
+        if (proxyServer && proxyServer.address()) {
+          proxyPort = proxyServer.address().port;
+        }
+        resolve(proxyPort);
+      });
+    });
+  }
+
+  if (proxyServer && proxyServer.listening && proxyServer.address()) {
+    proxyPort = proxyServer.address().port;
+  }
 
   return proxyPort;
+}
+
+function ensureProxyReady() {
+  startProxy();
+  if (proxyPort > 0) return Promise.resolve(proxyPort);
+  return proxyReadyPromise || Promise.resolve(proxyPort);
 }
 
 function getProxiedUrls(serverUrl, fullUrlString) {
@@ -358,10 +451,21 @@ function getProxiedUrls(serverUrl, fullUrlString) {
   }
 }
 
+function stopProxy() {
+  if (proxyServer) {
+    try { proxyServer.close(); } catch (_) {}
+    proxyServer = null;
+    proxyPort = 0;
+    proxyReadyPromise = null;
+  }
+}
+
 startProxy();
 
 module.exports = {
   startProxy,
+  stopProxy,
+  ensureProxyReady,
   getProxiedUrls
 };
 `;
