@@ -385,7 +385,17 @@ const goldenCases = [
   { input: "Log back in", expected: "重新登录" },
   { input: "Toggle Maximize Auxiliary Pane", expected: "切换辅助面板最大化" },
   { input: "Toggle Overview Panel", expected: "切换概览面板" },
-  { input: "Overview Panel", expected: "概览面板" }
+  { input: "Overview Panel", expected: "概览面板" },
+
+  // 2.28.2 Screenshot: Search Across Conversations & View archived in sidebar popover (media_1793337580397_407c256f.png)
+  { input: "Search Across Conversations", expected: "跨会话搜索" },
+  { input: "View archived in the sidebar (▾ menu).", expected: "可在侧边栏查看已归档会话（▾ 菜单）。" },
+  { input: "View archived in the sidebar (▾ menu)", expected: "可在侧边栏查看已归档会话（▾ 菜单）" },
+  { input: "Search across conversations", expected: "跨会话搜索" },
+  { input: "Archived conversations", expected: "已归档会话" },
+  { input: "View archived", expected: "查看已归档" },
+  { input: "Show archived", expected: "显示已归档" },
+  { input: "Hide archived", expected: "隐藏已归档" }
 ];
 
 console.log(`执行 ${goldenCases.length} 项黄金语义精确断言...`);

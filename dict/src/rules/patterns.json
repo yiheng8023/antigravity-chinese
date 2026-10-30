@@ -1,5 +1,9 @@
 [
   {
+    "regex": "^View archived in the sidebar\\s*\\((.*?)\\s*menu\\)\\.?$",
+    "replacement": "可在侧边栏查看已归档会话（$1 菜单）。"
+  },
+  {
     "regex": "^(\\d+)\\s+turns?$",
     "replacement": "$1 个轮次"
   },

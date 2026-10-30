@@ -505,6 +505,29 @@ win.document.body.appendChild(multiLayerContainer);
 win.__AGY_TRANSLATE_EL__(multiLayerContainer);
 assert(multiLayerContainer.textContent.includes('在此类会话中工作时包含') && multiLayerContainer.textContent.includes('全局权限') && !multiLayerContainer.textContent.includes('when working in these conversations'), '极端跨层级多节点拓扑重排自愈彻底消灭英文残留');
 
+// 15. 验证 2.28.2 历史会话下线、跨会话搜索与侧边栏归档引导气泡
+console.log('\n--- 4.17 验证 v2.28.2 跨会话搜索与侧边栏归档引导气泡汉化 ---');
+assert(translate('Search Across Conversations') === '跨会话搜索', '"Search Across Conversations" -> "跨会话搜索"');
+assert(translate('View archived in the sidebar (▾ menu).') === '可在侧边栏查看已归档会话（▾ 菜单）。', '侧边栏归档提示带三角符号汉化通过');
+assert(translate('View archived in the sidebar (▾ menu)') === '可在侧边栏查看已归档会话（▾ 菜单）', '侧边栏归档提示无句号汉化通过');
+assert(translate('View archived in the sidebar (▼ menu).') === '可在侧边栏查看已归档会话（▼ 菜单）。', '侧边栏归档提示带黑三角符号汉化通过');
+assert(translate('Archived conversations') === '已归档会话', '"Archived conversations" -> "已归档会话"');
+assert(translate('View archived') === '查看已归档', '"View archived" -> "查看已归档"');
+assert(translate('Show archived') === '显示已归档', '"Show archived" -> "显示已归档"');
+assert(translate('Hide archived') === '隐藏已归档', '"Hide archived" -> "隐藏已归档"');
+
+const popoverEl = win.document.createElement('div');
+popoverEl.innerHTML = '<h3>Search Across Conversations</h3>' +
+  '<div>Search conversations with <svg aria-label="search"></svg> in the top left.</div>' +
+  '<div>View archived in the sidebar (▾ menu).</div>' +
+  '<button>Close</button>';
+win.document.body.appendChild(popoverEl);
+win.__AGY_TRANSLATE_EL__(popoverEl);
+assert(popoverEl.querySelector('h3').textContent === '跨会话搜索', '引导气泡标题汉化通过');
+assert(popoverEl.querySelectorAll('div')[0].textContent.includes('可通过左上角') && popoverEl.querySelectorAll('div')[0].textContent.includes('图标搜索会话。'), '引导气泡搜索提示行汉化通过');
+assert(popoverEl.querySelectorAll('div')[1].textContent === '可在侧边栏查看已归档会话（▾ 菜单）。', '引导气泡侧边栏归档提示行汉化通过');
+assert(popoverEl.querySelector('button').textContent === '关闭', '引导气泡关闭按钮汉化通过');
+
 console.log('\n============================================================');
 console.log(`📊 测试完成: 共 ${passed + failed} 项断言, 通过 ${passed} 项, 失败 ${failed} 项`);
 console.log('============================================================\n');
