@@ -1,4 +1,8 @@
 {
+  "Chat": "对话",
+  "Conversation Steps": "对话步骤",
+  "Choose how much detail is shown during a conversation.": "选择对话过程中显示的详细程度。",
+  "Verbose": "详细",
   "No automations yet": "暂无自动化",
   "Run a prompt on a schedule, like a morning summary of yesterday's changes. Runs show up here.": "按计划运行提示词，例如每天早晨汇总昨天的更改。运行记录将显示在此处。",
   "Always on": "持续运行",

@@ -18,6 +18,10 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 151 项来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  { input: 'Chat', expected: '对话' },
+  { input: 'Conversation Steps', expected: '对话步骤' },
+  { input: 'Choose how much detail is shown during a conversation.', expected: '选择对话过程中显示的详细程度。' },
+  { input: 'Verbose', expected: '详细' },
   { input: 'No automations yet', expected: '暂无自动化' },
   { input: "Run a prompt on a schedule, like a morning summary of yesterday's changes. Runs show up here.", expected: '按计划运行提示词，例如每天早晨汇总昨天的更改。运行记录将显示在此处。' },
   { input: 'Always on', expected: '持续运行' },
