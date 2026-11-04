@@ -16,7 +16,7 @@ const { findVsCodeExtensionDir, installVsCodePatch, restoreVsCodePatch,
 
 function tempDir(t) {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'agy-regression-'));
-  t.after(() => fs.rmSync(dir, { recursive: true, force: true }));
+  t.after(() => fs.rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 100 }));
   return dir;
 }
 
