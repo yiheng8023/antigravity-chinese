@@ -3,6 +3,7 @@ const path = require('path');
 const os = require('os');
 const { execSync } = require('child_process');
 const { isAsarPatched, getAsarFingerprint } = require('../cli');
+const asar = require('@electron/asar');
 
 console.log('🧪 ============================================================');
 console.log('🧪 开始执行真实 ASAR 生命周期注入、二次安装幂等与上游升级回归测试');
@@ -35,6 +36,9 @@ process.env.AGY_PLUGIN_DIR = mockPluginDir;
 
 fs.mkdirSync(resourcesDir, { recursive: true });
 fs.mkdirSync(path.join(mockSrcDir, 'dist', 'ideInstall'), { recursive: true });
+fs.mkdirSync(path.join(mockSrcDir, 'node_modules', 'external-tool'), { recursive: true });
+const externalToolContent = 'module.exports = "external process entry point";';
+fs.writeFileSync(path.join(mockSrcDir, 'node_modules', 'external-tool', 'index.js'), externalToolContent);
 
 // 1. 创建逼真的 Electron 宿主源码 Mock (官方版本 A)
 const origPreloadA = `"use strict";
@@ -83,14 +87,22 @@ fs.writeFileSync(path.join(mockSrcDir, 'dist', 'tray.js'), origTrayA, 'utf-8');
 
 try {
   // 2. 打包出真实的初始 app.asar (版本 A)
-  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}" --unpack-dir "${path.join('node_modules', 'external-tool')}"`, { stdio: 'ignore' });
   assert(fs.existsSync(asarPath), '【阶段 1】初始版本 A app.asar 构建成功');
+  assert(asar.statFile(asarPath, path.join('node_modules', 'external-tool', 'index.js')).unpacked === true,
+    '原始测试包包含真实 unpacked 外置工具');
   assert(!isAsarPatched(asarPath), '初始版本 A 确认为原生未修改状态');
 
   // 3. 首次执行 install
   execSync(`node "${cliPath}" install --path "${testDir}"`, { stdio: 'ignore' });
   assert(fs.existsSync(backupPath), '首次安装成功生成纯净备份 app.asar.bak (版本 A)');
   assert(isAsarPatched(asarPath), '首次安装后当前 ASAR 处于汉化状态');
+  asar.uncache(asarPath);
+  assert(asar.statFile(asarPath, path.join('node_modules', 'external-tool', 'index.js')).unpacked === true,
+    '安装必须保留上游外置工具的 unpacked 标记');
+  assert(fs.readFileSync(path.join(asarPath + '.unpacked', 'node_modules', 'external-tool', 'index.js'), 'utf8') === externalToolContent,
+    '安装不能改变外置工具文件');
+  assert(!fs.existsSync(path.join(resourcesDir, 'app.asar.new.unpacked')), '安装后不遗留临时外置文件目录');
 
   // 4. 【P0 关键用例】二次重复执行 install (验证绝不把已打补丁的 ASAR 存为备份)
   console.log('🔄 执行二次重复 install...');

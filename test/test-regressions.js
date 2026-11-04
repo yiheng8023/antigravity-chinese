@@ -6,7 +6,9 @@ const path = require('path');
 const http = require('http');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { spawnSync } = require('child_process');
+const { spawnSync, execFileSync } = require('child_process');
+const asar = require('@electron/asar');
+const { readEntries, getUnpackArgs, verifyUnpackedOutput } = require('../core/asar-unpack');
 const { JSDOM } = require('jsdom');
 const { SimpleWebSocketClient } = require('../core/cdp-client');
 const { findVsCodeExtensionDir, installVsCodePatch, restoreVsCodePatch,
@@ -27,6 +29,37 @@ function extension(dir, version = '1.9.0', suffix = '') {
   fs.writeFileSync(path.join(dir, 'extension.js'), js);
   return { pkg, js };
 }
+
+test('repacking preserves mixed unpacked directories and individual files', async (t) => {
+  const dir = tempDir(t);
+  const src = path.join(dir, 'source');
+  for (const file of ['one/a.bin', 'two/b.bin', 'mixed/c.bin', 'mixed/keep.js', 'root.bin', 'keep.js']) {
+    const target = path.join(src, file);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, file);
+  }
+  const original = path.join(dir, 'original.asar');
+  const output = path.join(dir, 'output.asar');
+  await asar.createPackageWithOptions(src, original, { unpack: '*.bin' });
+  assert.equal(readEntries(original).filter(e => e.unpacked).length, 4);
+  const asarRoot = path.dirname(path.dirname(require.resolve('@electron/asar')));
+  const cli = ['asar.js', 'asar.mjs'].map(name => path.join(asarRoot, 'bin', name)).find(file => fs.existsSync(file));
+  execFileSync(process.execPath, [cli, 'pack', src, output, ...getUnpackArgs(original)]);
+  assert.equal(verifyUnpackedOutput(original, output), 4);
+  fs.writeFileSync(path.join(output + '.unpacked', 'one', 'a.bin'), 'changed');
+  assert.throws(() => verifyUnpackedOutput(original, output), /改变了外置文件/);
+});
+
+test('ASAR inspection rejects truncated or oversized headers before allocating them', (t) => {
+  const dir = tempDir(t);
+  const archive = path.join(dir, 'bad.asar');
+  fs.writeFileSync(archive, 'bad');
+  assert.throws(() => readEntries(archive), /头部不完整/);
+  const header = Buffer.alloc(8);
+  header.writeUInt32LE(0xffffffff, 4);
+  fs.writeFileSync(archive, header);
+  assert.throws(() => readEntries(archive), /头部长度无效/);
+});
 
 test('extension discovery selects the newest numeric version and validates identity', (t) => {
   const home = tempDir(t);

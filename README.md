@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器。当前版本 **v3.3.33**，面向 Antigravity **v2.28.2**：修复 VS Code 扩展升级后的备份回退、恢复失败误报与仅安装扩展时的一键入口；完善 CDP 超时与断线处理、代理解码与来源校验，以及深层代码区和可编辑区域保护。
+专为 **Google Antigravity** 全生态（桌面客户端 2.0、独立 IDE 与第三方 IDE 扩展、CLI 命令行工具）打造的高性能、可逆式中文本地化套件与生命周期管理器。当前版本 **v3.3.34**，面向 Antigravity **v2.29.0**：补齐新版首页个性化问候语；安装时保留 ASAR 外置文件布局，并在替换前逐文件验证内容，保护新版随附的 Chrome DevTools MCP；延续扩展升级防回退、CDP 生命周期与代码区保护修复。
 
 ---
 
@@ -242,7 +242,7 @@ antigravity-chinese/
 │   │   ├── core/                     # 原子纯词条 (common.json)
 │   │   ├── rules/                    # 动态级联正则表达式 (patterns.json)
 │   │   └── ctx/                      # 特定上下文 (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # 核心汉化词库 (3,896 精确词条 + 360 组级联正则，兼容同步)
+│   └── zh-CN.json                    # 核心汉化词库 (3,896 精确词条 + 362 组级联正则，兼容同步)
 ├── dist/                             # 自动化构建编译产物
 │   └── zh-CN.bundle.json             # 三层编译整合单一发布包
 ├── core/                             # 核心引擎与双模驱动
@@ -259,7 +259,7 @@ antigravity-chinese/
 │   ├── test-screenshots.js          # 306 项 strictEqual 黄金语义真断言 + 20 项不变性模糊测试
 │   ├── test-cdp.js                   # 零依赖 RFC 6455 CDP 协议层双向通信测试
 │   ├── test-menu-and-titles.js       # 菜单项、托盘协同与自杀防御门禁断言
-│   ├── test-asar-lifecycle.js        # 31 项 ASAR 生命周期、两阶段原子回滚与冷启动自愈断言
+│   ├── test-asar-lifecycle.js        # 35 项 ASAR 生命周期、外置文件保留、回滚与冷启动自愈断言
 │   ├── test-detector-live.js         # 真实宿主系统 0 参数无参安装路径探测断言
 │   ├── test-proofread-integrity.js   # 出版级错别字、全角标点、学术术语与正则安全质检
 │   ├── test-vscode-patch.js          # VS Code 扩展补丁、Webview 代理与回滚断言

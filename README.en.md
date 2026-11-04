@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-A high-performance, reversible Chinese localization suite and lifecycle manager for the **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI). Version **v3.3.33**, targeting Antigravity **v2.28.2**, fixes stale VS Code extension backups, misleading restore success, and extension-only installation. It also improves CDP timeouts and disconnect handling, proxy decoding and origin checks, and protection for deeply nested code and editable regions.
+A high-performance, reversible Chinese localization suite and lifecycle manager for the **Google Antigravity** ecosystem (Desktop App 2.0, Standalone IDE & IDE Extensions, CLI). Version **v3.3.34**, targeting Antigravity **v2.29.0**, translates the new personalized home greeting, preserves the ASAR unpacked-file layout, and verifies external file contents before replacement, protecting the bundled Chrome DevTools MCP. It retains the extension update, CDP lifecycle, and code-region protection fixes.
 
 ---
 
@@ -242,7 +242,7 @@ antigravity-chinese/
 │   │   ├── core/                     # Atomic phrases (common.json)
 │   │   ├── rules/                    # Dynamic cascade regexes (patterns.json)
 │   │   └── ctx/                      # Context-specific dictionaries (permissions.json, settings.json, plugins.json)
-│   └── zh-CN.json                    # Core translation dictionary (3,896 exact entries + 360 regexes, backwards-compatible)
+│   └── zh-CN.json                    # Core translation dictionary (3,896 exact entries + 362 regexes, backwards-compatible)
 ├── dist/                             # Automated compilation bundles
 │   └── zh-CN.bundle.json             # Three-tier compiled distribution bundle
 ├── core/                             # Core injection & dual-mode engines
@@ -259,7 +259,7 @@ antigravity-chinese/
 │   ├── test-screenshots.js          # 306 strictEqual golden truth assertions + 20 invariant fuzzing tests
 │   ├── test-cdp.js                   # Zero-dependency RFC 6455 CDP protocol bidirectional tests
 │   ├── test-menu-and-titles.js       # Menu items, tray integration, and suicide prevention gate assertions
-│   ├── test-asar-lifecycle.js        # 31 ASAR lifecycle, staged rollback & cold-boot recovery assertions
+│   ├── test-asar-lifecycle.js        # 35 ASAR lifecycle, unpacked files, rollback & cold-boot recovery assertions
 │   ├── test-detector-live.js         # Real host system 0-argument path detection assertions
 │   ├── test-proofread-integrity.js   # Publication-grade typos, punctuation, terminology & regex safety checks
 │   ├── test-vscode-patch.js          # VS Code extension patch, Webview proxy & restore assertions

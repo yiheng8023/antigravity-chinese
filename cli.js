@@ -10,6 +10,7 @@ const path = require('path');
 const os = require('os');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
+const { getUnpackArgs, verifyUnpackedOutput } = require('./core/asar-unpack');
 
 const PROJECT_ROOT = __dirname;
 const DICT_PATH = path.join(PROJECT_ROOT, 'dict', 'zh-CN.json');
@@ -682,13 +683,22 @@ function install(customPath) {
   console.log('🔄 [5/5] 正在重构并应用补丁...');
   const tempNewAsar = path.join(resourcesDir, 'app.asar.new');
   if (fs.existsSync(tempNewAsar)) fs.rmSync(tempNewAsar, { force: true });
+  const tempUnpackedDir = tempNewAsar + '.unpacked';
+  if (fs.existsSync(tempUnpackedDir)) {
+    console.error('❌ 检测到上次重打包遗留的外置目录，请先检查并移走: ' + tempUnpackedDir);
+    process.exit(1);
+  }
 
   try {
+    const unpackArgs = getUnpackArgs(asarPath).map(arg => `"${arg}"`).join(' ');
     const asarBin = path.join(__dirname, 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
     const packCmd = fs.existsSync(asarBin)
-      ? `"${asarBin}" pack "${tempExtractDir}" "${tempNewAsar}"`
-      : `npx -y @electron/asar@3.2.14 pack "${tempExtractDir}" "${tempNewAsar}"`;
+      ? `"${asarBin}" pack "${tempExtractDir}" "${tempNewAsar}" ${unpackArgs}`
+      : `npx -y @electron/asar@3.2.14 pack "${tempExtractDir}" "${tempNewAsar}" ${unpackArgs}`;
     execSync(packCmd, { stdio: 'inherit' });
+    const externalCount = verifyUnpackedOutput(asarPath, tempNewAsar);
+    if (externalCount) console.log(`✅ 已验证 ${externalCount} 个外置文件的布局与原始内容保持一致`);
+    if (fs.existsSync(tempUnpackedDir)) fs.rmSync(tempUnpackedDir, { recursive: true, force: true });
     
     // 带自动回滚的双阶段安全替换架构 (Two-Phase Staged Swap with Automatic Rollback)
     const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
@@ -804,6 +814,7 @@ function install(customPath) {
     console.log('🎉 ==============================================\n');
   } catch (err) {
     console.error('❌ 重构 app.asar 失败:', err.message);
+    if (fs.existsSync(tempUnpackedDir)) fs.rmSync(tempUnpackedDir, { recursive: true, force: true });
     if (fs.existsSync(tempExtractDir)) {
       fs.rmSync(tempExtractDir, { recursive: true, force: true });
     }

@@ -18,6 +18,10 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 151 项来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  { input: 'Hi Alex, what can we get done today?', expected: '你好，Alex，今天想完成什么？' },
+  { input: 'Hi 小明, what can we get done today?', expected: '你好，小明，今天想完成什么？' },
+  { input: 'Version 2.29.0', expected: '版本 2.29.0' },
+  { input: 'Version 2.29.0-insiders.1', expected: '版本 2.29.0-insiders.1' },
   // Screenshot 1: App Settings (media_1789717290478.png)
   { input: "App Settings", expected: "应用设置" },
   { input: "Manage application settings.", expected: "管理应用程序设置。" },

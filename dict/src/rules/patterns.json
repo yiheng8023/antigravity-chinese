@@ -1438,5 +1438,13 @@
   {
     "regex": "^(\\d+)\\s*d\\s+rate\\s+limit$",
     "replacement": "$1 天速率限制"
+  },
+  {
+    "regex": "^Hi (.+), what can we get done today\\?$",
+    "replacement": "你好，$1，今天想完成什么？"
+  },
+  {
+    "regex": "^Version (\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?)$",
+    "replacement": "版本 $1"
   }
 ]
