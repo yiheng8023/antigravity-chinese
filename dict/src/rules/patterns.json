@@ -1,5 +1,25 @@
 [
   {
+    "regex": "^Work locally on (.+)$",
+    "replacement": "在 $1 上本地工作"
+  },
+  {
+    "regex": "^Worktree from (.+?), and reuse (.+)$",
+    "replacement": "从 $1 创建工作树，并复用 $2"
+  },
+  {
+    "regex": "^(\\d+) on for this conversation$",
+    "replacement": "本会话已启用 $1 项"
+  },
+  {
+    "regex": "^(\\d+) on$",
+    "replacement": "已启用 $1 项"
+  },
+  {
+    "regex": "^(\\d+) tool$",
+    "replacement": "$1 个工具"
+  },
+  {
     "regex": "^View archived in the sidebar\\s*\\((.*?)\\s*menu\\)\\.?$",
     "replacement": "可在侧边栏查看已归档会话（$1 菜单）。"
   },

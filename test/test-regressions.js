@@ -445,6 +445,75 @@ test('the proxy rejects unrelated browser origins before forwarding HTTP or WebS
   assert.equal(forwarded, 0);
 });
 
+test('settings, voice tooltip and connector placeholders translate in the live DOM runtime', async (t) => {
+  const dom = new JSDOM(`<body>
+    <section><h3>Download Location</h3><p>Folder where files downloaded in the built-in browser are saved.</p>
+      <button>Change...</button><code>~/Downloads</code></section>
+    <button id="voice" title="Start Voice mode" aria-label="Start Voice mode"></button>
+    <button id="shortcut" aria-label="Remove shortcut Alt+M for Mute Voice Mic"></button>
+    <input placeholder="Search connectors" value="Codegraph">
+    <div contenteditable="true"><span>Download Location</span></div>
+  </body>`, { runScripts: 'outside-only', pretendToBeVisual: true });
+  t.after(() => dom.window.close());
+  const { window } = dom;
+  window.__AGY_I18N_DATA__ = require('../dict/zh-CN.json');
+  window.eval(fs.readFileSync(path.join(__dirname, '../core/i18n-runtime.js'), 'utf8'));
+  await new Promise(resolve => window.setTimeout(resolve, 40));
+  const doc = window.document;
+  assert.equal(doc.querySelector('h3').textContent, '下载位置');
+  assert.equal(doc.querySelector('p').textContent, '内置浏览器下载文件的保存文件夹。');
+  assert.equal(doc.querySelector('section button').textContent, '更改...');
+  assert.equal(doc.querySelector('#voice').title, '启动语音模式');
+  assert.equal(doc.querySelector('#voice').getAttribute('aria-label'), '启动语音模式');
+  assert.equal(doc.querySelector('#shortcut').getAttribute('aria-label'), '移除将语音麦克风静音的快捷键：Alt+M');
+  assert.equal(doc.querySelector('input').placeholder, '搜索连接器');
+  assert.equal(doc.querySelector('input').value, 'Codegraph');
+  assert.equal(doc.querySelector('code').textContent, '~/Downloads');
+  assert.equal(doc.querySelector('[contenteditable] span').textContent, 'Download Location');
+
+  // Popovers mount after startup, and their counts can change without replacing the element.
+  const popover = doc.createElement('div');
+  popover.setAttribute('role', 'menu');
+  popover.innerHTML = '<h3>Connectors</h3><span class="count">7 on for this conversation</span><p>1 tool</p>';
+  doc.body.appendChild(popover);
+  await new Promise(resolve => window.setTimeout(resolve, 40));
+  assert.equal(popover.querySelector('h3').textContent, '连接器');
+  assert.equal(popover.querySelector('.count').textContent, '本会话已启用 7 项');
+  assert.equal(popover.querySelector('p').textContent, '1 个工具');
+  popover.querySelector('.count').firstChild.nodeValue = '0 on for this conversation';
+  await new Promise(resolve => window.setTimeout(resolve, 40));
+  assert.equal(popover.querySelector('.count').textContent, '本会话已启用 0 项');
+});
+
+test('connector count patterns preserve numbers and reject unrelated sentences', () => {
+  const { createI18nEngine } = require('../core/i18n-runtime');
+  const engine = createI18nEngine(require('../dict/zh-CN.json'));
+  for (const count of [0, 1, 7, 20, 123]) {
+    assert.equal(engine.translate(`${count} on for this conversation`), `本会话已启用 ${count} 项`);
+    assert.equal(engine.translate(`${count} on`), `已启用 ${count} 项`);
+    assert.equal(engine.translate(`${count} tool`), `${count} 个工具`);
+    assert.equal(engine.translate(`${count} tools`), `${count} 个工具`);
+  }
+  for (const text of ['on', 'Keep 7 on', '1 tool call in user content', '7 on for this conversation yesterday']) {
+    assert.equal(engine.translate(text), null, text);
+  }
+});
+
+test('shortcut labels compose known actions without rewriting chords or unknown actions', () => {
+  const { createI18nEngine } = require('../core/i18n-runtime');
+  const engine = createI18nEngine(require('../dict/zh-CN.json'));
+  for (const chord of ['Ctrl+Shift+⇥', 'Alt+↑', 'Ctrl++', 'Ctrl+$', 'Ctrl+K Ctrl+S']) {
+    assert.equal(engine.translate(`Shortcut ${chord} for Previous Side Panel Tab`), `上一个侧面板标签页的快捷键：${chord}`);
+    assert.equal(engine.translate(`Remove shortcut ${chord} for Previous Side Panel Tab`), `移除上一个侧面板标签页的快捷键：${chord}`);
+  }
+  assert.equal(engine.translate('Add shortcut for Toggle Maximize Side Panel'), '为切换侧面板最大化添加快捷键');
+  for (const label of ['Shortcut Ctrl+S for my-extension.action', 'Add shortcut for my-extension.action',
+    'Shortcut Ctrl+S for Settings yesterday', 'Read about Shortcut Ctrl+S for Settings']) {
+    assert.equal(engine.translate(label), null, label);
+  }
+  assert.equal(createI18nEngine({ exact: { Settings: '设置' } }).translate('Shortcut Ctrl+, for Settings'), null);
+});
+
 test('deep mutations in code, terminals and model selectors remain untouched', async (t) => {
   const dom = new JSDOM('<body><button>Settings</button></body>',
     { runScripts: 'outside-only', pretendToBeVisual: true });

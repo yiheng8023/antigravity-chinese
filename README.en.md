@@ -2,15 +2,15 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.36** targets **Antigravity App 2.29.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.37** targets **Antigravity App 2.29.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This maintenance pass checks the [official changelog](https://antigravity.google/docs/changelog), handles the home greeting, version menu, automation empty state, Appearance descriptions and related UI labels, and preserves the upstream ASAR unpacked layout. See the [2.29.0 maintenance record](docs/maintenance/antigravity-2.29.0.md) for evidence, validation and remaining gaps.
+This maintenance pass checks the [official changelog](https://antigravity.google/docs/changelog) and user screenshots, fills missing browser, voice, shortcut, project-settings, worktree and connector labels, and preserves the upstream ASAR unpacked layout. See the [2.29.0 maintenance record](docs/maintenance/antigravity-2.29.0.md) for evidence, validation and remaining gaps.
 
 ## Support and verification
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.29.0 package-copy install/restore and live Home, version menu, empty Automations, Settings and Appearance-description checks |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.29.0 package-copy install/restore; specific labels in Home, version menu, empty Automations, General/Appearance/Shortcuts/project settings, worktree and connector menus |
 | VS Code extension | Manifest translation, local Webview proxy, separate backup/restore | 1.10.0 discovery and automated regressions; no live VS Code UI acceptance in this pass |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |

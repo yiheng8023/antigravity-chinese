@@ -1,6 +1,6 @@
 /**
- * Antigravity Chinese Localization Engine (Runtime v3.3.4)
- * 支持 2.17.0 复合 Alert 自愈 / WSL 跨平台菜单与弹窗适配 / 官方 10 大插件与 131 项技能全量汉化 / 极速性能闭环
+ * Antigravity Chinese Localization Engine
+ * 桌面 preload 与 VS Code Webview 共用的翻译、缓存和 DOM 保护实现。
  *
  * 核心改进：
  * 1. 彻底阻断 requestIdleCallback 自旋死循环，改为 15 秒低频保底扫描
@@ -84,6 +84,21 @@
 
       if (/[\u4e00-\u9fa5]/.test(normalized) && !/[a-zA-Z]{2,}/.test(normalized)) {
         return cacheAndReturn(normalized, null);
+      }
+
+      // Shortcut accessibility labels combine a configurable chord with a known UI action.
+      // Translate only dictionary-backed actions and templates; preserve the key symbols.
+      var shortcutLabel = normalized.match(/^(?:(Shortcut|Remove shortcut) (.+?) for|Add shortcut for) (.+)$/);
+      if (shortcutLabel && hasOwn.call(exactDict, shortcutLabel[3])) {
+        var shortcutTemplateKey = shortcutLabel[1]
+          ? shortcutLabel[1] + ' {shortcut} for {action}'
+          : 'Add shortcut for {action}';
+        if (hasOwn.call(exactDict, shortcutTemplateKey)) {
+          var shortcutText = exactDict[shortcutTemplateKey].replace(/\{(action|shortcut)\}/g, function (_, field) {
+            return field === 'action' ? exactDict[shortcutLabel[3]] : shortcutLabel[2];
+          });
+          return cacheAndReturn(normalized, shortcutText);
+        }
       }
 
       for (var i = 0; i < patterns.length; i++) {

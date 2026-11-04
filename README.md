@@ -2,15 +2,15 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-当前源码版本 **v3.3.36**，维护目标为 **Antigravity App 2.29.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.37**，维护目标为 **Antigravity App 2.29.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本次依据 [官方更新日志](https://antigravity.google/docs/changelog) 补查受影响功能；处理首页问候语、版本菜单、自动化空状态、外观说明及相关 UI 标签，并保留新版 ASAR 外置工具布局。具体依据、验证与未覆盖部分见 [2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
+本次依据 [官方更新日志](https://antigravity.google/docs/changelog) 和用户截图复核受影响功能；补齐浏览器、语音、快捷键、项目设置、新工作树和连接器界面文案，并保留新版 ASAR 外置工具布局。具体依据、验证与未覆盖部分见 [2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
 
 ## 支持与验证范围
 
 | 组件 | 实现 | 当前验证范围 |
 | --- | --- | --- |
-| Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows 2.29.0 安装/还原副本，以及首页、版本菜单、自动化空状态、设置页和外观说明实机检查 |
+| Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows 2.29.0 安装/还原副本，以及首页、版本菜单、自动化空状态、通用/外观/快捷键/项目设置、工作树与连接器弹层的指定文案检查 |
 | VS Code 扩展 | 清单翻译、Webview 本地代理、独立备份/还原 | 1.10.0 目录探测与自动化回归；本次未做 VS Code 实机界面验收 |
 | 社区中文插件 | 中文交互规则与维护诊断技能 | 可选安装；不代表 Google 官方插件 |
 | 独立 IDE、其他 IDE 扩展 | 尚无专用汉化安装器 | 不声明已适配 |

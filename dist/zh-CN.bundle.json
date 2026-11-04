@@ -1,6 +1,6 @@
 {
-  "version": "3.3.36",
-  "buildTime": "2026-11-04T08:29:50.541Z",
+  "version": "3.3.37",
+  "buildTime": "2026-11-04T09:12:08.449Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -3430,6 +3430,36 @@
     "Uses Chrome DevTools MCP for inspecting, debugging, and testing cookies, session state, authentication issues, and cookie consent compliance. Use when diagnosing 401/403 errors, authentication redirects, session expiration, Cookie/Set-Cookie header issues, cookie banner consent conformance, or third-party cookie/SameSite/Partitioned cookie warnings.": "使用 Chrome DevTools MCP 检查、调试和测试 Cookie、会话状态、身份验证问题以及 Cookie 同意合规性。适用于诊断 401/403 错误、身份验证重定向、会话过期、Cookie/Set-Cookie 标头问题、Cookie 横幅授权合规性或第三方 Cookie/SameSite/Partitioned 警告。",
     "Diagnoses and resolves memory leaks in JavaScript/Node.js applications. Use when a user reports high memory usage, OOM errors, or wants to capture, compare, or inspect heap snapshots with Chrome DevTools MCP memory tools.": "诊断并解决 JavaScript / Node.js 应用程序中的内存泄漏。适用于用户报告高内存占用、OOM 内存溢出错误，或需要使用 Chrome DevTools MCP 内存工具捕获、比对或检查堆快照 (Heap Snapshots)。",
     "Search tool for modern web development best practices. MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks. Do NOT skip — web APIs evolve rapidly and training weights contain obsolete patterns.": "现代 Web 开发最佳实践搜索工具。强制要求：针对所有 HTML/CSS 及客户端 JS 任务必须首先执行此工具。请勿跳过 —— Web API 演进迅速，训练权重可能包含已过时的模式。",
+    "Shortcut {shortcut} for {action}": "{action}的快捷键：{shortcut}",
+    "Remove shortcut {shortcut} for {action}": "移除{action}的快捷键：{shortcut}",
+    "Add shortcut for {action}": "为{action}添加快捷键",
+    "Download Location": "下载位置",
+    "Folder where files downloaded in the built-in browser are saved.": "内置浏览器下载文件的保存文件夹。",
+    "Change": "更改",
+    "Browsing History": "浏览历史",
+    "Clear visited URLs and autocomplete suggestions from the built-in browser.": "清除内置浏览器的访问记录和自动补全建议。",
+    "Browser Subagent": "浏览器子智能体",
+    "Voice mode": "语音模式",
+    "Voice": "语音",
+    "The voice used in Voice mode. Powered by Gemini Live.": "语音模式使用的声音，由 Gemini Live 提供支持。",
+    "Not set": "未设置",
+    "Microphone": "麦克风",
+    "Input device for voice mode and dictation.": "语音模式和听写使用的输入设备。",
+    "System default": "系统默认",
+    "How loud Antigravity's voice is.": "Antigravity 的语音音量。",
+    "Previous Side Panel Tab": "上一个侧面板标签页",
+    "Next Side Panel Tab": "下一个侧面板标签页",
+    "Mute Voice Mic": "将语音麦克风静音",
+    "Mute Voice Speaker": "将语音扬声器静音",
+    "Toggle Maximize Side Panel": "切换侧面板最大化",
+    "Manage project folders and settings.": "管理项目文件夹和设置。",
+    "Settings for conversations outside of projects.": "项目外会话的设置。",
+    "Start Voice mode": "启动语音模式",
+    "Work in a New Worktree": "在新工作树中工作",
+    "Keeps your checkout untouched": "保持当前检出的工作区不变",
+    "Connectors": "连接器",
+    "Search connectors": "搜索连接器",
+    "Browse Connectors": "浏览连接器",
     "Chat": "对话",
     "Conversation Steps": "对话步骤",
     "Choose how much detail is shown during a conversation.": "选择对话过程中显示的详细程度。",
@@ -3913,6 +3943,26 @@
     "Move conversation down": "下移会话"
   },
   "patterns": [
+    {
+      "regex": "^Work locally on (.+)$",
+      "replacement": "在 $1 上本地工作"
+    },
+    {
+      "regex": "^Worktree from (.+?), and reuse (.+)$",
+      "replacement": "从 $1 创建工作树，并复用 $2"
+    },
+    {
+      "regex": "^(\\d+) on for this conversation$",
+      "replacement": "本会话已启用 $1 项"
+    },
+    {
+      "regex": "^(\\d+) on$",
+      "replacement": "已启用 $1 项"
+    },
+    {
+      "regex": "^(\\d+) tool$",
+      "replacement": "$1 个工具"
+    },
     {
       "regex": "^View archived in the sidebar\\s*\\((.*?)\\s*menu\\)\\.?$",
       "replacement": "可在侧边栏查看已归档会话（$1 菜单）。"
