@@ -7,7 +7,6 @@ const http = require('http');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const { spawnSync, execFileSync } = require('child_process');
-const asar = require('@electron/asar');
 const { readEntries, getUnpackArgs, verifyUnpackedOutput } = require('../core/asar-unpack');
 const { JSDOM } = require('jsdom');
 const { SimpleWebSocketClient } = require('../core/cdp-client');
@@ -30,7 +29,7 @@ function extension(dir, version = '1.9.0', suffix = '') {
   return { pkg, js };
 }
 
-test('repacking preserves mixed unpacked directories and individual files', async (t) => {
+test('repacking preserves mixed unpacked directories and individual files', (t) => {
   const dir = tempDir(t);
   const src = path.join(dir, 'source');
   for (const file of ['one/a.bin', 'two/b.bin', 'mixed/c.bin', 'mixed/keep.js', 'root.bin', 'keep.js']) {
@@ -40,10 +39,11 @@ test('repacking preserves mixed unpacked directories and individual files', asyn
   }
   const original = path.join(dir, 'original.asar');
   const output = path.join(dir, 'output.asar');
-  await asar.createPackageWithOptions(src, original, { unpack: '*.bin' });
-  assert.equal(readEntries(original).filter(e => e.unpacked).length, 4);
   const asarRoot = path.dirname(path.dirname(require.resolve('@electron/asar')));
   const cli = ['asar.js', 'asar.mjs'].map(name => path.join(asarRoot, 'bin', name)).find(file => fs.existsSync(file));
+  // ASAR 3.x 的 API 可在输出流关闭前返回。与安装器相同，等待 CLI 退出后再读写和清理。
+  execFileSync(process.execPath, [cli, 'pack', src, original, '--unpack', '*.bin']);
+  assert.equal(readEntries(original).filter(e => e.unpacked).length, 4);
   execFileSync(process.execPath, [cli, 'pack', src, output, ...getUnpackArgs(original)]);
   assert.equal(verifyUnpackedOutput(original, output), 4);
   fs.writeFileSync(path.join(output + '.unpacked', 'one', 'a.bin'), 'changed');
