@@ -1,4 +1,13 @@
 {
+  "No automations yet": "暂无自动化",
+  "Run a prompt on a schedule, like a morning summary of yesterday's changes. Runs show up here.": "按计划运行提示词，例如每天早晨汇总昨天的更改。运行记录将显示在此处。",
+  "Always on": "持续运行",
+  "Paused": "已暂停",
+  "Downloads": "下载",
+  "Screen Reader Mode": "屏幕阅读器模式",
+  "Accessibility": "无障碍",
+  "Font": "字体",
+  "Close tabs to the left": "关闭左侧标签页",
   "AI Credits": "AI 积分",
   "Show in the menu bar when closed. Right-click to quit.": "关闭窗口后仍保留在菜单栏/系统托盘中。右键点击可彻底退出。",
   "AI Credits are used when you've exceeded your model quota. Keep track of your current AI Credits in the": "AI 积分用于超出模型配额时的计费消耗。可在以下位置跟踪您的当前 AI 积分：",

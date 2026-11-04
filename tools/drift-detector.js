@@ -145,6 +145,7 @@ function scanBuiltinAndPluginSkills() {
     path.join(home, '.gemini', 'config', 'plugins')
   ];
   const uncoveredSkills = [];
+  let scannedDescriptions = 0;
   function walk(dir) {
     if (!fs.existsSync(dir)) return;
     for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
@@ -153,6 +154,7 @@ function scanBuiltinAndPluginSkills() {
         if (entry.name !== 'node_modules' && entry.name !== '.git') walk(full);
       } else if (entry.name.endsWith('.md')) {
         const fm = parseYamlFrontmatter(fs.readFileSync(full, 'utf8'));
+        if (typeof fm.description === 'string') scannedDescriptions++;
         if (fm.description && !/[\u4e00-\u9fa5]/.test(fm.description)) {
           const norm = engine.normalizeWhitespace(fm.description);
           const trans = emulateTranslation(norm);
@@ -163,6 +165,7 @@ function scanBuiltinAndPluginSkills() {
       } else if (entry.name === 'plugin.json') {
         try {
           const pj = JSON.parse(fs.readFileSync(full, 'utf8'));
+          if (typeof pj.description === 'string') scannedDescriptions++;
           if (pj.description && !/[\u4e00-\u9fa5]/.test(pj.description)) {
             const norm = engine.normalizeWhitespace(pj.description);
             const trans = emulateTranslation(norm);
@@ -175,29 +178,34 @@ function scanBuiltinAndPluginSkills() {
     }
   }
   for (const d of dirs) walk(d);
-  return uncoveredSkills;
+  return { uncoveredSkills, scannedDescriptions };
 }
+
+const args = process.argv.slice(2);
+const targetBundlePath = args[0];
+const reportIndex = args.indexOf('--report');
+if (!targetBundlePath || targetBundlePath.startsWith('--') || !fs.existsSync(targetBundlePath) ||
+    !fs.statSync(targetBundlePath).isFile() ||
+    (reportIndex !== -1 && (!args[reportIndex + 1] || args[reportIndex + 1].startsWith('--')))) {
+  console.error('未提供有效的上游 bundle 文件或报告路径，本次未完成漂移分析。');
+  console.log('用法: node tools/drift-detector.js <frontend-bundle.js> [--report <report.json>]');
+  process.exit(2);
+}
+const reportPath = reportIndex === -1 ? path.join(__dirname, 'drift-report.json') : path.resolve(args[reportIndex + 1]);
 
 console.log('🔍 [Drift Detector] 启动 Antigravity 文本漂移与版本演进分析器...');
 console.log(`📖 当前词典收录条目数: ${exactKeys.length} 项精确规则, ${patterns.length} 组正则规则\n`);
 
-const uncoveredSkills = scanBuiltinAndPluginSkills();
-if (uncoveredSkills.length === 0) {
-  console.log('✅ [Builtin & Plugin Skills] 本机内置技能与插件多行 YAML 描述 100% 完整覆盖 (0 漏项 / 0 假阳性)。');
+const { uncoveredSkills, scannedDescriptions } = scanBuiltinAndPluginSkills();
+if (!scannedDescriptions) {
+  console.log('[Builtin & Plugin Skills] 未读取到技能描述，未评估该部分覆盖情况。');
+} else if (uncoveredSkills.length === 0) {
+  console.log(`[Builtin & Plugin Skills] 已读取的 ${scannedDescriptions} 项描述中未发现未覆盖项。`);
 } else {
   console.log(`⚠️ [Builtin & Plugin Skills] 发现 ${uncoveredSkills.length} 项未完全覆盖的技能描述:`);
   for (const item of uncoveredSkills) {
     console.log(`   - [${item.status}] ${item.file}: ${item.description.slice(0, 80)}...`);
   }
-}
-
-const targetBundlePath = process.argv[2] || path.join(__dirname, 'main.js');
-
-if (!fs.existsSync(targetBundlePath)) {
-  console.log(`ℹ️ 未找到待分析的上游 bundle 文件: ${targetBundlePath}`);
-  console.log('💡 用法: node tools/drift-detector.js <path-to-unpacked-main.js>');
-  console.log('✅ 当前词典结构与语法校验通过 (100% 格式完好)。');
-  process.exit(0);
 }
 
 const content = fs.readFileSync(targetBundlePath, 'utf-8');
@@ -248,15 +256,15 @@ for (const text of observedCandidates) {
 const staleEntries = exactKeys.filter(k => !observedSet.has(k) && !content.includes(k));
 
 const totalCovered = exactMatchedCount + ruleAssistedCount;
-const exactCoveragePct = ((exactMatchedCount / totalObserved) * 100).toFixed(2);
-const totalEffectiveCoveragePct = ((totalCovered / totalObserved) * 100).toFixed(2);
+const exactCoveragePct = totalObserved ? ((exactMatchedCount / totalObserved) * 100).toFixed(2) + '%' : null;
+const totalEffectiveCoveragePct = totalObserved ? ((totalCovered / totalObserved) * 100).toFixed(2) + '%' : null;
 
 console.log(`\n============================================================`);
 console.log(`📊 科学分级覆盖率与漂移检测报告 (Drift Analysis Summary)`);
 console.log(`============================================================`);
 console.log(`1. [Observed UI Candidates] 观察到的 UI 候选总量 (2~800字符): ${totalObserved} 条`);
-console.log(`2. [Exact Match Coverage]   精确匹配覆盖 (Exact):             ${exactMatchedCount} 条 (${exactCoveragePct}%)`);
-console.log(`3. [Rule-Assisted Coverage] 综合规则有效翻译覆盖率:           ${totalCovered} 条 (${totalEffectiveCoveragePct}%)`);
+console.log(`2. [Exact Match Coverage]   精确匹配覆盖 (Exact):             ${exactMatchedCount} 条 (${exactCoveragePct || 'N/A'})`);
+console.log(`3. [Rule-Assisted Coverage] 综合规则有效翻译覆盖率:           ${totalCovered} 条 (${totalEffectiveCoveragePct || 'N/A'})`);
 console.log(`   └─ 其中正则/多句/快捷键规则额外覆盖:                       ${ruleAssistedCount} 条`);
 console.log(`4. [False-Positive Guard]   半英半中假阳性残片拦截数:         ${falsePositiveList.length} 条`);
 console.log(`5. [Uncovered Candidates]   未覆盖待处理候选数:               ${uncoveredList.length} 条`);
@@ -268,20 +276,20 @@ const report = {
   metrics: {
     observedCandidatesCount: totalObserved,
     exactMatchesCount: exactMatchedCount,
-    exactCoveragePercentage: `${exactCoveragePct}%`,
+    exactCoveragePercentage: exactCoveragePct,
     ruleAssistedCount: ruleAssistedCount,
     falsePositiveCount: falsePositiveList.length,
     totalCoveredCount: totalCovered,
-    effectiveTranslationCoverage: `${totalEffectiveCoveragePct}%`,
+    effectiveTranslationCoverage: totalEffectiveCoveragePct,
     uncoveredCount: uncoveredList.length,
     staleEntriesCount: staleEntries.length,
-    uncoveredBuiltinSkillsCount: uncoveredSkills.length
+    uncoveredBuiltinSkillsCount: uncoveredSkills.length,
+    scannedSkillDescriptionsCount: scannedDescriptions
   },
   falsePositivesSample: falsePositiveList.slice(0, 50),
   decayedRulesSample: staleEntries.slice(0, 50),
   uncoveredCandidatesSample: uncoveredList.slice(0, 50)
 };
 
-const reportPath = path.join(__dirname, 'drift-report.json');
 fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-console.log(`\n📄 完整结构化数据与候选 Diff 已输出至: ${reportPath}`);
+console.log(`\n📄 结构化摘要与候选样本已输出至: ${reportPath}`);

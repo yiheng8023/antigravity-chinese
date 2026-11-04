@@ -18,6 +18,15 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 151 项来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  { input: 'No automations yet', expected: '暂无自动化' },
+  { input: "Run a prompt on a schedule, like a morning summary of yesterday's changes. Runs show up here.", expected: '按计划运行提示词，例如每天早晨汇总昨天的更改。运行记录将显示在此处。' },
+  { input: 'Always on', expected: '持续运行' },
+  { input: 'Paused', expected: '已暂停' },
+  { input: 'Downloads', expected: '下载' },
+  { input: 'Screen Reader Mode', expected: '屏幕阅读器模式' },
+  { input: 'Accessibility', expected: '无障碍' },
+  { input: 'Font', expected: '字体' },
+  { input: 'Close tabs to the left', expected: '关闭左侧标签页' },
   { input: 'Hi Alex, what can we get done today?', expected: '你好，Alex，今天想完成什么？' },
   { input: 'Hi 小明, what can we get done today?', expected: '你好，小明，今天想完成什么？' },
   { input: 'Version 2.29.0', expected: '版本 2.29.0' },

@@ -183,8 +183,8 @@ test('the consistency audit rejects an incorrect suite count in either README', 
       fs.readFileSync = function(file, ...args) {
         const content = original.call(this, file, ...args);
         if (require('path').basename(String(file)) !== process.argv[1]) return content;
-        return String(content).replace(/聚合 \\d+ 大|aggregating \\d+ full-fidelity/,
-          process.argv[1] === 'README.md' ? '聚合 999 大' : 'aggregating 999 full-fidelity');
+        return String(content).replace(/聚合 \\d+ 套|aggregating \\d+ test suites/,
+          process.argv[1] === 'README.md' ? '聚合 999 套' : 'aggregating 999 test suites');
       };
       require(process.argv[2]);
     `;
@@ -193,6 +193,92 @@ test('the consistency audit rejects an incorrect suite count in either README', 
     assert.equal(result.status, 1, readme);
     assert.match(result.stdout, /测试套件数量.*FAIL|FAIL.*测试套件数量/);
   }
+});
+
+test('the consistency audit checks source dictionaries even when both exports agree', () => {
+  const script = `
+    const fs = require('fs');
+    const original = fs.readFileSync;
+    fs.readFileSync = function(file, ...args) {
+      const content = original.call(this, file, ...args);
+      const name = String(file).replace(/\\\\/g, '/');
+      if (!name.endsWith('/dict/zh-CN.json') && !name.endsWith('/dist/zh-CN.bundle.json')) return content;
+      const data = JSON.parse(content);
+      data.exact.__audit_fixture_entry__ = '测试偏移';
+      return JSON.stringify(data);
+    };
+    require(process.argv[1]);
+  `;
+  const result = spawnSync(process.execPath, ['-e', script,
+    path.join(__dirname, '../tools/ultimate-consistency-audit.js')], { encoding: 'utf8', timeout: 10000 });
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /FAIL.*分层词库源码/);
+});
+
+test('the consistency audit rejects stale compiled-bundle metadata', () => {
+  const script = `
+    const fs = require('fs');
+    const original = fs.readFileSync;
+    fs.readFileSync = function(file, ...args) {
+      const content = original.call(this, file, ...args);
+      if (!String(file).replace(/\\\\/g, '/').endsWith('/dist/zh-CN.bundle.json')) return content;
+      const data = JSON.parse(content);
+      data.version = '0.0.0';
+      return JSON.stringify(data);
+    };
+    require(process.argv[1]);
+  `;
+  const result = spawnSync(process.execPath, ['-e', script,
+    path.join(__dirname, '../tools/ultimate-consistency-audit.js')], { encoding: 'utf8', timeout: 10000 });
+  assert.equal(result.status, 1);
+  assert.match(result.stdout, /FAIL.*编译词库版本/);
+});
+
+function runDriftFixture(target, report, home) {
+  const script = `
+    const os = require('os');
+    const home = process.argv[4];
+    os.homedir = () => home;
+    const tool = process.argv[1];
+    process.argv = [process.execPath, tool, process.argv[2], '--report', process.argv[3]];
+    require(tool);
+  `;
+  return spawnSync(process.execPath, ['-e', script, path.join(__dirname, '../tools/drift-detector.js'),
+    target, report, home], { encoding: 'utf8', timeout: 10000 });
+}
+
+test('drift detection refuses a missing bundle without reporting success', (t) => {
+  const dir = tempDir(t);
+  const result = runDriftFixture(path.join(dir, 'missing.js'), path.join(dir, 'report.json'), dir);
+  assert.equal(result.status, 2);
+  assert.doesNotMatch(result.stdout, /100%/);
+  assert.ok(!fs.existsSync(path.join(dir, 'report.json')));
+});
+
+test('drift detection writes a requested report for a known fixture', (t) => {
+  const dir = tempDir(t);
+  const target = path.join(dir, 'frontend.js');
+  const report = path.join(dir, 'report.json');
+  fs.writeFileSync(target, 'const labels = ["No automations yet", "Unmapped fixture button"];');
+  const result = runDriftFixture(target, report, dir);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(fs.readFileSync(report, 'utf8'));
+  assert.equal(data.metrics.observedCandidatesCount, 2);
+  assert.equal(data.metrics.exactMatchesCount, 1);
+  assert.equal(data.metrics.uncoveredCount, 1);
+});
+
+test('drift coverage is unknown when the bundle has no UI candidates', (t) => {
+  const dir = tempDir(t);
+  const target = path.join(dir, 'frontend.js');
+  const report = path.join(dir, 'report.json');
+  fs.writeFileSync(target, 'const n = 1;');
+  const result = runDriftFixture(target, report, dir);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(fs.readFileSync(report, 'utf8'));
+  assert.equal(data.metrics.observedCandidatesCount, 0);
+  assert.equal(data.metrics.effectiveTranslationCoverage, null);
+  assert.equal(data.metrics.scannedSkillDescriptionsCount, 0);
 });
 
 async function listen(t, server) {

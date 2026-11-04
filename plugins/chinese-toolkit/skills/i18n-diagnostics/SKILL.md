@@ -1,59 +1,28 @@
 ---
 name: i18n-diagnostics
-description: >-
-  Inspects Google Antigravity Chinese localization status, validates patch health, detects upstream UI drift, runs automated regressions, or assists in adding new translations. Activate this skill when the user asks about Antigravity Chinese localization status, wants to diagnose UI translation issues, run drift detection on upstream updates, or add new translation entries.
+description: 检查 Antigravity 汉化状态、适配上游更新、诊断漏翻、补充词条或验证发布时使用。
 ---
 
-# Antigravity 本地化诊断与演进工作流 (Localization Diagnostics & Evolution)
+# 本地化维护与诊断
 
-本技能为 Antigravity Agent 提供完整的客户端汉化状态诊断、上游版本演进比对、词库维护与自动化回归测试指南。
+先定位已有的 `antigravity-chinese` 仓库，检查其 `package.json` 身份；以下命令在该仓库根目录执行。阅读 `CONTRIBUTING.md` 的“更新维护与发版”流程，以该流程作为维护步骤的单一来源。
 
----
+## 上游更新
 
-## 🛠️ 常见诊断工作流
+核查 https://antigravity.google/docs/changelog 中的目标版本和灰度说明，逐项分析对词库、内容保护、安装/还原、扩展及插件的影响。结合实际客户端与测试确定修复，记录尚未验收的功能。
 
-### 1. 检查客户端汉化补丁状态
-当用户询问当前客户端是否已打上汉化补丁或补丁是否被官方更新覆盖时：
-```bash
-node cli.js status
-```
-* **已汉化 (Patched)**：提示用户当前客户端状态完好，如需更新词库可重新运行安装；
-* **未汉化 / 被官方覆盖 (Original)**：提示用户完全退出客户端后运行 `install.bat` 或 `node cli.js install`。
+## 状态与漂移
 
----
+- `node cli.js status`：检查桌面客户端、备份与汉化状态。
+- `node cli.js status:vscode`：检查已安装的 VS Code 扩展。
+- `npm run scan:drift -- <官方前端-bundle.js> --report <报告.json>`：分析明确来源的前端脚本。没有有效文件时不能声称完成漂移检测。
 
-### 2. 执行上游版本文本漂移分析 (Drift Detection)
-当检测到 Antigravity 官方客户端发布了新版本（或用户提供了新版本 `main.js` / `app.asar` 解包目录时）：
-```bash
-npm run scan:drift
-```
-* 检查输出的 **三层分级指标**：
-  * `Observed UI Candidates`（观察到的 UI 候选总量）
-  * `Exact Match Coverage`（精确匹配覆盖率）
-  * `Rule-Assisted Coverage`（综合有效翻译覆盖率）
-  * `Decayed / Stale Rules`（当前版本未观测到的历史陈旧词条）
-* 查看生成的详细分析文件：[`tools/drift-report.json`](file:///C:/Projects/antigravity-chinese/tools/drift-report.json)。
+漂移指标只反映候选字符串的启发式匹配，不代表整个客户端的翻译覆盖率。报告样本需结合实际界面判断，不能直接批量加入词库。
 
----
+## 修正与验证
 
-### 3. 运行端到端自动化测试套件
-在修改了词典 [`dict/zh-CN.json`](file:///C:/Projects/antigravity-chinese/dict/zh-CN.json) 或运行时引擎 [`core/i18n-runtime.js`](file:///C:/Projects/antigravity-chinese/core/i18n-runtime.js) 后：
-```bash
-npm test
-```
-必须确保以下 6 大测试套件（共 145+ 项断言）100% 全部 PASS：
-1. `test/verify.js`（50 项核心 DOM 渲染、代码保护与跨平台候选路径断言）
-2. `test/test-screenshots.js`（64 项真实界面截图用例）
-3. `test/test-menu-and-titles.js`（8 项窗口菜单与用户自定义会话标题防误伤断言）
-4. `test/test-asar-lifecycle.js`（10 项真实 ASAR 二进制包打包、注入与原子还原全真测试）
-5. `test/test-detector-live.js`（真实宿主环境无参路径探测实测）
-6. `test/test-proofread-integrity.js`（11 项出版级规范字、全角标点、CCF 学术名词与正则安全性断言）
+编辑 `dict/src/` 的分层词库，运行 `npm run build:dict` 同步两个生成词库。运行 `npm test` 与 `npm run audit`；测试入口和数量以当前 `package.json` 与输出为准。
 
----
+保护品牌、模型信息、代码、终端、可编辑内容和用户数据；UI 短词使用精确匹配。安装器修改先验证副本的安装与还原，保留纯净备份及上游 unpacked 文件。实机检查不触发未授权的会话、自动化、录音或云端执行。
 
-### 4. 补充新词条与规则规范
-* **新增精确词条**：写入 `dict/zh-CN.json` 的 `exact` 对象。
-* **边界保护原则**：
-  * 严禁翻译品牌名（`Google`, `Gemini`, `Antigravity` 等）；
-  * 严禁翻译技术缩写（`API`, `MCP`, `CLI`, `IDE`, `Token`, `JSON`, `DOM` 等）；
-  * 单字词（如 `Project`, `File`, `Open`）严禁作为子串进行模糊替换，必须确保其只在精确独立匹配时生效。
+按贡献指南记录来源、验证范围、文档对齐与发布结果。当前正在使用的客户端与项目源码发布分别处理，不以强制关闭会话完成验证。

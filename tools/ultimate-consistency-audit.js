@@ -13,6 +13,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const { isDeepStrictEqual } = require('util');
 
 const ROOT_DIR = path.join(__dirname, '..');
 const pkgPath = path.join(ROOT_DIR, 'package.json');
@@ -29,7 +30,7 @@ const exact = dict.exact || {};
 const patterns = dict.patterns || [];
 
 console.log('================================================================');
-console.log('  🔍 Antigravity 全生态终极全局一致性深度体检 (Ultimate Audit)  ');
+console.log('  🔍 Antigravity 本地化静态一致性检查  ');
 console.log(`  当前目标版本: v${currentVersion} | 词条总数: ${Object.keys(exact).length} | 动态正则: ${patterns.length}`);
 console.log('================================================================\n');
 
@@ -69,10 +70,38 @@ check(`README.en.md 包含当前最新版本号 v${currentVersion}`, () => {
   return readmeEn.includes(`v${currentVersion}`);
 });
 
+const bundle = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'dist/zh-CN.bundle.json'), 'utf8'));
+check('编译词库版本与根包一致', () => bundle.version === currentVersion);
+
+check('社区插件版本与根包一致', () => {
+  const plugin = JSON.parse(fs.readFileSync(path.join(ROOT_DIR, 'plugins/chinese-toolkit/plugin.json'), 'utf8'));
+  return plugin.version === currentVersion;
+});
+
+check('分层词库源码与两个发布词库语义一致', () => {
+  const sourceRoot = path.join(ROOT_DIR, 'dict/src');
+  const pairs = new Map();
+  for (const folder of ['core', 'ctx']) {
+    const dir = path.join(sourceRoot, folder);
+    for (const name of fs.readdirSync(dir).filter(name => name.endsWith('.json')).sort()) {
+      for (const [key, value] of Object.entries(JSON.parse(fs.readFileSync(path.join(dir, name), 'utf8')))) {
+        if (pairs.has(key)) throw new Error('分层源码包含重复词条: ' + key);
+        pairs.set(key, value);
+      }
+    }
+  }
+  const rulesDir = path.join(sourceRoot, 'rules');
+  const sourcePatterns = fs.readdirSync(rulesDir).filter(name => name.endsWith('.json')).sort()
+    .flatMap(name => JSON.parse(fs.readFileSync(path.join(rulesDir, name), 'utf8')));
+  const sourceExact = Object.fromEntries(pairs);
+  return isDeepStrictEqual(exact, sourceExact) && isDeepStrictEqual(patterns, sourcePatterns) &&
+    isDeepStrictEqual(bundle.exact, sourceExact) && isDeepStrictEqual(bundle.patterns, sourcePatterns);
+});
+
 check('中英文文档测试套件数量与 npm test 一致', () => {
   const suiteCount = (pkg.scripts.test.match(/\bnode\s+(?:--test\s+)?test\/[\w-]+\.js\b/g) || []).length;
-  const zhCount = readmeZh.match(/聚合\s+(\d+)\s+大/);
-  const enCount = readmeEn.match(/aggregating\s+(\d+)\s+full-fidelity test suites/);
+  const zhCount = readmeZh.match(/聚合\s+(\d+)\s+套/);
+  const enCount = readmeEn.match(/aggregating\s+(\d+)\s+test suites/);
   if (!suiteCount || !zhCount || !enCount || Number(zhCount[1]) !== suiteCount || Number(enCount[1]) !== suiteCount) {
     return { ok: false, message: `中英文 README 的测试套件数量必须与 npm test 的 ${suiteCount} 个入口一致` };
   }
@@ -232,12 +261,16 @@ check('所有级联正则语法有效且捕获组数量守恒', () => {
 console.log('\n【维度 6】多端生态组件对齐与关键链路完备性 (Ecosystem Integrity)');
 
 const criticalFiles = [
+  'AGENTS.md',
+  'CONTRIBUTING.md',
   'cli.js',
   'install.bat',
   'install-vscode.bat',
   'restore-vscode.bat',
   'core/i18n-runtime.js',
   'core/vscode-patch.js',
+  'core/asar-unpack.js',
+  'plugins/chinese-toolkit/skills/i18n-diagnostics/SKILL.md',
   'dict/zh-CN.json',
   'test/test-vscode-patch.js',
   'test/verify.js',
@@ -287,7 +320,7 @@ console.log('\n================================================================'
 const totalChecks = passCount + issues.length;
 const healthScore = Math.round((passCount / totalChecks) * 100);
 console.log(`📊 全局一致性深度体检结果: 共 ${totalChecks} 项检查 | 通过 ${passCount} 项 | 异常 ${issues.length} 项`);
-console.log(`🏆 全生态健康指数评分 (Health Score): ${healthScore} / 100`);
+console.log(`检查通过率: ${healthScore}%（仅限上述检查项）`);
 
 if (issues.length > 0) {
   console.log('\n⚠️ 异常清单:');
@@ -295,7 +328,7 @@ if (issues.length > 0) {
   console.log('================================================================\n');
   process.exit(1);
 } else {
-  console.log('🌟 完美！全生态六大维度 100% 符合出版级全局一致性基线！');
+  console.log('静态一致性检查通过。功能、上游适配和实机验收范围见本次维护记录。');
   console.log('================================================================\n');
   process.exit(0);
 }
