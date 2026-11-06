@@ -18,6 +18,18 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  { input: 'Open Changelog', expected: '打开更新日志' },
+  { input: 'Toggle Chat Focus', expected: '切换对话焦点' },
+  { input: 'Focus Panel', expected: '聚焦面板' },
+  { input: 'Accept Changes in All Files', expected: '接受所有文件中的更改' },
+  { input: 'Reject Changes in All Files', expected: '拒绝所有文件中的更改' },
+  { input: 'Accept Changes in Current File', expected: '接受当前文件中的更改' },
+  { input: 'Reject Changes in Current File', expected: '拒绝当前文件中的更改' },
+  { input: 'Show Menu', expected: '显示菜单' },
+  { input: 'Add Comment to Chat', expected: '将评论添加到对话' },
+  { input: 'Delete Comment', expected: '删除评论' },
+  { input: 'Cancel Edit', expected: '取消编辑' },
+  { input: 'Comment for Antigravity', expected: '为 Antigravity 添加评论' },
   // Antigravity 2.29.0: user-reported settings omissions (2026-11-04).
   { input: 'Work locally on repo-a/, 资料/', expected: '在 repo-a/, 资料/ 上本地工作' },
   { input: 'Worktree from repo-a/, repo-b/, and reuse shared/', expected: '从 repo-a/, repo-b/ 创建工作树，并复用 shared/' },

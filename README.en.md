@@ -2,16 +2,16 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.37** targets **Antigravity App 2.29.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.38** targets **Antigravity App 2.29.0 / VS Code extension 1.11.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This maintenance pass checks the [official changelog](https://antigravity.google/docs/changelog) and user screenshots, fills missing browser, voice, shortcut, project-settings, worktree and connector labels, and preserves the upstream ASAR unpacked layout. See the [2.29.0 maintenance record](docs/maintenance/antigravity-2.29.0.md) for evidence, validation and remaining gaps.
+This maintenance pass checks the [official changelog](https://antigravity.google/docs/changelog?tab=extensions&ide=vscode) and adapts VS Code extension 1.11.0 command scopes, native menus and settings descriptions. Extension updates overwrite local patches: rerun `node cli.js install:vscode`, then reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the historical [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for evidence and verification limits.
 
 ## Support and verification
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
 | Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.29.0 package-copy install/restore; specific labels in Home, version menu, empty Automations, General/Appearance/Shortcuts/project settings, worktree and connector menus |
-| VS Code extension | Manifest translation, local Webview proxy, separate backup/restore | 1.10.0 discovery and automated regressions; no live VS Code UI acceptance in this pass |
+| VS Code extension | Manifest/native-menu translation, local Webview proxy, separate backup/restore | Real 1.11.0 copy install/reinstall/byte-identical restore, 16 menu states and render-entry-to-proxy/DOM verification; live results are scoped in the maintenance record |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
 | Antigravity CLI | Preserves upstream behavior | CLI binaries and terminal UI are unchanged |

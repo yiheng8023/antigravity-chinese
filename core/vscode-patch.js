@@ -515,6 +515,19 @@ module.exports = {
  * 在内存中生成补丁，匹配或语法验证失败时不写入扩展。
  */
 function buildPatchedExtensionJs(content) {
+  // Compiled extension UI objects use static double-quoted labels. Limit translation
+  // to display fields, preserving codicons, command IDs, route values and dynamic data.
+  const map = getVsCodeFullMap();
+  content = content.replace(/([,{]\s*)(label|tooltip|placeHolder)(\s*:\s*)("(?:\\.|[^"\\])*")/g,
+    (whole, prefix, field, colon, literal) => {
+      let text;
+      try { text = JSON.parse(literal); } catch (_) { return whole; }
+      const icon = text.match(/^(\$\([a-z0-9~-]+\)\s+)(.+)$/i);
+      const translated = map[icon ? icon[2] : text];
+      if (typeof translated !== 'string' || !translated) return whole;
+      return prefix + field + colon + JSON.stringify((icon ? icon[1] : '') + translated);
+    });
+
   // 2. 检查并注入 renderWebviewHtml 拦截（弹性兼容未压缩版与 1.8.0+ 压缩混淆版）
   const sigRegex = /renderWebviewHtml\s*\(\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*,\s*([a-zA-Z0-9_$]+)\s*\)\s*\{/;
   const sigMatch = content.match(sigRegex);

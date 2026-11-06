@@ -29,6 +29,40 @@ function extension(dir, version = '1.9.0', suffix = '') {
   return { pkg, js };
 }
 
+test('VS Code 1.11 command scopes and native menu labels translate without changing identifiers', (t) => {
+  const dir = tempDir(t);
+  extension(dir, '1.11.0');
+  const pkgPath = path.join(dir, 'package.json');
+  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  pkg.contributes = { commands: [
+    { command: 'antigravity.inlineDiff.acceptAll', title: 'Accept Changes in Current File' },
+    { command: 'antigravity.acceptAllChanges', title: 'Accept Changes in All Files' },
+    { command: 'antigravity.statusMenu', title: 'Show Menu' }
+  ] };
+  fs.writeFileSync(pkgPath, JSON.stringify(pkg));
+  fs.writeFileSync(path.join(dir, 'extension.js'), `"use strict";
+    const route = "Settings";
+    const items = [{label:"$(check-all) Accept Changes in All Files",command:"antigravity.acceptAllChanges"},
+      {label:"Settings",kind:1},{label:"$(book) Open Changelog",command:"antigravity.openChangelog"}];
+    class View { renderWebviewHtml(a,b,c,d) { a.html = c; } }
+  `);
+  assert.equal(installVsCodePatch(dir).success, true);
+  const patchedPkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+  assert.deepEqual(patchedPkg.contributes.commands, [
+    { command: 'antigravity.inlineDiff.acceptAll', title: '接受当前文件中的更改' },
+    { command: 'antigravity.acceptAllChanges', title: '接受所有文件中的更改' },
+    { command: 'antigravity.statusMenu', title: '显示菜单' }
+  ]);
+  const js = fs.readFileSync(path.join(dir, 'extension.js'), 'utf8');
+  assert.match(js, /label:"\$\(check-all\) 接受所有文件中的更改"/);
+  assert.match(js, /label:"设置"/);
+  assert.match(js, /label:"\$\(book\) 打开更新日志"/);
+  assert.ok(js.includes('const route = "Settings"'));
+  assert.ok(js.includes('command:"antigravity.acceptAllChanges"'));
+  assert.equal(restoreVsCodePatch(dir).success, true);
+  assert.equal(JSON.parse(fs.readFileSync(pkgPath)).contributes.commands[0].title, 'Accept Changes in Current File');
+});
+
 test('repacking preserves mixed unpacked directories and individual files', (t) => {
   const dir = tempDir(t);
   const src = path.join(dir, 'source');
