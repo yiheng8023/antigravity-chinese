@@ -57,12 +57,14 @@ Edit dictionary sources under `dict/src/`. Both `dict/zh-CN.json` and `dist/zh-C
 
 ```bash
 npm run build:dict
-# Run all automated tests (aggregating 10 test suites)
+# Run all automated tests (aggregating 11 test suites)
 npm test
 npm run audit
 ```
 
-Tests cover DOM/code boundaries, golden translations, CDP, menus, ASAR, discovery, proofreading, VS Code and regression cases. Read current output for counts. CI covers Windows, macOS and Ubuntu with Node.js 18/20/22.
+Tests cover DOM/code and user-content boundaries, golden translations, CDP, menus, ASAR, discovery, proofreading, VS Code and regression cases. Read current output for counts. CI covers Windows, macOS and Ubuntu with Node.js 18/20/22.
+
+Explicit content boundaries preserve message bodies, Markdown, file trees, path breadcrumbs, file references, and project/conversation names while fixed action buttons remain translated. See the [user-content boundary maintenance record](docs/maintenance/user-content-boundaries.md) for evidence and validation scope.
 
 For an official frontend bundle with known provenance:
 
