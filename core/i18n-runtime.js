@@ -232,6 +232,21 @@
 
   var TRANSLATABLE_ATTRS = ['title', 'placeholder', 'aria-label', 'data-tooltip', 'alt', 'aria-description'];
 
+  // These labels contain user-authored text or identifiers, even when their text
+  // happens to be an exact dictionary entry such as "Settings".
+  var CONTENT_TEST_IDS = {
+    'user-input-step': 1,
+    'user-message-content': 1,
+    'planner-response-text': 1,
+    'breadcrumb-segment': 1
+  };
+  var CONTENT_CLASSES = {
+    'prose': 1,
+    'markdown': 1,
+    'markdown-body': 1,
+    'markdown-content': 1
+  };
+
   function isModelSelectorBoundary(elem) {
     if (!elem || elem.nodeType !== 1) return false;
     var testId = elem.getAttribute ? elem.getAttribute('data-testid') : null;
@@ -250,38 +265,67 @@
     return false;
   }
 
-  function shouldIgnoreElement(el) {
-    if (!el || el.nodeType !== 1) return false;
+  function isProtectedBoundary(el) {
     if (IGNORED_TAGS[el.tagName]) return true;
     if (el.isContentEditable || el.getAttribute('contenteditable') === '' ||
         el.getAttribute('contenteditable') === 'true' || el.getAttribute('contenteditable') === 'plaintext-only') return true;
-
-    // 模型选择器相关边界元素及其子元素保持英文原样（纯属性 O(1) 短路）
     if (isModelSelectorBoundary(el)) return true;
+
+    var testId = el.getAttribute('data-testid');
+    if (CONTENT_TEST_IDS[testId] === 1 || el.hasAttribute('data-ag-localization-skip') ||
+        el.hasAttribute('data-markdown-root')) return true;
+    if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
+    if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
+    // The sidebar row mixes a user-named navigation link with fixed action
+    // buttons. Preserve the link's accessible name even if it gains a UI role.
+    if (el.tagName === 'A' && el.parentElement &&
+        el.parentElement.getAttribute('data-testid') === 'conversation-row-sidebar') return true;
+    var role = el.getAttribute('role');
+    if (role === 'tree' || role === 'treeitem') return true;
+    if (el.tagName === 'NAV' && el.getAttribute('aria-label') === 'File path breadcrumbs') return true;
 
     var className = typeof el.className === 'string' ? el.className : '';
     if (className) {
       for (var i = 0; i < IGNORED_CLASSES.length; i++) {
         if (className.indexOf(IGNORED_CLASSES[i]) !== -1) return true;
       }
-    }
-
-    // MutationObserver 可以直接提交任意深度的子节点，保护边界必须检查到根。
-    var ancestor = el.parentElement;
-    while (ancestor) {
-      if (IGNORED_TAGS[ancestor.tagName]) return true;
-      if (isModelSelectorBoundary(ancestor)) return true;
-      if (ancestor.isContentEditable || ancestor.getAttribute('contenteditable') === '' ||
-          ancestor.getAttribute('contenteditable') === 'true' || ancestor.getAttribute('contenteditable') === 'plaintext-only') return true;
-      var ancestorClass = typeof ancestor.className === 'string' ? ancestor.className : '';
-      if (ancestorClass) {
-        for (var ci = 0; ci < IGNORED_CLASSES.length; ci++) {
-          if (ancestorClass.indexOf(IGNORED_CLASSES[ci]) !== -1) return true;
-        }
+      var classes = className.split(/\s+/);
+      for (var ci = 0; ci < classes.length; ci++) {
+        if (CONTENT_CLASSES[classes[ci]] === 1) return true;
       }
-      ancestor = ancestor.parentElement;
     }
     return false;
+  }
+
+  function isUserContentContainer(el) {
+    var testId = el.getAttribute('data-testid');
+    return testId === 'agent-message' || testId === 'agent-response' || testId === 'conversation-row-sidebar';
+  }
+
+  function isMessageUiControl(el) {
+    var role = el.getAttribute('role');
+    return el.tagName === 'BUTTON' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ||
+      role === 'button' || role === 'status' || el.getAttribute('data-testid') === 'plan-command-fyi-alert';
+  }
+
+  // 0: protect the entire subtree; 1: traverse a message, preserving its own
+  // text/attributes; 2: translate UI. Recompute ancestry for every entry point:
+  // observer updates may start deep in a subtree, and React may reparent nodes.
+  function getElementTranslationMode(el) {
+    if (!el || el.nodeType !== 1) return 2;
+    var current = el;
+    var inUiControl = false;
+    var messageText = false;
+    while (current) {
+      if (isProtectedBoundary(current)) return 0;
+      if (isUserContentContainer(current)) {
+        if (!inUiControl) messageText = true;
+      } else if (!messageText && isMessageUiControl(current)) {
+        inUiControl = true;
+      }
+      current = current.parentElement;
+    }
+    return messageText ? 1 : 2;
   }
 
 
@@ -295,7 +339,7 @@
   function translateTextNode(node) {
     if (!node || node.nodeType !== 3) return;
     var parent = node.parentElement || node.parentNode;
-    if (parent && (shouldIgnoreElement(parent) || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) return;
+    if (parent && (getElementTranslationMode(parent) !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) return;
 
     var original = node.nodeValue;
     if (!original) return;
@@ -353,16 +397,18 @@
 
   function translateElement(el, scanId) {
     if (!el || el.nodeType !== 1) return;
-    if (shouldIgnoreElement(el)) return;
+    var translationMode = getElementTranslationMode(el);
+    if (translationMode === 0) return;
+    var translateOwnContent = translationMode === 2;
 
     // 同一轮扫描中，已处理的元素跳过
     if (scanId && el._agyScanId === scanId) return;
     if (scanId) el._agyScanId = scanId;
 
     // 复合组件自愈：处理特定 JSX 碎片化 Alert（如 plan-command-fyi-alert）
-    if (el.getAttribute && el.getAttribute('data-testid') === 'plan-command-fyi-alert') {
+    if (translateOwnContent && el.getAttribute && el.getAttribute('data-testid') === 'plan-command-fyi-alert') {
       var alertSpan = el.querySelector ? el.querySelector('span') : null;
-      if (alertSpan && !alertSpan._agyAlertDone) {
+      if (alertSpan && getElementTranslationMode(alertSpan) === 2 && !alertSpan._agyAlertDone) {
         var alertChild = alertSpan.firstChild;
         while (alertChild) {
           if (alertChild.nodeType === 3 && alertChild.nodeValue && alertChild.nodeValue.trim() === 'Type') {
@@ -376,7 +422,7 @@
     }
 
     // 翻译属性
-    for (var i = 0; i < TRANSLATABLE_ATTRS.length; i++) {
+    for (var i = 0; translateOwnContent && i < TRANSLATABLE_ATTRS.length; i++) {
       var attr = TRANSLATABLE_ATTRS[i];
       if (el.hasAttribute && el.hasAttribute(attr)) {
         var val = el.getAttribute(attr);
@@ -400,7 +446,7 @@
     // 遍历子节点
     // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
     var first = el.firstChild;
-    if (first && first.nextSibling) {
+    if (translateOwnContent && first && first.nextSibling) {
       var allText = true;
       var cur = first;
       while (cur) {

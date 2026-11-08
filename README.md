@@ -57,12 +57,14 @@ node cli.js install:vscode --path "<扩展目录>"
 
 ```bash
 npm run build:dict
-# 运行全套自动化测试（聚合 10 套测试入口）
+# 运行全套自动化测试（聚合 11 套测试入口）
 npm test
 npm run audit
 ```
 
-测试包括 DOM/代码保护、黄金语义、CDP、菜单、ASAR、路径探测、词库质检、VS Code 和边界回归。数量以当前脚本输出为准。CI 覆盖 Windows、macOS、Ubuntu × Node.js 18/20/22。
+测试包括 DOM/代码及用户内容保护、黄金语义、CDP、菜单、ASAR、路径探测、词库质检、VS Code 和边界回归。数量以当前脚本输出为准。CI 覆盖 Windows、macOS、Ubuntu × Node.js 18/20/22。
+
+内容保护按明确的界面边界保留消息正文、Markdown、文件树、路径导航、文件引用及项目/会话名称；同一区域的固定操作按钮继续翻译。修复依据与验证范围见[用户内容保护维护记录](docs/maintenance/user-content-boundaries.md)。
 
 提供明确来源的官方前端脚本后，可分析候选文本：
 
