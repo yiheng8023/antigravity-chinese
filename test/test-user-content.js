@@ -171,7 +171,7 @@ test('App 2.29 planner response text and markdown-root preserve assistant conten
 test('App 2.29 sidebar conversation names remain unchanged while row actions translate', async t => {
   const { document } = await fixture(t, `
     <div data-testid="conversation-row-sidebar" class="agy-sidebar-row">
-      <a class="agy-button agy-button-custom" href="#conversation" aria-label="Settings"></a>
+      <div><a class="agy-button agy-button-custom" role="button" href="#conversation" aria-label="Settings"></a></div>
       <div class="pointer-events-none"><div><span class="truncate text-sm" title="Settings">New conversation</span></div></div>
       <div><div class="agy-row-actions">
         <button data-testid="conversation-archive-button" aria-label="Settings">Settings</button>
@@ -311,7 +311,97 @@ test('plan command alerts respect protected spans while translating normal UI', 
   for (const selector of ['[data-ag-localization-skip]', '[data-markdown-root]', '[data-testid="user-message-content"]']) {
     const span = document.querySelector(selector);
     assert.equal(span.textContent, 'Type', selector);
-    assert.notEqual(span._agyAlertDone, true, selector);
   }
   assert.equal(document.querySelector('#normal-alert').textContent, '输入');
+});
+
+test('a file tree preserves item names and translates controls inside the same item', async t => {
+  const { document } = await fixture(t, `
+    <div role="tree"><button role="treeitem" title="Settings">
+      <span>Settings</span>
+    </button><div role="treeitem" aria-label="Settings">
+      <span title="Settings">Settings</span>
+      <button id="file-link" data-uri="file:///workspace/Settings" title="Settings">Settings</button>
+      <div><button id="more" aria-label="More actions">More actions</button></div>
+    </div></div>`);
+  assert.equal(document.querySelector('[role="treeitem"] span').textContent, 'Settings');
+  assert.equal(document.querySelector('[role="treeitem"][aria-label]').getAttribute('aria-label'), 'Settings');
+  assert.equal(document.querySelector('span[title]').title, 'Settings');
+  assert.equal(document.querySelector('#file-link').textContent, 'Settings');
+  assert.equal(document.querySelector('#file-link').title, 'Settings');
+  assert.equal(document.querySelector('#more').textContent, '更多操作');
+  assert.equal(document.querySelector('#more').getAttribute('aria-label'), '更多操作');
+});
+
+test('reparenting an already translated node restores its text and attributes', async t => {
+  const { window, document } = await fixture(t, `
+    <div id="ui"><span id="moving" title="Settings">Settings</span></div>
+    <div data-testid="user-input-step"></div>`);
+  const moving = document.querySelector('#moving');
+  const message = document.querySelector('[data-testid="user-input-step"]');
+  assert.equal(moving.textContent, '设置');
+  assert.equal(moving.title, '设置');
+  message.appendChild(moving);
+  await settle(window);
+  assert.equal(moving.textContent, 'Settings');
+  assert.equal(moving.title, 'Settings');
+  document.querySelector('#ui').appendChild(moving);
+  await settle(window);
+  assert.equal(moving.textContent, '设置');
+  assert.equal(moving.title, '设置');
+});
+
+test('a reparented fragmented label and plan hint recover their original nodes', async t => {
+  const { window, document, translate } = await fixture(t, `
+    <div id="split"></div>
+    <div data-testid="plan-command-fyi-alert"><span id="hint">Type</span></div>
+    <div data-markdown-root></div>`);
+  const split = document.querySelector('#split');
+  const first = document.createTextNode('New ');
+  const second = document.createTextNode('conversation');
+  split.append(first, second);
+  translate(split);
+  const hint = document.querySelector('#hint');
+  const alert = hint.parentElement;
+  assert.equal(split.textContent, '新建会话');
+  assert.equal(hint.textContent, '输入');
+  document.querySelector('[data-markdown-root]').append(split, hint);
+  await settle(window);
+  assert.deepEqual([...split.childNodes], [first, second]);
+  assert.equal(first.nodeValue, 'New ');
+  assert.equal(second.nodeValue, 'conversation');
+  assert.equal(hint.textContent, 'Type');
+  alert.appendChild(hint);
+  window.__AGY_RUN_FULL_SCAN__();
+  assert.equal(hint.textContent, '输入');
+});
+
+test('renderer writes equal to a previous translation remain authored values', async t => {
+  const { window, document } = await fixture(t, `
+    <span id="moving" title="Settings">Settings</span>
+    <div data-testid="user-input-step"></div>`);
+  const moving = document.querySelector('#moving');
+  assert.equal(moving.textContent, '设置');
+  assert.equal(moving.title, '设置');
+  moving.firstChild.nodeValue = '设置';
+  moving.title = '设置';
+  document.querySelector('[data-testid="user-input-step"]').appendChild(moving);
+  // A scan can run before the queued observer callback handles renderer writes.
+  window.__AGY_RUN_FULL_SCAN__();
+  await settle(window);
+  assert.equal(moving.textContent, '设置');
+  assert.equal(moving.title, '设置');
+});
+
+test('legacy message controls translate while unmarked nested authored buttons stay intact', async t => {
+  const { document } = await fixture(t, `
+    <div data-testid="agent-response">
+      <div><button id="authored" title="Settings">Settings</button></div>
+      <button id="direct">Settings</button>
+      <div role="toolbar"><div><button id="toolbar">More actions</button></div></div>
+    </div>`);
+  assert.equal(document.querySelector('#authored').textContent, 'Settings');
+  assert.equal(document.querySelector('#authored').title, 'Settings');
+  assert.equal(document.querySelector('#direct').textContent, '设置');
+  assert.equal(document.querySelector('#toolbar').textContent, '更多操作');
 });
