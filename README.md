@@ -100,6 +100,8 @@ npm run scan:drift -- "<frontend-bundle.js>" --report "<report.json>"
 
 诚挚感谢所有为本项目贡献代码、反馈 Bug、完善词库与文档的开发者们！
 
+- 感谢 **a705876883-arch** 提交用户内容保护修复方案，并提供误译复现与回归用例。 [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6)
+
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/graphs/contributors">
     <img src="https://contrib.rocks/image?repo=yiheng8023/antigravity-chinese" alt="Contributors" />

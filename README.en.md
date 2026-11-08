@@ -100,6 +100,8 @@ Please verify the payee name shown on the checkout page before confirming paymen
 
 Heartfelt thanks to all developers who contribute code, report bugs, and improve translations and documentation!
 
+- Thanks to **a705876883-arch** for proposing a fix for unintended translation of user content and supplying reproduction and regression cases. [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6)
+
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/graphs/contributors">
     <img src="https://contrib.rocks/image?repo=yiheng8023/antigravity-chinese" alt="Contributors" />
