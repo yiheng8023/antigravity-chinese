@@ -3469,6 +3469,25 @@
     "Manage project folders and settings.": "管理项目文件夹和设置。",
     "Settings for conversations outside of projects.": "项目外会话的设置。",
     "Start Voice mode": "启动语音模式",
+    "End Voice mode": "结束语音模式",
+    "Voice mode in progress": "语音模式进行中",
+    "Mute mic": "将麦克风静音",
+    "Unmute mic": "取消麦克风静音",
+    "Back to chat": "返回对话",
+    "Voice speed": "语速",
+    "Mute Antigravity": "将 Antigravity 静音",
+    "Unmute Antigravity": "取消 Antigravity 静音",
+    "Listening. Ask anything.": "正在聆听，您可以随时提问。",
+    "Nothing said yet": "暂无发言",
+    "Couldn't connect": "无法连接",
+    "Microphone blocked. Allow mic access.": "无法访问麦克风。请允许访问麦克风。",
+    "Still connecting…": "仍在连接…",
+    "Connecting…": "正在连接…",
+    "Message this chat": "在此对话中输入消息",
+    "Write a message": "撰写消息",
+    "Close message": "关闭消息输入框",
+    "Drag to move": "拖动以移动",
+    "Voice transcript": "语音转写",
     "Work in a New Worktree": "在新工作树中工作",
     "Keeps your checkout untouched": "保持当前检出的工作区不变",
     "Connectors": "连接器",
@@ -5420,6 +5439,18 @@
     {
       "regex": "^Hi (.+), what can we get done today\\?$",
       "replacement": "你好，$1，今天想完成什么？"
+    },
+    {
+      "regex": "^Voice speed, (\\d+(?:\\.\\d+)?)x$",
+      "replacement": "语速：$1 倍"
+    },
+    {
+      "regex": "^Voice mode, (\\d+:\\d{2})$",
+      "replacement": "语音模式，$1"
+    },
+    {
+      "regex": "^Open Voice transcript, (.+)$",
+      "replacement": "打开语音转写，$1"
     },
     {
       "regex": "^Version (\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?)$",

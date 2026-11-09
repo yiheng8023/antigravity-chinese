@@ -238,7 +238,10 @@
     'user-input-step': 1,
     'user-message-content': 1,
     'planner-response-text': 1,
-    'breadcrumb-segment': 1
+    'breadcrumb-segment': 1,
+    'live-user-turn': 1,
+    'live-agent-turn': 1,
+    'transcript-line-text': 1
   };
   var CONTENT_CLASSES = {
     'prose': 1,

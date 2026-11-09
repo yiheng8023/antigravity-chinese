@@ -405,3 +405,30 @@ test('legacy message controls translate while unmarked nested authored buttons s
   assert.equal(document.querySelector('#direct').textContent, '设置');
   assert.equal(document.querySelector('#toolbar').textContent, '更多操作');
 });
+
+test('voice transcripts preserve authored text and fragments while nearby controls translate', async t => {
+  const { window, document } = await fixture(t, `
+    <section data-testid="live-docked" aria-label="Voice mode">
+      <button data-testid="voice-call-end" aria-label="End Voice mode"></button>
+      <div data-testid="live-docked-scroll">
+        <div data-testid="live-user-turn"><p id="spoken">Settings</p></div>
+        <div data-testid="live-agent-turn"><p id="reply" data-testid="live-lead"><span>New</span><span> </span><span>conversation</span></p></div>
+      </div>
+    </section>
+    <ol data-testid="live-transcript">
+      <li><p id="transcript" data-testid="transcript-line-text" title="Settings">Settings</p></li>
+    </ol>
+    <p id="status">Couldn't connect</p>`);
+  assert.equal(document.querySelector('#spoken').textContent, 'Settings');
+  assert.deepEqual([...document.querySelector('#reply').children].map(node => node.textContent),
+    ['New', ' ', 'conversation']);
+  const transcript = document.querySelector('#transcript');
+  assert.equal(transcript.textContent, 'Settings');
+  assert.equal(transcript.title, 'Settings');
+  transcript.firstChild.nodeValue = 'New conversation';
+  await settle(window);
+  assert.equal(transcript.textContent, 'New conversation');
+  assert.equal(document.querySelector('[data-testid="live-docked"]').getAttribute('aria-label'), '语音模式');
+  assert.equal(document.querySelector('[data-testid="voice-call-end"]').getAttribute('aria-label'), '结束语音模式');
+  assert.equal(document.querySelector('#status').textContent, '无法连接');
+});

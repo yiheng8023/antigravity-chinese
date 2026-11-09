@@ -1464,6 +1464,18 @@
     "replacement": "你好，$1，今天想完成什么？"
   },
   {
+    "regex": "^Voice speed, (\\d+(?:\\.\\d+)?)x$",
+    "replacement": "语速：$1 倍"
+  },
+  {
+    "regex": "^Voice mode, (\\d+:\\d{2})$",
+    "replacement": "语音模式，$1"
+  },
+  {
+    "regex": "^Open Voice transcript, (.+)$",
+    "replacement": "打开语音转写，$1"
+  },
+  {
     "regex": "^Version (\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?)$",
     "replacement": "版本 $1"
   }
