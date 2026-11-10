@@ -1464,6 +1464,22 @@
     "replacement": "你好，$1，今天想完成什么？"
   },
   {
+    "regex": "^Hello, (.+)\\.$",
+    "replacement": "你好，$1。"
+  },
+  {
+    "regex": "^Welcome back, (.+)\\.$",
+    "replacement": "欢迎回来，$1。"
+  },
+  {
+    "regex": "^Hi (.+)\\.$",
+    "replacement": "你好，$1。"
+  },
+  {
+    "regex": "^Good to see you, (.+)\\.$",
+    "replacement": "很高兴见到你，$1。"
+  },
+  {
     "regex": "^Voice speed, (\\d+(?:\\.\\d+)?)x$",
     "replacement": "语速：$1 倍"
   },
@@ -1474,6 +1490,34 @@
   {
     "regex": "^Open Voice transcript, (.+)$",
     "replacement": "打开语音转写，$1"
+  },
+  {
+    "regex": "^Proceed to (.+) \\(unsafe\\)$",
+    "replacement": "继续前往 $1（不安全）"
+  },
+  {
+    "regex": "^Site data cleared for (.+)\\.$",
+    "replacement": "已清除 $1 的网站数据。"
+  },
+  {
+    "regex": "^Could not clear site data for (.+)\\.$",
+    "replacement": "无法清除 $1 的网站数据。"
+  },
+  {
+    "regex": "^An embedded page at (https?://\\S+) wants to connect to a (USB|HID) device$",
+    "replacement": "来自 $1 的嵌入页面请求连接 $2 设备"
+  },
+  {
+    "regex": "^An embedded page at (https?://\\S+) wants to connect to a serial port$",
+    "replacement": "来自 $1 的嵌入页面请求连接串口"
+  },
+  {
+    "regex": "^(https?://\\S+) wants to connect to a (USB|HID) device$",
+    "replacement": "$1 请求连接 $2 设备"
+  },
+  {
+    "regex": "^(https?://\\S+) wants to connect to a serial port$",
+    "replacement": "$1 请求连接串口"
   },
   {
     "regex": "^Version (\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?)$",

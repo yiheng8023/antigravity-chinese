@@ -432,3 +432,28 @@ test('voice transcripts preserve authored text and fragments while nearby contro
   assert.equal(document.querySelector('[data-testid="voice-call-end"]').getAttribute('aria-label'), '结束语音模式');
   assert.equal(document.querySelector('#status').textContent, '无法连接');
 });
+
+test('updated browser and voice notices retain hosts and actions while conversation text stays original', async t => {
+  const { document } = await fixture(t, `
+    <div data-testid="browser-cert-interstitial">
+      <h1>Your connection is not private</h1>
+      <p id="warning">Attackers might be trying to steal your information from <strong>example.com:8443</strong> (for example, passwords, messages, or credit cards).</p>
+      <button id="proceed">Proceed to example.com:8443 (unsafe)</button>
+    </div>
+    <p id="voice">Your sign-in needs an update. <button data-testid="voice-sign-in">Sign in again</button> to use Voice.</p>
+    <div data-testid="webview-device-chooser-bubble">
+      <button data-testid="webview-device-chooser-option" data-device-id="unit-1"><span>Settings</span></button>
+      <button data-testid="webview-device-chooser-connect">Connect</button>
+    </div>
+    <div data-testid="user-input-step"><div data-testid="user-message-content">Knowledge Work</div></div>
+    <div data-testid="transcript-line-text">No microphone found. Connect one.</div>`);
+  assert.equal(document.querySelector('#warning strong').textContent, 'example.com:8443');
+  assert.match(document.querySelector('#warning').textContent, /攻击者可能试图窃取您在 .*上的信息/);
+  assert.equal(document.querySelector('#proceed').textContent, '继续前往 example.com:8443（不安全）');
+  assert.equal(document.querySelector('#voice button').textContent, '重新登录');
+  assert.match(document.querySelector('#voice').textContent, /您的登录状态需要更新。请.*以使用语音模式。/);
+  assert.equal(document.querySelector('[data-testid="webview-device-chooser-option"]').textContent, 'Settings');
+  assert.equal(document.querySelector('[data-testid="webview-device-chooser-connect"]').textContent, '连接');
+  assert.equal(document.querySelector('[data-testid="user-message-content"]').textContent, 'Knowledge Work');
+  assert.equal(document.querySelector('[data-testid="transcript-line-text"]').textContent, 'No microphone found. Connect one.');
+});

@@ -241,7 +241,8 @@
     'breadcrumb-segment': 1,
     'live-user-turn': 1,
     'live-agent-turn': 1,
-    'transcript-line-text': 1
+    'transcript-line-text': 1,
+    'webview-device-chooser-option': 1
   };
   var CONTENT_CLASSES = {
     'prose': 1,

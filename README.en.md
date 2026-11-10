@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.40** targets **Antigravity App 2.29.1 / VS Code extension 1.11.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.41** targets **Antigravity App 2.30.0 / VS Code extension 1.11.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release adapts the patch to desktop 2.29.1, translates voice connection prompts and call controls, and preserves spoken text in live and saved transcripts. After updating the desktop app, rerun `node cli.js install` and reopen the clients. See the [2.29.1 maintenance record](docs/maintenance/antigravity-2.29.1.md) and the [user-content protection record](docs/maintenance/user-content-boundaries.md).
+This release adapts the patch to desktop 2.30.0. It translates the Knowledge Work layout, browser certificate and hardware connection prompts, and microphone status messages while preserving device names in the chooser. After updating the desktop app, rerun `node cli.js install` and reopen the clients. See the [2.30.0 maintenance record](docs/maintenance/antigravity-2.30.0.md).
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 
@@ -12,7 +12,7 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.29.1 package-copy install/reinstall/restore, live voice entry controls and transcript-protection DOM samples. See the desktop 2.29.0 record for earlier UI coverage. |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.30.0 package-copy install/reinstall/restore, live layout and browser settings, and DOM samples for translated prompts and device-name protection |
 | VS Code extension | Manifest/native-menu translation, local Webview proxy, separate backup/restore | Windows 1.11.0 package-copy install/reinstall/byte-identical restore, 16 menu states and proxy/DOM verification. Selected Chinese Webview controls were checked in the live client. |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
