@@ -242,6 +242,8 @@
     'live-user-turn': 1,
     'live-agent-turn': 1,
     'transcript-line-text': 1,
+    'voice-transcript-summary-lead': 1,
+    'voice-transcript-summary-point': 1,
     'webview-device-chooser-option': 1
   };
   var CONTENT_CLASSES = {
@@ -280,6 +282,10 @@
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
     if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
+    if (el.tagName === 'DD' && el.parentElement &&
+        el.parentElement.getAttribute('data-testid') === 'permission-download-details') return true;
+    if (testId && testId.indexOf('gcp-project-combobox-option-') === 0 &&
+        el.hasAttribute('data-project-id')) return true;
     if (el.tagName === 'NAV' && el.getAttribute('aria-label') === 'File path breadcrumbs') return true;
 
     var className = typeof el.className === 'string' ? el.className : '';

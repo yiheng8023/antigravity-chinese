@@ -1496,6 +1496,18 @@
     "replacement": "打开语音转写，$1"
   },
   {
+    "regex": "^Yes, allow downloads from (.+) for this run$",
+    "replacement": "是，允许本次运行从 $1 下载"
+  },
+  {
+    "regex": "^Yes, allow downloads from (.+) in this conversation$",
+    "replacement": "是，允许此会话从 $1 下载"
+  },
+  {
+    "regex": "^Yes, always allow downloads from (.+)$",
+    "replacement": "是，始终允许从 $1 下载"
+  },
+  {
     "regex": "^Proceed to (.+) \\(unsafe\\)$",
     "replacement": "继续前往 $1（不安全）"
   },

@@ -480,3 +480,34 @@ test('marketplace and browser notices translate around links without changing th
   assert.match(notice.textContent, /可能会与 Google 共享/);
   assert.equal(notice.querySelector('a').getAttribute('href'), 'https://policies.google.com/privacy');
 });
+
+test('2.31 download approvals and voice cards distinguish controls from generated content', async t => {
+  const { document } = await fixture(t, `
+    <div>
+      <h3>Allow the browser agent to download a file?</h3>
+      <dl data-testid="permission-download-details"><dt>File</dt><dd>Settings</dd><dt>Save to</dt><dd>Download</dd></dl>
+      <button id="approve">Yes, allow this download</button>
+    </div>
+    <button data-testid="voice-transcript-card" aria-label="Open Voice transcript, 2m 05s. Settings">
+      <span>Voice transcript</span><span>Open</span>
+      <span data-testid="voice-transcript-summary">
+        <span data-testid="voice-transcript-summary-lead">Settings</span>
+        <span data-testid="voice-transcript-summary-point"><span>New conversation</span></span>
+      </span>
+    </button>
+    <span data-testid="voice-transcript-summary-pending">Summarizing call…</span>
+    <div data-testid="gcp-project-combobox-option-demo" data-project-id="demo"><span>Settings</span></div>
+    <button data-testid="gcp-project-combobox-trigger" aria-label="Toggle Google Cloud projects"></button>`);
+  assert.deepEqual([...document.querySelectorAll('dd')].map(el => el.textContent), ['Settings', 'Download']);
+  assert.deepEqual([...document.querySelectorAll('dt')].map(el => el.textContent), ['文件', '保存到']);
+  assert.equal(document.querySelector('h3').textContent, '允许浏览器智能体下载文件吗？');
+  assert.equal(document.querySelector('#approve').textContent, '是，允许本次下载');
+  const card = document.querySelector('[data-testid="voice-transcript-card"]');
+  assert.equal(card.firstElementChild.textContent, '语音转写');
+  assert.equal(card.getAttribute('aria-label'), '打开语音转写，2m 05s. Settings');
+  assert.equal(card.querySelector('[data-testid="voice-transcript-summary-lead"]').textContent, 'Settings');
+  assert.equal(card.querySelector('[data-testid="voice-transcript-summary-point"]').textContent, 'New conversation');
+  assert.equal(document.querySelector('[data-testid="voice-transcript-summary-pending"]').textContent, '正在总结通话…');
+  assert.equal(document.querySelector('[data-project-id]').textContent, 'Settings');
+  assert.equal(document.querySelector('[data-testid="gcp-project-combobox-trigger"]').getAttribute('aria-label'), '展开或收起 Google Cloud 项目列表');
+});

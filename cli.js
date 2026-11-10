@@ -872,7 +872,6 @@ function restore(customPath) {
     if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
-    uninstallPlugin();
     console.log('\n✅ 客户端版本安全保护完成，当前官方全新原生版本已完整保留！\n');
     return;
   }
@@ -884,7 +883,6 @@ function restore(customPath) {
     if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
-    uninstallPlugin();
     console.log('✅ 已清理污染的历史备份，完整保留当前官方原生客户端。\n');
     return;
   }
@@ -923,12 +921,8 @@ function restore(customPath) {
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
 
-    // 2. ASAR 成功还原后，安全同步卸载社区插件
-    uninstallPlugin();
-
     console.log('\n✅ ==============================================');
     console.log('✅ 已成功还原为官方原生英文版本！');
-    console.log('✅ 插件与宿主 UI 汉化已全部干净清除。');
     console.log('✅ 重启 Antigravity 客户端即可生效。');
     console.log('✅ ==============================================\n');
   } catch (err) {
@@ -1272,7 +1266,7 @@ if (require.main === module) {
       const vsExtDir = findVsCodeExtensionDir(customPath);
       const asarPath = customPath && vsExtDir ? null : findAsarPath(customPath);
       if (asarPath) restore(customPath);
-      else if (!customPath) uninstallPlugin();
+      if (!customPath) uninstallPlugin();
       // 弹性自适应联动：自动检测并恢复本机 VS Code 扩展至官方原生
       try {
         if (vsExtDir && isVsCodeExtensionPatched(vsExtDir)) {

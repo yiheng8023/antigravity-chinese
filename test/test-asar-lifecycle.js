@@ -86,6 +86,11 @@ fs.writeFileSync(path.join(mockSrcDir, 'dist', 'main.js'), origMainA, 'utf-8');
 fs.writeFileSync(path.join(mockSrcDir, 'dist', 'tray.js'), origTrayA, 'utf-8');
 
 try {
+  fs.mkdirSync(mockPluginDir, { recursive: true });
+  const pluginMarker = path.join(mockPluginDir, 'plugin.json');
+  const pluginManifest = '{"name":"fixture-global-plugin"}';
+  fs.writeFileSync(pluginMarker, pluginManifest, 'utf8');
+
   // 2. 打包出真实的初始 app.asar (版本 A)
   execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}" --unpack-dir "${path.join('node_modules', 'external-tool')}"`, { stdio: 'ignore' });
   assert(fs.existsSync(asarPath), '【阶段 1】初始版本 A app.asar 构建成功');
@@ -243,6 +248,8 @@ contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
   assert(!fs.existsSync(swapOldPath), '【冷启动自愈验证通过】孤儿 swap-old 文件已被自动清理干净！');
   const asarRecoveredFp = getAsarFingerprint(asarPath);
   assert(asarPreFp === asarRecoveredFp, '【冷启动自愈验证通过】复原后的 app.asar 内容指纹完全一致，客户端永不瘫痪！');
+  assert(fs.existsSync(pluginMarker) && fs.readFileSync(pluginMarker, 'utf8') === pluginManifest,
+    '指定 --path 的还原保持全局插件文件不变');
 
 } finally {
   // 清理测试临时目录
