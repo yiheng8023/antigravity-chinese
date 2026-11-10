@@ -457,3 +457,26 @@ test('updated browser and voice notices retain hosts and actions while conversat
   assert.equal(document.querySelector('[data-testid="user-message-content"]').textContent, 'Knowledge Work');
   assert.equal(document.querySelector('[data-testid="transcript-line-text"]').textContent, 'No microphone found. Connect one.');
 });
+
+test('marketplace and browser notices translate around links without changing their targets', async t => {
+  const { document } = await fixture(t, `
+    <p id="browser-rule">Configure allowed and denied URLs for the browser subagent (invoked with /browser). Requires <a href="https://www.google.com/chrome/">Google Chrome</a>.</p>
+    <section data-testid="customizations-marketplace">
+      <h2>Business</h2>
+      <button aria-label="See more in Business"><svg></svg>See 19 more</button>
+      <h3>Gmail</h3><p>Search, read, draft, and send emails in Gmail.</p>
+      <footer aria-label="Marketplace notice"><p>Google does not control the availability or functionality of third party developer tools. Your data from third party developer tools connected to your Antigravity instance may be shared with Google. Google will protect any such data in accordance with the Google Privacy Policy, found here: <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a></p></footer>
+    </section>`);
+  const rule = document.querySelector('#browser-rule');
+  assert.match(rule.textContent, /通过 \/browser 调用.*需要安装 Google Chrome/);
+  assert.equal(rule.querySelector('a').getAttribute('href'), 'https://www.google.com/chrome/');
+  const market = document.querySelector('[data-testid="customizations-marketplace"]');
+  assert.equal(market.querySelector('h2').textContent, '商务');
+  assert.equal(market.querySelector('button').textContent, '再查看 19 项');
+  assert.equal(market.querySelector('button').getAttribute('aria-label'), '在商务中查看更多');
+  assert.equal(market.querySelector('h3').textContent, 'Gmail');
+  assert.equal(market.querySelector(':scope > p').textContent, '搜索、阅读、起草和发送 Gmail 邮件。');
+  const notice = market.querySelector('footer');
+  assert.match(notice.textContent, /可能会与 Google 共享/);
+  assert.equal(notice.querySelector('a').getAttribute('href'), 'https://policies.google.com/privacy');
+});

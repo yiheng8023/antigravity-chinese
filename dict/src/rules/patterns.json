@@ -1048,6 +1048,10 @@
     "replacement": "在 $1 中查看更多"
   },
   {
+    "regex": "^See (\\d+) more$",
+    "replacement": "再查看 $1 项"
+  },
+  {
     "regex": "^(?:See less|收起) in (.+)$",
     "replacement": "在 $1 中收起"
   },
