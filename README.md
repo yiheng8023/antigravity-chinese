@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-当前源码版本 **v3.3.44**，维护目标为 **Antigravity App 2.31.2 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.45**，维护目标为 **Antigravity App 2.31.2 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版核对桌面 2.31.2 的兼容性，并补齐 VS Code 扩展 1.12.0 的证书设置、登录和安装进度、更新重启与窗口重载提示。中文通知按钮保留原有操作返回值。更新补丁时，在保存工作并退出客户端后运行 `node cli.js install`，再重新打开。详见 [2.31.2 与扩展 1.12.0 维护记录](docs/maintenance/antigravity-2.31.2.md) 和 [2.31.0 下载审批与内容保护记录](docs/maintenance/antigravity-2.31.0.md)。
+本版补齐外观设置中的代码预览和对话布局、浏览器地址栏提示及 Swarm 插件功能说明。保留插件名、斜杠命令、网址、代码及用户内容。沿用扩展 1.12.0 的证书设置、登录进度及通知适配。更新补丁时，在保存工作并退出客户端后运行 `node cli.js install`，再重新打开。详见 [v3.3.45 补充记录](docs/maintenance/antigravity-2.31.2-follow-up.md) 和 [2.31.2 与扩展 1.12.0 维护记录](docs/maintenance/antigravity-2.31.2.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。相关适配与验证见 [1.11.0 维护记录](docs/maintenance/vscode-1.11.0.md) 和 [桌面 2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
 

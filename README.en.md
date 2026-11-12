@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.44** targets **Antigravity App 2.31.2 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.45** targets **Antigravity App 2.31.2 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release checks desktop 2.31.2 compatibility and translates certificate settings, sign-in and installation progress, backend update prompts and window reload notices in VS Code extension 1.12.0. Chinese notification buttons return the original action values to upstream handlers. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [2.31.2 and extension 1.12.0 maintenance record](docs/maintenance/antigravity-2.31.2.md) and the [2.31.0 download approval and content protection record](docs/maintenance/antigravity-2.31.0.md).
+This release translates the Code Preview and Chat Layout labels, the browser address hint and the Swarm plugin description. Plugin names, slash commands, URLs, code and user content retain their original text. It retains the certificate settings, sign-in progress and notification adaptation for extension 1.12.0. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [v3.3.45 follow-up record](docs/maintenance/antigravity-2.31.2-follow-up.md) and the [2.31.2 and extension 1.12.0 maintenance record](docs/maintenance/antigravity-2.31.2.md).
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 

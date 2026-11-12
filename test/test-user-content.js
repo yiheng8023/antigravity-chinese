@@ -481,6 +481,30 @@ test('marketplace and browser notices translate around links without changing th
   assert.equal(notice.querySelector('a').getAttribute('href'), 'https://policies.google.com/privacy');
 });
 
+test('appearance, browser URL hints and plugin descriptions translate without rewriting content', async t => {
+  const { document, translate } = await fixture(t, `
+    <button id="preview">Code Preview</button>
+    <h3 id="layout">Chat Layout</h3>
+    <article><h4>Swarm</h4><p id="description">Unlock the power of agent swarms.</p></article>
+    <input id="address" type="url" placeholder="Search or enter a URL" value="https://example.com/Code%20Preview?q=Chat+Layout">
+    <pre><code>Code Preview\nChat Layout\n/swarm</code></pre>
+    <div data-testid="user-input-step">Code Preview<span>Search or enter a URL</span></div>`);
+  assert.equal(document.querySelector('#preview').textContent, '代码预览');
+  assert.equal(document.querySelector('#layout').textContent, '对话布局');
+  assert.equal(document.querySelector('#description').textContent, '发挥多智能体协作的优势。');
+  assert.equal(document.querySelector('h4').textContent, 'Swarm');
+  const address = document.querySelector('#address');
+  assert.equal(address.placeholder, '搜索或输入网址');
+  assert.equal(address.value, 'https://example.com/Code%20Preview?q=Chat+Layout');
+  address.value = 'Search or enter a URL';
+  translate(document.body);
+  assert.equal(address.value, 'Search or enter a URL');
+  assert.equal(document.querySelector('code').textContent, 'Code Preview\nChat Layout\n/swarm');
+  const message = document.querySelector('[data-testid="user-input-step"]');
+  assert.equal(message.firstChild.nodeValue, 'Code Preview');
+  assert.equal(message.querySelector('span').textContent, 'Search or enter a URL');
+});
+
 test('2.31 download approvals and voice cards distinguish controls from generated content', async t => {
   const { document } = await fixture(t, `
     <div>
