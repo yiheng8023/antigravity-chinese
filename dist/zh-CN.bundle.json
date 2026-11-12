@@ -1,6 +1,6 @@
 {
-  "version": "3.3.45",
-  "buildTime": "2026-11-12T04:57:20.890Z",
+  "version": "3.3.46",
+  "buildTime": "2026-11-12T05:16:04.454Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -3527,7 +3527,6 @@
     "Code Preview": "代码预览",
     "Chat Layout": "对话布局",
     "Search or enter a URL": "搜索或输入网址",
-    "Unlock the power of agent swarms.": "发挥多智能体协作的优势。",
     "Focus Panel": "聚焦面板",
     "Accept Changes in All Files": "接受所有文件中的更改",
     "Reject Changes in All Files": "拒绝所有文件中的更改",

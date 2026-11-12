@@ -244,7 +244,11 @@
     'transcript-line-text': 1,
     'voice-transcript-summary-lead': 1,
     'voice-transcript-summary-point': 1,
-    'webview-device-chooser-option': 1
+    'webview-device-chooser-option': 1,
+    'plugin-detail-footer-author': 1,
+    'plugin-detail-footer-version': 1,
+    'plugin-hook-list': 1,
+    'plugin-suggested-prompt-row': 1
   };
   var CONTENT_CLASSES = {
     'prose': 1,
@@ -267,6 +271,26 @@
     }
     if (elem.hasAttribute && elem.hasAttribute('data-effort')) {
       return true;
+    }
+    return false;
+  }
+
+  function isCustomizationContent(el) {
+    // App 2.31.2 uses the same workspace view for project and unassigned settings.
+    // These leaves carry author metadata; their neighboring actions and headings
+    // are ordinary UI. Test classes before looking up their scoped container.
+    if (el.matches('span.font-medium.truncate[data-tooltip-id], div.text-sm.text-muted-foreground.line-clamp-2.mt-1, span.text-purple-400, span.text-green-400') &&
+        el.closest('[data-testid="workspace-customizations-view"]')) return true;
+    if (el.matches('div.font-medium.text-foreground.truncate, div.text-sm.text-muted-foreground.truncate, img') &&
+        el.closest('[data-testid="customization-card"][data-card-name]')) return true;
+    if (el.matches('h1.text-xl.font-medium.truncate, p.text-muted-foreground.leading-relaxed, span.font-medium.flex-shrink-0, span.text-muted-foreground.truncate[title]')) {
+      var detail = el.closest('[data-testid="plugin-detail"], [role="dialog"]');
+      if (detail && (detail.getAttribute('data-testid') === 'plugin-detail' ||
+          detail.querySelector('h1.text-xl.font-medium.truncate, [data-testid="doc-row-modal"]'))) return true;
+    }
+    if (el.matches('h1, h2, p.text-muted-foreground.leading-relaxed, div.font-mono.break-all > span')) {
+      var dialog = el.closest('[role="dialog"]');
+      if (dialog && dialog.querySelector('[data-testid="doc-row-modal"]')) return true;
     }
     return false;
   }
@@ -298,7 +322,7 @@
         if (CONTENT_CLASSES[classes[ci]] === 1) return true;
       }
     }
-    return false;
+    return isCustomizationContent(el);
   }
 
   function getMixedContentKind(el) {

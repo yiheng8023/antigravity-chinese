@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-当前源码版本 **v3.3.45**，维护目标为 **Antigravity App 2.31.2 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.46**，维护目标为 **Antigravity App 2.31.2 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版补齐外观设置中的代码预览和对话布局、浏览器地址栏提示及 Swarm 插件功能说明。保留插件名、斜杠命令、网址、代码及用户内容。沿用扩展 1.12.0 的证书设置、登录进度及通知适配。更新补丁时，在保存工作并退出客户端后运行 `node cli.js install`，再重新打开。详见 [v3.3.45 补充记录](docs/maintenance/antigravity-2.31.2-follow-up.md) 和 [2.31.2 与扩展 1.12.0 维护记录](docs/maintenance/antigravity-2.31.2.md)。
+本版统一自定义扩展的内容边界。技能、规则、插件和自定义智能体的名称与作者说明保留原文，栏目、按钮和固定提示继续汉化，覆盖项目内与未归属项目的共享列表，以及卡片、详情和内容弹窗。保留代码预览、对话布局和地址栏提示的界面译文，Swarm 作者说明按统一规则保留英文。更新补丁时，在保存工作并退出客户端后运行 `node cli.js install`，再重新打开。详见 [自定义扩展内容边界记录](docs/maintenance/customization-content-boundaries.md) 和 [2.31.2 与扩展 1.12.0 维护记录](docs/maintenance/antigravity-2.31.2.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。相关适配与验证见 [1.11.0 维护记录](docs/maintenance/vscode-1.11.0.md) 和 [桌面 2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
 
@@ -66,7 +66,7 @@ npm run audit
 
 测试包括 DOM/代码及用户内容保护、黄金语义、CDP、菜单、ASAR、路径探测、词库质检、VS Code 和边界回归。数量以当前脚本输出为准。CI 覆盖 Windows、macOS、Ubuntu × Node.js 18/20/22。
 
-内容保护按明确的界面边界保留消息正文、Markdown、文件树、路径导航、文件引用及项目/会话名称；同一区域的固定操作按钮继续翻译。修复依据与验证范围见[用户内容保护维护记录](docs/maintenance/user-content-boundaries.md)。
+内容保护按明确的界面边界保留消息正文、Markdown、文件树、路径导航、文件引用、项目/会话名称及自定义扩展的作者内容；同一区域的固定操作按钮继续翻译。修复依据与验证范围见[用户内容保护维护记录](docs/maintenance/user-content-boundaries.md)和[自定义扩展内容边界记录](docs/maintenance/customization-content-boundaries.md)。
 
 提供明确来源的官方前端脚本后，可分析候选文本：
 

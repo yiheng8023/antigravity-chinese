@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.45** targets **Antigravity App 2.31.2 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.46** targets **Antigravity App 2.31.2 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release translates the Code Preview and Chat Layout labels, the browser address hint and the Swarm plugin description. Plugin names, slash commands, URLs, code and user content retain their original text. It retains the certificate settings, sign-in progress and notification adaptation for extension 1.12.0. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [v3.3.45 follow-up record](docs/maintenance/antigravity-2.31.2-follow-up.md) and the [2.31.2 and extension 1.12.0 maintenance record](docs/maintenance/antigravity-2.31.2.md).
+This release applies consistent content boundaries to customizations. Skill, rule, plugin and custom-agent names and author descriptions retain their source text, while section headings, actions and fixed notices remain localized. It covers shared project and unassigned settings lists, cards, details and content dialogs. Code Preview, Chat Layout and browser address hints remain translated. The Swarm author description retains its English source under the same policy. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [customization content record](docs/maintenance/customization-content-boundaries.md) and the [2.31.2 and extension 1.12.0 maintenance record](docs/maintenance/antigravity-2.31.2.md).
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 
@@ -66,7 +66,7 @@ npm run audit
 
 Tests cover DOM/code and user-content boundaries, golden translations, CDP, menus, ASAR, discovery, proofreading, VS Code and regression cases. Read current output for counts. CI covers Windows, macOS and Ubuntu with Node.js 18/20/22.
 
-Explicit content boundaries preserve message bodies, Markdown, file trees, path breadcrumbs, file references, and project/conversation names while fixed action buttons remain translated. See the [user-content boundary maintenance record](docs/maintenance/user-content-boundaries.md) for evidence and validation scope.
+Explicit content boundaries preserve message bodies, Markdown, file trees, path breadcrumbs, file references, project/conversation names and customization author content while fixed action buttons remain translated. See the [user-content boundary record](docs/maintenance/user-content-boundaries.md) and [customization content record](docs/maintenance/customization-content-boundaries.md) for evidence and validation scope.
 
 For an official frontend bundle with known provenance:
 

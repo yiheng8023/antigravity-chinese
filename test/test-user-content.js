@@ -481,18 +481,128 @@ test('marketplace and browser notices translate around links without changing th
   assert.equal(notice.querySelector('a').getAttribute('href'), 'https://policies.google.com/privacy');
 });
 
-test('appearance, browser URL hints and plugin descriptions translate without rewriting content', async t => {
+for (const scope of ['project', 'unassigned']) {
+  test(`customization metadata retains author text in ${scope} settings`, async t => {
+    const { document } = await fixture(t, `
+      <section id="${scope}"><div data-testid="workspace-customizations-view">
+        <h3>Skills</h3><h3>Rules</h3><h3>Plugins</h3><h3>Custom Agents</h3>
+        ${['skill', 'rule', 'plugin', 'agent'].map(kind => `
+          <div class="group flex items-start justify-between gap-3 px-3 py-2 border-border" data-kind="${kind}">
+            <div class="flex flex-col gap-0.5 min-w-0 flex-1 space-y-0">
+              <div class="flex items-center gap-2">
+                <span class="font-medium truncate" data-tooltip-id="${kind}-name">automation</span>
+                <span class="text-blue-400">Global</span>
+                <span class="text-green-400">Settings</span>
+                <span class="text-purple-400">Plugin: <span>Settings</span></span>
+              </div>
+              <div class="text-sm text-muted-foreground line-clamp-2 mt-1" title="Code Preview">Settings<span>New conversation</span></div>
+            </div>
+            <button aria-label="Copy path">Copy Path</button>
+          </div>`).join('')}
+      </div></section>`);
+    for (const row of document.querySelectorAll('[data-kind]')) {
+      assert.equal(row.querySelector('[data-tooltip-id]').textContent, 'automation');
+      assert.equal(row.querySelector('.line-clamp-2').textContent, 'SettingsNew conversation');
+      assert.equal(row.querySelector('.line-clamp-2').title, 'Code Preview');
+      assert.equal(row.querySelector('.text-green-400').textContent, 'Settings');
+      assert.equal(row.querySelector('.text-purple-400').textContent, 'Plugin: Settings');
+      assert.equal(row.querySelector('.text-blue-400').textContent, '全局');
+      assert.equal(row.querySelector('button').textContent, '复制路径');
+      assert.equal(row.querySelector('button').getAttribute('aria-label'), '复制路径');
+    }
+    assert.deepEqual([...document.querySelectorAll('h3')].map(el => el.textContent), ['技能库', '规则库', '插件', '自定义智能体']);
+  });
+}
+
+test('customization cards and details preserve metadata while actions translate', async t => {
+  const { document } = await fixture(t, `
+    <article data-testid="customization-card" data-card-name="Settings">
+      <img alt="Settings">
+      <div class="font-medium text-foreground truncate"><a aria-label="Open Settings">Settings</a></div>
+      <div class="text-sm text-muted-foreground truncate"><mark>Code Preview</mark></div>
+      <button>Install</button>
+    </article>
+    <main data-testid="plugin-detail">
+      <h1 class="text-xl font-medium truncate">Settings</h1>
+      <p class="text-muted-foreground leading-relaxed">Chat Layout</p>
+      <span class="font-medium flex-shrink-0">automation</span>
+      <span class="text-muted-foreground truncate" title="Settings">Code Preview</span>
+      <div data-testid="plugin-hook-list"><button>Stop<span>Settings</span></button></div>
+      <button data-testid="plugin-suggested-prompt-row">New conversation</button>
+      <footer><dt>Developer</dt><dd data-testid="plugin-detail-footer-author">Settings</dd>
+        <dt>Version</dt><dd data-testid="plugin-detail-footer-version">Download</dd></footer>
+      <button aria-label="Delete plugin">Delete plugin</button>
+    </main>
+    <div role="dialog"><h2>Settings</h2><div data-testid="doc-row-modal">
+      <div class="font-mono break-all"><span>Settings</span><button>Copy Path</button></div>
+      <p class="text-muted-foreground leading-relaxed">Code Preview</p>
+    </div><button>Close</button></div>
+    <div role="dialog" id="plugin-modal"><h1 class="text-xl font-medium truncate">Settings</h1>
+      <p class="text-muted-foreground leading-relaxed">Code Preview</p><button>Install</button></div>
+    <span id="ordinary" class="font-medium flex-shrink-0">Settings</span>`);
+  const card = document.querySelector('article');
+  assert.equal(card.querySelector('a').textContent, 'Settings');
+  assert.equal(card.querySelector('a').getAttribute('aria-label'), 'Open Settings');
+  assert.equal(card.querySelector('img').alt, 'Settings');
+  assert.equal(card.querySelector('mark').textContent, 'Code Preview');
+  assert.equal(card.querySelector('button').textContent, '安装');
+  const detail = document.querySelector('main');
+  assert.equal(detail.querySelector('h1').textContent, 'Settings');
+  assert.equal(detail.querySelector('p').textContent, 'Chat Layout');
+  assert.equal(detail.querySelector('.font-medium.flex-shrink-0').textContent, 'automation');
+  assert.equal(detail.querySelector('[title]').title, 'Settings');
+  assert.equal(detail.querySelector('[title]').textContent, 'Code Preview');
+  assert.equal(detail.querySelector('[data-testid="plugin-hook-list"]').textContent, 'StopSettings');
+  assert.equal(detail.querySelector('[data-testid="plugin-suggested-prompt-row"]').textContent, 'New conversation');
+  assert.equal(detail.querySelector('[data-testid="plugin-detail-footer-author"]').textContent, 'Settings');
+  assert.equal(detail.querySelector('[data-testid="plugin-detail-footer-version"]').textContent, 'Download');
+  assert.deepEqual([...detail.querySelectorAll('dt')].map(el => el.textContent), ['开发者', '版本信息']);
+  assert.equal(detail.lastElementChild.getAttribute('aria-label'), '删除插件');
+  const dialog = document.querySelector('[role="dialog"]');
+  assert.equal(dialog.querySelector('h2').textContent, 'Settings');
+  assert.equal(dialog.querySelector('p').textContent, 'Code Preview');
+  assert.equal(dialog.querySelector('span').textContent, 'Settings');
+  assert.equal(dialog.querySelector('button').textContent, '复制路径');
+  assert.equal(dialog.lastElementChild.textContent, '关闭');
+  const pluginModal = document.querySelector('#plugin-modal');
+  assert.equal(pluginModal.querySelector('h1').textContent, 'Settings');
+  assert.equal(pluginModal.querySelector('p').textContent, 'Code Preview');
+  assert.equal(pluginModal.querySelector('button').textContent, '安装');
+  assert.equal(document.querySelector('#ordinary').textContent, '设置');
+});
+
+test('customization fields restore source text after reparenting and preserve later author edits', async t => {
+  const { document, translate, window } = await fixture(t, `
+    <div id="outside"><span class="font-medium truncate" data-tooltip-id="name">automation</span></div>
+    <div data-testid="workspace-customizations-view" id="inside"></div>`);
+  const name = document.querySelector('[data-tooltip-id]');
+  assert.equal(name.textContent, '自动化任务');
+  document.querySelector('#inside').append(name);
+  translate(name);
+  assert.equal(name.textContent, 'automation');
+  name.textContent = 'Settings';
+  await settle(window);
+  assert.equal(name.textContent, 'Settings');
+  document.querySelector('#outside').append(name);
+  translate(name);
+  assert.equal(name.textContent, '设置');
+});
+
+test('appearance and URL hints translate while the Swarm description retains its source', async t => {
   const { document, translate } = await fixture(t, `
     <button id="preview">Code Preview</button>
     <h3 id="layout">Chat Layout</h3>
-    <article><h4>Swarm</h4><p id="description">Unlock the power of agent swarms.</p></article>
+    <article data-testid="customization-card" data-card-name="Swarm">
+      <div class="font-medium text-foreground truncate">Swarm</div>
+      <div class="text-sm text-muted-foreground truncate" id="description">Unlock the power of agent swarms.</div>
+    </article>
     <input id="address" type="url" placeholder="Search or enter a URL" value="https://example.com/Code%20Preview?q=Chat+Layout">
     <pre><code>Code Preview\nChat Layout\n/swarm</code></pre>
     <div data-testid="user-input-step">Code Preview<span>Search or enter a URL</span></div>`);
   assert.equal(document.querySelector('#preview').textContent, '代码预览');
   assert.equal(document.querySelector('#layout').textContent, '对话布局');
-  assert.equal(document.querySelector('#description').textContent, '发挥多智能体协作的优势。');
-  assert.equal(document.querySelector('h4').textContent, 'Swarm');
+  assert.equal(document.querySelector('#description').textContent, 'Unlock the power of agent swarms.');
+  assert.equal(document.querySelector('[data-card-name="Swarm"] .font-medium').textContent, 'Swarm');
   const address = document.querySelector('#address');
   assert.equal(address.placeholder, '搜索或输入网址');
   assert.equal(address.value, 'https://example.com/Code%20Preview?q=Chat+Layout');
