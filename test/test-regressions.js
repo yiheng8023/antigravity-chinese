@@ -63,6 +63,72 @@ test('VS Code 1.11 command scopes and native menu labels translate without chang
   assert.equal(JSON.parse(fs.readFileSync(pkgPath)).contributes.commands[0].title, 'Accept Changes in Current File');
 });
 
+test('VS Code native notices translate buttons while preserving action results and options', async (t) => {
+  const dir = tempDir(t);
+  extension(dir, '1.12.0');
+  const source = `"use strict";
+    const vscode = require('vscode');
+    exports.notice = (options, extra) => vscode.window.showInformationMessage(
+      "Changing proxy or CA certificate settings requires reloading the window for Antigravity to apply them.",
+      options, "Reload Window", extra);
+    exports.dynamic = text => vscode.window.showInformationMessage(text, "Reload Window");
+    exports.escaped = () => vscode.window.showInformationMessage("\\x53ettings", "Reload Window");
+    exports.update = message => vscode.window.showInformationMessage(message, // upstream comment
+      "Restart Agent Server", "Later");
+    exports.progress = () => vscode.window.setStatusBarMessage("Antigravity: Sign-in successful", 3000);
+    exports.auth = {title:"Sign in to Antigravity",buttonLabel:"Log In",route:"Settings"};
+    class View { renderWebviewHtml(a,b,c,d) { a.html = c; } }
+  `;
+  fs.writeFileSync(path.join(dir, 'extension.js'), source);
+  assert.equal(installVsCodePatch(dir).success, true);
+  let seen;
+  let selection = 2;
+  const disposable = { dispose() {} };
+  const host = { window: {
+    showInformationMessage(...args) {
+      seen = args;
+      if (selection === 'error') return Promise.reject(new Error('native failure'));
+      return Promise.resolve(selection === undefined ? undefined : args[selection]);
+    },
+    setStatusBarMessage(...args) { seen = args; return disposable; }
+  } };
+  const module = { exports: {} };
+  new Function('require', 'module', 'exports', fs.readFileSync(path.join(dir, 'extension.js'), 'utf8'))(
+    name => name === 'vscode' ? host : {}, module, module.exports);
+  const options = { modal: true, detail: 'Settings' };
+  const extra = { title: 'Settings', isCloseAffordance: true };
+  assert.equal(await module.exports.notice(options, extra), 'Reload Window');
+  assert.equal(seen[0], '更改代理或 CA 证书设置后，需要重新加载窗口才能让 Antigravity 应用这些设置。');
+  assert.equal(seen[1], options);
+  assert.equal(seen[2].title, '重新加载窗口');
+  assert.equal(seen[3], extra);
+  selection = 3;
+  assert.equal(await module.exports.notice(options, extra), extra);
+  selection = undefined;
+  assert.equal(await module.exports.notice(options, extra), undefined);
+  selection = 'error';
+  await assert.rejects(module.exports.notice(options, extra), /native failure/);
+  selection = 1;
+  assert.equal(await module.exports.dynamic('Settings'), 'Reload Window');
+  assert.equal(seen[0], 'Settings');
+  assert.equal(await module.exports.escaped(), 'Reload Window');
+  assert.equal(seen[0], 'Settings');
+  assert.equal(await module.exports.update('Antigravity Backend v1.12.0-beta.2 is ready. Restart the agent server to apply the update.'), 'Restart Agent Server');
+  assert.equal(seen[0], 'Antigravity 后台 v1.12.0-beta.2 已就绪。重启智能体服务器即可应用更新。');
+  assert.equal(seen[1].title, '重启智能体服务器');
+  selection = 2;
+  assert.equal(await module.exports.update('Settings'), 'Later');
+  assert.equal(seen[0], 'Settings');
+  assert.equal(seen[2].title, '稍后');
+  assert.equal(await module.exports.update('constructor'), 'Later');
+  assert.equal(seen[0], 'constructor');
+  assert.equal(module.exports.progress(), disposable);
+  assert.deepEqual(seen, ['Antigravity：登录成功', 3000]);
+  assert.deepEqual(module.exports.auth, { title: '登录 Antigravity', buttonLabel: '登录', route: 'Settings' });
+  assert.equal(restoreVsCodePatch(dir).success, true);
+  assert.equal(fs.readFileSync(path.join(dir, 'extension.js'), 'utf8'), source);
+});
+
 test('repacking preserves mixed unpacked directories and individual files', (t) => {
   const dir = tempDir(t);
   const src = path.join(dir, 'source');

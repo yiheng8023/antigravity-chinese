@@ -1472,6 +1472,22 @@
     "replacement": "你好，$1。"
   },
   {
+    "regex": "^Welcome back, (.+)\\. Where should we pick up\\?$",
+    "replacement": "欢迎回来，$1。我们从哪里继续？"
+  },
+  {
+    "regex": "^Hey (.+), what should we build today\\?$",
+    "replacement": "你好，$1，今天想构建什么？"
+  },
+  {
+    "regex": "^Good to see you, (.+)\\. What's next\\?$",
+    "replacement": "很高兴见到你，$1。接下来做什么？"
+  },
+  {
+    "regex": "^Select project, current: (.+)$",
+    "replacement": "选择项目，当前：$1"
+  },
+  {
     "regex": "^Welcome back, (.+)\\.$",
     "replacement": "欢迎回来，$1。"
   },

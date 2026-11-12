@@ -518,7 +518,7 @@ function buildPatchedExtensionJs(content) {
   // Compiled extension UI objects use static double-quoted labels. Limit translation
   // to display fields, preserving codicons, command IDs, route values and dynamic data.
   const map = getVsCodeFullMap();
-  content = content.replace(/([,{]\s*)(label|tooltip|placeHolder)(\s*:\s*)("(?:\\.|[^"\\])*")/g,
+  content = content.replace(/([,{]\s*)(label|title|subtitle|buttonLabel|tooltip|placeHolder)(\s*:\s*)("(?:\\.|[^"\\])*")/g,
     (whole, prefix, field, colon, literal) => {
       let text;
       try { text = JSON.parse(literal); } catch (_) { return whole; }
@@ -526,6 +526,35 @@ function buildPatchedExtensionJs(content) {
       const translated = map[icon ? icon[2] : text];
       if (typeof translated !== 'string' || !translated) return whole;
       return prefix + field + colon + JSON.stringify((icon ? icon[1] : '') + translated);
+    });
+
+  const nativeTexts = {};
+  content = content.replace(/(\b[A-Za-z_$][\w$]*\.window)\.(showInformationMessage|showWarningMessage|showErrorMessage)\(\s*("(?:\\.|[^"\\])*")/g,
+    (whole, host, method, literal) => {
+      let text;
+      try { text = JSON.parse(literal); } catch (_) { return whole; }
+      if (typeof map[text] !== 'string' || !map[text]) return whole;
+      nativeTexts[text] = map[text];
+      return `__agyI18nMessage(${host}, ${JSON.stringify(method)}, ${literal}`;
+    });
+  const updateText = map['Antigravity Backend v{version} is ready. Restart the agent server to apply the update.'];
+  if (updateText) {
+    // This upstream call uses a versioned message variable and a fixed restart
+    // action. Translate at its display boundary, retaining the original log text.
+    content = content.replace(/(\b[A-Za-z_$][\w$]*\.window)\.showInformationMessage\(\s*([A-Za-z_$][\w$]*)\s*,(\s*(?:\/\/[^\r\n]*\r?\n\s*)?)"Restart Agent Server"/g,
+      (whole, host, message, spacing) => {
+        nativeTexts['Restart Agent Server'] = map['Restart Agent Server'];
+        nativeTexts.Later = map.Later;
+        const replacement = JSON.stringify(updateText.replace('{version}', '$1'));
+        return `__agyI18nMessage(${host}, "showInformationMessage", ${message}.replace(/^Antigravity Backend v([0-9A-Za-z][0-9A-Za-z.+-]*) is ready\\. Restart the agent server to apply the update\\.$/, ${replacement}),${spacing}"Restart Agent Server"`;
+      });
+  }
+  content = content.replace(/(\.(?:setStatusBarMessage|notifyMessage)\(\s*)("(?:\\.|[^"\\])*")/g,
+    (whole, prefix, literal) => {
+      let text;
+      try { text = JSON.parse(literal); } catch (_) { return whole; }
+      const translated = map[text];
+      return typeof translated === 'string' && translated ? prefix + JSON.stringify(translated) : whole;
     });
 
   // 2. 检查并注入 renderWebviewHtml 拦截（弹性兼容未压缩版与 1.8.0+ 压缩混淆版）
@@ -545,6 +574,25 @@ try {
 // --- AGY_VSCODE_I18N_PROXY_INJECTION_END ---
 `;
 
+  let nativeMessageHeader = '';
+  if (Object.keys(nativeTexts).length) {
+    for (const action of ['Reload Window', 'Turn Off Auto Save', 'Use Side-by-Side', "Don't Show Again", 'Send anyway']) {
+      if (map[action]) nativeTexts[action] = map[action];
+    }
+    // VS Code returns the selected MessageItem object. Map it back to the original
+    // action so upstream comparisons, option objects and cancellation keep working.
+    nativeMessageHeader = `const __agyNativeTexts = Object.assign(Object.create(null), ${JSON.stringify(nativeTexts)});
+function __agyI18nMessage(host, method, message, ...items) {
+  const shown = items.map(item => typeof item === 'string' && __agyNativeTexts[item]
+    ? { title: __agyNativeTexts[item] } : item);
+  return host[method](__agyNativeTexts[message] || message, ...shown).then(selected => {
+    const index = shown.indexOf(selected);
+    return index < 0 ? selected : items[index];
+  });
+}
+`;
+  }
+
   const interceptionCode = `${matchedSignature}\n` +
 `        // --- AGY_VSCODE_I18N_INTERCEPT_START ---
         try {
@@ -560,10 +608,11 @@ try {
         // --- AGY_VSCODE_I18N_INTERCEPT_END ---
 `;
 
-  content = proxyRequireHeader + content.replace(matchedSignature, interceptionCode);
+  const body = content.replace(matchedSignature, interceptionCode);
+  content = proxyRequireHeader + nativeMessageHeader + body;
 
   // 保留原模块的 strict 指令语义。
-  if (/^(?:\s|\/\/[^\n]*(?:\n|$)|\/\*[\s\S]*?\*\/)*(['"])use strict\1\s*;/.test(content.slice(proxyRequireHeader.length))) {
+  if (/^(?:\s|\/\/[^\n]*(?:\n|$)|\/\*[\s\S]*?\*\/)*(['"])use strict\1\s*;/.test(body)) {
     content = '"use strict";\n' + content;
   }
   new Function(content);

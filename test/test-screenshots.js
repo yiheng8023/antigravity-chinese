@@ -18,6 +18,15 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  { input: 'Welcome back, Alex. Where should we pick up?', expected: '欢迎回来，Alex。我们从哪里继续？' },
+  { input: 'Select project, current: No Project', expected: '选择项目，当前无项目关联' },
+  { input: 'Select project, current: Settings', expected: '选择项目，当前：Settings' },
+  { input: 'Hey Alex, what should we build today?', expected: '你好，Alex，今天想构建什么？' },
+  { input: "Good to see you, Alex. What's next?", expected: '很高兴见到你，Alex。接下来做什么？' },
+  { input: 'Hey there, what should we build today?', expected: '你好，今天想构建什么？' },
+  { input: 'Welcome back. Where should we pick up?', expected: '欢迎回来。我们从哪里继续？' },
+  { input: "Good to see you. What's next?", expected: '很高兴见到你。接下来做什么？' },
+  { input: 'Select an Antigravity action', expected: '选择 Antigravity 操作' },
   { input: 'Open Changelog', expected: '打开更新日志' },
   { input: 'Toggle Chat Focus', expected: '切换对话焦点' },
   { input: 'Focus Panel', expected: '聚焦面板' },

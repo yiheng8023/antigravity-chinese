@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.43** targets **Antigravity App 2.31.0 / VS Code extension 1.11.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.44** targets **Antigravity App 2.31.2 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release updates desktop 2.31.0 labels for browser download approvals, remote projects, and voice summaries. Download details, cloud project names, and voice summary content retain their original text. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [2.31.0 maintenance record](docs/maintenance/antigravity-2.31.0.md) and the [2.30.0 browser and marketplace record](docs/maintenance/antigravity-2.30.0.md).
+This release checks desktop 2.31.2 compatibility and translates certificate settings, sign-in and installation progress, backend update prompts and window reload notices in VS Code extension 1.12.0. Chinese notification buttons return the original action values to upstream handlers. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [2.31.2 and extension 1.12.0 maintenance record](docs/maintenance/antigravity-2.31.2.md) and the [2.31.0 download approval and content protection record](docs/maintenance/antigravity-2.31.0.md).
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 
@@ -12,8 +12,8 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.31.0 package-copy install/reinstall/restore, Appearance settings, and DOM samples for download approvals and voice summaries. See the maintenance record for verification scope. |
-| VS Code extension | Manifest/native-menu translation, local Webview proxy, separate backup/restore | Windows 1.11.0 package-copy install/reinstall/byte-identical restore, 16 menu states and proxy/DOM verification. Selected Chinese Webview controls were checked in the live client. |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | The Windows 2.31.2 frontend matches the 2.31.0 checksum. Installation, restore and UI verification scope is recorded in this maintenance pass. |
+| VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | Windows 1.12.0 package verification and notification action regressions. See this maintenance record for proxy and live-client checks. |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
 | Antigravity CLI | Preserves upstream behavior | CLI binaries and terminal UI are unchanged |

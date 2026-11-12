@@ -1,6 +1,6 @@
 {
   "name": "antigravity-chinese",
-  "version": "3.3.43",
+  "version": "3.3.44",
   "description": "Antigravity 桌面与 VS Code 扩展中文本地化、备份还原与维护工具 (Community Chinese localization and lifecycle tools)",
   "main": "cli.js",
   "engines": {
