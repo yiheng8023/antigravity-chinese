@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.46** targets **Antigravity App 2.31.2 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.47** targets **Antigravity App 2.32.1 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release applies consistent content boundaries to customizations. Skill, rule, plugin and custom-agent names and author descriptions retain their source text, while section headings, actions and fixed notices remain localized. It covers shared project and unassigned settings lists, cards, details and content dialogs. Code Preview, Chat Layout and browser address hints remain translated. The Swarm author description retains its English source under the same policy. To update, save your work, exit the clients, run `node cli.js install`, and reopen them. See the [customization content record](docs/maintenance/customization-content-boundaries.md) and the [2.31.2 and extension 1.12.0 maintenance record](docs/maintenance/antigravity-2.31.2.md).
+This release targets desktop 2.32.1 with prompt navigation, authorization-code sign-in, blocked-download and MCP startup status text. MCP server names, tool names and raw diagnostics retain their source text while adjacent actions remain localized. The shared author-content policy still covers project and unassigned skills, rules and plugins. Drift analysis no longer reads local skill or plugin inventories or counts author descriptions as missing translations. Save your work, exit the clients, run `node cli.js install`, then reopen them. See the [2.32.1 maintenance record](docs/maintenance/antigravity-2.32.1.md) and [customization content boundaries](docs/maintenance/customization-content-boundaries.md).
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 
@@ -12,7 +12,7 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | The Windows 2.31.2 frontend matches the 2.31.0 checksum. Installation, restore and UI verification scope is recorded in this maintenance pass. |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.32.1 package install/reinstall/restore and DOM checks using delivered scripts. See this maintenance record for the limits of visual acceptance. |
 | VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | Windows 1.12.0 package verification and notification action regressions. See this maintenance record for proxy and live-client checks. |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |

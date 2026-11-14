@@ -339,6 +339,16 @@ function runDriftFixture(target, report, home) {
     const os = require('os');
     const home = process.argv[4];
     os.homedir = () => home;
+    const fs = require('fs'), path = require('path');
+    const readdir = fs.readdirSync;
+    fs.readdirSync = (dir, ...args) => {
+      const localMetadata = path.join(home, '.gemini');
+      const resolved = path.resolve(dir);
+      if (resolved === localMetadata || resolved.startsWith(localMetadata + path.sep)) {
+        throw new Error('Author metadata must not be read for translation coverage');
+      }
+      return readdir(dir, ...args);
+    };
     const tool = process.argv[1];
     process.argv = [process.execPath, tool, process.argv[2], '--report', process.argv[3]];
     require(tool);
@@ -378,7 +388,28 @@ test('drift coverage is unknown when the bundle has no UI candidates', (t) => {
   const data = JSON.parse(fs.readFileSync(report, 'utf8'));
   assert.equal(data.metrics.observedCandidatesCount, 0);
   assert.equal(data.metrics.effectiveTranslationCoverage, null);
-  assert.equal(data.metrics.scannedSkillDescriptionsCount, 0);
+  assert.equal(data.scope.authorContent, 'preserve-source; not scanned');
+});
+
+test('drift analysis excludes author metadata even when it matches a UI dictionary entry', (t) => {
+  const dir = tempDir(t);
+  const target = path.join(dir, 'frontend.js');
+  const report = path.join(dir, 'report.json');
+  const skill = path.join(dir, '.gemini', 'antigravity', 'builtin', 'skills', 'fixture');
+  fs.mkdirSync(skill, { recursive: true });
+  fs.writeFileSync(path.join(skill, 'SKILL.md'), '---\nname: Settings\ndescription: Settings\n---\n');
+  const plugin = path.join(dir, '.gemini', 'config', 'plugins', 'fixture');
+  fs.mkdirSync(plugin, { recursive: true });
+  fs.writeFileSync(path.join(plugin, 'plugin.json'), JSON.stringify({ description: 'Private plugin description' }));
+  fs.writeFileSync(target, 'const labels = ["Settings", "Unmapped fixture button"];');
+  const result = runDriftFixture(target, report, dir);
+  assert.equal(result.status, 0, result.stderr);
+  const data = JSON.parse(fs.readFileSync(report, 'utf8'));
+  assert.equal(data.scope.authorContent, 'preserve-source; not scanned');
+  assert.equal(data.metrics.observedCandidatesCount, 2);
+  assert.equal(data.metrics.uncoveredCount, 1);
+  assert.equal(data.metrics.uncoveredBuiltinSkillsCount, undefined);
+  assert.doesNotMatch(result.stdout + JSON.stringify(data), /Private author|Private plugin|SKILL\.md|plugin\.json/);
 });
 
 async function listen(t, server) {

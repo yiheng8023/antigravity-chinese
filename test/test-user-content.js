@@ -24,6 +24,51 @@ async function fixture(t, html) {
   return { window, document: window.document, translate: window.__AGY_TRANSLATE_EL__ };
 }
 
+test('App 2.32 MCP status UI translates while server names, tools and diagnostics retain source', async t => {
+  const { document } = await fixture(t, `
+    <span data-testid="plugin-status-indicator" aria-label="2 MCP servers failed to start"></span>
+    <div data-testid="mcp-server-row">
+      <span class="font-medium shrink-0 text-foreground" title="Settings">Settings</span>
+      <div class="text-sm text-red-500 break-words min-w-0 flex-1">Error: <span>Settings</span></div>
+      <div class="text-sm text-red-500 break-words mt-1">Settings</div>
+      <button aria-pressed="true" aria-label="Settings">Settings</button>
+      <span class="px-2 py-0.5 rounded-full text-[11px] leading-4 border shrink-0">Settings</span>
+      <button id="fix">Fix with Agent</button><button id="restart">Restart</button>
+    </div>
+    <button id="outside">Settings</button>`);
+  assert.equal(document.querySelector('[data-testid="plugin-status-indicator"]').getAttribute('aria-label'), '2 个 MCP 服务器启动失败');
+  const row = document.querySelector('[data-testid="mcp-server-row"]');
+  assert.equal(row.querySelector('span[title]').textContent, 'Settings');
+  assert.equal(row.querySelector('span[title]').title, 'Settings');
+  assert.equal(row.querySelector('div').textContent, 'Error: Settings');
+  assert.equal(row.querySelector('div.mt-1').textContent, 'Settings');
+  assert.equal(row.querySelector('[aria-pressed]').textContent, 'Settings');
+  assert.equal(row.querySelector('[aria-pressed]').getAttribute('aria-label'), 'Settings');
+  assert.equal(row.querySelector('span.rounded-full').textContent, 'Settings');
+  assert.equal(document.querySelector('#fix').textContent, '使用智能体修复');
+  assert.equal(document.querySelector('#restart').textContent, '重启');
+  assert.equal(document.querySelector('#outside').textContent, '设置');
+});
+
+test('App 2.32 sign-in controls translate without rewriting authorization input or model names', async t => {
+  const { document } = await fixture(t, `
+    <div data-testid="onboarding-auth-code-panel">
+      <label>Authorization code</label><input type="password" placeholder="Paste authorization code" value="Settings">
+      <button>Submit code</button>
+    </div>
+    <button title="Jump to Previous Prompt">Submit Prompt (Alternate to Enter)</button>
+    <div data-testid="model-selector-item">Gemini 4 Hydrogen</div>
+    <div data-testid="user-input-step">Copy sign-in link</div>`);
+  assert.equal(document.querySelector('label').textContent, '授权码');
+  assert.equal(document.querySelector('input').placeholder, '粘贴授权码');
+  assert.equal(document.querySelector('input').value, 'Settings');
+  assert.equal(document.querySelector('button').textContent, '提交授权码');
+  assert.equal(document.querySelector('button[title]').title, '跳转到上一条提示词');
+  assert.equal(document.querySelector('button[title]').textContent, '提交提示词（替代 Enter）');
+  assert.equal(document.querySelector('[data-testid="model-selector-item"]').textContent, 'Gemini 4 Hydrogen');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Copy sign-in link');
+});
+
 test('sent user messages preserve dictionary matches, nested labels and attributes', async t => {
   const { document } = await fixture(t, `
     <button id="settings">Settings</button>

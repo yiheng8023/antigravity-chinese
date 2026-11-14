@@ -668,5 +668,19 @@
   "Move Conversation Up": "上移会话",
   "Move conversation up": "上移会话",
   "Move Conversation Down": "下移会话",
-  "Move conversation down": "下移会话"
+  "Move conversation down": "下移会话",
+  "Jump to Previous Prompt": "跳转到上一条提示词",
+  "Jump to Next Prompt": "跳转到下一条提示词",
+  "Submit Prompt (Alternate to Enter)": "提交提示词（替代 Enter）",
+  "Copy sign-in link": "复制登录链接",
+  "Trouble signing in? Enter authorization code": "登录遇到问题？输入授权码",
+  "Sign in in your browser, then paste the authorization code shown on the callback page.": "在浏览器中登录，然后粘贴回调页面显示的授权码。",
+  "Authorization code": "授权码",
+  "Paste authorization code": "粘贴授权码",
+  "Submit code": "提交授权码",
+  "Authorization code was rejected. Paste a fresh code and try again.": "授权码被拒绝。请粘贴新的授权码后重试。",
+  "Blocked: file type not allowed": "已阻止：不允许此文件类型",
+  "Default needs the terminal sandbox, which isn't available on this host.": "默认模式需要终端沙箱，但此主机不支持终端沙箱。",
+  "Auto needs the terminal sandbox, which isn't available on this host.": "自动模式需要终端沙箱，但此主机不支持终端沙箱。",
+  "Default and Auto need the terminal sandbox, which isn't available on this host.": "默认和自动模式需要终端沙箱，但此主机不支持终端沙箱。"
 }

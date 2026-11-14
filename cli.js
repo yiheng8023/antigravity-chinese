@@ -633,7 +633,9 @@ function install(customPath) {
 
   // Check if already patched
   if (preloadContent.includes('Antigravity Chinese Localization Injection')) {
-    const regex = /\/\/ --- Antigravity Chinese Localization Injection Start ---[\s\S]*?\/\/ --- Antigravity Chinese Localization Injection End ---/g;
+    // Remove the two separators and final newline owned by getBundleScript(),
+    // preserving any original trailing newline instead of accumulating blanks.
+    const regex = /(?:\r?\n){0,2}\/\/ --- Antigravity Chinese Localization Injection Start ---[\s\S]*?\/\/ --- Antigravity Chinese Localization Injection End ---(?:\r?\n)?/g;
     preloadContent = preloadContent.replace(regex, '');
   }
 

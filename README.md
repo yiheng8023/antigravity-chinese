@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-当前源码版本 **v3.3.46**，维护目标为 **Antigravity App 2.31.2 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.47**，维护目标为 **Antigravity App 2.32.1 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版统一自定义扩展的内容边界。技能、规则、插件和自定义智能体的名称与作者说明保留原文，栏目、按钮和固定提示继续汉化，覆盖项目内与未归属项目的共享列表，以及卡片、详情和内容弹窗。保留代码预览、对话布局和地址栏提示的界面译文，Swarm 作者说明按统一规则保留英文。更新补丁时，在保存工作并退出客户端后运行 `node cli.js install`，再重新打开。详见 [自定义扩展内容边界记录](docs/maintenance/customization-content-boundaries.md) 和 [2.31.2 与扩展 1.12.0 维护记录](docs/maintenance/antigravity-2.31.2.md)。
+本版适配桌面 2.32.1，补充提示词导航、授权码登录、下载拦截和 MCP 启动状态文案。MCP 服务器名、工具名与原始诊断保留原文，相邻操作继续汉化；项目内与未归属项目的技能、规则和插件沿用统一的作者内容保护。漂移分析不再扫描本机技能或插件清单、将作者说明计作漏译。更新前保存工作并退出客户端，运行 `node cli.js install` 后重新打开。详见 [2.32.1 维护记录](docs/maintenance/antigravity-2.32.1.md) 和 [自定义扩展内容边界](docs/maintenance/customization-content-boundaries.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。相关适配与验证见 [1.11.0 维护记录](docs/maintenance/vscode-1.11.0.md) 和 [桌面 2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
 
@@ -12,7 +12,7 @@ VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node
 
 | 组件 | 实现 | 当前验证范围 |
 | --- | --- | --- |
-| Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows 2.31.2 前端与 2.31.0 校验一致；安装、还原和界面验证范围见本次维护记录 |
+| Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows 2.32.1 安装包、安装/重复安装/还原与实际交付脚本的 DOM 验证；逐项视觉验收范围见本次维护记录 |
 | VS Code 扩展 | 清单、原生菜单和通知翻译、Webview 本地代理、独立备份/还原 | Windows 1.12.0 安装包验证与通知按钮回归；代理和实机检查范围见本次维护记录 |
 | 社区中文插件 | 中文交互规则与维护诊断技能 | 可选安装；不代表 Google 官方插件 |
 | 独立 IDE、其他 IDE 扩展 | 尚无专用汉化安装器 | 不声明已适配 |

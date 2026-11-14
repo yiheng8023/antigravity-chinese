@@ -8,12 +8,11 @@
  * 2. [Exact Match Coverage]   词典直接精确命中的覆盖率 (exact mapping)
  * 3. [Rule-Assisted Coverage] 经正则 patterns + 全句拆分 + 快捷键组合处理后的有效翻译覆盖率
  * 4. [False-Positive Guard]   严格拦截“半英半中”假阳性残片，严禁将半截翻译计入有效覆盖
- * 5. [Builtin/Plugin YAML]    自动解析 ~/.gemini/antigravity/builtin 与 plugins 的多行 YAML 描述
+ * 5. [Author Content]        作者内容不读取、不计入漏译，遵循运行时内容保护边界
  * 6. [Decayed / Stale Rules]  反向检测词典中在当前版本未被观测到的历史词条
  */
 
 const fs = require('fs');
-const os = require('os');
 const path = require('path');
 
 const dictPath = path.join(__dirname, '..', 'dict', 'zh-CN.json');
@@ -94,93 +93,6 @@ function isLikelyUIText(s) {
   return /[a-zA-Z]{2}/.test(s);
 }
 
-// 解析 SKILL.md 的多行 YAML frontmatter
-function parseYamlFrontmatter(content) {
-  const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
-  if (!match) return {};
-  const lines = match[1].split(/\r?\n/);
-  const result = {};
-  let currentKey = null;
-  let multilineMode = null;
-  let buffer = [];
-  function flush() {
-    if (currentKey && buffer.length > 0) {
-      if (multilineMode === '>' || multilineMode === '>-') {
-        result[currentKey] = buffer.map(s => s.trim()).filter(Boolean).join(' ');
-      } else {
-        result[currentKey] = buffer.join('\n').trim();
-      }
-    }
-    currentKey = null;
-    multilineMode = null;
-    buffer = [];
-  }
-  for (const line of lines) {
-    const keyMatch = line.match(/^([a-zA-Z0-9_\-]+):\s*(.*)$/);
-    if (keyMatch && !line.startsWith(' ') && !line.startsWith('\t')) {
-      flush();
-      const key = keyMatch[1];
-      let val = keyMatch[2].trim();
-      if (val === '>' || val === '>-' || val === '|' || val === '|-') {
-        currentKey = key;
-        multilineMode = val;
-      } else {
-        if ((val.startsWith('"') && val.endsWith('"')) || (val.startsWith("'") && val.endsWith("'"))) {
-          val = val.slice(1, -1);
-        }
-        result[key] = val;
-      }
-    } else if (currentKey && (line.startsWith(' ') || line.startsWith('\t') || line.trim() === '')) {
-      buffer.push(line);
-    }
-  }
-  flush();
-  return result;
-}
-
-function scanBuiltinAndPluginSkills() {
-  const home = os.homedir();
-  const dirs = [
-    path.join(home, '.gemini', 'antigravity', 'builtin'),
-    path.join(home, '.gemini', 'config', 'plugins')
-  ];
-  const uncoveredSkills = [];
-  let scannedDescriptions = 0;
-  function walk(dir) {
-    if (!fs.existsSync(dir)) return;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (entry.name !== 'node_modules' && entry.name !== '.git') walk(full);
-      } else if (entry.name.endsWith('.md')) {
-        const fm = parseYamlFrontmatter(fs.readFileSync(full, 'utf8'));
-        if (typeof fm.description === 'string') scannedDescriptions++;
-        if (fm.description && !/[\u4e00-\u9fa5]/.test(fm.description)) {
-          const norm = engine.normalizeWhitespace(fm.description);
-          const trans = emulateTranslation(norm);
-          if (!trans || trans.type === 'false_positive') {
-            uncoveredSkills.push({ file: full, description: norm, status: trans ? 'half_translated' : 'untranslated' });
-          }
-        }
-      } else if (entry.name === 'plugin.json') {
-        try {
-          const pj = JSON.parse(fs.readFileSync(full, 'utf8'));
-          if (typeof pj.description === 'string') scannedDescriptions++;
-          if (pj.description && !/[\u4e00-\u9fa5]/.test(pj.description)) {
-            const norm = engine.normalizeWhitespace(pj.description);
-            const trans = emulateTranslation(norm);
-            if (!trans || trans.type === 'false_positive') {
-              uncoveredSkills.push({ file: full, description: norm, status: trans ? 'half_translated' : 'untranslated' });
-            }
-          }
-        } catch {}
-      }
-    }
-  }
-  for (const d of dirs) walk(d);
-  return { uncoveredSkills, scannedDescriptions };
-}
-
 const args = process.argv.slice(2);
 const targetBundlePath = args[0];
 const reportIndex = args.indexOf('--report');
@@ -196,17 +108,7 @@ const reportPath = reportIndex === -1 ? path.join(__dirname, 'drift-report.json'
 console.log('🔍 [Drift Detector] 启动 Antigravity 文本漂移与版本演进分析器...');
 console.log(`📖 当前词典收录条目数: ${exactKeys.length} 项精确规则, ${patterns.length} 组正则规则\n`);
 
-const { uncoveredSkills, scannedDescriptions } = scanBuiltinAndPluginSkills();
-if (!scannedDescriptions) {
-  console.log('[Builtin & Plugin Skills] 未读取到技能描述，未评估该部分覆盖情况。');
-} else if (uncoveredSkills.length === 0) {
-  console.log(`[Builtin & Plugin Skills] 已读取的 ${scannedDescriptions} 项描述中未发现未覆盖项。`);
-} else {
-  console.log(`⚠️ [Builtin & Plugin Skills] 发现 ${uncoveredSkills.length} 项未完全覆盖的技能描述:`);
-  for (const item of uncoveredSkills) {
-    console.log(`   - [${item.status}] ${item.file}: ${item.description.slice(0, 80)}...`);
-  }
-}
+console.log('[Author Content] 作者内容保留原文；本机技能和插件清单不参与扫描。前端字符串候选仍需按上下文复核。');
 
 const content = fs.readFileSync(targetBundlePath, 'utf-8');
 console.log(`📦 正在分析目标文件: ${targetBundlePath} (${(content.length / 1024 / 1024).toFixed(2)} MB)`);
@@ -273,6 +175,7 @@ console.log(`6. [Decayed / Stale Rules]  当前版本未观测到的历史词条
 const report = {
   timestamp: new Date().toISOString(),
   targetFile: targetBundlePath,
+  scope: { frontend: 'static-string-candidates-only', authorContent: 'preserve-source; not scanned', runtimeCoverage: 'not-measured' },
   metrics: {
     observedCandidatesCount: totalObserved,
     exactMatchesCount: exactMatchedCount,
@@ -282,9 +185,7 @@ const report = {
     totalCoveredCount: totalCovered,
     effectiveTranslationCoverage: totalEffectiveCoveragePct,
     uncoveredCount: uncoveredList.length,
-    staleEntriesCount: staleEntries.length,
-    uncoveredBuiltinSkillsCount: uncoveredSkills.length,
-    scannedSkillDescriptionsCount: scannedDescriptions
+    staleEntriesCount: staleEntries.length
   },
   falsePositivesSample: falsePositiveList.slice(0, 50),
   decayedRulesSample: staleEntries.slice(0, 50),

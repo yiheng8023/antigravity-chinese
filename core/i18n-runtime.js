@@ -295,6 +295,15 @@
     return false;
   }
 
+  function isMcpServerContent(el) {
+    // App 2.32.1 renders identifiers and raw startup diagnostics beside controls.
+    // Keep those source values intact without suppressing Restart/status labels.
+    var content = el.matches('span.font-medium.shrink-0[title], div.text-sm.text-red-500.break-words, button[aria-pressed]') ||
+      (el.tagName === 'SPAN' && el.classList.contains('rounded-full') &&
+        el.classList.contains('shrink-0') && el.classList.contains('text-[11px]'));
+    return content && !!el.closest('[data-testid="mcp-server-row"]');
+  }
+
   function isProtectedBoundary(el) {
     if (IGNORED_TAGS[el.tagName]) return true;
     if (el.isContentEditable || el.getAttribute('contenteditable') === '' ||
@@ -322,7 +331,7 @@
         if (CONTENT_CLASSES[classes[ci]] === 1) return true;
       }
     }
-    return isCustomizationContent(el);
+    return isCustomizationContent(el) || isMcpServerContent(el);
   }
 
   function getMixedContentKind(el) {

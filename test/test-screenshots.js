@@ -18,6 +18,26 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  // App 2.32.1: fixed UI from the shipped frontend; author text and identifiers stay original in DOM tests.
+  { input: 'Jump to Previous Prompt', expected: '跳转到上一条提示词' },
+  { input: 'Jump to Next Prompt', expected: '跳转到下一条提示词' },
+  { input: 'Submit Prompt (Alternate to Enter)', expected: '提交提示词（替代 Enter）' },
+  { input: 'Copy sign-in link', expected: '复制登录链接' },
+  { input: 'Trouble signing in? Enter authorization code', expected: '登录遇到问题？输入授权码' },
+  { input: 'Sign in in your browser, then paste the authorization code shown on the callback page.', expected: '在浏览器中登录，然后粘贴回调页面显示的授权码。' },
+  { input: 'Authorization code', expected: '授权码' },
+  { input: 'Paste authorization code', expected: '粘贴授权码' },
+  { input: 'Submit code', expected: '提交授权码' },
+  { input: 'Authorization code was rejected. Paste a fresh code and try again.', expected: '授权码被拒绝。请粘贴新的授权码后重试。' },
+  { input: 'Blocked: file type not allowed', expected: '已阻止：不允许此文件类型' },
+  { input: 'Sign in required', expected: '需要登录' },
+  { input: 'Starting', expected: '正在启动' },
+  { input: 'Fix with Agent', expected: '使用智能体修复' },
+  { input: '1 MCP server failed to start', expected: '1 个 MCP 服务器启动失败' },
+  { input: '12 MCP servers failed to start', expected: '12 个 MCP 服务器启动失败' },
+  { input: "Default needs the terminal sandbox, which isn't available on this host.", expected: '默认模式需要终端沙箱，但此主机不支持终端沙箱。' },
+  { input: "Auto needs the terminal sandbox, which isn't available on this host.", expected: '自动模式需要终端沙箱，但此主机不支持终端沙箱。' },
+  { input: "Default and Auto need the terminal sandbox, which isn't available on this host.", expected: '默认和自动模式需要终端沙箱，但此主机不支持终端沙箱。' },
   { input: 'Welcome back, Alex. Where should we pick up?', expected: '欢迎回来，Alex。我们从哪里继续？' },
   { input: 'Select project, current: No Project', expected: '选择项目，当前无项目关联' },
   { input: 'Select project, current: Settings', expected: '选择项目，当前：Settings' },

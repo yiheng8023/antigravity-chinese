@@ -1554,5 +1554,9 @@
   {
     "regex": "^Version (\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?)$",
     "replacement": "版本 $1"
+  },
+  {
+    "regex": "^(\\d+) MCP servers? failed to start$",
+    "replacement": "$1 个 MCP 服务器启动失败"
   }
 ]

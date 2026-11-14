@@ -1,6 +1,6 @@
 {
-  "version": "3.3.46",
-  "buildTime": "2026-11-12T05:16:04.454Z",
+  "version": "3.3.47",
+  "buildTime": "2026-11-14T05:51:13.123Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -3522,6 +3522,9 @@
     "Uses Chrome DevTools MCP for inspecting, debugging, and testing cookies, session state, authentication issues, and cookie consent compliance. Use when diagnosing 401/403 errors, authentication redirects, session expiration, Cookie/Set-Cookie header issues, cookie banner consent conformance, or third-party cookie/SameSite/Partitioned cookie warnings.": "使用 Chrome DevTools MCP 检查、调试和测试 Cookie、会话状态、身份验证问题以及 Cookie 同意合规性。适用于诊断 401/403 错误、身份验证重定向、会话过期、Cookie/Set-Cookie 标头问题、Cookie 横幅授权合规性或第三方 Cookie/SameSite/Partitioned 警告。",
     "Diagnoses and resolves memory leaks in JavaScript/Node.js applications. Use when a user reports high memory usage, OOM errors, or wants to capture, compare, or inspect heap snapshots with Chrome DevTools MCP memory tools.": "诊断并解决 JavaScript / Node.js 应用程序中的内存泄漏。适用于用户报告高内存占用、OOM 内存溢出错误，或需要使用 Chrome DevTools MCP 内存工具捕获、比对或检查堆快照 (Heap Snapshots)。",
     "Search tool for modern web development best practices. MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks. Do NOT skip — web APIs evolve rapidly and training weights contain obsolete patterns.": "现代 Web 开发最佳实践搜索工具。强制要求：针对所有 HTML/CSS 及客户端 JS 任务必须首先执行此工具。请勿跳过 —— Web API 演进迅速，训练权重可能包含已过时的模式。",
+    "Sign in required": "需要登录",
+    "Starting": "正在启动",
+    "Restart": "重启",
     "Open Changelog": "打开更新日志",
     "Toggle Chat Focus": "切换对话焦点",
     "Code Preview": "代码预览",
@@ -4191,7 +4194,21 @@
     "Move Conversation Up": "上移会话",
     "Move conversation up": "上移会话",
     "Move Conversation Down": "下移会话",
-    "Move conversation down": "下移会话"
+    "Move conversation down": "下移会话",
+    "Jump to Previous Prompt": "跳转到上一条提示词",
+    "Jump to Next Prompt": "跳转到下一条提示词",
+    "Submit Prompt (Alternate to Enter)": "提交提示词（替代 Enter）",
+    "Copy sign-in link": "复制登录链接",
+    "Trouble signing in? Enter authorization code": "登录遇到问题？输入授权码",
+    "Sign in in your browser, then paste the authorization code shown on the callback page.": "在浏览器中登录，然后粘贴回调页面显示的授权码。",
+    "Authorization code": "授权码",
+    "Paste authorization code": "粘贴授权码",
+    "Submit code": "提交授权码",
+    "Authorization code was rejected. Paste a fresh code and try again.": "授权码被拒绝。请粘贴新的授权码后重试。",
+    "Blocked: file type not allowed": "已阻止：不允许此文件类型",
+    "Default needs the terminal sandbox, which isn't available on this host.": "默认模式需要终端沙箱，但此主机不支持终端沙箱。",
+    "Auto needs the terminal sandbox, which isn't available on this host.": "自动模式需要终端沙箱，但此主机不支持终端沙箱。",
+    "Default and Auto need the terminal sandbox, which isn't available on this host.": "默认和自动模式需要终端沙箱，但此主机不支持终端沙箱。"
   },
   "patterns": [
     {
@@ -5749,6 +5766,10 @@
     {
       "regex": "^Version (\\d+\\.\\d+\\.\\d+(?:[-+][A-Za-z0-9.-]+)?)$",
       "replacement": "版本 $1"
+    },
+    {
+      "regex": "^(\\d+) MCP servers? failed to start$",
+      "replacement": "$1 个 MCP 服务器启动失败"
     }
   ]
 }
