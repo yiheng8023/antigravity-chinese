@@ -11,10 +11,11 @@ function settle(window) {
   return new Promise(resolve => window.setTimeout(resolve, 40));
 }
 
-async function fixture(t, html) {
+async function fixture(t, html, options = {}) {
   const dom = new JSDOM('<!doctype html><body>' + html + '</body>', {
     runScripts: 'outside-only',
-    pretendToBeVisual: true
+    pretendToBeVisual: true,
+    url: options.url
   });
   t.after(() => dom.window.close());
   const { window } = dom;
@@ -22,6 +23,97 @@ async function fixture(t, html) {
   window.eval(runtime);
   await settle(window);
   return { window, document: window.document, translate: window.__AGY_TRANSLATE_EL__ };
+}
+
+test('complete shortcut rows translate descriptions and toggle labels while authored copies stay intact', async t => {
+  const { document } = await fixture(t, `
+    <section><h3>Submit Prompt (Alternate to Enter)</h3>
+      <p>Enter always submits. This adds a second shortcut.</p>
+      <button title="Pin / Unpin Conversation">Pin / Unpin Conversation</button></section>
+    <div data-testid="user-input-step">Enter always submits. This adds a second shortcut.</div>
+    <div data-testid="workspace-customizations-view"><span class="font-medium truncate" data-tooltip-id="skill">Pin / Unpin Conversation</span></div>`);
+  assert.equal(document.querySelector('section p').textContent, 'Enter 始终用于提交。此处可添加第二个提交快捷键。');
+  assert.equal(document.querySelector('section button').textContent, '置顶 / 取消置顶会话');
+  assert.equal(document.querySelector('section button').title, '置顶 / 取消置顶会话');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Enter always submits. This adds a second shortcut.');
+  assert.equal(document.querySelector('[data-tooltip-id="skill"]').textContent, 'Pin / Unpin Conversation');
+});
+
+test('side-question chrome translates without rewriting the question, answer or quoted command', async t => {
+  const { document } = await fixture(t, `
+    <div data-testid="side-question-panel">
+      <span data-testid="side-question-question"><span class="shrink-0">Side Question:</span><span class="truncate">Settings</span></span>
+      <div data-testid="side-question-answer"><span class="opacity-70 animate-pulse">Thinking...</span><div>Settings<button>Log in</button></div></div>
+      <button>Side Questions</button>
+    </div>
+    <div class="selection-quote-popup"><button>Ask /btw</button></div>
+    <div data-testid="user-input-step">Ask /btw</div>`);
+  assert.equal(document.querySelector('.shrink-0').textContent, '旁路提问：');
+  assert.equal(document.querySelector('.truncate').textContent, 'Settings');
+  assert.equal(document.querySelector('[data-testid="side-question-answer"] > div').textContent, 'SettingsLog in');
+  assert.equal(document.querySelector('.animate-pulse').textContent, '深度思考中...');
+  assert.equal(document.querySelector('[data-testid="side-question-panel"] > button').textContent, '旁路提问');
+  assert.equal(document.querySelector('.selection-quote-popup button').textContent, '提问 /btw');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Ask /btw');
+});
+
+test('relative clocks translate only UI timestamps, including updates and reparenting', async t => {
+  const { window, document } = await fixture(t, `
+    <div data-testid="agent-message"><div data-testid="cascade-system-message-toolbar"><span id="clock" data-screenshot-volatile="true" data-tooltip-id="time" class="text-sm whitespace-nowrap">1mo ago</span></div>
+      <div class="prose"><span data-screenshot-volatile="true" data-tooltip-id="fake" class="whitespace-nowrap">1mo ago</span></div></div>
+    <div data-testid="conversation-row-sidebar"><span class="tabular-nums" data-screenshot-volatile="true">2w</span></div><p>1mo ago</p>`);
+  const clock = document.querySelector('#clock');
+  assert.equal(clock.textContent, '1个月前');
+  assert.equal(document.querySelector('.tabular-nums').textContent, '2周');
+  assert.equal(document.querySelector('.prose span').textContent, '1mo ago');
+  assert.equal(document.querySelector('p').textContent, '1mo ago');
+  clock.textContent = 'about 2h ago';
+  await settle(window);
+  assert.equal(clock.textContent, '约 2小时前');
+  document.querySelector('.prose').appendChild(clock);
+  await settle(window);
+  assert.equal(clock.textContent, 'about 2h ago');
+});
+
+test('customization route translates only its fixed home breadcrumb, never resource or project names', async t => {
+  const html = `<div id="crumbs"><div><span data-testid="breadcrumb-segment">Customizations</span></div><div><span data-testid="breadcrumb-segment">Customizations</span></div></div>`;
+  const ui = await fixture(t, html, { url: 'https://127.0.0.1/customizations/gdocs' });
+  const crumbs = ui.document.querySelectorAll('[data-testid="breadcrumb-segment"]');
+  assert.equal(crumbs[0].textContent, '自定义扩展');
+  assert.equal(crumbs[1].textContent, 'Customizations');
+  ui.window.history.pushState({}, '', '/conversations/example');
+  ui.document.body.appendChild(ui.document.createElement('hr'));
+  await settle(ui.window);
+  assert.equal(crumbs[0].textContent, 'Customizations');
+  const project = await fixture(t, html, { url: 'https://127.0.0.1/conversations/example' });
+  for (const crumb of project.document.querySelectorAll('[data-testid="breadcrumb-segment"]')) assert.equal(crumb.textContent, 'Customizations');
+});
+
+for (const ownership of ['project', 'unassigned']) {
+  test(`all reviewed UI phrases retain source as customization content in ${ownership} settings`, async t => {
+    const { document, translate } = await fixture(t, '<div data-testid="workspace-customizations-view"></div><button id="action">Commands</button>');
+    const sources = require('./fixtures/app-2.32.1-ui.json').ui;
+    const root = document.querySelector('[data-testid="workspace-customizations-view"]');
+    root.setAttribute('data-owner-fixture', ownership);
+    const fragment = document.createDocumentFragment();
+    const fields = [];
+    for (const text of sources) {
+      const field = document.createElement('span');
+      field.className = 'font-medium truncate';
+      field.setAttribute('data-tooltip-id', 'resource-' + fields.length);
+      field.title = text;
+      field.textContent = text;
+      fragment.append(field);
+      fields.push(field);
+    }
+    root.append(fragment);
+    translate(root);
+    fields.forEach((field, i) => {
+      assert.equal(field.textContent, sources[i]);
+      assert.equal(field.title, sources[i]);
+    });
+    assert.equal(document.querySelector('#action').textContent, '命令');
+  });
 }
 
 test('App 2.32 MCP status UI translates while server names, tools and diagnostics retain source', async t => {

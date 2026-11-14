@@ -1,5 +1,29 @@
 [
   {
+    "regex": "^Start Best-of-(\\d+)$",
+    "replacement": "启动 Best-of-$1"
+  },
+  {
+    "regex": "^No MCP servers found for \"(.*)\"$",
+    "replacement": "未找到匹配“$1”的 MCP 服务器"
+  },
+  {
+    "regex": "^Permanently delete (.+) including (\\d+) conversations?\\.$",
+    "replacement": "永久删除 $1 及其中的 $2 个会话。"
+  },
+  {
+    "regex": "^(\\d+) selected$",
+    "replacement": "已选 $1 项"
+  },
+  {
+    "regex": "^(\\d+) plugins available\\.$",
+    "replacement": "有 $1 个可用插件"
+  },
+  {
+    "regex": "^(\\d+) resources$",
+    "replacement": "$1 项资源"
+  },
+  {
     "regex": "^Work locally on (.+)$",
     "replacement": "在 $1 上本地工作"
   },

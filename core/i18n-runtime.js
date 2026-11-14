@@ -311,7 +311,7 @@
     if (isModelSelectorBoundary(el)) return true;
 
     var testId = el.getAttribute('data-testid');
-    if (CONTENT_TEST_IDS[testId] === 1 || el.hasAttribute('data-ag-localization-skip') ||
+    if ((CONTENT_TEST_IDS[testId] === 1 && !isCustomizationBreadcrumb(el)) || el.hasAttribute('data-ag-localization-skip') ||
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
     if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
@@ -334,10 +334,21 @@
     return isCustomizationContent(el) || isMcpServerContent(el);
   }
 
+  function isCustomizationBreadcrumb(el) {
+    // The first segment on the dedicated customization route is navigation UI.
+    // Plugin/project names, later segments and the same name on other routes stay protected.
+    if (el.getAttribute('data-testid') !== 'breadcrumb-segment' ||
+        !/^\/customizations(?:\/|$)/.test(doc.location.pathname) ||
+        !/^(Customizations|自定义扩展)$/.test(el.textContent.trim())) return false;
+    var group = el.parentElement && el.parentElement.parentElement;
+    return !!group && group.querySelector('[data-testid="breadcrumb-segment"]') === el;
+  }
+
   function getMixedContentKind(el) {
     var testId = el.getAttribute('data-testid');
     if (testId === 'agent-message' || testId === 'agent-response') return 'message';
     if (testId === 'conversation-row-sidebar') return 'conversation';
+    if (testId === 'side-question-question' || testId === 'side-question-answer') return 'side-question';
     var role = el.getAttribute('role');
     if (role === 'tree' || role === 'treeitem') return 'tree';
     return null;
@@ -346,7 +357,29 @@
   function isMessageUiControl(el) {
     var role = el.getAttribute('role');
     return el.tagName === 'BUTTON' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ||
-      role === 'button' || role === 'status' || el.getAttribute('data-testid') === 'plan-command-fyi-alert';
+      role === 'button' || role === 'status' || el.getAttribute('data-testid') === 'plan-command-fyi-alert' ||
+      isSideQuestionUi(el) || isTimestampUi(el);
+  }
+
+  function isSideQuestionUi(el) {
+    return el.matches('[data-testid="side-question-question"] > span.shrink-0, [data-testid="side-question-answer"] > span.opacity-70.animate-pulse');
+  }
+
+  function isTimestampUi(el) {
+    if (!el || el.nodeType !== 1 || el.tagName !== 'SPAN' || !el.hasAttribute('data-screenshot-volatile')) return false;
+    return (el.hasAttribute('data-tooltip-id') && el.classList.contains('whitespace-nowrap')) ||
+      (el.classList.contains('tabular-nums') && !!el.closest('[data-testid="conversation-row-sidebar"]'));
+  }
+
+  function translateUiText(text, el) {
+    // Compact relative times belong to UI clocks, never arbitrary message text.
+    if (isTimestampUi(el)) {
+      var clock = text.match(/^(?:(about|over|almost|less than) )?(\d+)(mo|m|h|d|w|y)( ago)?$/);
+      if (clock) return ({about: '约 ', over: '超过 ', almost: '将近 ', 'less than': '不到 '}[clock[1]] || '') +
+        clock[2] + ({mo: '个月', m: '分钟', h: '小时', d: '天', w: '周', y: '年'}[clock[3]]) + (clock[4] ? '前' : '');
+      if (text === 'now' || text === 'just now') return '刚刚';
+    }
+    return translateSingleUnit(text);
   }
 
   // 0: protect the entire subtree; 1: traverse mixed content, preserving its own
@@ -367,8 +400,10 @@
         if (kind === 'conversation' && inLink) return 0;
         if (!control) {
           preserveContent = true;
+        } else if (kind === 'side-question' && !isSideQuestionUi(control)) {
+          preserveContent = true;
         } else if (kind === 'message' && !inToolbar && control.parentElement !== current &&
-            control.getAttribute('data-testid') !== 'plan-command-fyi-alert') {
+            control.getAttribute('data-testid') !== 'plan-command-fyi-alert' && !isTimestampUi(control)) {
           // Unmarked legacy bodies can contain buttons. A nested button alone is not UI chrome.
           preserveContent = true;
         } else if (kind === 'tree' && (control.hasAttribute('data-uri') ||
@@ -462,7 +497,7 @@
       return;
     }
 
-    var translated = translateSingleUnit(trimmed);
+    var translated = translateUiText(trimmed, parent);
     if (translated !== null && translated !== trimmed) {
       var leadingSpace = original.match(/^\s*/)[0];
       var trailingSpace = original.match(/\s*$/)[0];
@@ -568,7 +603,7 @@
       if (allText) {
         var combinedText = el.textContent;
         if (combinedText) {
-          var combinedTrans = translateSingleUnit(combinedText);
+          var combinedTrans = translateUiText(combinedText, el);
           if (combinedTrans !== null && combinedTrans !== combinedText) {
             writeLocalizedText(first, combinedTrans);
             var other = first.nextSibling;
@@ -656,6 +691,7 @@
 
   // ---- 节流与去重：合并高频 mutation 到下一个 rAF ----
   var pendingNodes = [];
+  var observedDocumentPath = doc && doc.location ? doc.location.pathname : '';
   var pendingNodeSet = typeof Set !== 'undefined' ? new Set() : null;
   var rafScheduled = false;
 
@@ -702,6 +738,12 @@
   }
 
   function recordMutations(mutations) {
+    // A SPA route can reuse an unchanged breadcrumb node with a different role.
+    if (doc.location.pathname !== observedDocumentPath) {
+      observedDocumentPath = doc.location.pathname;
+      var breadcrumbs = doc.querySelectorAll('[data-testid="breadcrumb-segment"]');
+      for (var bi = 0; bi < breadcrumbs.length; bi++) enqueueNode(breadcrumbs[bi]);
+    }
     for (var i = 0; i < mutations.length; i++) {
       var mutation = mutations[i];
       if (mutation.type === 'childList') {

@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.47** targets **Antigravity App 2.32.1 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.48** targets **Antigravity App 2.32.1 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release targets desktop 2.32.1 with prompt navigation, authorization-code sign-in, blocked-download and MCP startup status text. MCP server names, tool names and raw diagnostics retain their source text while adjacent actions remain localized. The shared author-content policy still covers project and unassigned skills, rules and plugins. Drift analysis no longer reads local skill or plugin inventories or counts author descriptions as missing translations. Save your work, exit the clients, run `node cli.js install`, then reopen them. See the [2.32.1 maintenance record](docs/maintenance/antigravity-2.32.1.md) and [customization content boundaries](docs/maintenance/customization-content-boundaries.md).
+This release reviews complete settings, shortcut and popup components for desktop 2.32.1, fixing omitted submit hints, pin toggles, side-question labels, sign-in actions and command headings. Scoped UI clocks and customization navigation retain message text, resource names, paths, commands and author content. Contextual positive/negative regressions accompany a reviewed upstream inventory of 1052 localizable strings and 45 preservation/composition decisions, with source checks to catch omissions beyond feature names. See the [follow-up review](docs/maintenance/antigravity-2.32.1-follow-up.md).
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 
@@ -62,6 +62,7 @@ npm run build:dict
 # Run all automated tests (aggregating 11 test suites)
 npm test
 npm run audit
+npm run audit:ui -- --bundle <official-main.js>
 ```
 
 Tests cover DOM/code and user-content boundaries, golden translations, CDP, menus, ASAR, discovery, proofreading, VS Code and regression cases. Read current output for counts. CI covers Windows, macOS and Ubuntu with Node.js 18/20/22.

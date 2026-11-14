@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-当前源码版本 **v3.3.47**，维护目标为 **Antigravity App 2.32.1 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.48**，维护目标为 **Antigravity App 2.32.1 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版适配桌面 2.32.1，补充提示词导航、授权码登录、下载拦截和 MCP 启动状态文案。MCP 服务器名、工具名与原始诊断保留原文，相邻操作继续汉化；项目内与未归属项目的技能、规则和插件沿用统一的作者内容保护。漂移分析不再扫描本机技能或插件清单、将作者说明计作漏译。更新前保存工作并退出客户端，运行 `node cli.js install` 后重新打开。详见 [2.32.1 维护记录](docs/maintenance/antigravity-2.32.1.md) 和 [自定义扩展内容边界](docs/maintenance/customization-content-boundaries.md)。
+本版按完整组件补查桌面 2.32.1 的设置、快捷键及浮层文案，修复遗漏的提交说明、置顶切换、旁路提问、登录入口和命令栏目。新增界面时间与自定义扩展导航的限定翻译，保留正文、资源名、路径、命令和作者内容；同词在不同位置有正反例回归。保存了 1052 条需汉化文案与 45 项保留/组合处理决定的上游组件清单，并加入来源校验，避免只补功能名称而漏查说明与操作。详见 [补充检查记录](docs/maintenance/antigravity-2.32.1-follow-up.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。相关适配与验证见 [1.11.0 维护记录](docs/maintenance/vscode-1.11.0.md) 和 [桌面 2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
 
@@ -62,6 +62,7 @@ npm run build:dict
 # 运行全套自动化测试（聚合 11 套测试入口）
 npm test
 npm run audit
+npm run audit:ui -- --bundle <official-main.js>
 ```
 
 测试包括 DOM/代码及用户内容保护、黄金语义、CDP、菜单、ASAR、路径探测、词库质检、VS Code 和边界回归。数量以当前脚本输出为准。CI 覆盖 Windows、macOS、Ubuntu × Node.js 18/20/22。

@@ -19,6 +19,24 @@ function tempDir(t) {
   return dir;
 }
 
+test('reviewed component inventory catches omitted descriptions and changed upstream sources', () => {
+  const { checkInventory } = require('../tools/ui-inventory');
+  const inventory = require('./fixtures/app-2.32.1-ui.json');
+  const dictionary = require('../dict/zh-CN.json');
+  const baseline = checkInventory(dictionary, inventory);
+  assert.equal(baseline.ok, true, baseline.errors.join('\n'));
+  assert.equal(baseline.uiCount, 1052);
+  const broken = JSON.parse(JSON.stringify(dictionary));
+  delete broken.exact['Enter always submits. This adds a second shortcut.'];
+  const omitted = checkInventory(broken, inventory);
+  assert.equal(omitted.ok, false);
+  assert.ok(omitted.errors.some(e => e.includes('Enter always submits.')));
+  const drifted = checkInventory(dictionary, inventory, Buffer.from('a different upstream bundle'));
+  assert.equal(drifted.ok, false);
+  assert.equal(drifted.sourceVerified, false);
+  assert.match(drifted.errors.join('\n'), /Upstream changed/);
+});
+
 function extension(dir, version = '1.9.0', suffix = '') {
   fs.mkdirSync(dir, { recursive: true });
   const pkg = JSON.stringify({ name: 'google-antigravity', publisher: 'google', version,

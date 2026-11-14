@@ -18,6 +18,14 @@ console.log('🧪 === 开始执行单源引擎驱动的截图黄金语义回归�
 
 // 来自历史真实截图与上游界面更新的黄金语义映射集
 const goldenCases = [
+  { input: 'Enter always submits. This adds a second shortcut.', expected: 'Enter 始终用于提交。此处可添加第二个提交快捷键。' },
+  { input: 'Pin / Unpin Conversation', expected: '置顶 / 取消置顶会话' },
+  { input: 'Side Questions', expected: '旁路提问' },
+  { input: 'Ask /btw', expected: '提问 /btw' },
+  { input: 'Go to Accounts', expected: '前往账号' },
+  { input: 'Log in', expected: '登录' },
+  { input: 'Permanently delete Settings including 1 conversation.', expected: '永久删除 Settings 及其中的 1 个会话。' },
+  { input: 'No MCP servers found for "Settings"', expected: '未找到匹配“Settings”的 MCP 服务器' },
   // App 2.32.1: fixed UI from the shipped frontend; author text and identifiers stay original in DOM tests.
   { input: 'Jump to Previous Prompt', expected: '跳转到上一条提示词' },
   { input: 'Jump to Next Prompt', expected: '跳转到下一条提示词' },

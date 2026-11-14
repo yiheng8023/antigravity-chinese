@@ -16,6 +16,7 @@ description: 检查 Antigravity 汉化状态、适配上游更新、诊断漏翻
 - `node cli.js status`：检查桌面客户端、备份与汉化状态。
 - `node cli.js status:vscode`：检查已安装的 VS Code 扩展。
 - `npm run scan:drift -- <官方前端-bundle.js> --report <报告.json>`：分析明确来源的前端脚本。没有有效文件时不能声称完成漂移检测。
+- `npm run audit:ui -- --bundle <官方前端-main.js>`：核对已审查组件清单的来源和文案映射；上游变化时按贡献指南重新提取和审查完整组件。只运行 `npm run audit:ui` 不验证当前上游或实机。
 
 漂移指标只反映前端候选字符串的启发式匹配，不代表整个客户端的翻译覆盖率。作者内容按贡献指南保留原文；扫描器不读取本机技能或插件清单，也不将作者说明计作漏译。报告样本需结合实际界面判断，不能直接批量加入词库。
 
