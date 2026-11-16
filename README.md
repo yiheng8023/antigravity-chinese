@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-当前源码版本 **v3.3.48**，维护目标为 **Antigravity App 2.32.1 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.49**，维护目标为 **Antigravity App 2.32.1 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版按完整组件补查桌面 2.32.1 的设置、快捷键及浮层文案，修复遗漏的提交说明、置顶切换、旁路提问、登录入口和命令栏目。新增界面时间与自定义扩展导航的限定翻译，保留正文、资源名、路径、命令和作者内容；同词在不同位置有正反例回归。保存了 1052 条需汉化文案与 45 项保留/组合处理决定的上游组件清单，并加入来源校验，避免只补功能名称而漏查说明与操作。详见 [补充检查记录](docs/maintenance/antigravity-2.32.1-follow-up.md)。
+本版修复桌面内置 Swarm 面板未加载汉化的问题，补齐空状态、连接提示、看板筛选、回放和复制等固定控件。独立词库按实际控件生效，保留 `Swarm`、`/swarm`、成员名称、任务、消息、原始数据和讲述者内容。安装与还原沿用桌面 ASAR 流程，不修改插件源文件。详见 [Swarm 维护记录](docs/maintenance/swarm-pane-2.32.1.md)；设置、快捷键及主界面组件清单见[上一轮补查](docs/maintenance/antigravity-2.32.1-follow-up.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。相关适配与验证见 [1.11.0 维护记录](docs/maintenance/vscode-1.11.0.md) 和 [桌面 2.29.0 维护记录](docs/maintenance/antigravity-2.29.0.md)。
 
@@ -59,7 +59,7 @@ node cli.js install:vscode --path "<扩展目录>"
 
 ```bash
 npm run build:dict
-# 运行全套自动化测试（聚合 11 套测试入口）
+# 运行全套自动化测试（聚合 12 套测试入口）
 npm test
 npm run audit
 npm run audit:ui -- --bundle <official-main.js>

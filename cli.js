@@ -11,6 +11,7 @@ const os = require('os');
 const crypto = require('crypto');
 const { execSync } = require('child_process');
 const { getUnpackArgs, verifyUnpackedOutput } = require('./core/asar-unpack');
+const { patchSwarmFrames } = require('./core/swarm-frame-patch');
 
 const PROJECT_ROOT = __dirname;
 const DICT_PATH = path.join(PROJECT_ROOT, 'dict', 'zh-CN.json');
@@ -440,6 +441,7 @@ function patchMainFile(mainFilePath) {
   content = content.replace(/['"]WSL distro not found['"]/g, "'未找到 WSL 发行版'");
   content = content.replace(/['"]Antigravity opened on Windows instead\.['"]/g, "'Antigravity 已改为在 Windows 本地打开。'");
 
+  content = patchSwarmFrames(content);
   fs.writeFileSync(mainFilePath, content, 'utf-8');
 }
 

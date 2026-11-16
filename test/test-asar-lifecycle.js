@@ -104,6 +104,9 @@ try {
   assert(isAsarPatched(asarPath), '首次安装后当前 ASAR 处于汉化状态');
   asar.uncache(asarPath);
   const firstPreload = asar.extractFile(asarPath, path.join('dist', 'preload.js')).toString();
+  const firstMain = asar.extractFile(asarPath, path.join('dist', 'main.js')).toString();
+  assert(firstMain.includes('// --- Antigravity Chinese Swarm Frame Start ---'),
+    '桌面主进程包含限定 Swarm 来源的独立面板加载器');
   assert(asar.statFile(asarPath, path.join('node_modules', 'external-tool', 'index.js')).unpacked === true,
     '安装必须保留上游外置工具的 unpacked 标记');
   assert(fs.readFileSync(path.join(asarPath + '.unpacked', 'node_modules', 'external-tool', 'index.js'), 'utf8') === externalToolContent,
@@ -117,6 +120,8 @@ try {
   asar.uncache(asarPath);
   assert(asar.extractFile(asarPath, path.join('dist', 'preload.js')).toString() === firstPreload,
     '重复安装的 preload 必须字节一致，不能累积空行或重复注入');
+  assert(asar.extractFile(asarPath, path.join('dist', 'main.js')).toString() === firstMain,
+    '重复安装的 main.js 必须字节一致，Swarm 加载器不重复累积');
 
   // 执行 restore 并验证是否 100% 回滚为纯净版本 A
   execSync(`node "${cliPath}" restore --path "${testDir}"`, { stdio: 'ignore' });

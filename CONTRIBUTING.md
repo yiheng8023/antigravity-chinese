@@ -43,6 +43,7 @@
 3. **修改词库或代码**：
    * 词库字典：编辑 `dict/src/` 中的分层源文件，然后运行 `npm run build:dict`，同步生成 `dict/zh-CN.json` 与 `dist/zh-CN.bundle.json`。请勿仅修改生成文件。
    * 运行时引擎：编辑 [`core/i18n-runtime.js`](core/i18n-runtime.js)。
+   * 桌面内置 Swarm 面板：限定词库为 `dict/scoped/swarm.json`，通过 `core/swarm-i18n.js` 的明确控件选择器生效；不合并到全局词库。加载器为 `core/swarm-frame-patch.js`，随桌面 ASAR 安装和还原。独立插件网页不自动继承主界面的 preload，必须验证实际加载路径。
    * CLI 工具：编辑 [`cli.js`](cli.js)。
 
 4. **运行本地自动化回归测试（必须全部 PASS）**：
