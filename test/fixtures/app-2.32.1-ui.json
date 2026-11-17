@@ -1,6 +1,7 @@
 {
   "source": {
     "version": "Antigravity App 2.32.1",
+    "verifiedMatchingVersions": ["Antigravity App 2.32.2 (2026-11-17: identical main.js hash and source-presence check)"],
     "platform": "Windows x64",
     "sha256": "4c0a1ff5659e7dd92e6ad249a386c0dbce2c8e94b88522a2f366ff20b397081e",
     "scope": "Static command labels and complete settings components, plugin/detail/file UI, side-question, overview, selection and navigation components in the recorded source regions.",

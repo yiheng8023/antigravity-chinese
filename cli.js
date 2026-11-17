@@ -439,6 +439,7 @@ function patchMainFile(mainFilePath) {
   // 4. WSL 弹窗与系统提示
   content = content.replace(/title:\s*['"]WSL distro not found['"]/g, "title: '未找到 WSL 发行版'");
   content = content.replace(/['"]WSL distro not found['"]/g, "'未找到 WSL 发行版'");
+  content = content.replace(/The WSL distro \\?"\$\{WSL_DISTRO\}\\?" is no longer installed\./g, 'WSL 发行版“${WSL_DISTRO}”已不再安装。');
   content = content.replace(/['"]Antigravity opened on Windows instead\.['"]/g, "'Antigravity 已改为在 Windows 本地打开。'");
 
   content = patchSwarmFrames(content);

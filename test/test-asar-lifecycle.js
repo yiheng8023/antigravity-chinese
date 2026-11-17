@@ -65,6 +65,7 @@ function getWizardHtml() {
 `;
 
 const origMainA = `"use strict";
+dialog.showMessageBox({ message: \`The WSL distro "\${WSL_DISTRO}" is no longer installed.\` });
 (0, tray_1.createTray)([
   { id: 'running-agents', label: 'No agents running', enabled: false },
   { label: \`Open \${electron_1.app.getName()}\` },
@@ -107,6 +108,8 @@ try {
   const firstMain = asar.extractFile(asarPath, path.join('dist', 'main.js')).toString();
   assert(firstMain.includes('// --- Antigravity Chinese Swarm Frame Start ---'),
     '桌面主进程包含限定 Swarm 来源的独立面板加载器');
+  assert(firstMain.includes('WSL 发行版“\${WSL_DISTRO}”已不再安装。'),
+    '原生 WSL 缺失说明汉化并保留发行版变量');
   assert(asar.statFile(asarPath, path.join('node_modules', 'external-tool', 'index.js')).unpacked === true,
     '安装必须保留上游外置工具的 unpacked 标记');
   assert(fs.readFileSync(path.join(asarPath + '.unpacked', 'node_modules', 'external-tool', 'index.js'), 'utf8') === externalToolContent,

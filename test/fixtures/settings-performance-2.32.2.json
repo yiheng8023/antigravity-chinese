@@ -1,0 +1,213 @@
+{
+  "schema": "antigravity-settings-performance/v1",
+  "date": "2026-11-17",
+  "platform": "Windows 11 10.0.26300 x64",
+  "client": "2.32.2",
+  "frontendSha256": "4c0a1ff5659e7dd92e6ad249a386c0dbce2c8e94b88522a2f366ff20b397081e",
+  "candidateRuntimeSha256": "29fcd89f01081b27b106c6f771a57bc597d85f1788210d09ac0351e3345b0afa",
+  "measurements": {
+    "english": [
+      {
+        "name": "open",
+        "syncMs": 17.900000035762787,
+        "maxFrameGapMs": 130.10000000000582,
+        "longTaskMs": [
+          125,
+          63
+        ],
+        "frames": 114,
+        "nodes": 3702
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 3.699999988079071,
+        "maxFrameGapMs": 30,
+        "longTaskMs": [],
+        "frames": 188,
+        "nodes": 3702
+      },
+      {
+        "name": "Shortcuts",
+        "syncMs": 3.5,
+        "maxFrameGapMs": 63.39999999999418,
+        "longTaskMs": [],
+        "frames": 169,
+        "nodes": 3702
+      },
+      {
+        "name": "General",
+        "syncMs": 3.399999976158142,
+        "maxFrameGapMs": 30,
+        "longTaskMs": [],
+        "frames": 188,
+        "nodes": 3702
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 3.900000035762787,
+        "maxFrameGapMs": 26.69999999999709,
+        "longTaskMs": [],
+        "frames": 188,
+        "nodes": 3702
+      },
+      {
+        "name": "General",
+        "syncMs": 3.5,
+        "maxFrameGapMs": 23.40000000000873,
+        "longTaskMs": [],
+        "frames": 191,
+        "nodes": 3702
+      },
+      {
+        "name": "close",
+        "syncMs": 4.800000011920929,
+        "maxFrameGapMs": 33.40000000000873,
+        "longTaskMs": [],
+        "frames": 181,
+        "nodes": 997
+      }
+    ],
+    "candidate": [
+      {
+        "name": "open",
+        "syncMs": 38.80000001192093,
+        "maxFrameGapMs": 250,
+        "longTaskMs": [
+          60,
+          231,
+          79
+        ],
+        "frames": 20,
+        "nodes": 3660
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 5.700000047683716,
+        "maxFrameGapMs": 56.69999999998254,
+        "longTaskMs": [],
+        "frames": 173,
+        "nodes": 3660
+      },
+      {
+        "name": "Shortcuts",
+        "syncMs": 5.699999988079071,
+        "maxFrameGapMs": 143.39999999999418,
+        "longTaskMs": [
+          114,
+          63
+        ],
+        "frames": 107,
+        "nodes": 3660
+      },
+      {
+        "name": "General",
+        "syncMs": 5.400000035762787,
+        "maxFrameGapMs": 60.10000000000582,
+        "longTaskMs": [],
+        "frames": 172,
+        "nodes": 3660
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 4.899999976158142,
+        "maxFrameGapMs": 46.60000000000582,
+        "longTaskMs": [],
+        "frames": 175,
+        "nodes": 3660
+      },
+      {
+        "name": "General",
+        "syncMs": 5.199999988079071,
+        "maxFrameGapMs": 36.70000000001164,
+        "longTaskMs": [],
+        "frames": 181,
+        "nodes": 3660
+      },
+      {
+        "name": "close",
+        "syncMs": 12.5,
+        "maxFrameGapMs": 63.39999999999418,
+        "longTaskMs": [
+          58
+        ],
+        "frames": 154,
+        "nodes": 955
+      }
+    ],
+    "candidateWarm": [
+      {
+        "name": "open",
+        "syncMs": 11.900000035762787,
+        "maxFrameGapMs": 113.39999999999418,
+        "longTaskMs": [
+          100
+        ],
+        "frames": 109,
+        "nodes": 3660
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 4.5,
+        "maxFrameGapMs": 36.69999999998254,
+        "longTaskMs": [],
+        "frames": 179,
+        "nodes": 3660
+      },
+      {
+        "name": "Shortcuts",
+        "syncMs": 3.600000023841858,
+        "maxFrameGapMs": 56.60000000000582,
+        "longTaskMs": [],
+        "frames": 161,
+        "nodes": 3660
+      },
+      {
+        "name": "General",
+        "syncMs": 4.300000011920929,
+        "maxFrameGapMs": 46.69999999998254,
+        "longTaskMs": [],
+        "frames": 172,
+        "nodes": 3660
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 5.900000035762787,
+        "maxFrameGapMs": 36.69999999998254,
+        "longTaskMs": [],
+        "frames": 179,
+        "nodes": 3660
+      },
+      {
+        "name": "General",
+        "syncMs": 4.699999988079071,
+        "maxFrameGapMs": 43.29999999998836,
+        "longTaskMs": [],
+        "frames": 178,
+        "nodes": 3660
+      },
+      {
+        "name": "close",
+        "syncMs": 11.900000035762787,
+        "maxFrameGapMs": 60,
+        "longTaskMs": [
+          56
+        ],
+        "frames": 147,
+        "nodes": 955
+      }
+    ]
+  },
+  "limits": [
+    "Selected same-machine samples; first-open and warm samples differ.",
+    "No old3.3.49 measurement was repeated on2.32.2.",
+    "Identical frontend hash does not prove all host behavior or universal FPS."
+  ],
+  "additionalDiagnostics": {
+    "warmOpenCloseV8Sampling": {
+      "observedMs": 1491.166,
+      "runtimeStackSampleMs": 55.012,
+      "idleMs": 548.328,
+      "scope": "Warm settings open and close; V8 sampled stacks, not a wall-time attribution guarantee"
+    }
+  }
+}
