@@ -4,7 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const { JSDOM } = require('jsdom');
 
-const runtime = fs.readFileSync(path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
+const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
 const dictionary = require('../dict/zh-CN.json');
 
 function settle(window) {

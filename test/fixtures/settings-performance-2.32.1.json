@@ -1,0 +1,411 @@
+{
+  "schema": "antigravity-settings-performance/v1",
+  "date": "2026-11-17",
+  "platform": "Windows 11 10.0.26300 x64",
+  "client": "2.32.1",
+  "baselineCommit": "6f44bd6e274e37126c157d658e49ee3910ca1b99",
+  "candidateRuntimeSha256": "29fcd89f01081b27b106c6f771a57bc597d85f1788210d09ac0351e3345b0afa",
+  "measurements": {
+    "previous": [
+      {
+        "name": "open",
+        "syncMs": 10.800000011920929,
+        "maxFrameGapMs": 450.1000000000058,
+        "longTaskMs": [
+          83,
+          365,
+          95
+        ],
+        "frames": 4,
+        "nodes": 3702
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 3.600000023841858,
+        "maxFrameGapMs": 20,
+        "longTaskMs": [],
+        "frames": 191,
+        "nodes": 3702
+      },
+      {
+        "name": "Shortcuts",
+        "syncMs": 3.900000035762787,
+        "maxFrameGapMs": 40,
+        "longTaskMs": [],
+        "frames": 178,
+        "nodes": 3702
+      },
+      {
+        "name": "General",
+        "syncMs": 4.400000035762787,
+        "maxFrameGapMs": 19.89999999999418,
+        "longTaskMs": [],
+        "frames": 190,
+        "nodes": 3702
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 4.300000011920929,
+        "maxFrameGapMs": 19.89999999999418,
+        "longTaskMs": [],
+        "frames": 188,
+        "nodes": 3702
+      },
+      {
+        "name": "General",
+        "syncMs": 3.600000023841858,
+        "maxFrameGapMs": 20,
+        "longTaskMs": [],
+        "frames": 187,
+        "nodes": 3702
+      },
+      {
+        "name": "close",
+        "syncMs": 6.199999988079071,
+        "maxFrameGapMs": 33.20000000001164,
+        "longTaskMs": [],
+        "frames": 181,
+        "nodes": 997
+      }
+    ],
+    "english": [
+      {
+        "name": "open",
+        "syncMs": 21.099999964237213,
+        "maxFrameGapMs": 149.89999999999964,
+        "longTaskMs": [
+          145,
+          68
+        ],
+        "frames": 99,
+        "nodes": 3676
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 4.5,
+        "maxFrameGapMs": 40.19999999999709,
+        "longTaskMs": [],
+        "frames": 181,
+        "nodes": 3676
+      },
+      {
+        "name": "Shortcuts",
+        "syncMs": 5.200000047683716,
+        "maxFrameGapMs": 106.79999999999927,
+        "longTaskMs": [
+          84
+        ],
+        "frames": 147,
+        "nodes": 3676
+      },
+      {
+        "name": "General",
+        "syncMs": 5.199999988079071,
+        "maxFrameGapMs": 53.400000000001455,
+        "longTaskMs": [],
+        "frames": 178,
+        "nodes": 3676
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 4.600000023841858,
+        "maxFrameGapMs": 30,
+        "longTaskMs": [],
+        "frames": 187,
+        "nodes": 3676
+      },
+      {
+        "name": "General",
+        "syncMs": 4.300000011920929,
+        "maxFrameGapMs": 30,
+        "longTaskMs": [],
+        "frames": 185,
+        "nodes": 3676
+      },
+      {
+        "name": "close",
+        "syncMs": 6.900000035762787,
+        "maxFrameGapMs": 53.5,
+        "longTaskMs": [
+          53
+        ],
+        "frames": 172,
+        "nodes": 971
+      }
+    ],
+    "candidate": [
+      {
+        "name": "open",
+        "syncMs": 19.30000001192093,
+        "maxFrameGapMs": 150.10000000000582,
+        "longTaskMs": [
+          130
+        ],
+        "frames": 87,
+        "nodes": 3676
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 4.400000035762787,
+        "maxFrameGapMs": 36.700000000004366,
+        "longTaskMs": [],
+        "frames": 184,
+        "nodes": 3676
+      },
+      {
+        "name": "Shortcuts",
+        "syncMs": 3.300000011920929,
+        "maxFrameGapMs": 93.40000000000146,
+        "longTaskMs": [
+          74
+        ],
+        "frames": 151,
+        "nodes": 3676
+      },
+      {
+        "name": "General",
+        "syncMs": 3.700000047683716,
+        "maxFrameGapMs": 30,
+        "longTaskMs": [],
+        "frames": 186,
+        "nodes": 3676
+      },
+      {
+        "name": "Appearance",
+        "syncMs": 3.200000047683716,
+        "maxFrameGapMs": 26.700000000004366,
+        "longTaskMs": [],
+        "frames": 187,
+        "nodes": 3676
+      },
+      {
+        "name": "General",
+        "syncMs": 3.5,
+        "maxFrameGapMs": 20,
+        "longTaskMs": [],
+        "frames": 188,
+        "nodes": 3676
+      },
+      {
+        "name": "close",
+        "syncMs": 6.400000035762787,
+        "maxFrameGapMs": 43.39999999999418,
+        "longTaskMs": [],
+        "frames": 175,
+        "nodes": 971
+      }
+    ],
+    "candidateWarm": [
+      [
+        {
+          "name": "open",
+          "syncMs": 8.200000047683716,
+          "maxFrameGapMs": 73.29999999998836,
+          "longTaskMs": [
+            68,
+            61
+          ],
+          "frames": 121,
+          "nodes": 3676
+        },
+        {
+          "name": "Appearance",
+          "syncMs": 6.800000011920929,
+          "maxFrameGapMs": 36.60000000000582,
+          "longTaskMs": [],
+          "frames": 186,
+          "nodes": 3676
+        },
+        {
+          "name": "Shortcuts",
+          "syncMs": 3.300000011920929,
+          "maxFrameGapMs": 40,
+          "longTaskMs": [],
+          "frames": 173,
+          "nodes": 3676
+        },
+        {
+          "name": "General",
+          "syncMs": 3.699999988079071,
+          "maxFrameGapMs": 20,
+          "longTaskMs": [],
+          "frames": 189,
+          "nodes": 3676
+        },
+        {
+          "name": "Appearance",
+          "syncMs": 3.900000035762787,
+          "maxFrameGapMs": 23.300000000017462,
+          "longTaskMs": [],
+          "frames": 188,
+          "nodes": 3676
+        },
+        {
+          "name": "General",
+          "syncMs": 4.600000023841858,
+          "maxFrameGapMs": 23.300000000017462,
+          "longTaskMs": [],
+          "frames": 189,
+          "nodes": 3676
+        },
+        {
+          "name": "close",
+          "syncMs": 5.800000011920929,
+          "maxFrameGapMs": 40,
+          "longTaskMs": [],
+          "frames": 177,
+          "nodes": 971
+        }
+      ],
+      [
+        {
+          "name": "open",
+          "syncMs": 11.200000047683716,
+          "maxFrameGapMs": 69.89999999999418,
+          "longTaskMs": [
+            63,
+            53
+          ],
+          "frames": 130,
+          "nodes": 3676
+        },
+        {
+          "name": "Appearance",
+          "syncMs": 3.199999988079071,
+          "maxFrameGapMs": 33.39999999999418,
+          "longTaskMs": [],
+          "frames": 185,
+          "nodes": 3676
+        },
+        {
+          "name": "Shortcuts",
+          "syncMs": 3.400000035762787,
+          "maxFrameGapMs": 40,
+          "longTaskMs": [],
+          "frames": 183,
+          "nodes": 3676
+        },
+        {
+          "name": "General",
+          "syncMs": 5,
+          "maxFrameGapMs": 20.10000000000582,
+          "longTaskMs": [],
+          "frames": 188,
+          "nodes": 3676
+        },
+        {
+          "name": "Appearance",
+          "syncMs": 3.200000047683716,
+          "maxFrameGapMs": 23.29999999998836,
+          "longTaskMs": [],
+          "frames": 186,
+          "nodes": 3676
+        },
+        {
+          "name": "General",
+          "syncMs": 3.300000011920929,
+          "maxFrameGapMs": 16.60000000000582,
+          "longTaskMs": [],
+          "frames": 186,
+          "nodes": 3676
+        },
+        {
+          "name": "close",
+          "syncMs": 4.300000011920929,
+          "maxFrameGapMs": 30,
+          "longTaskMs": [],
+          "frames": 180,
+          "nodes": 971
+        }
+      ],
+      [
+        {
+          "name": "open",
+          "syncMs": 8.600000023841858,
+          "maxFrameGapMs": 70.09999999997672,
+          "longTaskMs": [
+            63
+          ],
+          "frames": 133,
+          "nodes": 3676
+        },
+        {
+          "name": "Appearance",
+          "syncMs": 3.100000023841858,
+          "maxFrameGapMs": 23.20000000001164,
+          "longTaskMs": [],
+          "frames": 190,
+          "nodes": 3676
+        },
+        {
+          "name": "Shortcuts",
+          "syncMs": 3.099999964237213,
+          "maxFrameGapMs": 36.60000000000582,
+          "longTaskMs": [],
+          "frames": 184,
+          "nodes": 3676
+        },
+        {
+          "name": "General",
+          "syncMs": 4,
+          "maxFrameGapMs": 23.39999999999418,
+          "longTaskMs": [],
+          "frames": 190,
+          "nodes": 3676
+        },
+        {
+          "name": "Appearance",
+          "syncMs": 3.5,
+          "maxFrameGapMs": 20,
+          "longTaskMs": [],
+          "frames": 187,
+          "nodes": 3676
+        },
+        {
+          "name": "General",
+          "syncMs": 3.099999964237213,
+          "maxFrameGapMs": 20,
+          "longTaskMs": [],
+          "frames": 189,
+          "nodes": 3676
+        },
+        {
+          "name": "close",
+          "syncMs": 5.399999976158142,
+          "maxFrameGapMs": 33.29999999998836,
+          "longTaskMs": [],
+          "frames": 180,
+          "nodes": 971
+        }
+      ]
+    ],
+    "scanPrevious": {
+      "elapsedMs": 284.89999997615814,
+      "elements": 2698,
+      "counts": {
+        "getAttribute": 743367,
+        "hasAttribute": 359541,
+        "matches": 482047,
+        "closest": 241,
+        "querySelector": 45
+      }
+    },
+    "scanCandidate": {
+      "elapsedMs": 30,
+      "elements": 2698,
+      "counts": {
+        "getAttribute": 51543,
+        "hasAttribute": 26501,
+        "matches": 15099,
+        "closest": 195,
+        "querySelector": 16
+      }
+    }
+  },
+  "limits": [
+    "Single machine and selected settings controls; not a universal FPS guarantee.",
+    "No cache deletion, external localization package or cloud tasks used.",
+    "Manual hot scan includes temporary DOM-method counting overhead.",
+    "Initial unretained run and failed measurement script attempts excluded."
+  ]
+}

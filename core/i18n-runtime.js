@@ -382,19 +382,43 @@
     return translateSingleUnit(text);
   }
 
+  // Cache DOM facts only during one synchronous scan slice. Never retain a
+  // content verdict across renderer writes, reparenting, routes or later frames.
+  var scanContext = null;
+  function withScanContext(callback) {
+    var previous = scanContext;
+    scanContext = { facts: new WeakMap(), modes: new WeakMap() };
+    try { return callback(); }
+    finally { scanContext = previous; }
+  }
+
+  function getElementFacts(el) {
+    var facts = scanContext && scanContext.facts.get(el);
+    if (!facts) {
+      facts = { protected: isProtectedBoundary(el), kind: getMixedContentKind(el) };
+      if (scanContext) scanContext.facts.set(el, facts);
+    }
+    return facts;
+  }
+
   // 0: protect the entire subtree; 1: traverse mixed content, preserving its own
   // text/attributes; 2: translate UI. Recompute ancestry for every entry point:
   // observer updates may start deep in a subtree, and React may reparent nodes.
   function getElementTranslationMode(el) {
     if (!el || el.nodeType !== 1) return 2;
+    if (scanContext && scanContext.modes.has(el)) return scanContext.modes.get(el);
     var current = el;
     var control = null;
     var inToolbar = false;
     var inLink = false;
     var preserveContent = false;
     while (current) {
-      if (isProtectedBoundary(current)) return 0;
-      var kind = getMixedContentKind(current);
+      var facts = getElementFacts(current);
+      if (facts.protected || (scanContext && scanContext.modes.get(current) === 0)) {
+        if (scanContext) scanContext.modes.set(el, 0);
+        return 0;
+      }
+      var kind = facts.kind;
       if (kind) {
         // A sidebar navigation link carries the conversation name, even inside wrappers.
         if (kind === 'conversation' && inLink) return 0;
@@ -411,13 +435,18 @@
           preserveContent = true;
         }
       } else if (!preserveContent) {
-        if (!control && isMessageUiControl(current)) control = current;
+        if (!control) {
+          if (facts.control === undefined) facts.control = isMessageUiControl(current);
+          if (facts.control) control = current;
+        }
         if (control && current.getAttribute('role') === 'toolbar') inToolbar = true;
         if (current.tagName === 'A') inLink = true;
       }
       current = current.parentElement;
     }
-    return preserveContent ? 1 : 2;
+    var mode = preserveContent ? 1 : 2;
+    if (scanContext) scanContext.modes.set(el, mode);
+    return mode;
   }
 
 
@@ -471,10 +500,10 @@
   // 扫描轮次 ID，同一轮全量扫描中元素只处理一次
   var currentScanId = 0;
 
-  function translateTextNode(node) {
+  function translateTextNode(node, parentMode) {
     if (!node || node.nodeType !== 3) return;
     var parent = node.parentElement || node.parentNode;
-    if (parent && (getElementTranslationMode(parent) !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
+    if (parent && ((parentMode === undefined ? getElementTranslationMode(parent) : parentMode) !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
       restoreLocalizedText(node);
       return;
     }
@@ -531,18 +560,21 @@
 
 
 
-  function translateElement(el, scanId) {
+  function translateElement(el, scanId, work) {
     if (!el || el.nodeType !== 1) return;
+    if (scanId && el._agyScanId === scanId) return;
     var translationMode = getElementTranslationMode(el);
     if (translationMode === 0) {
-      restoreProtectedSubtree(el);
+      if (work) {
+        restoreLocalizedAttributes(el);
+        appendChildren(el, work);
+      } else restoreProtectedSubtree(el);
       return;
     }
     var translateOwnContent = translationMode === 2;
     if (!translateOwnContent) restoreLocalizedAttributes(el);
 
     // 同一轮扫描中，已处理的元素跳过
-    if (scanId && el._agyScanId === scanId) return;
     if (scanId) el._agyScanId = scanId;
 
     // 复合组件自愈：处理特定 JSX 碎片化 Alert（如 plan-command-fyi-alert）
@@ -617,15 +649,23 @@
       }
     }
 
+    if (work) {
+      appendChildren(el, work);
+      return;
+    }
     var child = el.firstChild;
     while (child) {
       if (child.nodeType === 3) {
-        translateTextNode(child);
+        translateTextNode(child, translationMode);
       } else if (child.nodeType === 1) {
         translateElement(child, scanId);
       }
       child = child.nextSibling;
     }
+  }
+
+  function appendChildren(el, work) {
+    for (var child = el.lastChild; child; child = child.previousSibling) work.push(child);
   }
 
   // ============ Observer 与扫描调度 ============
@@ -662,14 +702,16 @@
   function safeTranslateNodes(nodes) {
     disconnectObserver();
     try {
-      for (var i = 0; i < nodes.length; i++) {
-        var node = nodes[i];
-        if (node.nodeType === 1) {
-          translateElement(node);
-        } else if (node.nodeType === 3) {
-          translateTextNode(node);
+      withScanContext(function () {
+        for (var i = 0; i < nodes.length; i++) {
+          var node = nodes[i];
+          if (node.nodeType === 1) {
+            translateElement(node);
+          } else if (node.nodeType === 3) {
+            translateTextNode(node);
+          }
         }
-      }
+      });
     } catch (e) {
       // 静默吞错，避免一个异常阻断整体
     }
@@ -684,7 +726,7 @@
     currentScanId++;
     disconnectObserver();
     try {
-      translateElement(doc.documentElement, currentScanId);
+      withScanContext(function () { translateElement(doc.documentElement, currentScanId); });
     } catch (e) {}
     reconnectObserver();
   }
@@ -693,37 +735,59 @@
   var pendingNodes = [];
   var observedDocumentPath = doc && doc.location ? doc.location.pathname : '';
   var pendingNodeSet = typeof Set !== 'undefined' ? new Set() : null;
+  var scanJobs = [];
   var rafScheduled = false;
 
   function enqueueNode(node) {
-    if (!node) return;
+    if (!node || (node.nodeType !== 1 && node.nodeType !== 3)) return;
     if (pendingNodeSet) {
-      if (pendingNodeSet.has(node)) return;
-      if (pendingNodes.length < 500) {
-        pendingNodes.push(node);
-        pendingNodeSet.add(node);
-      }
+      if (pendingNodeSet.has(node) || pendingNodeSet.has(doc.documentElement)) return;
+    }
+    if (pendingNodes.length >= 500) {
+      // Coalesce an exceptional burst into a bounded, time-sliced document scan.
+      // Never silently drop the tail and wait 15 seconds for translation.
+      pendingNodes = [doc.documentElement];
+      if (pendingNodeSet) { pendingNodeSet.clear(); pendingNodeSet.add(doc.documentElement); }
     } else {
-      if (pendingNodes.length < 500) {
-        pendingNodes.push(node);
-      }
+      pendingNodes.push(node);
+      if (pendingNodeSet) pendingNodeSet.add(node);
     }
   }
 
   function flushPendingNodes() {
     rafScheduled = false;
-    if (pendingNodes.length === 0) return;
-    var batch = pendingNodes.splice(0, 200);
-    if (pendingNodeSet) {
-      for (var bIdx = 0; bIdx < batch.length; bIdx++) {
-        pendingNodeSet.delete(batch[bIdx]);
+    if (!pendingNodes.length && !scanJobs.length) return;
+    disconnectObserver();
+    try {
+      if (!scanJobs.length) {
+        for (var i = pendingNodes.length - 1; i >= 0; i--) {
+          var node = pendingNodes[i];
+          if (!node.isConnected) continue;
+          var ancestor = node.parentElement;
+          while (ancestor && !(pendingNodeSet && pendingNodeSet.has(ancestor))) ancestor = ancestor.parentElement;
+          if (!ancestor) scanJobs.push(node);
+        }
+        pendingNodes = [];
+        if (pendingNodeSet) pendingNodeSet.clear();
       }
-    }
-    safeTranslateNodes(batch);
-    // 如果还有剩余，安排下一帧处理
-    if (pendingNodes.length > 0) {
-      scheduleFlush();
-    }
+      withScanContext(function () {
+        var clock = root.performance && root.performance.now ? function () { return root.performance.now(); } : Date.now;
+        var deadline = clock() + 6;
+        var processed = 0;
+        // Count DOM nodes, not roots: a single remounted dialog can contain
+        // thousands of descendants. Yield even when it is the only queue item.
+        while (scanJobs.length && processed < 200 && (!processed || clock() < deadline)) {
+          var next = scanJobs.pop();
+          if (!next.isConnected) continue;
+          try {
+            if (next.nodeType === 1) translateElement(next, undefined, scanJobs);
+            else if (next.nodeType === 3) translateTextNode(next);
+          } catch (e) { /* A transient bad node must not discard the remaining queue. */ }
+          processed++;
+        }
+      });
+    } finally { reconnectObserver(); }
+    if (pendingNodes.length || scanJobs.length) scheduleFlush();
   }
 
   function scheduleFlush() {
@@ -758,6 +822,7 @@
         var edits = attributeEdits.get(mutation.target);
         if (edits) delete edits[mutation.attributeName];
         mutation.target[MARK_ATTR + '_' + mutation.attributeName] = undefined;
+        enqueueNode(mutation.target);
       }
     }
     if (pendingNodes.length > 0) scheduleFlush();
@@ -784,10 +849,12 @@
         idleScanScheduled = true;
         root.requestIdleCallback(function () {
           idleScanScheduled = false;
-          safeFullScan();
+          enqueueNode(doc.documentElement);
+          scheduleFlush();
         }, { timeout: 5000 });
       } else {
-        safeFullScan();
+        enqueueNode(doc.documentElement);
+        scheduleFlush();
       }
     }
     setInterval(scheduleIdleScan, 15000);
@@ -842,24 +909,23 @@
 
       function scanFloatingContainers() {
         if (!doc || !doc.body) return;
-        disconnectObserver();
         try {
           // 定向扫描顶层 Portal 容器、Tooltip、Popover 节点，门禁拦截非浮层元素，绝不遍历整棵 DOM 树
           var last = doc.body.lastElementChild;
           if (last && isFloatingElement(last)) {
-            translateElement(last);
+            enqueueNode(last);
           }
           if (last && last.previousElementSibling && isFloatingElement(last.previousElementSibling)) {
-            translateElement(last.previousElementSibling);
+            enqueueNode(last.previousElementSibling);
           }
           var tooltips = doc.querySelectorAll ? doc.querySelectorAll('[role="tooltip"], [role="menu"], [role="dialog"], [data-floating-ui-portal], [data-radix-popper-content-wrapper], .popover, .tooltip, .context-view, .monaco-hover') : null;
           if (tooltips && tooltips.length > 0) {
             for (var tIdx = 0; tIdx < tooltips.length; tIdx++) {
-              translateElement(tooltips[tIdx]);
+              enqueueNode(tooltips[tIdx]);
             }
           }
         } catch (e) {}
-        reconnectObserver();
+        scheduleFlush();
       }
 
       var onHoverAction = function (e) {
@@ -870,17 +936,16 @@
 
         var target = e.target;
         if (!target) return;
-        disconnectObserver();
         try {
           if (target.nodeType === 1) {
-            translateElement(target);
+            enqueueNode(target);
             // 严禁对 #workbench / body 根容器递归全树深搜，防止剧烈掉帧
             if (target.parentElement && !isWorkbenchOrRoot(target.parentElement)) {
-              translateElement(target.parentElement);
+              enqueueNode(target.parentElement);
             }
           }
         } catch (e) {}
-        reconnectObserver();
+        scheduleFlush();
 
         // 防抖延迟定向扫描浮动提示层（捕获动态延迟 50ms 挂载的气泡）
         if (hoverScanTimer) clearTimeout(hoverScanTimer);

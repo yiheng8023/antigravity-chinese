@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.49** targets **Antigravity App 2.32.1 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.50** targets **Antigravity App 2.32.1 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release loads localization into the desktop built-in Swarm pane and translates its empty states, connection hints, board filters, replay and copy controls. A separate dictionary applies only to identified controls, preserving `Swarm`, `/swarm`, member names, tasks, messages, raw data and narrator content. Installation and restore use the desktop ASAR lifecycle without editing plugin source files. See the [Swarm maintenance record](docs/maintenance/swarm-pane-2.32.1.md) and the [previous settings, shortcuts and main UI review](docs/maintenance/antigravity-2.32.1-follow-up.md).
+This release addresses settings stutter reported in [#8](https://github.com/yiheng8023/antigravity-chinese/issues/8). Content-boundary decisions are reused within each synchronous scan slice, large trees yield between frames, and bursts above 500 queued nodes are coalesced without losing the tail. Reparenting, authored content and dynamic attributes retain their protections. Windows 2.32.1 was compared on one machine using the previous patch, pristine English and this fix; see the [performance record](docs/maintenance/settings-performance-2.32.1.md) for methods and limits. [Swarm pane localization](docs/maintenance/swarm-pane-2.32.1.md) is retained.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 
@@ -59,7 +59,7 @@ Edit dictionary sources under `dict/src/`. Both `dict/zh-CN.json` and `dist/zh-C
 
 ```bash
 npm run build:dict
-# Run all automated tests (aggregating 12 test suites)
+# Run all automated tests (aggregating 13 test suites)
 npm test
 npm run audit
 npm run audit:ui -- --bundle <official-main.js>
