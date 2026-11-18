@@ -400,6 +400,7 @@
 
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
+    if (text === 'SSH Host' && el?.closest('[data-testid="project-selector-ssh-host-trigger"]')) return 'SSH 主机';
     if (el && el.classList.contains('text-muted-foreground') && el.closest('[data-testid="ssh-connect-dialog"]')) {
       if (text.trim() === 'No hosts in') return '尚无主机记录，配置文件：';
       if (text.trim() === 'yet. Type one above.') return '。可在上方手动输入。';
@@ -670,7 +671,9 @@
           var markKey = MARK_ATTR + '_' + attr;
           if (el[markKey] === val) continue;
 
-          var trans = translateSingleUnit(val);
+          var trans = attr === 'placeholder' && val === 'Search Hosts…' && el.tagName === 'INPUT' &&
+            el.parentElement?.getAttribute('data-testid') === 'project-selector-ssh-host-search'
+            ? '搜索主机…' : translateSingleUnit(val);
           if (trans !== null && trans !== val) {
             var edits = attributeEdits.get(el);
             if (!edits) {

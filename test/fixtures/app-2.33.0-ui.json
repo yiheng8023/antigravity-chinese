@@ -38,6 +38,10 @@
         "end": 8583370
       },
       {
+        "start": 8587257,
+        "end": 8599080
+      },
+      {
         "start": 11938000,
         "end": 11939500
       },
@@ -126,6 +130,16 @@
     "Full View"
   ],
   "preserve": [
+    {
+      "text": "SSH Host",
+      "kind": "composed",
+      "reason": "Localized only on the project picker's SSH submenu trigger"
+    },
+    {
+      "text": "Search Hosts…",
+      "kind": "composed",
+      "reason": "Localized only as the placeholder inside the SSH submenu's search control"
+    },
     {
       "text": "user@host:port",
       "kind": "example",

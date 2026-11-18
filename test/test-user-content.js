@@ -50,6 +50,38 @@ test('2.33 SSH and pull request controls preserve remote metadata with matching 
   assert.equal(read('#turn-count'), '第 2 轮（共 4 轮）');
 });
 
+test('2.33 SSH project picker localizes only the submenu trigger and search placeholder', async t => {
+  const { document } = await fixture(t, `<div role="menu">
+    <div role="menuitem" data-testid="project-selector-ssh-host-trigger">
+      <span class="flex"><span class="truncate">SSH Host</span></span>
+    </div>
+    <div role="menuitem"><span id="project-name">SSH Host</span></div>
+  </div>
+  <div role="menu">
+    <div data-testid="project-selector-ssh-host-search">
+      <input placeholder="Search Hosts…" value="SSH Host">
+    </div>
+    <div data-testid="ssh-host-project-item" data-ssh-host="SSH Host" data-ssh-config-file="Search Hosts…">
+      <span class="truncate" title="SSH Host">SSH Host</span>
+      <span class="truncate" title="Search Hosts…">Search Hosts…</span>
+    </div>
+    <input id="other-search" placeholder="Search Hosts…">
+  </div>`);
+  const trigger = document.querySelector('[data-testid="project-selector-ssh-host-trigger"] .truncate');
+  const search = document.querySelector('[data-testid="project-selector-ssh-host-search"] input');
+  assert.equal(trigger.textContent, 'SSH 主机');
+  assert.equal(search.placeholder, '搜索主机…');
+  assert.equal(search.value, 'SSH Host');
+  assert.equal(document.querySelector('#project-name').textContent, 'SSH Host');
+  assert.equal(document.querySelector('#other-search').placeholder, 'Search Hosts…');
+  const host = document.querySelector('[data-testid="ssh-host-project-item"]');
+  assert.equal(host.getAttribute('data-ssh-host'), 'SSH Host');
+  assert.equal(host.getAttribute('data-ssh-config-file'), 'Search Hosts…');
+  assert.deepEqual(Array.from(host.children, el => [el.textContent, el.title]), [
+    ['SSH Host', 'SSH Host'], ['Search Hosts…', 'Search Hosts…']
+  ]);
+});
+
 test('2.33 side question insert action translates without changing a matching answer', async t => {
   const { document } = await fixture(t, `<div data-testid="side-question-answer">
     <div class="prose">Insert into main conversation</div>
