@@ -46,12 +46,16 @@ if (require.main === module) {
   const index = args.indexOf('--bundle');
   try {
     if (args.length && (index !== 0 || args.length !== 2)) throw new Error('Usage: node tools/ui-inventory.js [--bundle <official-main.js>]');
-    const inventory = require('../test/fixtures/app-2.32.1-ui.json');
     const source = index === -1 ? undefined : fs.readFileSync(path.resolve(args[1]));
-    const result = checkInventory(require('../dict/zh-CN.json'), inventory, source);
-    console.log(JSON.stringify(result, null, 2));
-    console.log(source === undefined ? 'Saved inventory only; upstream freshness and live UI are not verified.' : 'Explicit upstream bundle and reviewed inventory checked; live UI remains a separate check.');
-    process.exitCode = result.ok ? 0 : 1;
+    const inventories = [require('../test/fixtures/app-2.32.1-ui.json'), require('../test/fixtures/app-2.33.0-ui.json')];
+    const hash = source && crypto.createHash('sha256').update(source).digest('hex');
+    const selected = hash ? inventories.filter(i => i.source.sha256 === hash) : inventories;
+    if (!selected.length) throw new Error('Upstream changed: extract and review a component inventory for SHA-256 ' + hash);
+    const dictionary = require('../dict/zh-CN.json');
+    const results = selected.map(i => ({ version: i.source.version, ...checkInventory(dictionary, i, source) }));
+    console.log(JSON.stringify(results, null, 2));
+    console.log(source === undefined ? 'Saved inventories only; upstream freshness and live UI are not verified.' : 'Explicit upstream bundle and reviewed inventory checked; live UI remains a separate check.');
+    process.exitCode = results.every(r => r.ok) ? 0 : 1;
   } catch (error) { console.error(error.message); process.exitCode = 2; }
 }
 

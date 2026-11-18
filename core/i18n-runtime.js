@@ -304,6 +304,32 @@
     return content && !!el.closest('[data-testid="mcp-server-row"]');
   }
 
+  function isPullRequestLink(el) {
+    return el && el.tagName === 'A' &&
+      /^https?:\/\/(?:github\.com|depot\.code\.corp\.goog)\/[\w.-]+\/[\w.-]+\/pull\/[1-9]\d*(?:[/?#]|$)/i.test(el.getAttribute('href') || '');
+  }
+
+  function hasPullRequestCardHeader(el) {
+    var header = el && el.firstElementChild;
+    return !!(header && header.classList.contains('text-compact') &&
+      header.classList.contains('gap-1.5') && isPullRequestLink(header.querySelector('a[href]')));
+  }
+
+  function isRemoteMetadata(el, testId) {
+    if (testId === 'ssh-config-file-name') return el.hasAttribute('tabindex');
+    var classes = el.classList;
+    if (el.tagName === 'SPAN' && classes.contains('truncate') && el.closest('[data-ssh-host]')) return true;
+    if (classes.contains('whitespace-pre-line') && el.closest('[data-testid="ssh-connect-error"]')) return true;
+
+    // The PR card shares this slot with repository-supplied titles and diagnostics.
+    if (el.tagName === 'DIV' && classes.contains('text-compact') &&
+        (classes.contains('-mt-1') || classes.contains('font-medium')) && hasPullRequestCardHeader(el.parentElement)) return true;
+    if (classes.contains('line-clamp-4') && classes.contains('whitespace-pre-wrap') && hasPullRequestCardHeader(el.parentElement)) return true;
+    if (el.tagName === 'SPAN' && classes.contains('break-words') && classes.contains('min-w-0') &&
+        el.parentElement?.classList.contains('grid-cols-[auto_1fr]') && hasPullRequestCardHeader(el.parentElement.parentElement)) return true;
+    return isPullRequestLink(el) && (el.closest('.text-compact.gap-1\\.5') || el.hasAttribute('data-item-id'));
+  }
+
   function isProtectedBoundary(el) {
     if (IGNORED_TAGS[el.tagName]) return true;
     if (el.isContentEditable || el.getAttribute('contenteditable') === '' ||
@@ -331,7 +357,7 @@
         if (CONTENT_CLASSES[classes[ci]] === 1) return true;
       }
     }
-    return isCustomizationContent(el) || isMcpServerContent(el);
+    return isRemoteMetadata(el, testId) || isCustomizationContent(el) || isMcpServerContent(el);
   }
 
   function isCustomizationBreadcrumb(el) {
@@ -362,7 +388,8 @@
   }
 
   function isSideQuestionUi(el) {
-    return el.matches('[data-testid="side-question-question"] > span.shrink-0, [data-testid="side-question-answer"] > span.opacity-70.animate-pulse');
+    return el.getAttribute('data-testid') === 'side-question-insert-to-main' ||
+      el.matches('[data-testid="side-question-question"] > span.shrink-0, [data-testid="side-question-answer"] > span.opacity-70.animate-pulse');
   }
 
   function isTimestampUi(el) {
@@ -372,6 +399,35 @@
   }
 
   function translateUiText(text, el) {
+    var testId = el && el.getAttribute('data-testid');
+    if (el && el.classList.contains('text-muted-foreground') && el.closest('[data-testid="ssh-connect-dialog"]')) {
+      if (text.trim() === 'No hosts in') return '尚无主机记录，配置文件：';
+      if (text.trim() === 'yet. Type one above.') return '。可在上方手动输入。';
+    }
+    if (el && el.classList.contains('text-foreground') && el.closest('[data-testid="ssh-connect-error"]') &&
+        text.trim() === "Couldn't connect to") return '无法连接到';
+    if (el && el.tagName === 'SPAN' && el.classList.contains('whitespace-nowrap') &&
+        el.closest('[data-testid="github-hover-auth-actions"]') && text.trim() === 'in a terminal') return '（在终端中）';
+    if (el && el.tagName === 'SPAN' && el.classList.contains('text-muted-foreground') &&
+        el.parentElement?.classList.contains('grid-cols-[auto_1fr]') &&
+        hasPullRequestCardHeader(el.parentElement.parentElement) && text.trim() === 'Author') return '作者';
+    if (testId === 'find-bar-match-count') {
+      var matchCount = text.match(/^\s*(\d+) of (\d+\+?)\s*$/);
+      if (matchCount) return '第 ' + matchCount[1] + ' 项，共 ' + matchCount[2] + ' 项';
+    }
+    if (testId === 'ssh-connect-hidden-hosts-toggle') {
+      var hidden = text.match(/^\s*(\d+) hidden hosts?\s*$/);
+      if (hidden) return hidden[1] + ' 台隐藏主机';
+    }
+    if (testId === 'ssh-connect-host-group-label') {
+      var config = text.match(/^SSH Config \((.+)\)$/);
+      if (config) return 'SSH 配置（' + config[1] + '）';
+    }
+    if (el && el.classList.contains('z-10') && el.parentElement?.classList.contains('text-compact') &&
+        hasPullRequestCardHeader(el.parentElement.parentElement?.parentElement)) {
+      var state = { Open: '开放', Closed: '已关闭', Merged: '已合并', Draft: '草稿' }[text.trim()];
+      if (typeof state === 'string') return state;
+    }
     // Compact relative times belong to UI clocks, never arbitrary message text.
     if (isTimestampUi(el)) {
       var clock = text.match(/^(?:(about|over|almost|less than) )?(\d+)(mo|m|h|d|w|y)( ago)?$/);
@@ -506,6 +562,19 @@
     if (parent && ((parentMode === undefined ? getElementTranslationMode(parent) : parentMode) !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
       restoreLocalizedText(node);
       return;
+    }
+
+    // React emits the alias/path as a separate text node after the fixed SSH
+    // prefix. Preserve it even when it matches a menu label such as "Open".
+    var previous = node.previousSibling;
+    if (previous && previous.nodeType === 3 && parent?.classList &&
+        (parent.classList.contains('text-foreground') || parent.classList.contains('text-muted-foreground'))) {
+      var prefix = (textEdits.get(previous)?.source || previous.nodeValue).trim();
+      if ((prefix === "Couldn't connect to" && parent.closest('[data-testid="ssh-connect-error"]')) ||
+          (prefix === 'No hosts in' && parent.closest('[data-testid="ssh-connect-dialog"]'))) {
+        restoreLocalizedText(node);
+        return;
+      }
     }
 
     var original = node.nodeValue;

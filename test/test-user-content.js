@@ -7,6 +7,60 @@ const { JSDOM } = require('jsdom');
 const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
 const dictionary = require('../dict/zh-CN.json');
 
+test('2.33 SSH and pull request controls preserve remote metadata with matching UI strings', async t => {
+  const { document, translate } = await fixture(t, `
+    <div data-testid="ssh-connect-dialog">
+      <button data-ssh-host="Open"><span class="truncate" title="Open">Open</span><span>Connected</span></button>
+      <span data-testid="ssh-config-file-name" tabindex="0">Settings</span>
+      <button data-testid="ssh-connect-hidden-hosts-toggle">3 hidden hosts</button>
+      <div data-testid="ssh-connect-host-group-label">SSH Config (Settings)</div>
+      <div data-testid="ssh-connect-error"><span class="whitespace-pre-line">Settings</span><span class="text-foreground" id="ssh-failure"></span></div>
+    </div>
+    <div id="pr">
+      <div class="text-compact gap-1.5"><a href="https://github.com/example/repo/pull/7"><span>Settings</span></a>
+        <span class="text-compact"><span class="z-10">Open</span></span></div>
+      <div class="text-compact font-medium text-foreground">Connect GitHub</div>
+      <div class="line-clamp-4 whitespace-pre-wrap">Settings</div>
+      <div class="grid-cols-[auto_1fr]"><span>Branch</span><span class="break-words min-w-0">Open</span></div>
+      <button data-testid="github-hover-connect-plugin">Connect GitHub</button>
+    </div>
+    <span id="open">Open</span>
+    <span data-testid="find-bar-match-count">2 of 4</span>
+    <span id="turn-count">2 of 4</span>`);
+  const read = selector => document.querySelector(selector).textContent;
+  assert.equal(read('[data-ssh-host] .truncate'), 'Open');
+  assert.equal(document.querySelector('[data-ssh-host] .truncate').title, 'Open');
+  assert.equal(read('[data-ssh-host] span:last-child'), '已连接');
+  assert.equal(read('[data-testid="ssh-config-file-name"]'), 'Settings');
+  assert.equal(read('[data-testid="ssh-connect-hidden-hosts-toggle"]'), '3 台隐藏主机');
+  assert.equal(read('[data-testid="ssh-connect-host-group-label"]'), 'SSH 配置（Settings）');
+  assert.equal(read('.whitespace-pre-line'), 'Settings');
+  const failure = document.querySelector('#ssh-failure');
+  failure.append(document.createTextNode("Couldn't connect to "), document.createTextNode('Open'));
+  translate(failure);
+  assert.equal(failure.textContent, '无法连接到 Open');
+  assert.equal(read('#pr a'), 'Settings');
+  assert.equal(read('#pr .z-10'), '开放');
+  assert.equal(read('#pr .font-medium'), 'Connect GitHub');
+  assert.equal(read('#pr .line-clamp-4'), 'Settings');
+  assert.equal(read('#pr .break-words'), 'Open');
+  assert.equal(read('#pr button'), '连接 GitHub');
+  assert.equal(read('#open'), '打开');
+  assert.equal(read('[data-testid="find-bar-match-count"]'), '第 2 项，共 4 项');
+  assert.equal(read('#turn-count'), '第 2 轮（共 4 轮）');
+});
+
+test('2.33 side question insert action translates without changing a matching answer', async t => {
+  const { document } = await fixture(t, `<div data-testid="side-question-answer">
+    <div class="prose">Insert into main conversation</div>
+    <button data-testid="side-question-insert-to-main" aria-label="Insert into main conversation">Insert into main conversation</button>
+  </div>`);
+  assert.equal(document.querySelector('.prose').textContent, 'Insert into main conversation');
+  const action = document.querySelector('button');
+  assert.equal(action.textContent, '插入主会话');
+  assert.equal(action.getAttribute('aria-label'), '插入主会话');
+});
+
 function settle(window) {
   return new Promise(resolve => window.setTimeout(resolve, 40));
 }

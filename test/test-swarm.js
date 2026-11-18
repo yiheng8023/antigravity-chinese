@@ -119,6 +119,19 @@ test('message controls and fixed author hints translate without translating the 
   assert.equal(button.textContent, 'Show less');
 });
 
+test('2.33 progress navigation translates without rewriting authored frame captions', t => {
+  const dom = domFor(t, `<div id="ov-plain"><input class="o2-rswipe" aria-label="Compare then and now"></div>
+    <div class="o2-tvstage"><button class="o2-tvnav prev" aria-label="Previous"></button><img alt="Previous"></div>
+    <div class="o2-tvstrip" role="listbox" aria-label="Frames"><button aria-label="Frames">Frames</button></div>`);
+  run(dom);
+  const {document} = dom.window;
+  assert.equal(document.querySelector('input').getAttribute('aria-label'), '对比前后画面');
+  assert.equal(document.querySelector('.prev').getAttribute('aria-label'), '上一帧');
+  assert.equal(document.querySelector('img').alt, 'Previous');
+  assert.equal(document.querySelector('.o2-tvstrip').getAttribute('aria-label'), '画面列表');
+  assert.equal(document.querySelector('.o2-tvstrip button').getAttribute('aria-label'), 'Frames');
+});
+
 test('fixed member controls translate while custom narrator labels remain authored', t => {
   const dom = domFor(t, '<div id="members" class="o2"><input class="o2-msin" placeholder="Search members">' +
     '<h3 class="o2-msec"><span>Active</span></h3><span class="o2-mstat info">Working</span></div>');

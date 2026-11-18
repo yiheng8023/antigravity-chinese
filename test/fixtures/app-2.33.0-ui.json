@@ -1,0 +1,200 @@
+{
+  "source": {
+    "version": "Antigravity App 2.33.0",
+    "platform": "Windows x64",
+    "sha256": "f066a497c9c61198394cb3218e42ff61d85b03910d81282589c3ef066905f347",
+    "scope": "Reviewed 2.33.0 component literals for SSH dialogs and project picker, GitHub PR cards and repository picker, side-question controls, find bar, PDF text selection, managed settings and remote environment actions. Dynamic templates and sidecar sources are verified separately.",
+    "regions": [
+      {
+        "start": 1903000,
+        "end": 1915500
+      },
+      {
+        "start": 3203210,
+        "end": 3210460
+      },
+      {
+        "start": 5444149,
+        "end": 5464082
+      },
+      {
+        "start": 6219553,
+        "end": 6234060
+      },
+      {
+        "start": 7389993,
+        "end": 7392446
+      },
+      {
+        "start": 7468336,
+        "end": 7469270
+      },
+      {
+        "start": 8479490,
+        "end": 8491300
+      },
+      {
+        "start": 8578333,
+        "end": 8583370
+      },
+      {
+        "start": 11938000,
+        "end": 11939500
+      },
+      {
+        "start": 12106063,
+        "end": 12113669
+      },
+      {
+        "start": 12260950,
+        "end": 12270400
+      }
+    ]
+  },
+  "ui": [
+    "Open SSH Host",
+    "Connect to SSH Host",
+    "SSH Host…",
+    "SSH host",
+    "Create a project on a machine you reach over SSH. It opens in that host's own window.",
+    "Enter [user@]host[:port], or pick a host from your SSH config.",
+    " Then create the project in its window.",
+    "A host can't contain spaces.",
+    "SSH Config",
+    "SSH config: ",
+    "~/.ssh/config (default)",
+    "Choose File…",
+    "Use Default",
+    "Remove from Recent",
+    "Hide from this list",
+    "Show in the list again",
+    "Hidden hosts",
+    "1 hidden host",
+    "Loading hosts…",
+    "Loading Hosts…",
+    "Couldn't load your SSH hosts",
+    "Couldn't load your SSH hosts. You can still type one.",
+    "No matching hosts",
+    "No hosts in ~/.ssh/config yet",
+    "Pull Requests",
+    "Connect GitHub",
+    "GitHub: not signed in",
+    "Connect GitHub: Run gh auth login in a terminal",
+    "Copy gh auth login command",
+    "Grant repository access",
+    "GitHub Repositories",
+    "Loading Repositories…",
+    "No matching repositories",
+    "No repositories found",
+    "Insert into main conversation",
+    "Side Question Selection",
+    "Unarchive the main conversation to insert",
+    "Previous Match (Shift+Enter)",
+    "Next Match (Enter)",
+    "Use Regular Expression (.*)",
+    "0 results",
+    "managed by your organization",
+    "Terminal sandbox is not supported in this environment",
+    "Checking availability…",
+    "Saving setup routine",
+    "Canceled saving setup routine",
+    "Saved setup routine",
+    "Deleting setup routine",
+    "Canceled deletion of setup routine",
+    "Deleted setup routine",
+    "Open in settings",
+    "Connect to SSH Host…",
+    "Stop SSH Server…",
+    "Switch to This Computer",
+    "Recent",
+    "Connected",
+    "Connect",
+    "Connecting…",
+    "Show Details",
+    "Branch",
+    "Copy link",
+    "Find in Pane",
+    "Find in Conversation",
+    "Find",
+    "No Results",
+    "Previous match",
+    "Next match",
+    "Enable Text Selection",
+    "Disable Text Selection",
+    "Text Selection",
+    "Side Question",
+    "Full View"
+  ],
+  "preserve": [
+    {
+      "text": "user@host:port",
+      "kind": "example",
+      "reason": "SSH host input format"
+    },
+    {
+      "text": "gh auth login",
+      "kind": "technical",
+      "reason": "Exact GitHub CLI command"
+    },
+    {
+      "text": "~/.ssh/config",
+      "kind": "technical",
+      "reason": "Default SSH config path"
+    },
+    {
+      "text": "Enter",
+      "kind": "technical",
+      "reason": "Keyboard event key"
+    },
+    {
+      "text": "No hosts in ",
+      "kind": "composed",
+      "reason": "Scoped prefix followed by the original config path"
+    },
+    {
+      "text": " yet. Type one above.",
+      "kind": "composed",
+      "reason": "Scoped suffix after the original config path"
+    },
+    {
+      "text": "Couldn't connect to ",
+      "kind": "composed",
+      "reason": "Scoped prefix followed by the original host alias"
+    },
+    {
+      "text": "Author",
+      "kind": "composed",
+      "reason": "Localized only in the PR metadata grid"
+    },
+    {
+      "text": "in a terminal",
+      "kind": "composed",
+      "reason": "Localized only in the PR sign-in tooltip"
+    },
+    {
+      "text": "Open",
+      "kind": "composed",
+      "reason": "PR status localized by chip context; Open action has its own translation"
+    },
+    {
+      "text": "Closed",
+      "kind": "composed",
+      "reason": "PR status localized by chip context"
+    },
+    {
+      "text": "Merged",
+      "kind": "composed",
+      "reason": "PR status localized by chip context"
+    },
+    {
+      "text": "Draft",
+      "kind": "composed",
+      "reason": "PR status localized by chip context"
+    },
+    {
+      "text": "PR details unavailable",
+      "kind": "composed",
+      "reason": "Shared display slot with PR titles and upstream diagnostics"
+    }
+  ]
+}

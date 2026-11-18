@@ -35,6 +35,11 @@ test('reviewed component inventory catches omitted descriptions and changed upst
   assert.equal(drifted.ok, false);
   assert.equal(drifted.sourceVerified, false);
   assert.match(drifted.errors.join('\n'), /Upstream changed/);
+  const remoteInventory = require('./fixtures/app-2.33.0-ui.json');
+  assert.equal(checkInventory(dictionary, remoteInventory).ok, true);
+  const missingRemote = { ...dictionary, exact: { ...dictionary.exact } };
+  delete missingRemote.exact['Insert into main conversation'];
+  assert.ok(checkInventory(missingRemote, remoteInventory).errors.some(e => e.includes('Insert into main conversation')));
 });
 
 function extension(dir, version = '1.9.0', suffix = '') {
