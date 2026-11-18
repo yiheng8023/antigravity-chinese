@@ -78,6 +78,41 @@ test('one large remounted subtree is split across frames and still protects auth
   assert.equal(section.querySelector('[data-testid="user-input-step"]').textContent, 'Settings');
 });
 
+test('a newly opened settings sidebar runs ahead of an older scan within the frame budget', async t => {
+  const { window, document, frame, drain } = await fixture(t);
+  let clock = 0;
+  Object.defineProperty(window.performance, 'now', { value: () => clock += 0.01 });
+  const background = document.createElement('div');
+  background.innerHTML = '<span>Settings</span>'.repeat(1200);
+  document.body.appendChild(background);
+  await turn();
+  await frame();
+  assert.equal(background.lastChild.textContent, 'Settings');
+
+  const portal = document.createElement('div');
+  portal.setAttribute('data-base-ui-portal', '');
+  document.body.appendChild(portal);
+  const settings = document.createElement('div');
+  settings.className = 'settings-modal-backdrop';
+  settings.innerHTML = `<div class="settings-modal-container" role="dialog">
+    <div data-testid="settings-sidebar">
+      <h1>Settings</h1><button data-testid="settings-nav-item-General"><span>General</span></button>
+      <div data-testid="user-input-step">Settings</div>
+    </div>
+    <main><h2>Appearance</h2></main>
+  </div>`;
+  portal.appendChild(settings);
+  await turn();
+  await frame();
+  assert.equal(settings.querySelector('h1').textContent, '设置');
+  assert.equal(settings.querySelector('button').textContent, '通用');
+  assert.equal(settings.querySelector('[data-testid="user-input-step"]').textContent, 'Settings');
+  assert.equal(background.lastChild.textContent, 'Settings');
+  await drain();
+  assert.equal(background.lastChild.textContent, '设置');
+  assert.equal(settings.querySelector('main h2').textContent, '外观');
+});
+
 test('content ownership is rechecked after yielding and moving a queued node', async t => {
   const { document, frame, drain } = await fixture(t);
   const section = document.createElement('section');

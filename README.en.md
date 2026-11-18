@@ -2,9 +2,9 @@
 
 [简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
 
-Source version **v3.3.52** targets **Antigravity App 2.33.0 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.53** targets **Antigravity App 2.33.0 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release localizes the desktop project picker's SSH Host menu item and Search Hosts placeholder. Host aliases, repository content, branch names, commands and user text retain their original wording. It retains the [settings scan fix for #8](docs/maintenance/settings-performance-2.32.1.md). See the [2.33.0 maintenance record](docs/maintenance/antigravity-2.33.0.md) for compatibility and verification scope.
+This release localizes the welcome title on the desktop sign-in screen and prioritizes the settings sidebar when it first appears. Host aliases, repository content, branch names, commands and user text retain their original wording. It retains the [settings scan fix for #8](docs/maintenance/settings-performance-2.32.1.md). See the [2.33.0 maintenance record](docs/maintenance/antigravity-2.33.0.md) for compatibility and verification scope.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window. See the [1.11.0 maintenance record](docs/maintenance/vscode-1.11.0.md) and the [desktop 2.29.0 record](docs/maintenance/antigravity-2.29.0.md) for compatibility and verification details.
 

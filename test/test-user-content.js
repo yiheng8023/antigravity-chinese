@@ -7,6 +7,23 @@ const { JSDOM } = require('jsdom');
 const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
 const dictionary = require('../dict/zh-CN.json');
 
+test('2.33 sign-in title translates only on the welcome screen', async t => {
+  const { document } = await fixture(t, `<section>
+    <div class="entrance-title text-3xl font-normal">Welcome to Antigravity!</div>
+    <button>Continue with Google</button>
+    <button>Copy sign-in link</button>
+  </section>
+  <div class="entrance-title text-3xl font-normal">Welcome to Example!</div>
+  <div id="project-name">Welcome to Antigravity!</div>
+  <div data-testid="user-input-step">Welcome to Antigravity!</div>`);
+  assert.equal(document.querySelector('section .entrance-title').textContent, '欢迎使用 Antigravity！');
+  assert.deepEqual([...document.querySelectorAll('section button')].map(button => button.textContent),
+    ['通过 Google 继续', '复制登录链接']);
+  assert.equal(document.querySelector('body > .entrance-title').textContent, 'Welcome to Example!');
+  assert.equal(document.querySelector('#project-name').textContent, 'Welcome to Antigravity!');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Welcome to Antigravity!');
+});
+
 test('2.33 SSH and pull request controls preserve remote metadata with matching UI strings', async t => {
   const { document, translate } = await fixture(t, `
     <div data-testid="ssh-connect-dialog">

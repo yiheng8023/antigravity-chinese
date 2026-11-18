@@ -400,6 +400,7 @@
 
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
+    if (text === 'Welcome to Antigravity!' && el?.tagName === 'DIV' && el.classList.contains('entrance-title')) return '欢迎使用 Antigravity！';
     if (text === 'SSH Host' && el?.closest('[data-testid="project-selector-ssh-host-trigger"]')) return 'SSH 主机';
     if (el && el.classList.contains('text-muted-foreground') && el.closest('[data-testid="ssh-connect-dialog"]')) {
       if (text.trim() === 'No hosts in') return '尚无主机记录，配置文件：';
@@ -808,6 +809,7 @@
   var observedDocumentPath = doc && doc.location ? doc.location.pathname : '';
   var pendingNodeSet = typeof Set !== 'undefined' ? new Set() : null;
   var scanJobs = [];
+  var pendingSettingsSidebar = null;
   var rafScheduled = false;
 
   function enqueueNode(node) {
@@ -841,6 +843,12 @@
         }
         pendingNodes = [];
         if (pendingNodeSet) pendingNodeSet.clear();
+      }
+      // A new desktop settings sidebar should not wait for an older subtree.
+      // It uses the same frame budget and content boundaries as other jobs.
+      if (pendingSettingsSidebar) {
+        if (pendingSettingsSidebar.isConnected) scanJobs.push(pendingSettingsSidebar);
+        pendingSettingsSidebar = null;
       }
       withScanContext(function () {
         var clock = root.performance && root.performance.now ? function () { return root.performance.now(); } : Date.now;
@@ -884,7 +892,13 @@
       var mutation = mutations[i];
       if (mutation.type === 'childList') {
         var added = mutation.addedNodes;
-        for (var j = 0; j < added.length; j++) enqueueNode(added[j]);
+        for (var j = 0; j < added.length; j++) {
+          var child = added[j];
+          if (child.nodeType === 1 && child.classList.contains('settings-modal-backdrop')) {
+            pendingSettingsSidebar = child.querySelector('[data-testid="settings-sidebar"]');
+          }
+          enqueueNode(child);
+        }
       } else if (mutation.type === 'characterData') {
         // Writes made while observing belong to the renderer, even when the value is unchanged.
         textEdits.delete(mutation.target);
