@@ -42,11 +42,21 @@ function getCandidateAsarPaths(platform = os.platform(), homedir = os.homedir())
     ];
   } else {
     // Linux
+    const applicationsDir = path.join(homedir, 'Applications');
+    const portableParents = new Set([
+      path.join(applicationsDir, 'Portable'),
+      applicationsDir,
+      path.dirname(PROJECT_ROOT),
+    ]);
+    const portableNames = ['Antigravity', 'antigravity', `Antigravity-${process.arch}`];
     return [
       '/opt/antigravity/resources/app.asar',
       '/usr/lib/antigravity/resources/app.asar',
       '/usr/share/antigravity/resources/app.asar',
       path.join(homedir, '.local', 'share', 'antigravity', 'resources', 'app.asar'),
+      ...Array.from(portableParents).flatMap(parent =>
+        portableNames.map(name => path.join(parent, name, 'resources', 'app.asar'))
+      ),
     ];
   }
 }
@@ -93,7 +103,7 @@ function findAsarPath(customPath) {
   const candidates = getCandidateAsarPaths();
   for (const p of candidates) {
     tryRecoverSwappedAsar(p);
-    if (fs.existsSync(p)) {
+    if (fs.existsSync(p) && fs.statSync(p, { throwIfNoEntry: false })?.isFile()) {
       return p;
     }
   }

@@ -309,11 +309,25 @@ assert(macPaths.includes('/Users/TestUser/Applications/Antigravity.app/Contents/
 
 // 3. Linux 候选路径校验
 const linuxPaths = getCandidateAsarPaths('linux', '/home/testuser').map(p => p.replace(/\\/g, '/'));
-assert(linuxPaths.length >= 4, 'Linux 包含 /opt, /usr/lib, /usr/share, ~/.local 4 组候选路径');
-assert(linuxPaths.includes('/opt/antigravity/resources/app.asar'), 'Linux 包含 /opt 路径');
-assert(linuxPaths.includes('/usr/lib/antigravity/resources/app.asar'), 'Linux 包含 /usr/lib 路径');
-assert(linuxPaths.includes('/usr/share/antigravity/resources/app.asar'), 'Linux 包含 /usr/share 路径');
-assert(linuxPaths.includes('/home/testuser/.local/share/antigravity/resources/app.asar'), 'Linux 包含 ~/.local/share 路径');
+const linuxDefaultPaths = [
+  '/opt/antigravity/resources/app.asar',
+  '/usr/lib/antigravity/resources/app.asar',
+  '/usr/share/antigravity/resources/app.asar',
+  '/home/testuser/.local/share/antigravity/resources/app.asar',
+];
+assert(linuxDefaultPaths.every((p, i) => linuxPaths[i] === p), 'Linux 保留原有四个安装路径的探测顺序');
+const linuxPortablePaths = [
+  '/home/testuser/Applications/Portable/Antigravity/resources/app.asar',
+  '/home/testuser/Applications/Portable/antigravity/resources/app.asar',
+  `/home/testuser/Applications/Portable/Antigravity-${process.arch}/resources/app.asar`,
+  '/home/testuser/Applications/Antigravity/resources/app.asar',
+  '/home/testuser/Applications/antigravity/resources/app.asar',
+  `/home/testuser/Applications/Antigravity-${process.arch}/resources/app.asar`,
+  path.resolve(__dirname, '../..', 'Antigravity', 'resources', 'app.asar').replace(/\\/g, '/'),
+  path.resolve(__dirname, '../..', 'antigravity', 'resources', 'app.asar').replace(/\\/g, '/'),
+  path.resolve(__dirname, '../..', `Antigravity-${process.arch}`, 'resources', 'app.asar').replace(/\\/g, '/'),
+];
+assert(linuxPortablePaths.every(p => linuxPaths.includes(p)), 'Linux 补充用户目录和仓库同级的便携版路径');
 
 console.log('\n--- 7. 验证 v3.2.35 性能黑洞修复与引擎优化断言 ---');
 // 1. 算法极速短路：纯数字与纯符号瞬间退出

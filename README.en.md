@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.54** targets **Antigravity App 2.33.1 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.55** targets **Antigravity App 2.33.1 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release adds Chinese translations for VS Code extension commands, shortcut scheme descriptions, and voice dictation controls. Desktop 2.33.1 keeps the sign-in and settings sidebar localization from the preceding release, including the [settings scan fix for #8](docs/maintenance/settings-performance-2.32.1.md). See the [maintenance record](docs/maintenance/antigravity-2.33.1.md) for compatibility and verification scope.
+This release detects portable Linux installations and forwards options such as `--path` through the install and restore scripts. See the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for verification details and the [preceding maintenance record](docs/maintenance/antigravity-2.33.1.md) for desktop 2.33.1 and VS Code extension 1.13.0 UI coverage.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window.
 
@@ -25,13 +25,13 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows 2.33.1 install, reinstall, restore and unpacked file verification. See the maintenance record for live UI coverage. |
-| VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | Windows 1.13.0 install, reinstall and restore. See the maintenance record for command and shortcut settings coverage. |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | See the preceding record for Windows 2.33.1 installation and UI checks. This release verifies install, reinstall, restore and unpacked files for Linux x64 2.33.0 on Ubuntu WSL 2. |
+| VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | Windows 1.13.0 install, reinstall and restore. See the preceding maintenance record for command and shortcut settings coverage. |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
 | Antigravity CLI | Preserves upstream behavior | CLI binaries and terminal UI are unchanged |
 
-macOS/Linux have cross-platform mock regressions, without live-client acceptance in this pass. Gradually rolled-out features depend on account availability. Static checks and candidate-string matches do not measure whole-product translation coverage.
+Linux verification covers the official archive and CLI. macOS coverage consists of automated regressions. Gradually rolled-out features depend on account availability. Static checks and candidate-string matches do not measure whole-product translation coverage.
 
 ## Installation and use
 
@@ -63,6 +63,15 @@ Custom targets:
 node cli.js install --path "<installation directory or app.asar>"
 node cli.js install:vscode --path "<extension directory>"
 ```
+
+On Linux, the detector also looks under `~/Applications/Portable`, under `~/Applications`, and beside the toolkit checkout. It accepts `Antigravity`, `antigravity`, and the official extracted directory for the current architecture (`Antigravity-x64` or `Antigravity-arm64`). Pass `--path` to select a specific copy when several are installed.
+
+```bash
+bash install.sh --path "$HOME/Applications/Portable/Antigravity"
+bash uninstall.sh --path "$HOME/Applications/Portable/Antigravity"
+```
+
+`install.sh` also installs the community plugin. To apply only the desktop patch to the selected copy, use `node cli.js install --path`. Restoration with `--path` applies only to the selected target.
 
 The installer preserves unpacked flags and compares external file contents before replacement. It aborts when a layout cannot be preserved safely. The desktop CLI uses ASAR; `core/cdp-client.js` is a separate protocol module for development integration.
 
@@ -120,6 +129,7 @@ Heartfelt thanks to all developers who contribute code, report bugs, and improve
 
 - Thanks to **a705876883-arch** for proposing a fix for unintended translation of user content and supplying reproduction and regression cases. [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6)
 - Thanks to **[fansID512](https://github.com/fansID512)** for detailed environment information, reproduction steps and comparison observations that helped diagnose settings stutter. [Issue #8](https://github.com/yiheng8023/antigravity-chinese/issues/8)
+- Thanks to **[MizuIro-H](https://github.com/MizuIro-H)** for reproducing the portable Linux detection problem on Bazzite, proposing a fix, and verifying installation. [Issue #9](https://github.com/yiheng8023/antigravity-chinese/issues/9)
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/graphs/contributors">
@@ -127,6 +137,9 @@ Heartfelt thanks to all developers who contribute code, report bugs, and improve
   </a>
   <a href="https://github.com/fansID512">
     <img src="https://avatars.githubusercontent.com/u/103017881?v=4" width="64" height="64" alt="fansID512 - bug reproduction and performance diagnosis" title="fansID512: bug reproduction and performance diagnosis" />
+  </a>
+  <a href="https://github.com/MizuIro-H">
+    <img src="https://avatars.githubusercontent.com/u/123630455?v=4" width="64" height="64" alt="MizuIro-H - portable Linux reproduction and fix proposal" title="MizuIro-H - portable Linux reproduction and fix proposal" />
   </a>
 </p>
 

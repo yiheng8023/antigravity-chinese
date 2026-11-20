@@ -1,6 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { spawnSync } = require('child_process');
 const { findAsarPath } = require('../cli');
 
 console.log('🧪 ============================================================');
@@ -65,6 +66,34 @@ try {
     detected && path.resolve(detected) === path.resolve(targetDummyAsar),
     `探测结果 "${detected}" 精确匹配系统默认安装路径 "${targetDummyAsar}"`
   );
+
+  if (platform === 'linux') {
+    const portableDir = path.join(homedir, 'Applications', 'Portable', 'Antigravity');
+    const portableAsar = path.join(portableDir, 'resources', 'app.asar');
+    fs.mkdirSync(path.dirname(portableAsar), { recursive: true });
+    fs.writeFileSync(portableAsar, 'DUMMY_PORTABLE_ASAR', 'utf8');
+    assert(findAsarPath() === targetDummyAsar, 'Linux 默认安装与便携版共存时沿用默认路径');
+    assert(findAsarPath(portableDir) === portableAsar, '显式安装目录优先于 Linux 默认安装');
+    fs.unlinkSync(targetDummyAsar);
+    fs.mkdirSync(targetDummyAsar);
+    assert(findAsarPath() === portableAsar, '默认位置只有同名目录时，Linux 继续探测便携版');
+  }
+
+  if (platform !== 'win32') {
+    const projectDir = path.join(__dirname, '..');
+    const cliArgs = ['--path', path.join(homedir, 'Portable Apps', 'Antigravity'), '--force'];
+    for (const [file, commandArgs] of [
+      ['install.sh', ['install', '--with-plugin']],
+      ['uninstall.sh', ['restore']],
+    ]) {
+      const result = spawnSync('bash', [
+        '-c', 'node() { printf "%s\\0" "$@"; }; source "$@"',
+        'test-wrapper', path.join(projectDir, file), ...cliArgs,
+      ], { encoding: 'utf8' });
+      const expected = [path.join(projectDir, 'cli.js'), ...commandArgs, ...cliArgs].join('\0') + '\0';
+      assert(result.status === 0 && result.stdout === expected, `${file} 按原顺序透传含空格的路径和选项`);
+    }
+  }
 
 } catch (err) {
   console.error('❌ 测试运行异常:', err);
