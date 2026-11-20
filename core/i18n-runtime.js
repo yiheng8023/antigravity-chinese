@@ -402,6 +402,10 @@
     var testId = el && el.getAttribute('data-testid');
     if (text === 'Welcome to Antigravity!' && el?.tagName === 'DIV' && el.classList.contains('entrance-title')) return '欢迎使用 Antigravity！';
     if (text === 'SSH Host' && el?.closest('[data-testid="project-selector-ssh-host-trigger"]')) return 'SSH 主机';
+    if (text === 'commands.' && el?.firstElementChild?.tagName === 'CODE' &&
+        el.firstElementChild.textContent === 'antigravity.' &&
+        (textEdits.get(el.firstChild)?.source || el.firstChild.nodeValue)?.trim() ===
+          'Inspect live bindings or record custom key chords filtered to') return '的命令。';
     if (el && el.classList.contains('text-muted-foreground') && el.closest('[data-testid="ssh-connect-dialog"]')) {
       if (text.trim() === 'No hosts in') return '尚无主机记录，配置文件：';
       if (text.trim() === 'yet. Type one above.') return '。可在上方手动输入。';
@@ -672,9 +676,15 @@
           var markKey = MARK_ATTR + '_' + attr;
           if (el[markKey] === val) continue;
 
-          var trans = attr === 'placeholder' && val === 'Search Hosts…' && el.tagName === 'INPUT' &&
-            el.parentElement?.getAttribute('data-testid') === 'project-selector-ssh-host-search'
-            ? '搜索主机…' : translateSingleUnit(val);
+          var trans = translateSingleUnit(val);
+          if (attr === 'placeholder' && el.tagName === 'INPUT') {
+            if (val === 'Search Hosts…' && el.parentElement?.getAttribute('data-testid') === 'project-selector-ssh-host-search') {
+              trans = '搜索主机…';
+            } else if (val === 'Search languages to add (e.g. English, Spanish, 中文, yue)...' &&
+                el.getAttribute('data-testid') === 'dictation-languages-search-input') {
+              trans = '搜索要添加的语言（例如 English、Spanish、中文、yue）…';
+            }
+          }
           if (trans !== null && trans !== val) {
             var edits = attributeEdits.get(el);
             if (!edits) {

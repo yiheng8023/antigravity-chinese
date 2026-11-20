@@ -38,6 +38,11 @@ const VSCODE_TRANSLATION_MAP = {
   "Open Antigravity Settings": "打开 Antigravity 设置",
   "Manage Data Sharing & Telemetry": "管理数据共享与遥测",
   "Provide Feedback": "提供反馈",
+  "Add to Antigravity Chat": "添加到 Antigravity 对话",
+  "Undo Inline Diff Change": "撤销内联更改",
+  "Redo Inline Diff Change": "重做内联更改",
+  "Cancel / Stop Generation": "取消 / 停止生成",
+  "Search / Pick Conversation": "搜索 / 选择会话",
 
   // 配置项描述 (Configuration Properties)
   "Port for the Antigravity background server (`agy --hub`). Leave at 0 to allocate an ephemeral port automatically.":
@@ -64,6 +69,12 @@ const VSCODE_TRANSLATION_MAP = {
     "CLI 命令行工具下载的基础 URL（用于测试与内部环境重写）。",
   "Additional command line arguments passed to the language server.":
     "传递给语言服务器的额外命令行启动参数。",
+  "Keybinding scheme for Antigravity shortcuts in VS Code.":
+    "在 VS Code 中使用的 Antigravity 快捷键方案。",
+  "Use VS Code friendly shortcuts (Cmd+L / Ctrl+L for chat, Cmd+Shift+L for new conversation, Cmd+Shift+A for search) to avoid colliding with built-in IDE shortcuts.":
+    "使用与 VS Code 内置快捷键兼容的组合键（Cmd+L / Ctrl+L 打开对话，Cmd+Shift+L 新建会话，Cmd+Shift+A 搜索）。",
+  "Use standalone Antigravity chords (Ctrl+I / Cmd+I Focus Input or Add Selection, Ctrl+Shift+O / Cmd+Shift+O New Conversation, Ctrl+K / Cmd+K Conversation Picker in chat, Ctrl+, / Cmd+, Antigravity Settings, Ctrl+[/] / Cmd+[/] History Navigation). Replaces Go to Symbol in Editor (Ctrl+Shift+O / Cmd+Shift+O) and Trigger Suggest (Ctrl+I / Cmd+I), and rebinds VS Code Settings to Ctrl+Alt+, / Cmd+Option+,.":
+    "使用 Antigravity 桌面端的快捷键（Ctrl+I / Cmd+I 聚焦输入框或添加选中内容，Ctrl+Shift+O / Cmd+Shift+O 新建会话，Ctrl+K / Cmd+K 在对话中选择会话，Ctrl+, / Cmd+, 打开 Antigravity 设置，Ctrl+[/] / Cmd+[/] 浏览历史）。此方案占用“转到编辑器中的符号”（Ctrl+Shift+O / Cmd+Shift+O）和“触发建议”（Ctrl+I / Cmd+I）的按键，并将 VS Code 设置改绑为 Ctrl+Alt+, / Cmd+Option+,。",
   "The release channel for this extension build":
     "此扩展构建版本的发布频道",
   "Internal channel setting":
@@ -755,6 +766,11 @@ function installVsCodePatch(customDir) {
           }
           if (prop.deprecationMessage && map[prop.deprecationMessage]) {
             prop.deprecationMessage = map[prop.deprecationMessage];
+          }
+          for (const field of ['enumDescriptions', 'markdownEnumDescriptions']) {
+            if (Array.isArray(prop[field])) {
+              prop[field] = prop[field].map(text => typeof map[text] === 'string' ? map[text] : text);
+            }
           }
         }
       }

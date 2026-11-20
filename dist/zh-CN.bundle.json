@@ -1,6 +1,6 @@
 {
-  "version": "3.3.53",
-  "buildTime": "2026-11-18T18:20:23.928Z",
+  "version": "3.3.54",
+  "buildTime": "2026-11-20T19:38:26.738Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -3614,6 +3614,17 @@
     "Not set": "未设置",
     "Microphone": "麦克风",
     "Input device for voice mode and dictation.": "语音模式和听写使用的输入设备。",
+    "Dictation languages": "听写语言",
+    "Constrain voice dictation to selected languages in priority order. Leave empty to auto-detect.": "按优先顺序使用选定的语言进行语音听写。留空时自动检测。",
+    "Reset to auto": "恢复自动检测",
+    "Selected dictation languages": "已选听写语言",
+    "Auto-detect (browser defaults)": "自动检测（浏览器默认设置）",
+    "Toggle language list": "展开或收起语言列表",
+    "Dictation language options": "听写语言选项",
+    "Available dictation languages": "可选听写语言",
+    "Voice dictation unavailable": "语音听写不可用",
+    "Transcribing audio…": "正在转写音频…",
+    "Stop transcription": "停止转写",
     "System default": "系统默认",
     "How loud Antigravity's voice is.": "Antigravity 的语音音量。",
     "Previous Side Panel Tab": "上一个侧面板标签页",
@@ -3861,6 +3872,19 @@
     "Notification Settings": "通知设置",
     "Notifications": "通知",
     "Open Keyboard Shortcuts": "打开快捷键设置",
+    "Manage your keybinding scheme and customize shortcuts in VS Code.": "管理快捷键方案，并在 VS Code 中自定义快捷键。",
+    "Keybinding Scheme": "快捷键方案",
+    "Choose between non-colliding VS Code defaults or standalone Antigravity chords.": "选择与内置快捷键兼容的 VS Code 默认方案，或使用 Antigravity 桌面端快捷键。",
+    "VS Code Default": "VS Code 默认方案",
+    "Antigravity (AGY) Style": "Antigravity（AGY）方案",
+    "Honors standard VS Code shortcuts without collisions (e.g. Ctrl+L Focus Input, Ctrl+Shift+L New Conversation, Ctrl+Shift+A Picker, Ctrl+Shift+, Settings).": "保留 VS Code 的标准快捷键，避免冲突（例如 Ctrl+L 聚焦输入框、Ctrl+Shift+L 新建会话、Ctrl+Shift+A 打开会话选择器、Ctrl+Shift+, 打开设置）。",
+    "Honors standard VS Code shortcuts without collisions (e.g. ⌘L Focus Input, ⌘⇧L New Conversation, ⌘⇧A Picker, ⌘⇧, Settings).": "保留 VS Code 的标准快捷键，避免冲突（例如 ⌘L 聚焦输入框、⌘⇧L 新建会话、⌘⇧A 打开会话选择器、⌘⇧, 打开设置）。",
+    "Uses standalone Antigravity chords (e.g. Ctrl+I Focus Input, Ctrl+Shift+O New Conversation, Ctrl+K Picker in chat, Ctrl+, Settings, Ctrl+[/] History). Replaces Go to Symbol (Ctrl+Shift+O) and Trigger Suggest (Ctrl+I), and rebinds VS Code Settings to Ctrl+Alt+,.": "使用 Antigravity 桌面端快捷键（例如 Ctrl+I 聚焦输入框、Ctrl+Shift+O 新建会话、Ctrl+K 在对话中选择会话、Ctrl+, 打开设置、Ctrl+[/] 浏览历史）。此方案占用“转到符号”（Ctrl+Shift+O）和“触发建议”（Ctrl+I）的按键，并将 VS Code 设置改绑为 Ctrl+Alt+,。",
+    "Uses standalone Antigravity chords (e.g. ⌘I Focus Input, ⌘⇧O New Conversation, ⌘K Picker in chat, ⌘, Settings, ⌘[/] History). Replaces Go to Symbol (⌘⇧O) and Trigger Suggest (⌘I), and rebinds VS Code Settings to ⌘⌥,.": "使用 Antigravity 桌面端快捷键（例如 ⌘I 聚焦输入框、⌘⇧O 新建会话、⌘K 在对话中选择会话、⌘, 打开设置、⌘[/] 浏览历史）。此方案占用“转到符号”（⌘⇧O）和“触发建议”（⌘I）的按键，并将 VS Code 设置改绑为 ⌘⌥,。",
+    "Customize Shortcuts": "自定义快捷键",
+    "All active Antigravity shortcuts and user keybinding overrides are managed directly by VS Code.": "VS Code 直接管理当前生效的 Antigravity 快捷键及用户自定义绑定。",
+    "VS Code Keyboard Shortcuts": "VS Code 键盘快捷键",
+    "Inspect live bindings or record custom key chords filtered to": "查看现有快捷键或录制自定义组合键，列表仅显示前缀为",
     "Preset": "预设",
     "Purchase Credits": "购买积分",
     "Quota Remaining": "剩余配额",
@@ -6015,6 +6039,10 @@
     {
       "regex": "^Zipping\\s+(.+?)(?:…|\\.\\.\\.)?$",
       "replacement": "正在压缩 $1…"
+    },
+    {
+      "regex": "^Retrying transcription \\(attempt (\\d+)\\)…$",
+      "replacement": "正在重试转写（第 $1 次）…"
     },
     {
       "regex": "^Could not attach folder \"(.+?)\":\\s*Folder is empty$",

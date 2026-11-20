@@ -1420,6 +1420,10 @@
     "replacement": "正在压缩 $1…"
   },
   {
+    "regex": "^Retrying transcription \\(attempt (\\d+)\\)…$",
+    "replacement": "正在重试转写（第 $1 次）…"
+  },
+  {
     "regex": "^Could not attach folder \"(.+?)\":\\s*Folder is empty$",
     "replacement": "无法附加文件夹“$1”：文件夹为空"
   },

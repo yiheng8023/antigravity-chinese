@@ -22,7 +22,7 @@ console.log('🧪 ============================================================')
 const testDir = path.join(os.tmpdir(), `agy_test_vscode_${Date.now()}`);
 fs.mkdirSync(testDir, { recursive: true });
 
-// 模拟官方真实 1.6.0 版 package.json
+// 以 1.6.0 清单为基础，纳入新版设置和命令显示字段。
 const rawOriginalPkg = {
   name: "google-antigravity",
   displayName: "Google Antigravity",
@@ -49,7 +49,8 @@ const rawOriginalPkg = {
       { command: "antigravity.inlineDiff.rejectAll", title: "Reject All Changes" },
       { command: "antigravity.toggleInlineDiff", title: "Toggle Inline Diff" },
       { command: "antigravity.openSettings", title: "Open Antigravity Settings" },
-      { command: "antigravity.feedback", title: "Provide Feedback" }
+      { command: "antigravity.feedback", title: "Provide Feedback" },
+      { command: "antigravity.addFileToChat", title: "Add to Antigravity Chat" }
     ],
     configuration: {
       title: "Antigravity",
@@ -72,6 +73,20 @@ const rawOriginalPkg = {
         "antigravity.channel": {
           description: "The release channel for this extension build",
           deprecationMessage: "Internal channel setting"
+        },
+        "antigravity.keybindingScheme": {
+          type: "string",
+          default: "vscode",
+          enum: ["vscode", "agy"],
+          description: "Keybinding scheme for Antigravity shortcuts in VS Code.",
+          enumDescriptions: [
+            "Use VS Code friendly shortcuts (Cmd+L / Ctrl+L for chat, Cmd+Shift+L for new conversation, Cmd+Shift+A for search) to avoid colliding with built-in IDE shortcuts.",
+            "Unknown upstream description."
+          ]
+        },
+        "antigravity.markdownEnumFixture": {
+          enum: ["vscode", "agy"],
+          markdownEnumDescriptions: ["VS Code Default", "Keep `agy` Markdown."]
         }
       }
     }
@@ -134,7 +149,24 @@ async function runAllTests() {
     assert.strictEqual(patchedPkg1.contributes.customEditors[0].displayName, 'Antigravity 产物文档查看器');
     assert.strictEqual(patchedPkg1.contributes.configuration.properties['antigravity.enableInlineDiff'].description, '启用内联代码差异标记与 CodeLens。禁用后将回退为在并排对比标签页中显示更改。');
     assert.strictEqual(patchedPkg1.contributes.configuration.properties['antigravity.channel'].deprecationMessage, '内部频道设置');
-    console.log('✅ [PASS] 首次安装后所有命令、设置描述与查看器标题 100% 汉化');
+    const [addFile] = patchedPkg1.contributes.commands.slice(-1);
+    assert.deepStrictEqual(addFile, { command: 'antigravity.addFileToChat', title: '添加到 Antigravity 对话' });
+    const props = patchedPkg1.contributes.configuration.properties;
+    assert.deepStrictEqual(props['antigravity.keybindingScheme'], {
+      type: 'string',
+      default: 'vscode',
+      enum: ['vscode', 'agy'],
+      description: '在 VS Code 中使用的 Antigravity 快捷键方案。',
+      enumDescriptions: [
+        '使用与 VS Code 内置快捷键兼容的组合键（Cmd+L / Ctrl+L 打开对话，Cmd+Shift+L 新建会话，Cmd+Shift+A 搜索）。',
+        'Unknown upstream description.'
+      ]
+    });
+    assert.deepStrictEqual(props['antigravity.markdownEnumFixture'], {
+      enum: ['vscode', 'agy'],
+      markdownEnumDescriptions: ['VS Code 默认方案', 'Keep `agy` Markdown.']
+    });
+    console.log('✅ [PASS] 命令、设置描述和查看器标题正确翻译，枚举值保持原样');
 
     // 3. 二次重复安装（幂等性与防备份污染 P0 验证）
     const installRes2 = installVsCodePatch(testDir);
@@ -340,7 +372,7 @@ async function runAllTests() {
     })();
 
     console.log('\n============================================================');
-    console.log('📊 VS Code 扩展补丁测试完成: 共 26 项全维核心断言 100% 全部通过！');
+    console.log('📊 VS Code 扩展清单、安装还原与代理断言全部通过');
     console.log('============================================================\n');
   } finally {
     try {

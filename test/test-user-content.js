@@ -7,6 +7,43 @@ const { JSDOM } = require('jsdom');
 const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
 const dictionary = require('../dict/zh-CN.json');
 
+test('VS Code shortcut descriptions preserve scheme values and the command prefix', async t => {
+  const { document } = await fixture(t, `
+    <div role="radiogroup" aria-label="Keybinding Scheme">
+      <button data-testid="scheme-option-vscode" value="vscode" aria-label="VS Code Default">VS Code Default</button>
+      <button data-testid="scheme-option-agy" value="agy">Antigravity (AGY) Style</button>
+    </div>
+    <span id="shortcut-help">Inspect live bindings or record custom key chords filtered to <code>antigravity.</code> commands.</span>
+    <span id="other">List of <code>antigravity.</code> commands.</span>
+    <div data-testid="user-input-step">Keybinding Scheme</div>`);
+  const group = document.querySelector('[role="radiogroup"]');
+  assert.equal(group.getAttribute('aria-label'), '快捷键方案');
+  assert.equal(group.firstElementChild.getAttribute('aria-label'), 'VS Code 默认方案');
+  assert.deepEqual([...group.children].map(button => [button.value, button.textContent]),
+    [['vscode', 'VS Code 默认方案'], ['agy', 'Antigravity（AGY）方案']]);
+  assert.equal(document.querySelector('#shortcut-help').textContent,
+    '查看现有快捷键或录制自定义组合键，列表仅显示前缀为 antigravity. 的命令。');
+  assert.equal(document.querySelector('#shortcut-help code').textContent, 'antigravity.');
+  assert.equal(document.querySelector('#other').textContent, 'List of antigravity. commands.');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Keybinding Scheme');
+});
+
+test('Dictation controls translate without changing language codes and user text', async t => {
+  const hint = 'Search languages to add (e.g. English, Spanish, 中文, yue)...';
+  const { document } = await fixture(t, `
+    <input data-testid="dictation-languages-search-input" placeholder="${hint}" value="yue">
+    <input id="other-input" placeholder="${hint}">
+    <div role="status"><span>Retrying transcription (attempt 2)…</span><button aria-label="Stop transcription"></button></div>
+    <div data-testid="user-input-step">Retrying transcription (attempt 2)…</div>`);
+  const search = document.querySelector('[data-testid="dictation-languages-search-input"]');
+  assert.equal(search.placeholder, '搜索要添加的语言（例如 English、Spanish、中文、yue）…');
+  assert.equal(search.value, 'yue');
+  assert.equal(document.querySelector('#other-input').placeholder, hint);
+  assert.equal(document.querySelector('[role="status"]').textContent, '正在重试转写（第 2 次）…');
+  assert.equal(document.querySelector('button').getAttribute('aria-label'), '停止转写');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Retrying transcription (attempt 2)…');
+});
+
 test('2.33 sign-in title translates only on the welcome screen', async t => {
   const { document } = await fixture(t, `<section>
     <div class="entrance-title text-3xl font-normal">Welcome to Antigravity!</div>
