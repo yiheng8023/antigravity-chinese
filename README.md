@@ -1,6 +1,17 @@
 # Google Antigravity 中文本地化工具
 
-[简体中文](README.md) | [English](README.en.md) · [Release](https://github.com/yiheng8023/antigravity-chinese/releases/latest) · [CI](https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml)
+<p align="center">
+  <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&amp;label=CI&amp;logo=github" alt="CI 状态"></a>
+  <a href="https://github.com/yiheng8023/antigravity-chinese/releases/latest"><img src="https://img.shields.io/github/v/release/yiheng8023/antigravity-chinese?color=blue&amp;label=Release" alt="最新发行版"></a>
+  <a href="https://github.com/yiheng8023/antigravity-chinese/releases"><img src="https://img.shields.io/github/downloads/yiheng8023/antigravity-chinese/total?color=3388ff&amp;logo=github&amp;label=Asset%20downloads" alt="发行版附件下载量"></a>
+  <a href="https://github.com/yiheng8023/antigravity-chinese/stargazers"><img src="https://img.shields.io/github/stars/yiheng8023/antigravity-chinese?logo=github&amp;color=ffaa00" alt="GitHub 星标数"></a>
+  <a href="https://github.com/yiheng8023/antigravity-chinese/network/members"><img src="https://img.shields.io/github/forks/yiheng8023/antigravity-chinese?logo=github&amp;color=grey" alt="GitHub 派生数"></a>
+  <img src="https://img.shields.io/badge/Node.js-%3E%3D18-brightgreen?logo=node.js" alt="最低 Node.js 版本为 18">
+  <a href=".github/workflows/ci.yml"><img src="https://img.shields.io/badge/CI%20platforms-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey" alt="CI 平台为 Windows、macOS 和 Linux"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/yiheng8023/antigravity-chinese?color=green" alt="MIT 许可证"></a>
+</p>
+
+[简体中文](README.md) | [English](README.en.md)
 
 当前源码版本 **v3.3.53**，维护目标为 **Antigravity App 2.33.0 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
