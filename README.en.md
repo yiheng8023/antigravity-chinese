@@ -11,7 +11,9 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yiheng8023/antigravity-chinese?color=green" alt="MIT license"></a>
 </p>
 
-[简体中文](README.md) | [English](README.en.md)
+<p align="center">
+  <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
+</p>
 
 Source version **v3.3.53** targets **Antigravity App 2.33.0 / VS Code extension 1.12.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 

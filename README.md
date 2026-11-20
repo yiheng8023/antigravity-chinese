@@ -11,7 +11,9 @@
   <a href="LICENSE"><img src="https://img.shields.io/github/license/yiheng8023/antigravity-chinese?color=green" alt="MIT 许可证"></a>
 </p>
 
-[简体中文](README.md) | [English](README.en.md)
+<p align="center">
+  <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
+</p>
 
 当前源码版本 **v3.3.53**，维护目标为 **Antigravity App 2.33.0 / VS Code 扩展 1.12.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
