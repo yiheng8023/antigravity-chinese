@@ -4476,6 +4476,8 @@
     "Reset All to Defaults": "全部恢复默认设置",
     "Reset all shortcuts to defaults": "将所有快捷键恢复为默认设置",
     "No keyboard shortcuts found matching your filter.": "没有与筛选条件匹配的快捷键。",
+    "Managed by application menu": "由应用菜单管理",
+    "Terminal: Select All": "终端：全选",
     "Voices": "语音列表",
     "Save audio recordings": "保存录音",
     "Only stored on your machine.": "仅保存在您的电脑上。",

@@ -3,7 +3,7 @@
     "version": "Antigravity App 2.34.0",
     "platform": "Windows x64",
     "sha256": "d52ce739c15044c02a32e1b9df62bfe39dd8164c70a2ab783540e6ed5e070251",
-    "scope": "Reviewed shell and composer settings, model controls, permission settings and inline requests, sidebar ordering and filters, commit input, plugin controls and automation actions. Source-derived timer templates, MCP App status prefixes and request payload isolation are verified separately."
+    "scope": "Reviewed shell and composer settings, model controls, permission settings and inline requests, sidebar ordering and filters, commit input, plugin controls, automation actions, shortcut settings and the project deletion row. Source-derived templates, MCP App status prefixes and payload isolation are verified separately."
   },
   "ui": [
     "Input Box",
@@ -13,6 +13,9 @@
     "Press Ctrl+Enter to send, Enter for a new line.",
     "Press Enter to send, Shift+Enter for a new line.",
     "Command setup script",
+    "Terminal: Select All",
+    "Managed by application menu",
+    "Danger Zone",
     "Default workspace VCS",
     "Default Cog repository",
     "Default Cog branch / ref",
@@ -103,6 +106,11 @@
     "Recommended"
   ],
   "preserve": [
+    {
+      "text": " including ",
+      "kind": "composed",
+      "reason": "The project deletion row combines fixed text and conversation counts with a separately rendered project name."
+    },
     {
       "text": "Loading ",
       "kind": "composed",

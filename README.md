@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-当前源码版本 **v3.3.56**，维护目标为 **Antigravity App 2.34.0 / VS Code 扩展 1.13.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.57**，维护目标为 **Antigravity App 2.34.0 / VS Code 扩展 1.13.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版补齐 Antigravity App 2.34.0 的侧栏、输入、模型和权限界面文案，并保护新版请求卡片中的问题、选项和命令原文。界面与安装验证见 [2.34.0 维护记录](docs/maintenance/antigravity-2.34.0.md)。Linux 便携路径支持见 [Linux 便携安装维护记录](docs/maintenance/linux-portable-install.md)。
+本版补齐 Antigravity App 2.34.0 的终端全选快捷键和项目删除设置项，保留删除说明中的项目名及自动化名称。界面与安装验证见 [2.34.0 维护记录](docs/maintenance/antigravity-2.34.0.md)。Linux 便携路径支持见 [Linux 便携安装维护记录](docs/maintenance/linux-portable-install.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。
 

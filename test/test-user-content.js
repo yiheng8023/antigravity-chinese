@@ -279,6 +279,58 @@ test('complete shortcut rows translate descriptions and toggle labels while auth
   assert.equal(document.querySelector('[data-tooltip-id="skill"]').textContent, 'Pin / Unpin Conversation');
 });
 
+test('terminal select-all shortcut translates its label and accessibility text while preserving the chord', async t => {
+  const { document } = await fixture(t, `
+    <div data-testid="shortcut-row-terminalSelectAll">
+      <span>Terminal: Select All</span>
+      <button aria-label="Shortcut Ctrl+Shift+A for Terminal: Select All">Ctrl+Shift+A</button>
+      <button aria-label="Remove shortcut Ctrl+Shift+A for Terminal: Select All"></button>
+      <button aria-label="Add shortcut for Terminal: Select All"></button>
+      <button aria-label="Reset Terminal: Select All to default"></button>
+    </div>
+    <div title="Managed by application menu"></div>
+    <button id="unrelated-reset" aria-label="Reset Terminal: Select All to default"></button>
+    <div data-testid="user-input-step">Terminal: Select All</div>`);
+  const row = document.querySelector('[data-testid="shortcut-row-terminalSelectAll"]');
+  assert.equal(row.querySelector('span').textContent, '终端：全选');
+  const buttons = [...row.querySelectorAll('button')];
+  assert.equal(buttons[0].textContent, 'Ctrl+Shift+A');
+  assert.deepEqual(buttons.map(button => button.getAttribute('aria-label')), [
+    '终端：全选的快捷键：Ctrl+Shift+A', '移除终端：全选的快捷键：Ctrl+Shift+A',
+    '为终端：全选添加快捷键', '将终端：全选恢复为默认设置'
+  ]);
+  assert.equal(document.querySelector('[title]').title, '由应用菜单管理');
+  assert.equal(document.querySelector('#unrelated-reset').getAttribute('aria-label'), 'Reset Terminal: Select All to default');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Terminal: Select All');
+});
+
+test('project deletion row localizes the dynamic label and counts and retains authored project and automation names', async t => {
+  const { document } = await fixture(t, `
+    <h3>Danger Zone</h3>
+    <div>
+      <div class="flex-1 flex flex-col gap-0.5">
+        <div class="flex items-center gap-1.5"><span id="project-label">Delete project</span></div>
+        <span class="text-sm text-muted-foreground whitespace-pre-wrap"><span>Permanently delete <strong>Settings</strong> including <strong>2 active conversations and 1 archived conversation</strong>.</span></span>
+      </div>
+      <div class="shrink-0"><button data-testid="delete-project-button">Delete Project</button></div>
+    </div>
+    <div>
+      <div class="flex-1 flex flex-col gap-0.5">
+        <div class="flex items-center gap-1.5"><span id="workspace-label">Delete workspace</span></div>
+        <span class="text-sm text-muted-foreground whitespace-pre-wrap"><span>This workspace is managed by the <strong>Terminal: Select All</strong> automation and can only be deleted by deleting that automation.</span></span>
+      </div>
+      <div class="shrink-0"><button data-testid="delete-project-button" disabled>Delete Workspace</button></div>
+    </div>
+    <span id="outside-row">Delete project</span>`);
+  assert.equal(document.querySelector('h3').textContent, '危险区域');
+  assert.equal(document.querySelector('#project-label').textContent, '删除项目');
+  assert.equal(document.querySelector('#workspace-label').textContent, '删除工作区');
+  assert.equal(document.querySelector('#outside-row').textContent, 'Delete project');
+  assert.deepEqual([...document.querySelectorAll('strong')].map(strong => strong.textContent), [
+    'Settings', '2 个活跃会话和 1 个已归档会话', 'Terminal: Select All'
+  ]);
+});
+
 test('side-question chrome translates without rewriting the question, answer or quoted command', async t => {
   const { document } = await fixture(t, `
     <div data-testid="side-question-panel">

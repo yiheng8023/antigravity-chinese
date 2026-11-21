@@ -356,6 +356,17 @@
     return isPullRequestLink(el) && (el.closest('.text-compact.gap-1\\.5') || el.hasAttribute('data-item-id'));
   }
 
+  function isProjectDeletionDetails(el) {
+    return !!el?.classList.contains('flex-1') &&
+      !!el.parentElement?.querySelector(':scope > .shrink-0 > [data-testid="delete-project-button"]');
+  }
+
+  function isProjectDeletionDescription(el) {
+    var wrapper = el?.parentElement;
+    return el?.tagName === 'SPAN' && wrapper?.classList.contains('whitespace-pre-wrap') &&
+      isProjectDeletionDetails(wrapper.parentElement);
+  }
+
   function isProtectedBoundary(el) {
     if (IGNORED_TAGS[el.tagName]) return true;
     if (el.isContentEditable || el.getAttribute('contenteditable') === '' ||
@@ -367,6 +378,8 @@
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
     if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
+    // The first emphasized value in the deletion notice is a project or automation name.
+    if (el.tagName === 'STRONG' && !el.previousElementSibling && isProjectDeletionDescription(el.parentElement)) return true;
     if (el.tagName === 'DD' && el.parentElement &&
         el.parentElement.getAttribute('data-testid') === 'permission-download-details') return true;
     if (testId && testId.indexOf('gcp-project-combobox-option-') === 0 &&
@@ -465,6 +478,17 @@
     }
     if (text === 'Welcome to Antigravity!' && el?.tagName === 'DIV' && el.classList.contains('entrance-title')) return '欢迎使用 Antigravity！';
     if (text === 'SSH Host' && el?.closest('[data-testid="project-selector-ssh-host-trigger"]')) return 'SSH 主机';
+    if (text === 'Delete project' && el?.tagName === 'SPAN' && isProjectDeletionDetails(el.parentElement?.parentElement)) {
+      return translateSingleUnit('Delete Project');
+    }
+    if (el?.tagName === 'STRONG' && el.previousElementSibling && text.includes(' and ')) {
+      var counts = text.match(/^(\d+ active conversations?) and (\d+ archived conversations?)$/);
+      if (counts && isProjectDeletionDescription(el.parentElement)) {
+        var active = translateSingleUnit(counts[1]);
+        var archived = translateSingleUnit(counts[2]);
+        if (active && archived) return active + '和 ' + archived;
+      }
+    }
     if (text === 'commands.' && el?.firstElementChild?.tagName === 'CODE' &&
         el.firstElementChild.textContent === 'antigravity.' &&
         (textEdits.get(el.firstChild)?.source || el.firstChild.nodeValue)?.trim() ===
@@ -756,7 +780,11 @@
           if (el[markKey] === val) continue;
 
           var trans = translateSingleUnit(val);
-          if (attr === 'placeholder' && el.tagName === 'INPUT') {
+          if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
+              el.closest('[data-testid^="shortcut-row-"]')) {
+            var shortcutAction = translateSingleUnit(val.slice('Reset '.length, -' to default'.length));
+            if (shortcutAction) trans = '将' + shortcutAction + '恢复为默认设置';
+          } else if (attr === 'placeholder' && el.tagName === 'INPUT') {
             if (val === 'Search Hosts…' && el.parentElement?.getAttribute('data-testid') === 'project-selector-ssh-host-search') {
               trans = '搜索主机…';
             } else if (val === 'Search languages to add (e.g. English, Spanish, 中文, yue)...' &&
