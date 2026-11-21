@@ -1,7 +1,131 @@
 {
+  "Core tools and knowledge required to develop for Android.": {
+    "plugin": "android-cli-plugin",
+    "translation": "开发 Android 应用所需的核心工具与知识。"
+  },
+  "Query Arize AX projects, traces, datasets, and experiments from Antigravity, with skills for tracing, evals, and prompt optimization.": {
+    "plugin": "arize-skills",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Antigravity 中查询 Arize AX 项目、链路追踪、数据集和实验，并使用追踪、评估和提示词优化技能。"
+  },
+  "Teamwork Graph CLI is Atlassian's agent-first interface to your entire work context: Jira issues, Confluence pages, Bitbucket PRs, along with your connected third-party data sources. Purpose-built for coding agents like Antigravity (terminal or desktop), and powered by Atlassian's context graph. Try: \"draft a Jira issue from this PR and link it to the epic.\" Run /twg-setup after install to connect Atlassian Teamwork Graph CLI to Antigravity.": {
+    "plugin": "atlassian-twg-cli",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "Teamwork Graph CLI 是 Atlassian 为智能体设计的入口，可访问 Jira 事项、Confluence 页面、Bitbucket 拉取请求及已连接的第三方数据源。由 Atlassian 上下文图谱提供支持，面向 Antigravity 等终端或桌面编程智能体。可试用「根据这个拉取请求起草 Jira 事项，并关联到 Epic」。安装后运行 /twg-setup，将 Teamwork Graph CLI 连接到 Antigravity。"
+  },
+  "Add Auth0 authentication to any app: login, MFA, SSO, Organizations, RBAC, custom domains, and branding. Debug auth errors and migrate from other providers.": {
+    "plugin": "auth0",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "为应用接入 Auth0 登录、多因素认证、单点登录、组织管理、基于角色的访问控制、自定义域名和品牌设置。支持排查认证错误与迁移。"
+  },
+  "Build and deploy Base44 full-stack apps: CLI project management, JavaScript/TypeScript SDK development, and production troubleshooting skills.": {
+    "plugin": "base44",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "构建并部署 Base44 全栈应用，包含 CLI 项目管理、JavaScript/TypeScript SDK 开发和生产故障排查技能。"
+  },
+  "Investigate incidents, check who's on call, and query logs, metrics, traces, errors and RUM in Better Stack. Build dashboards and manage uptime monitors.": {
+    "plugin": "betterstack",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Better Stack 中调查事件、查看值班人员，查询日志、指标、链路追踪、错误和真实用户监控（RUM）数据。还可构建仪表板和管理可用性监控。"
+  },
+  "Give your agent a real browser: navigate, click, type, screenshot, and extract data from any site, locally or on Browserbase cloud browsers.": {
+    "plugin": "browse",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "为智能体提供本地或 Browserbase 云端浏览器，支持浏览、点击、输入、截图和提取网页数据。"
+  },
+  "Create, edit, review, resize, and brand-check Canva designs with the Canva MCP server.": {
+    "plugin": "canva",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Canva MCP 服务器创建、编辑、审查和调整设计尺寸，并检查设计是否符合品牌规范。"
+  },
+  "RDKit cheminformatics, reaction and property tools, plus ChEMBL and PubChem, to work with molecules, their properties, and bioactivity data.": {
+    "plugin": "chemistry",
+    "translation": "借助 RDKit 化学信息学、反应与性质分析工具以及 ChEMBL 和 PubChem，研究分子、分子性质和生物活性数据。"
+  },
   "Reliable automation, in-depth debugging, and performance analysis in Chrome using Chrome DevTools and Puppeteer": {
     "plugin": "chrome-devtools-plugin",
     "translation": "在 Chrome 中使用 Chrome DevTools 和 Puppeteer 进行可靠的自动化、深度调试与性能分析"
+  },
+  "Add authentication and user management with Clerk. Skills for setup, frameworks, organizations, billing, webhooks, and testing, plus the Clerk MCP server.": {
+    "plugin": "clerk",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Clerk 接入身份验证和用户管理。包含初始配置、框架、组织、计费、Webhook 和测试技能，以及 Clerk MCP 服务器。"
+  },
+  "Connect Antigravity to your ClickUp workspace — manage tasks, track time, and collaborate with your team without switching context.": {
+    "plugin": "clickup",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "将 Antigravity 连接到 ClickUp 工作区，无需切换应用即可管理任务、追踪工时并与团队协作。"
+  },
+  "Build, deploy and manage apps on Cloudflare Workers, storage and AI, with platform skills and the Cloudflare API through one MCP server.": {
+    "plugin": "cloudflare",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Cloudflare Workers、存储和 AI 服务上构建、部署并管理应用。通过同一个 MCP 服务器使用平台技能和 Cloudflare API。"
+  },
+  "AI-powered code review, review-comment autofix, and repository configuration, powered by CodeRabbit.": {
+    "plugin": "coderabbit",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "借助 CodeRabbit 进行 AI 代码审查，按审查评论自动修复代码，并配置代码仓库。"
+  },
+  "Up-to-date documentation lookup. Pull version-specific documentation and code examples directly from source repositories into your coding agent's context.": {
+    "plugin": "context7",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "查询最新文档，直接从源代码仓库获取与版本匹配的文档和代码示例，补充到编程智能体的上下文中。"
+  },
+  "Use the official CrowdStrike-hosted MCP server to work across Falcon: detections, cases, threat intel, SIEM, hosts, vulnerabilities, cloud, and more.": {
+    "plugin": "crowdstrike",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 CrowdStrike 托管的官方 MCP 服务器使用 Falcon，涵盖检测、事件、威胁情报、SIEM、主机、漏洞和云安全。"
+  },
+  "This plugin provides a specialized suite of skills for data engineers and database practitioners working on Google Cloud. It acts as an expert assistant, allowing you to use natural language prompts in your preferred coding agent to architect complex data pipelines, transform data with dbt, write Spark and BigQuery SQL notebooks, and orchestrate end-to-end workflows across GCP's data ecosystem.": {
+    "plugin": "data-agent-kit-plugin",
+    "translation": "此插件为在 Google Cloud 上工作的数据工程师和数据库从业者提供专业技能套件。它充当专家助手，支持在您偏好的编码智能体中使用自然语言提示词来设计复杂数据流水线、使用 dbt 转换数据、编写 Spark 与 BigQuery SQL 笔记本，并在 GCP 数据生态系统中编排端到端工作流。"
+  },
+  "Databricks skills for the CLI, Apps, Lakebase, Model Serving, Lakeflow Jobs, Spark Declarative Pipelines, Declarative Automation Bundles (DABs), and classic-to-serverless migration.": {
+    "plugin": "databricks",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "提供 Databricks CLI、Apps、Lakebase、Model Serving、Lakeflow Jobs、Spark 声明式流水线、声明式自动化包（DAB），以及从经典计算迁移到无服务器计算的技能。"
+  },
+  "Use Datadog directly in Antigravity through a preconfigured Datadog MCP server. Query logs, metrics, traces, dashboards, and more through natural conversation. This plugin is in preview.": {
+    "plugin": "datadog",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过预配置的 Datadog MCP 服务器在 Antigravity 中查询日志、指标、链路追踪与仪表板。此插件处于预览阶段。"
+  },
+  "Build, test, and debug Docusign integrations with developer skills for authentication, template-based signing, envelope status, and troubleshooting.": {
+    "plugin": "docusign",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "构建、测试和调试 Docusign 集成。开发技能涵盖身份验证、基于模板的签署、信封状态和故障排查。"
+  },
+  "Connect Antigravity to Dropbox to search, inspect, summarize, share, collect uploads, organize folders, and clean up files with confirmation for write actions.": {
+    "plugin": "dropbox",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "连接 Antigravity 与 Dropbox 后，可搜索、查看、总结和共享文件，收集上传内容，整理文件夹并清理文件。写入操作需要确认。"
+  },
+  "Investigate production issues with real Dynatrace data: problems and root causes, logs, metrics, traces, and vulnerabilities, via skills and the MCP server.": {
+    "plugin": "dynatrace",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过技能和 MCP 服务器访问实际 Dynatrace 数据，排查生产问题及根因，并查看日志、指标、链路追踪和漏洞。"
+  },
+  "Develop ideas with context and review documents with fresh eyes.": {
+    "plugin": "egm",
+    "translation": "结合上下文拓展想法，从新的角度审阅文档。"
+  },
+  "Packaged workflows for SCA remediation, AI SAST triage, CI/CD posture, malware response, findings review, Endor Labs setup, and more.": {
+    "plugin": "endor-labs-agent-kit",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "提供软件成分分析修复、AI 静态分析初筛、CI/CD 安全状况检查、恶意软件响应、发现审查及 Endor Labs 配置流程。"
+  },
+  "Turn Figma designs into production code, map components with Code Connect, and create or edit Figma files in Antigravity.": {
+    "plugin": "figma",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "将 Figma 设计转为可用代码，通过 Code Connect 映射组件，并在 Antigravity 中创建或编辑 Figma 文件。"
+  },
+  "Prototype, build & run modern apps that users love with Firebase's backend, AI, and operational infrastructure.": {
+    "plugin": "firebase",
+    "translation": "使用 Firebase 的后端、AI 和运维基础设施，制作原型、构建并运行用户喜爱的现代应用。"
+  },
+  "Official plugin for Dart and Flutter that installs Flutter/Dart Skills, Rules, Custom Agents, and Dart MCP server for building natively compiled, visually stunning applications for mobile, web, desktop, and embedded devices from a single codebase": {
+    "plugin": "flutter",
+    "translation": "Dart 与 Flutter 官方插件，集成 Flutter/Dart 技能、规则、自定义智能体及 Dart MCP 服务，助力通过单一代码库为移动端、Web、桌面端和嵌入式设备构建原生编译的精美应用"
   },
   "Check availability, schedule events, and RSVP.": {
     "plugin": "gcalendar",
@@ -19,9 +143,47 @@
     "plugin": "gemini-api",
     "translation": "使用 Gemini Interactions API、Decisions API、Live API 和 Gemini API CLI 构建应用及 Shell 工作流，支持文本、图像、视频和语音生成、托管智能体与实时多模态流式传输。"
   },
+  "AlphaGenome and major genetics databases to analyze DNA variants, gene regulation, and links between genes and disease.": {
+    "plugin": "genomics",
+    "translation": "通过 AlphaGenome 和主要遗传学数据库分析 DNA 变异、基因调控以及基因与疾病的关联。"
+  },
+  "Search, read, draft, and send emails in Gmail.": {
+    "plugin": "gmail",
+    "translation": "搜索、阅读、起草和发送 Gmail 邮件。"
+  },
+  "Integration skill and tools for Google Maps Platform APIs": {
+    "plugin": "google_maps_platform",
+    "translation": "用于 Google Maps Platform API 的集成技能与工具"
+  },
   "Using the Google Antigravity Python SDK to build AI agents": {
     "plugin": "google-antigravity-sdk",
     "translation": "使用 Google Antigravity Python SDK 构建 AI 智能体"
+  },
+  "Google Cloud guidance for coding agents: first-project onboarding, authentication and credential selection, and safety-critical validation for gcloud CLI commands. Includes the Google Developer Knowledge MCP server for grounded, up-to-date Google Cloud documentation.": {
+    "plugin": "google-cloud-developer",
+    "translation": "为编程智能体提供 Google Cloud 指南，涵盖首个项目的上手流程、身份验证与凭据选择，以及 gcloud CLI 命令的安全校验。内置 Google Developer Knowledge MCP 服务器，可查询最新官方文档。"
+  },
+  "Search and retrieve official documentation across Google Cloud, Gemini, Android, Firebase, Flutter, and Web. Requires Google Cloud credentials (ADC) or an API key.": {
+    "plugin": "google-developer-knowledge",
+    "translation": "搜索并获取 Google Cloud、Gemini、Android、Firebase、Flutter 和 Web 的官方文档。需要 Google Cloud 凭据（ADC）或 API 密钥。"
+  },
+  "Search and retrieve official Google Health API documentation on developers.google.com/health through the Google Health Developer MCP server.": {
+    "plugin": "google-health-developer",
+    "translation": "通过 Google Health Developer MCP 服务器，在 developers.google.com/health 搜索并查阅 Google Health API 官方文档。"
+  },
+  "Search official Google Home, Matter, and OpenThread documentation and query Cloud-to-cloud user feedback integration diagnostics through the Google Home Developer MCP server.": {
+    "plugin": "google-home-developer",
+    "translation": "通过 Google Home Developer MCP 服务器搜索 Google Home、Matter 和 OpenThread 官方文档，并查询云到云集成中用户反馈的诊断信息。"
+  },
+  "Query Grafana Cloud metrics, logs, traces and profiles, manage dashboards, alerts and incidents, and ask Grafana Assistant through the hosted MCP server.": {
+    "plugin": "grafana-cloud-mcp",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过托管的 MCP 服务器查询 Grafana Cloud 指标、日志、链路追踪与性能剖析数据，管理仪表板、告警和事件，并向 Grafana Assistant 提问。"
+  },
+  "The AI notepad for meetings. Connect to your meeting history and use your conversation context to get things done.": {
+    "plugin": "granola",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "面向会议的 AI 记事本。连接会议历史，利用对话上下文处理工作。"
   },
   "Read, write, and format spreadsheets.": {
     "plugin": "gsheets",
@@ -31,13 +193,273 @@
     "plugin": "gslides",
     "translation": "读取、编辑和导出演示文稿。"
   },
+  "Build and debug pipelines, manage deployments, investigate security findings, and operate Harness with connected tools and reusable workflow skills.": {
+    "plugin": "harness-antigravity",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过已连接的工具和可复用流程技能构建及调试流水线、管理部署、调查安全发现并操作 Harness。"
+  },
+  "Respond to and investigate incidents, manage on-call schedules and escalations, and write runbooks and skills. Bundles the official incident.io MCP server.": {
+    "plugin": "incident-io",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "响应和调查事件，管理值班安排与升级流程，并撰写运行手册和技能。内含官方 incident.io MCP 服务器。"
+  },
+  "Search Intercom conversations, contacts, and companies, spot support trends, and install the Intercom Messenger with secure identity verification.": {
+    "plugin": "intercom",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "搜索 Intercom 会话、联系人和公司，识别客服趋势，并安装带安全身份验证的 Intercom Messenger。"
+  },
+  "Connect your agent to invideo's AI-native video editor. It trims, grades and mixes on a real timeline while you watch every change land.": {
+    "plugin": "invideo",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "将智能体连接到 invideo 的 AI 视频编辑器，在实际时间线上剪辑、调色和混音，可实时查看改动。"
+  },
+  "Search the web and read any page as clean markdown with Keenable, a search engine built for AI agents. Keyless: no signup or API key needed.": {
+    "plugin": "keenable",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "使用面向 AI 智能体的 Keenable 搜索网页，并将页面提取为简洁的 Markdown。无需注册或 API 密钥。"
+  },
+  "Ask a question of the live web and get a table back. Keenable SELECT runs many searches, reads the pages and extracts the fields you need in one call. Sign in with a Keenable account.": {
+    "plugin": "keenable-select",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "向实时网络提出问题并获取表格结果。一次调用可执行多次搜索、读取网页并提取所需字段。需要登录 Keenable。"
+  },
+  "Create, run and debug Leapwork Play tests and runlists, build agents, and hand work to Play's AI workflows, right from Antigravity.": {
+    "plugin": "leapwork-play",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Antigravity 中创建、运行并调试 Leapwork Play 测试和运行列表，构建智能体，并将工作交给 Play 的 AI 流程。"
+  },
+  "Real salaries and company levels from Levels.fyi: check if an offer is fair, compare offers, find jobs with pay shown and add your own salary.": {
+    "plugin": "levels-fyi",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "查看 Levels.fyi 的实际薪资和公司职级，评估或比较录用条件、查找公开薪资的职位，并提交自己的薪资信息。"
+  },
+  "The product development system for teams and agents. Manage issues, projects, and documents across your Linear workspace from Antigravity.": {
+    "plugin": "linear",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "面向团队和智能体的产品开发系统。通过 Antigravity 管理 Linear 工作区中的事项、项目与文档。"
+  },
+  "Connect to your managed Looker MCP server to explore data, run saved Looks, build dashboards, and validate LookML.": {
+    "plugin": "looker",
+    "translation": "连接托管的 Looker MCP 服务器以探索数据、运行已保存的 Look、制作仪表板并验证 LookML。"
+  },
+  "Research US case law, statutes, and regulations, plus live dockets from federal and state courts. A Midpage account is required.": {
+    "plugin": "midpage",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "研究美国判例法、成文法和法规，并查阅联邦及州法院的最新案件案卷。需要 Midpage 账号。"
+  },
+  "Give your AI agent 600,000+ real app screens, and the skills to use them. Includes the Mobbin MCP and a skill that redesigns your screen from patterns real apps ship, in your own design system, with the references behind every change.": {
+    "plugin": "mobbin",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "提供 60 多万张真实应用界面和配套技能。包含 Mobbin MCP，可参考已上线应用的设计模式，在您自己的设计系统中改进界面，并给出各项改动的参考来源。"
+  },
   "Keep your coding agent up to date with the latest web best practices.": {
     "plugin": "modern-web-guidance-plugin",
     "translation": "让您的编码智能体紧跟最新的 Web 最佳实践。"
+  },
+  "Plan and track work in monday.com from Antigravity: create, update and assign items, write docs, and build forms that turn requests into items.": {
+    "plugin": "monday",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Antigravity 在 monday.com 中计划和跟踪工作，创建、更新和分配工作项，撰写文档，并用表单将请求转为工作项。"
+  },
+  "Official Antigravity plugin for MongoDB Atlas (hosted MCP Server + Skills). Connect to the MongoDB-hosted Atlas MCP server, explore data, manage collections, optimize queries, generate reliable code, implement best practices, develop advanced features, and more.": {
+    "plugin": "mongodb-atlas",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "适用于 MongoDB Atlas 的 Antigravity 官方插件，包含托管的 MCP 服务器和技能。连接 MongoDB 托管的 Atlas MCP 服务器后，可以探索数据、管理集合、优化查询、生成可靠代码、遵循最佳实践并开发高级功能。"
+  },
+  "Build, test, and manage n8n workflows and Agents through your instance MCP server. Use official skills for node setup, credentials, and debugging.": {
+    "plugin": "n8n-skills",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 n8n 实例的 MCP 服务器构建、测试和管理工作流与智能体。使用官方技能设置节点、配置凭据和排查问题。"
+  },
+  "Agent skills for Neo4j graph database — write Cypher queries, design graph models, use drivers, run imports, build GraphRAG pipelines, run GDS algorithms, and manage Aura instances.": {
+    "plugin": "neo4j",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "为 Neo4j 图数据库提供智能体技能，支持编写 Cypher 查询、建模、使用驱动程序、导入数据、构建 GraphRAG、运行 GDS 算法和管理 Aura 实例。"
+  },
+  "Build and deploy on Netlify: functions, edge functions, blobs, database, identity, forms, image CDN, caching, and AI Gateway, plus the Netlify MCP server.": {
+    "plugin": "netlify",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Netlify 上构建和部署项目，支持函数、边缘函数、Blob 存储、数据库、身份服务、表单、图片 CDN、缓存和 AI Gateway，并提供 Netlify MCP 服务器。"
+  },
+  "Connect Antigravity to your Notion workspace with the Notion MCP server, plus skills for research, documentation, meeting prep, specs, trackers, and project updates.": {
+    "plugin": "notion",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Notion MCP 服务器连接工作区，并使用研究、文档编写、会议准备、规格说明、跟踪和项目更新技能。"
+  },
+  "Create and send proposals, quotes, and contracts for e-signature. Track signing progress and identify documents that need follow-up.": {
+    "plugin": "pandadoc",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "创建并发送提案、报价单及合同以供电子签署。跟踪签署进度，找出需要跟进的文档。"
+  },
+  "Search the live web and fetch page content with Parallel's hosted MCP server. Free access with no Parallel account, API key, or Parallel CLI required.": {
+    "plugin": "parallel",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "使用 Parallel 托管的 MCP 服务器搜索实时网络并获取网页内容。免费使用，无需 Parallel 账号、API 密钥或 CLI。"
+  },
+  "Agent plugin for PingOne multi-tenant. Includes skills and a remote MCP server that lets AI agents configure and monitor your PingOne environments.": {
+    "plugin": "ping-identity-pingone",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "面向 PingOne 多租户环境的智能体插件，提供技能与远程 MCP 服务器，用于配置和监控环境。"
+  },
+  "Equip Antigravity with specialized Postman skills for the complete API lifecycle. Discover, design, test, document, mock, monitor, and improve APIs through agent-friendly, filesystem-first workflows.": {
+    "plugin": "postman",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Postman 技能管理 API 生命周期，涵盖发现、设计、测试、文档编写、模拟、监控和改进。流程以文件为基础，便于智能体操作。"
+  },
+  "Set up Qodo, explore code and repository history, review local changes, and resolve pull-request findings directly from Antigravity.": {
+    "plugin": "qodo",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Antigravity 中设置 Qodo、浏览代码和仓库历史、审查本地变更并处理拉取请求中发现的问题。"
+  },
+  "Deploy, configure, monitor, and troubleshoot apps, databases, and infrastructure on Railway from Antigravity with Railway's agent skill and hosted MCP server.": {
+    "plugin": "railway",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "借助 Railway 智能体技能和托管 MCP 服务器，在 Antigravity 中部署、配置、监控和排查应用、数据库及基础设施。"
+  },
+  "Robotics skills for any robot: 3D perception, collision-free motion planning, visual servoing, robot bring-up, sim2real, agent iteration, MuJoCo simulation, SimReady 3D asset authoring and physics auditing, and a live MuJoCo Studio 3D web sidecar.": {
+    "plugin": "robotics",
+    "translation": "为各类机器人提供技能，涵盖 3D 感知、无碰撞运动规划、视觉伺服、机器人启动调试、仿真到现实的迁移、智能体迭代、MuJoCo 仿真、SimReady 三维资产制作和物理属性审计，以及实时 MuJoCo Studio 3D 网页面板。"
+  },
+  "Skills for integrating the Scandit Data Capture SDK: product selection, docs and implementation guides for barcode scanning, ID capture and smart label capture.": {
+    "plugin": "scandit-sdk",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "提供集成 Scandit Data Capture SDK 的技能，涵盖产品选型、文档与实施指南，适用于条码扫描、证件采集和智能标签采集。"
+  },
+  "Antigravity for science highlights, and an overview of the main science plugins.": {
+    "plugin": "science-overview",
+    "translation": "了解 Antigravity 的科研功能及主要科研插件。"
+  },
+  "Search scientific papers, clinical trials, FDA records, and historical texts.": {
+    "plugin": "scientific-literature",
+    "translation": "搜索科研论文、临床试验、FDA 记录和历史文献。"
+  },
+  "SEO workflows on live Semrush data: keyword research, site audits, backlinks, competitor, traffic and market analytics, PPC, and AI brand visibility.": {
+    "plugin": "semrush",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "基于实时 Semrush 数据开展 SEO 工作，涵盖关键词研究、网站审计、外链、竞争对手、流量、市场、PPC 和 AI 品牌曝光分析。"
+  },
+  "Query your SentinelOne Singularity Console from Antigravity through a self-hosted, read-only Purple AI MCP server. Requires an active console deployment, your console URL, and an API token.": {
+    "plugin": "sentinelone-purple-mcp",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过自托管的只读 Purple AI MCP 服务器，在 Antigravity 中查询 SentinelOne Singularity 控制台。需要可用的控制台、其地址和 API 令牌。"
+  },
+  "Set up Sentry monitoring, investigate production errors, and configure alerts and releases with expert skills and live context from your Sentry projects.": {
+    "plugin": "sentry",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "借助专业技能和 Sentry 项目的实时上下文，设置监控、排查生产错误并配置告警和发布版本。"
+  },
+  "Triage Exabeam New-Scale alerts and cases end to end: gather the evidence, map MITRE, reach a verdict, and record it behind an approval step.": {
+    "plugin": "soc",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "处理 Exabeam New-Scale 告警和事件，收集证据、映射 MITRE 框架、作出判断，并在获得批准后记录结果。"
+  },
+  "SonarQube is the AI code quality and security verification platform used by millions of developers to catch bugs, vulnerabilities, and leaked secrets. This plugin enforces those standards in the agent coding loop: 7,500+ distinct issue types, secrets scanning, agentic analysis, and quality gates across 40+ languages.": {
+    "plugin": "sonarqube",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "SonarQube 是 AI 代码质量与安全验证平台，数百万开发者用它发现缺陷、漏洞和泄露的密钥。此插件在智能体编程流程中应用这些标准，覆盖 40 多种语言，提供 7,500 多种问题类型、密钥扫描、智能体分析和质量门禁。"
+  },
+  "Turn an idea into a website, dashboard, report, or small web tool you can share. Build it in chat or bring your own work, and publish it with Spacefast.": {
+    "plugin": "spacefast",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "将想法变成可分享的网站、仪表板、报告或小型 Web 工具。可在对话中构建，也可导入已有成果，再通过 Spacefast 发布。"
+  },
+  "Accept payments and grow your business. Stripe's official MCP server enables AI agents to manage customers, products, prices, payment links, invoices, subscriptions, and refunds, as well as search Stripe documentation.": {
+    "plugin": "stripe",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "使用 Stripe 收款并发展业务。官方 MCP 服务器支持管理客户、产品、价格、付款链接、发票、订阅和退款，以及搜索 Stripe 文档。"
+  },
+  "AlphaFold, 3D visualization tools, and protein databases to explore protein structures, sequences, pathways, and drug interactions.": {
+    "plugin": "structural-biology",
+    "translation": "借助 AlphaFold、三维可视化工具和蛋白质数据库，探索蛋白质的结构、序列、通路及药物相互作用。"
+  },
+  "Official Supabase plugin for Antigravity with Supabase skills and MCP access for project management, database work, auth, storage, and Postgres best practices.": {
+    "plugin": "supabase",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "Supabase 官方 Antigravity 插件，提供项目管理、数据库、认证、存储及 Postgres 最佳实践技能，并支持 MCP 访问。"
+  },
+  "Make your coding agent a better engineer": {
+    "plugin": "superpowers",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "提升编程智能体的工程实践能力。"
   },
   "Unlock the power of agent swarms.": {
     "plugin": "swarm",
     "builtin": true,
     "translation": "发挥多智能体协作的优势。"
+  },
+  "Web search, content extraction, website crawling, URL discovery, and deep research for Antigravity via Tavily's hosted MCP server and skills.": {
+    "plugin": "tavily",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Tavily 托管的 MCP 服务器和技能，在 Antigravity 中搜索网页、提取内容、抓取网站、发现网址并进行深入研究。"
+  },
+  "Run, debug and triage tests on the TestMu AI cloud, plus Kane CLI for browser and mobile test automation and Rook CLI for testing AI agents.": {
+    "plugin": "testmu-ai",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 TestMu AI 云平台运行、调试和初步排查测试。包含用于浏览器和移动端自动化测试的 Kane CLI，以及用于测试 AI 智能体的 Rook CLI。"
+  },
+  "Official Trello plugin with the Trello MCP server and a skill for boards, lists, cards, checklists, Inbox, and Planner.": {
+    "plugin": "trello",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "Trello 官方插件，包含 MCP 服务器及用于看板、列表、卡片、清单、收件箱与计划器的技能。"
+  },
+  "Unity's official plugin for Antigravity, with curated skills for game development, monetization, and performance optimization.": {
+    "plugin": "unity",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "Unity 官方 Antigravity 插件，精选游戏开发、商业化和性能优化技能。"
+  },
+  "Build and deploy web apps and AI agents on Vercel with skills for Next.js, AI SDK, and cloud services, plus the official Vercel MCP server.": {
+    "plugin": "vercel-plugin",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "使用 Next.js、AI SDK 和云服务技能，在 Vercel 构建并部署 Web 应用与 AI 智能体。包含 Vercel 官方 MCP 服务器。"
+  },
+  "Investigate files, URLs, domains and IP addresses with VirusTotal threat intelligence, analysis and submission recovery.": {
+    "plugin": "virustotal",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "利用 VirusTotal 的威胁情报、分析结果及历史提交记录调查文件、URL、域名和 IP 地址。"
+  },
+  "Search and read your Wispr Flow meeting notes, transcripts, scratchpad notes, and calendar events. Read-only access to your own account.": {
+    "plugin": "wispr-flow",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "搜索并阅读 Wispr Flow 会议笔记、转写、便笺和日历事件。仅对自己的账号提供只读访问。"
+  },
+  "Build Wix apps and headless sites, and manage Wix stores, bookings, CMS and more, with Wix CLI skills and the official Wix MCP server.": {
+    "plugin": "wix",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "使用 Wix CLI 技能和官方 MCP 服务器构建 Wix 应用和无头网站，管理商店、预约和 CMS 等功能。"
+  },
+  "Build, publish, and manage WordPress.com and Jetpack-connected sites. Draft posts, edit blocks, check traffic stats, moderate comments, and manage plugins.": {
+    "plugin": "wordpress",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "构建、发布和管理 WordPress.com 与连接 Jetpack 的网站。支持起草文章、编辑区块、查看流量、审核评论和管理插件。"
+  },
+  "Connect 9,000+ apps to your AI workflow. Discover, enable, and execute Zapier actions and workflows directly from your client.": {
+    "plugin": "zapier",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "将 9,000 多款应用接入 AI 工作流，直接在客户端查找、启用并执行 Zapier 操作和流程。"
+  },
+  "Manage your Bigin CRM from Antigravity: review pipelines, find contacts and deals, log calls, plan follow-ups, and email customers.": {
+    "plugin": "zoho-bigin",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Antigravity 中管理 Bigin CRM，查看销售流程，查找联系人和商机，记录通话，安排跟进并给客户发邮件。"
+  },
+  "Build on Zoho CRM v8: REST API, Deluge functions, ClientScript, widgets, COQL and connections, with live CRM data through your Zoho MCP server.": {
+    "plugin": "zoho-crm-plugin",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 Zoho CRM v8 上开发，支持 REST API、Deluge 函数、ClientScript、小组件、COQL 和连接，并通过 Zoho MCP 服务器访问实时 CRM 数据。"
+  },
+  "Zoho Desk plugin for Antigravity. Review, prioritize, and update Zoho Desk tickets directly from Antigravity through Zoho Desk MCP and includes a Ticket Prioritization Agent for triage and priority updates.": {
+    "plugin": "zoho-desk-antigravity",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Zoho Desk MCP 在 Antigravity 中查看、排序和更新工单。包含用于初筛和调整优先级的工单智能体。"
+  },
+  "Connect Zoho Projects to Antigravity to turn tasks and issues into working code. Access project context, investigate bugs, and update work items as you develop.": {
+    "plugin": "zoho-projects",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "将 Zoho Projects 接入 Antigravity，把任务和问题落实到代码。开发期间可获取项目上下文、排查故障并更新工作项。"
+  },
+  "Run Zoho Books from Antigravity: invoicing, bills, banking, journals, projects, items, taxes, customization and automation.": {
+    "plugin": "zohobooks-antigravity",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "通过 Antigravity 使用 Zoho Books，处理发票、账单、银行业务、会计分录、项目、商品、税务、自定义和自动化。"
   }
 }

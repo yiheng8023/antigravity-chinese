@@ -3,9 +3,8 @@
 function installOfficialPluginDescriptionSourceCheck(descriptions) {
   if (window.location.protocol !== 'https:' || window.location.hostname !== '127.0.0.1') return;
 
-  const marketplace = 'antigravity-plugins-official';
-
   function hasCatalogOrigin(origin, entry) {
+    const marketplace = entry.marketplace ?? 'antigravity-plugins-official';
     return origin?.marketplace === marketplace && origin.id === marketplace + '/plugin/' + entry.plugin;
   }
 
@@ -67,6 +66,13 @@ function installOfficialPluginDescriptionSourceCheck(descriptions) {
     return false;
   }
 
+  function isFeaturedDescription(fiber, source, entry) {
+    const member = fiber.return?.return?.memoizedProps?.member;
+    return fiber.memoizedProps?.children === source && fiber.memoizedProps.title === source &&
+      member?.description === source && member.item?.kind?.case === 'plugin' &&
+      member.item.description?.trim() === source && hasCatalogOrigin(member.item, entry);
+  }
+
   function hasVerifiedPluginDescription(el, source, entry) {
     // Origins are absent from the DOM. Bind the displayed text to the committed renderer.
     const settings = el.matches('div.text-sm.text-muted-foreground.line-clamp-2.mt-1') &&
@@ -74,7 +80,9 @@ function installOfficialPluginDescriptionSourceCheck(descriptions) {
     const card = el.matches('div.text-sm.text-muted-foreground.truncate') &&
       el.closest('[data-testid="customization-card"][data-card-name]');
     const detail = el.matches('p.text-muted-foreground.leading-relaxed') && el.closest('[data-testid="plugin-detail"]');
-    if (!settings && !card && !detail) return false;
+    const featured = el.matches('p.text-muted-foreground.line-clamp-3[title]') &&
+      el.closest('[data-testid="featured-carousel"] [role="tabpanel"]');
+    if (!settings && !card && !detail && !featured) return false;
     const key = Object.keys(el).find(name => name.startsWith('__reactFiber$'));
     let fiber = key && el[key];
     let verified = false;
@@ -85,6 +93,7 @@ function installOfficialPluginDescriptionSourceCheck(descriptions) {
       if (fiber.stateNode !== el) return false;
       if (settings) verified = isSettingsDescription(fiber, source, entry);
       else if (card) verified = isCardDescription(fiber, card, source, entry);
+      else if (featured) verified = isFeaturedDescription(fiber, source, entry);
       else verified = isDetailDescription(fiber, source, entry);
       // React can reuse part of the committed tree in both alternates.
       if (!verified) return false;

@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.59** targets **Antigravity App 2.34.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.60** targets **Antigravity App 2.34.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release applies the same translations for verified official plugin descriptions across project settings, unassigned conversation settings, the Marketplace, the Installed list, and plugin details in Antigravity App 2.34.0. Plugin names, custom content, and unmatched descriptions retain their original text. See the [2.34.0 maintenance record](docs/maintenance/antigravity-2.34.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
+This version fills gaps in settings and Marketplace UI copy. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.34.0 maintenance record](docs/maintenance/antigravity-2.34.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window.
 

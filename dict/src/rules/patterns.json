@@ -1084,6 +1084,10 @@
     "replacement": "再查看 $1 项"
   },
   {
+    "regex": "^See (\\d+) more plugins$",
+    "replacement": "再查看 $1 个插件"
+  },
+  {
     "regex": "^(?:See less|收起) in (.+)$",
     "replacement": "在 $1 中收起"
   },

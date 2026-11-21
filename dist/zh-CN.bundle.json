@@ -1,6 +1,6 @@
 {
-  "version": "3.3.59",
-  "buildTime": "2026-11-21T02:42:35.143Z",
+  "version": "3.3.60",
+  "buildTime": "2026-11-21T12:52:59.513Z",
   "exact": {
     ", or": "，或",
     ", or ": "，或 ",
@@ -1459,6 +1459,7 @@
     "Queued message": "排队中的消息",
     "Queued message deleted": "已删除排队中的消息",
     "Queued Messages": "排队消息",
+    "Queued messages": "排队消息",
     "Queued Messages Behavior": "排队消息处理行为",
     "Queues after the turn": "轮次结束后进入排队",
     "quick start": "快速入门",
@@ -3036,12 +3037,19 @@
     "Plugins Options": "插件选项",
     "See more": "查看更多",
     "Featured": "精选",
+    "Plugins in Featured": "精选插件",
+    "Clear category": "清除分类筛选",
+    "Most popular first": "按热门程度排序",
+    "Most popular matches first": "匹配结果按热门程度排序",
+    "Sign in required.": "需要登录。",
+    "Error:": "错误：",
     "Marketplace notice": "插件市场须知",
     "Google does not control the availability or functionality of third party developer tools. Your data from third party developer tools connected to your Antigravity instance may be shared with Google. Google will protect any such data in accordance with the Google Privacy Policy, found here:": "Google 不控制第三方开发者工具的可用性或功能。您在连接到 Antigravity 实例的第三方开发者工具中的数据可能会与 Google 共享。Google 将依据其隐私权政策保护此类数据，详见：",
     "Google does not control the availability or functionality of third-party developer tools. Your data from third-party developer tools connected to your Antigravity instance may be shared with Google. Google will protect any such data in accordance with the Google Privacy Policy, found here:": "Google 不控制第三方开发者工具的可用性或功能。您在连接到 Antigravity 实例的第三方开发者工具中的数据可能会与 Google 共享。Google 将依据其隐私权政策保护此类数据，详见：",
     "Connect to Google Workspace, including Docs, Sheets, Slides, Drive, and Calendar.": "连接 Google Workspace，包括文档、表格、演示文稿、云端硬盘和日历。",
-    "See more in Google Workspace": "在Google Workspace中查看更多",
-    "See less in Google Workspace": "在Google Workspace中收起",
+    "Connect to Google Workspace, including Docs, Sheets, Slides, Drive, Calendar, and Gmail.": "连接 Google Workspace，可使用文档、表格、演示文稿、云端硬盘、日历和 Gmail。",
+    "See more in Google Workspace": "在 Google Workspace 中查看更多",
+    "See less in Google Workspace": "在 Google Workspace 中收起",
     "Build on Google's developer platforms, including Android, Chrome, Gemini, and Google Cloud.": "使用 Android、Chrome、Gemini 和 Google Cloud 等 Google 开发者平台构建项目。",
     "See more in Build with Google": "在使用 Google 构建中查看更多",
     "See less in Build with Google": "在使用 Google 构建中收起",
@@ -3049,6 +3057,7 @@
     "Design, creative, and media tools.": "用于设计、创意和媒体制作的工具。",
     "See more in Design, Creative & Media": "在设计、创意与媒体中查看更多",
     "See less in Design, Creative & Media": "在设计、创意与媒体中收起",
+    "Agent skills, databases, and interactive viewers for scientific research.": "面向科研的智能体技能、数据库和交互式查看器。",
     "Productivity & Project Management": "生产力与项目管理",
     "Plan work, track issues, sign documents, and manage your notes and files.": "规划工作、跟踪事项、签署文档，以及管理笔记和文件。",
     "See more in Productivity & Project Management": "在生产力与项目管理中查看更多",
@@ -5782,6 +5791,10 @@
     {
       "regex": "^See (\\d+) more$",
       "replacement": "再查看 $1 项"
+    },
+    {
+      "regex": "^See (\\d+) more plugins$",
+      "replacement": "再查看 $1 个插件"
     },
     {
       "regex": "^(?:See less|收起) in (.+)$",

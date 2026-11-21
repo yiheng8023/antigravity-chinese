@@ -1172,6 +1172,97 @@ test('marketplace, installed cards, and detail headers share the official copy a
   for (const el of document.querySelectorAll('.prose p')) assert.equal(el.textContent, english);
 });
 
+test('featured descriptions and their tooltips use the same verified partner text', async t => {
+  const source = "Up-to-date documentation lookup. Pull version-specific documentation and code examples directly from source repositories into your coding agent's context.";
+  const expected = officialPluginDescriptions[source].translation;
+  const { document, translate } = await fixture(t, `
+    <section data-testid="featured-carousel">
+      <button data-testid="featured-carousel-member-tile" data-member-name="Settings" aria-label="Settings, Installed" title="Settings"></button>
+      <div role="tabpanel"><div>
+        <h3 class="font-semibold truncate">Settings</h3>
+        <p id="verified" class="text-muted-foreground line-clamp-3" title="${source}">${source}</p>
+        <a aria-label="Details for Settings">Details</a></div>
+        <div><p id="unverified" class="text-muted-foreground line-clamp-3" title="${source}">${source}</p></div>
+      </div>
+    </section>`, {
+    pluginDescriptions: true,
+    beforeStart(doc) {
+      for (const [id, marketplace] of [['verified', 'antigravity-plugins-partners'], ['unverified', 'antigravity-plugins-official']]) {
+        const el = doc.getElementById(id);
+        const root = { tag: 3 };
+        root.stateNode = { current: root };
+        el.__reactFiber$fixture = {
+          stateNode: el, memoizedProps: { children: source, title: source },
+          return: { return: {
+            return: root, memoizedProps: { member: { description: source, item: {
+              kind: { case: 'plugin' }, marketplace, id: marketplace + '/plugin/context7', description: source
+            } } }
+          } }
+        };
+      }
+    }
+  });
+  const verified = document.getElementById('verified');
+  const unverified = document.getElementById('unverified');
+  assert.equal(verified.textContent, expected);
+  assert.equal(verified.title, expected);
+  assert.equal(unverified.textContent, source);
+  assert.equal(unverified.title, source);
+  assert.equal(document.querySelector('h3').textContent, 'Settings');
+  assert.equal(document.querySelector('button').title, 'Settings');
+  assert.equal(document.querySelector('button').getAttribute('aria-label'), 'Settings，已安装');
+  assert.equal(document.querySelector('a').getAttribute('aria-label'), '查看详情：Settings');
+
+  const fiber = verified.__reactFiber$fixture;
+  fiber.return.return.memoizedProps.member.item.id = 'antigravity-plugins-partners/plugin/another-plugin';
+  translate(verified);
+  assert.equal(verified.textContent, source);
+  assert.equal(verified.title, source);
+});
+
+test('host settings, marketplace sections, disclosure and review controls translate in their own surfaces', async t => {
+  const notice = 'Google does not control the availability or functionality of third party developer tools. Your data from third party developer tools connected to your Antigravity instance may be shared with Google. Google will protect any such data in accordance with the Google Privacy Policy, found here:';
+  const policy = 'https://policies.google.com/privacy';
+  const { document } = await fixture(t, `
+    <div id="setting">Queued messages</div>
+    <div data-testid="customizations-marketplace"><section aria-label="Science"><div><h2>Science</h2>
+      <p>Agent skills, databases, and interactive viewers for scientific research.</p></div>
+      <div><button aria-label="See more in Science">See more</button></div></section></div>
+    <button data-testid="marketplace-category-option-science"><span>Science</span></button>
+    <span data-testid="marketplace-category-chip">Science<button aria-label="Clear category"></button></span>
+    <div data-testid="customizations-installed-plugins"><button aria-label="See 3 more plugins">See 3 more</button></div>
+    <div id="elsewhere">Science</div>
+    <main data-testid="plugin-detail">
+      <p class="text-muted-foreground leading-relaxed">${notice}</p>
+      <p data-testid="third-party-tools-disclaimer" class="text-muted-foreground leading-relaxed">${notice} <span><a href="${policy}">${policy}</a></span></p>
+    </main>
+    <div data-testid="agent-message">
+      <div data-testid="changed-files-card"><div data-testid="changed-files-card-header">
+        <div><span class="truncate">2 files changed</span></div>
+        <button data-testid="changed-files-card-review"><span>Review</span></button>
+      </div></div>
+      <div class="prose"><button>Review</button><span>Queued messages</span></div>
+    </div>`);
+  const section = document.querySelector('section');
+  assert.equal(document.getElementById('setting').textContent, '排队消息');
+  assert.equal(section.getAttribute('aria-label'), '科研');
+  assert.equal(section.querySelector('h2').textContent, '科研');
+  assert.equal(section.querySelector('p').textContent, '面向科研的智能体技能、数据库和交互式查看器。');
+  assert.equal(section.querySelector('button').getAttribute('aria-label'), '在科研中查看更多');
+  assert.equal(document.querySelector('[data-testid="marketplace-category-option-science"]').textContent, '科研');
+  assert.equal(document.querySelector('[data-testid="marketplace-category-chip"]').textContent, '科研');
+  assert.equal(document.querySelector('[data-testid="customizations-installed-plugins"] button').getAttribute('aria-label'), '再查看 3 个插件');
+  assert.equal(document.getElementById('elsewhere').textContent, 'Science');
+  const disclosure = document.querySelector('[data-testid="third-party-tools-disclaimer"]');
+  assert.equal(disclosure.firstChild.textContent.trim(), dictionary.exact[notice]);
+  assert.equal(disclosure.querySelector('a').getAttribute('href'), policy);
+  assert.equal(document.querySelector('main p:not([data-testid])').textContent, notice);
+  assert.equal(document.querySelector('[data-testid="changed-files-card-review"]').textContent, '审查');
+  assert.equal(document.querySelector('[data-testid="changed-files-card-header"] .truncate').textContent, '2 个文件已修改');
+  assert.equal(document.querySelector('.prose button').textContent, 'Review');
+  assert.equal(document.querySelector('.prose span').textContent, 'Queued messages');
+});
+
 test('customization cards and details preserve metadata while actions translate', async t => {
   const { document } = await fixture(t, `
     <article data-testid="customization-card" data-card-name="Settings">

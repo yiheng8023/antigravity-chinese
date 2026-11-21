@@ -310,7 +310,10 @@
         el.closest('[data-testid="workspace-customizations-view"]')) return true;
     if (el.matches('div.font-medium.text-foreground.truncate, div.text-sm.text-muted-foreground.truncate, img') &&
         el.closest('[data-testid="customization-card"][data-card-name]')) return true;
-    if (el.matches('h1.text-xl.font-medium.truncate, p.text-muted-foreground.leading-relaxed, span.font-medium.flex-shrink-0, span.text-muted-foreground.truncate[title]')) {
+    if (el.matches('h3.font-semibold.truncate, p.text-muted-foreground.line-clamp-3[title]') &&
+        el.closest('[data-testid="featured-carousel"] [role="tabpanel"]')) return true;
+    if (el.tagName === 'IMG' && el.closest('[data-testid="featured-carousel-member-tile"]')) return true;
+    if (el.matches('h1.text-xl.font-medium.truncate, p.text-muted-foreground.leading-relaxed:not([data-testid="third-party-tools-disclaimer"]), span.font-medium.flex-shrink-0, span.text-muted-foreground.truncate[title]')) {
       var detail = el.closest('[data-testid="plugin-detail"], [role="dialog"]');
       if (detail && (detail.getAttribute('data-testid') === 'plugin-detail' ||
           detail.querySelector('h1.text-xl.font-medium.truncate, [data-testid="doc-row-modal"]'))) return true;
@@ -457,7 +460,14 @@
     var role = el.getAttribute('role');
     return el.tagName === 'BUTTON' || el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' ||
       role === 'button' || role === 'status' || el.getAttribute('data-testid') === 'plan-command-fyi-alert' ||
-      isSideQuestionUi(el) || isTimestampUi(el);
+      isSideQuestionUi(el) || isTimestampUi(el) || isChangedFilesCardUi(el);
+  }
+
+  function isChangedFilesCardUi(el) {
+    return (el.getAttribute('data-testid') === 'changed-files-card-review' ||
+      (el.tagName === 'SPAN' && el.classList.contains('truncate') &&
+        el.parentElement?.parentElement?.getAttribute('data-testid') === 'changed-files-card-header')) &&
+      !!el.closest('[data-testid="changed-files-card"]');
   }
 
   function isSideQuestionUi(el) {
@@ -469,6 +479,36 @@
     if (!el || el.nodeType !== 1 || el.tagName !== 'SPAN' || !el.hasAttribute('data-screenshot-volatile')) return false;
     return (el.hasAttribute('data-tooltip-id') && el.classList.contains('whitespace-nowrap')) ||
       (el.classList.contains('tabular-nums') && !!el.closest('[data-testid="conversation-row-sidebar"]'));
+  }
+
+  function translateMarketplaceCategory(text, el) {
+    if (text === 'Science' && el && (el.closest('[data-testid="marketplace-category-option-science"], [data-testid="marketplace-category-chip"]') ||
+        (el.matches('section[aria-label], section[aria-label] > div > h2') && el.closest('[data-testid="customizations-marketplace"]')))) {
+      return '科研';
+    }
+    if (el?.tagName === 'BUTTON' && (text === 'See more in Science' || text === 'See less in Science') &&
+        el.closest('[data-testid="customizations-marketplace"] section[aria-label]')) {
+      return text === 'See more in Science' ? '在科研中查看更多' : '在科研中收起';
+    }
+    return null;
+  }
+
+  function translateFeaturedAttribute(value, attr, el) {
+    var name = el.getAttribute('data-member-name');
+    if (name && el.getAttribute('data-testid') === 'featured-carousel-member-tile') {
+      if (attr === 'title') return value;
+      if (attr === 'aria-label') {
+        var status = value.startsWith(name + ', ') && translateSingleUnit(value.slice(name.length + 2));
+        return status ? name + '，' + status : value;
+      }
+    }
+    if (attr !== 'aria-label') return null;
+    var action = value.match(/^(Details for|Adding|Add) (.+)$/);
+    if (action && el.closest('[data-testid="featured-carousel"]')) {
+      var labels = { 'Details for': '查看详情：', Adding: '正在添加 ', Add: '添加 ' };
+      return labels[action[1]] + action[2];
+    }
+    return null;
   }
 
   function translateUiText(text, el) {
@@ -529,7 +569,7 @@
         clock[2] + ({mo: '个月', m: '分钟', h: '小时', d: '天', w: '周', y: '年'}[clock[3]]) + (clock[4] ? '前' : '');
       if (text === 'now' || text === 'just now') return '刚刚';
     }
-    return translateSingleUnit(text);
+    return translateMarketplaceCategory(text, el) ?? translateSingleUnit(text);
   }
 
   // Cache DOM facts only during one synchronous scan slice. Never retain a
@@ -583,7 +623,8 @@
         } else if (kind === 'side-question' && !isSideQuestionUi(control)) {
           preserveContent = true;
         } else if (kind === 'message' && !inToolbar && control.parentElement !== current &&
-            control.getAttribute('data-testid') !== 'plan-command-fyi-alert' && !isTimestampUi(control)) {
+            control.getAttribute('data-testid') !== 'plan-command-fyi-alert' && !isTimestampUi(control) &&
+            !isChangedFilesCardUi(control)) {
           // Unmarked legacy bodies can contain buttons. A nested button alone is not UI chrome.
           preserveContent = true;
         } else if (kind === 'tree' && (control.hasAttribute('data-uri') ||
@@ -616,8 +657,9 @@
     if (!officialPluginDescriptions || !el?.classList) return false;
     var searchHighlight = 'span.font-semibold.text-foreground';
     if (el.tagName === 'SPAN' && el.classList.contains('font-semibold') && el.matches(searchHighlight)) el = el.parentElement;
-    if (!el?.classList.contains('text-muted-foreground') ||
-        !el.matches('div.text-sm.text-muted-foreground.line-clamp-2.mt-1, div.text-sm.text-muted-foreground.truncate, p.text-muted-foreground.leading-relaxed')) return false;
+    if (!el?.classList.contains('text-muted-foreground')) return false;
+    var featured = el.matches('p.line-clamp-3[title]') && el.closest('[data-testid="featured-carousel"] [role="tabpanel"]');
+    if (!featured && !el.matches('div.text-sm.line-clamp-2.mt-1, div.text-sm.truncate, p.leading-relaxed')) return false;
 
     // Search can split a card's description into text and matching spans.
     // Read the full source and keep the nodes React owns in place.
@@ -640,10 +682,16 @@
     ))) {
       primary = primary || texts[0];
       for (var i = 0; i < texts.length; i++) writeLocalizedText(texts[i], texts[i] === primary ? entry.translation : '', true);
+      var title = el.getAttribute('title');
+      var edit = attributeEdits.get(el)?.title;
+      if (featured && (title === source || (title === edit?.localized && edit.source === source))) {
+        writeLocalizedAttribute(el, 'title', entry.translation, true);
+      } else restoreLocalizedAttributes(el);
       return true;
     }
     if (hasTranslation) {
       for (var j = 0; j < texts.length; j++) restoreLocalizedText(texts[j]);
+      restoreLocalizedAttributes(el);
     }
     return false;
   }
@@ -676,6 +724,24 @@
       if (el.getAttribute(attr) === edit.localized) el.setAttribute(attr, edit.source);
       el[MARK_ATTR + '_' + attr] = undefined;
     });
+  }
+
+  function writeLocalizedAttribute(el, attr, value, officialPluginDescription) {
+    var current = el.getAttribute(attr);
+    if (current === value) return;
+    var edits = attributeEdits.get(el);
+    if (!edits) {
+      edits = Object.create(null);
+      attributeEdits.set(el, edits);
+    }
+    var previous = edits[attr];
+    edits[attr] = {
+      source: previous?.localized === current ? previous.source : current,
+      localized: value,
+      officialPluginDescription: officialPluginDescription
+    };
+    el.setAttribute(attr, value);
+    el[MARK_ATTR + '_' + attr] = value;
   }
 
   function restoreProtectedSubtree(el) {
@@ -785,16 +851,15 @@
     if (scanId && el._agyScanId === scanId) return;
     var translationMode = getElementTranslationMode(el);
     if (translationMode === 0) {
-      if (translateOfficialPluginDescription(el)) {
-        restoreLocalizedAttributes(el);
-      } else if (work) {
+      if (translateOfficialPluginDescription(el)) return;
+      if (work) {
         restoreLocalizedAttributes(el);
         appendChildren(el, work);
       } else restoreProtectedSubtree(el);
       return;
     }
     var translateOwnContent = translationMode === 2;
-    if (!translateOwnContent) restoreLocalizedAttributes(el);
+    if (!translateOwnContent || attributeEdits.get(el)?.title?.officialPluginDescription) restoreLocalizedAttributes(el);
 
     // 同一轮扫描中，已处理的元素跳过
     if (scanId) el._agyScanId = scanId;
@@ -823,7 +888,7 @@
           var markKey = MARK_ATTR + '_' + attr;
           if (el[markKey] === val) continue;
 
-          var trans = translateSingleUnit(val);
+          var trans = translateMarketplaceCategory(val, el) ?? translateFeaturedAttribute(val, attr, el) ?? translateSingleUnit(val);
           if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
               el.closest('[data-testid^="shortcut-row-"]')) {
             var shortcutAction = translateSingleUnit(val.slice('Reset '.length, -' to default'.length));
@@ -837,14 +902,7 @@
             }
           }
           if (trans !== null && trans !== val) {
-            var edits = attributeEdits.get(el);
-            if (!edits) {
-              edits = Object.create(null);
-              attributeEdits.set(el, edits);
-            }
-            edits[attr] = { source: val, localized: trans };
-            el.setAttribute(attr, trans);
-            el[markKey] = trans; // 标记已翻译的值
+            writeLocalizedAttribute(el, attr, trans);
           } else {
             // 关键性能优化：补充 DOM 否定标记，未命中时记录原属性值，二次扫描直接 O(1) 退出
             el[markKey] = val;
