@@ -1,0 +1,162 @@
+{
+  "source": {
+    "version": "Antigravity App 2.34.0",
+    "platform": "Windows x64",
+    "sha256": "d52ce739c15044c02a32e1b9df62bfe39dd8164c70a2ab783540e6ed5e070251",
+    "scope": "Reviewed shell and composer settings, model controls, permission settings and inline requests, sidebar ordering and filters, commit input, plugin controls and automation actions. Source-derived timer templates, MCP App status prefixes and request payload isolation are verified separately."
+  },
+  "ui": [
+    "Input Box",
+    "Enter to send",
+    "Choose which key sends a message in the chat composer.",
+    "Press Cmd+Enter to send, Enter for a new line.",
+    "Press Ctrl+Enter to send, Enter for a new line.",
+    "Press Enter to send, Shift+Enter for a new line.",
+    "Command setup script",
+    "Default workspace VCS",
+    "Default Cog repository",
+    "Default Cog branch / ref",
+    "Sync JJ worktrees to head",
+    "Setup script",
+    "Orchestrator Settings",
+    "Choose the models Orchestrator uses. A larger, smarter orchestrator model with a faster, cheaper executor gives high quality for fewer tokens.",
+    "Orchestrator Model",
+    "Plans the work, makes design decisions, and reviews the result. Pick a top-tier model. You can also pick one per conversation from the Orchestrator row in the model menu.",
+    "Executor Model",
+    "Carries out the plan: searches, edits, builds, and tests. Pick a faster, cheaper model.",
+    "New conversation button",
+    "Signing out…",
+    "Describe your changes",
+    "Describe your changes, or leave empty to auto-generate",
+    "Pinned",
+    "Reply",
+    "Telemetry is turned off for your account. ",
+    "Unsent draft",
+    "Messages now send immediately. Configure in",
+    "Instead of queueing, try asking the agent to do something after the current task.",
+    "Thinking effort",
+    "Controls how much time and quota the model spends reasoning before responding. Higher effort improves accuracy on hard problems, at the cost of slower responses and higher quota use.",
+    "Edits the conversation title",
+    "Manual Order",
+    "Show 5",
+    "Show 10",
+    "Customize Sidebar",
+    "Idle Conversations",
+    "Only applies when grouped by status",
+    "Filters",
+    "Show Automation Conversations",
+    "Show Plugin Conversations",
+    "Any time",
+    "Filter and Sort",
+    "Last Activity",
+    "Needs Input",
+    "Failed to create automation.",
+    "New automation",
+    "Create automation",
+    "No sign-in required. This app is ready to use.",
+    "Enable terminal sandbox",
+    "Terminal command auto execution",
+    "File writes",
+    "Commands outside sandbox",
+    "File access rules",
+    "Network access rules",
+    "Tool permissions",
+    "Enable sandbox mode",
+    "Security preset",
+    "Permission preset",
+    "Add note",
+    "In chat",
+    "Answered: ",
+    "Replaced by newer request",
+    "Expired · Action not taken",
+    "Ask to retry",
+    "Select one or more options",
+    "Runtime permission",
+    "Permission approval scope",
+    "Tell the agent what to do instead...",
+    "Deny with note",
+    "Open System Settings ↗",
+    "Reopen ↗",
+    "Screen locked: agents can't use this Mac until you unlock it",
+    "This plugin is currently stopped. Events and stdout streams will appear here once started.",
+    "Start Plugin",
+    "Filter plugins",
+    "Category",
+    "Plugins Options",
+    "Select Sidebar Item 1",
+    "Select Sidebar Item 2",
+    "Select Sidebar Item 3",
+    "Select Sidebar Item 4",
+    "Select Sidebar Item 5",
+    "Select Sidebar Item 6",
+    "Select Sidebar Item 7",
+    "Select Sidebar Item 8",
+    "Select Sidebar Item 9",
+    "Send message",
+    "Edit permission target",
+    "Allow",
+    "Deny",
+    "Previous question",
+    "Next question",
+    "Submit",
+    "Skip",
+    "Recommended"
+  ],
+  "preserve": [
+    {
+      "text": "Loading ",
+      "kind": "composed",
+      "reason": "Translate only the fixed prefix in the MCP App loading element and preserve the separate app name."
+    },
+    {
+      "text": "Could not load ",
+      "kind": "composed",
+      "reason": "Translate only the fixed prefix in the MCP App pane error and preserve the separate app name and diagnostic."
+    },
+    {
+      "text": "Could not load the app view: ",
+      "kind": "composed",
+      "reason": "Translate the prefix at its dedicated MCP App view error element and preserve the diagnostic."
+    },
+    {
+      "text": "Orchestrator",
+      "kind": "technical",
+      "reason": "The switcher uses this upstream model and mode label as displayed identity."
+    },
+    {
+      "text": "ELMO Composite",
+      "kind": "technical",
+      "reason": "Upstream voice actor identifier in the internal voice configuration."
+    },
+    {
+      "text": "Run Jetski Live on the ELMO composite voice actor.",
+      "kind": "technical",
+      "reason": "Internal upstream voice configuration description."
+    },
+    {
+      "text": "CitC workspace type",
+      "kind": "technical",
+      "reason": "Internal workspace type selector."
+    },
+    {
+      "text": "Add a note or condition...",
+      "kind": "composed",
+      "reason": "The fallback shares an attribute with the card-supplied prompt."
+    },
+    {
+      "text": "Other answer",
+      "kind": "composed",
+      "reason": "The fallback shares an accessible label with the card-supplied prompt."
+    },
+    {
+      "text": "Other (write your answer)",
+      "kind": "composed",
+      "reason": "The fallback shares a placeholder with the card-supplied prompt."
+    },
+    {
+      "text": "Answered",
+      "kind": "composed",
+      "reason": "The fallback shares the slot with a recorded answer summary."
+    }
+  ]
+}

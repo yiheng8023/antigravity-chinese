@@ -1,5 +1,13 @@
 [
   {
+    "regex": "^Select Sidebar Item ([1-9])$",
+    "replacement": "选择侧栏第 $1 项"
+  },
+  {
+    "regex": "^Show (\\d+) More$",
+    "replacement": "再显示 $1 项"
+  },
+  {
     "regex": "^Start Best-of-(\\d+)$",
     "replacement": "启动 Best-of-$1"
   },

@@ -1,4 +1,9 @@
 {
+  "This plugin is currently stopped. Events and stdout streams will appear here once started.": "此插件已停止。启动后，此处会显示事件和标准输出。",
+  "Start Plugin": "启动插件",
+  "Filter plugins": "筛选插件",
+  "Category": "类别",
+  "Plugins Options": "插件选项",
   "See more": "查看更多",
   "Featured": "精选",
   "Marketplace notice": "插件市场须知",

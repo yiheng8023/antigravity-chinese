@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-当前源码版本 **v3.3.55**，维护目标为 **Antigravity App 2.33.1 / VS Code 扩展 1.13.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
+当前源码版本 **v3.3.56**，维护目标为 **Antigravity App 2.34.0 / VS Code 扩展 1.13.0**。这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。
 
-本版补齐 Linux 便携安装路径探测，支持把 `--path` 等参数传给安装和还原脚本。验证范围见 [Linux 便携安装维护记录](docs/maintenance/linux-portable-install.md)。桌面 2.33.1 与 VS Code 扩展 1.13.0 的界面适配见 [上一版维护记录](docs/maintenance/antigravity-2.33.1.md)。
+本版补齐 Antigravity App 2.34.0 的侧栏、输入、模型和权限界面文案，并保护新版请求卡片中的问题、选项和命令原文。界面与安装验证见 [2.34.0 维护记录](docs/maintenance/antigravity-2.34.0.md)。Linux 便携路径支持见 [Linux 便携安装维护记录](docs/maintenance/linux-portable-install.md)。
 
 VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node cli.js install:vscode`，再重新加载 VS Code 窗口。
 
@@ -25,13 +25,13 @@ VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node
 
 | 组件 | 实现 | 当前验证范围 |
 | --- | --- | --- |
-| Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows 2.33.1 的界面与安装验证见上一版记录。本轮在 Ubuntu WSL 2 上验证 Linux x64 2.33.0 安装、重复安装、还原与外置文件 |
-| VS Code 扩展 | 清单、原生菜单和通知翻译、Webview 本地代理、独立备份/还原 | Windows 1.13.0 安装、重复安装、还原；命令和快捷键设置检查范围见上一版维护记录 |
+| Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows x64 2.34.0 安装、重复安装、还原与外置文件核验。Linux x64 2.33.0 的安装验证见便携安装记录 |
+| VS Code 扩展 | 清单、原生菜单和通知翻译、Webview 本地代理、独立备份/还原 | Windows 1.13.0 安装、重复安装、还原与界面检查见 [1.13.0 维护记录](docs/maintenance/antigravity-2.33.1.md) |
 | 社区中文插件 | 中文交互规则与维护诊断技能 | 可选安装；不代表 Google 官方插件 |
 | 独立 IDE、其他 IDE 扩展 | 尚无专用汉化安装器 | 不声明已适配 |
 | Antigravity CLI | 保留官方原生行为 | 不修改 CLI 二进制或终端界面 |
 
-本轮 Linux 验证覆盖官方安装包和 CLI。macOS 的验证范围为跨平台自动化。语音、远程智能体等官方灰度功能以实际账号开放情况为准。静态检查与候选字符串匹配均不代表整个上游产品的翻译覆盖率。
+本轮桌面 2.34.0 的实测范围是 Windows x64。macOS 和 Linux 的本轮验证范围为跨平台自动化。语音、远程智能体等官方灰度功能以实际账号开放情况为准。静态检查与候选字符串匹配均不代表整个上游产品的翻译覆盖率。
 
 ## 安装与使用
 

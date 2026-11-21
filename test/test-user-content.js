@@ -7,6 +7,106 @@ const { JSDOM } = require('jsdom');
 const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
 const dictionary = require('../dict/zh-CN.json');
 
+test('2.34 inline requests translate renderer controls while retaining request and answer payloads', async t => {
+  const { document, translate } = await fixture(t, `
+    <section data-testid="agent-response">
+      <div data-testid="inline-card" data-inline-card-key="q1" data-inline-card-kind="question" data-inline-card-state="pending">
+        <div class="text-compact font-semibold">Settings</div>
+        <div role="radiogroup" aria-label="Settings">
+          <button role="radio" data-testid="inline-card-option-1"><span>Open</span>
+            <span class="rounded-full text-primary">Recommended</span>
+            <span class="text-muted-foreground">Download</span>
+          </button>
+        </div>
+        <div class="text-xs text-muted-foreground px-0.5">Select one or more options</div>
+        <div class="shrink-0 gap-0.5"><button aria-label="Next question"></button></div>
+        <textarea data-testid="inline-card-write-in" aria-label="Settings" placeholder="Search or enter a URL">Settings</textarea>
+        <button data-testid="inline-card-in-chat">In chat</button>
+        <button data-testid="inline-card-submit">Submit</button>
+        <span data-testid="inline-card-expiry"><span>5m left</span></span>
+      </div>
+      <div data-testid="inline-card" data-inline-card-key="a1" data-inline-card-state="pending">
+        <dl data-testid="inline-card-details"><dt>File</dt><dd>Download</dd></dl>
+        <span data-testid="inline-card-risk">Settings</span>
+        <button data-testid="inline-card-add-note">Add note</button>
+      </div>
+      <div data-testid="inline-card" data-inline-card-key="q2" data-inline-card-state="answered">
+        <span class="text-muted-foreground">Answered: </span><span class="font-medium break-words">Settings</span>
+      </div>
+      <div data-testid="inline-card" data-inline-card-key="q3" data-inline-card-state="expired">
+        <span>Expired · Action not taken</span><button data-testid="inline-card-retry">Ask to retry</button>
+        <div data-testid="inline-card-error">Download</div>
+      </div>
+      <div data-testid="inline-permission-card" data-permission-action="run_command">
+        <span data-testid="inline-permission-badge"><span>Runtime permission</span></span>
+        <p>Settings</p>
+        <pre>Download</pre>
+        <div role="radiogroup" aria-label="Permission approval scope"></div>
+        <input data-testid="inline-permission-deny-note" placeholder="Tell the agent what to do instead..." value="Open">
+        <button data-testid="inline-permission-add-note">Deny with note</button>
+        <button data-testid="inline-permission-allow">Allow</button>
+      </div>
+      <div class="prose"><div data-testid="inline-card" data-inline-card-key="example" data-inline-card-state="expired">
+        <button data-testid="inline-card-retry">Ask to retry</button>
+      </div></div>
+    </section>`);
+  const card = key => document.querySelector('[data-inline-card-key="' + key + '"]');
+  const find = (root, testId) => root.querySelector('[data-testid="' + testId + '"]');
+  assert.equal(card('q1').firstElementChild.textContent, 'Settings');
+  const choices = card('q1').querySelector('[role="radiogroup"]');
+  assert.equal(choices.getAttribute('aria-label'), 'Settings');
+  assert.deepEqual([...choices.querySelectorAll('span')].map(el => el.textContent), ['Open', '推荐', 'Download']);
+  assert.equal(card('q1').querySelector('.text-xs').textContent, '请选择一项或多项');
+  assert.equal(find(card('q1'), 'inline-card-write-in').placeholder, 'Search or enter a URL');
+  assert.equal(find(card('q1'), 'inline-card-write-in').value, 'Settings');
+  assert.equal(find(card('q1'), 'inline-card-in-chat').textContent, '在会话中查看');
+  assert.equal(find(card('q1'), 'inline-card-expiry').textContent, '剩余 5 分钟');
+  assert.equal(card('a1').querySelector('dt').textContent, 'File');
+  assert.equal(card('a1').querySelector('dd').textContent, 'Download');
+  assert.equal(find(card('a1'), 'inline-card-add-note').textContent, '添加备注');
+  assert.deepEqual([...card('q2').children].map(el => el.textContent), ['已回答： ', 'Settings']);
+  assert.equal(card('q3').firstElementChild.textContent, '已过期 · 未执行操作');
+  assert.equal(find(card('q3'), 'inline-card-retry').textContent, '请求重试');
+  assert.equal(find(card('q3'), 'inline-card-error').textContent, 'Download');
+  const permission = find(document, 'inline-permission-card');
+  assert.equal(find(permission, 'inline-permission-badge').textContent, '运行时权限');
+  assert.equal(permission.querySelector('p').textContent, 'Settings');
+  assert.equal(permission.querySelector('pre').textContent, 'Download');
+  assert.equal(permission.querySelector('[role="radiogroup"]').getAttribute('aria-label'), '权限批准范围');
+  assert.equal(find(permission, 'inline-permission-deny-note').placeholder, '告诉智能体改做什么…');
+  assert.equal(find(permission, 'inline-permission-deny-note').value, 'Open');
+  assert.equal(find(permission, 'inline-permission-add-note').textContent, '拒绝并附上备注');
+  assert.equal(find(permission, 'inline-permission-allow').textContent, '允许');
+  assert.equal(find(card('example'), 'inline-card-retry').textContent, 'Ask to retry');
+  translate(document.body);
+  assert.equal(card('q1').querySelector('button[aria-label]').getAttribute('aria-label'), '下一个问题');
+});
+
+test('2.34 MCP App status localizes the prefix while retaining app names and diagnostics', async t => {
+  const { document, translate } = await fixture(t, `
+    <section data-testid="agent-response">
+      <div data-testid="mcp-app-pane-loading" role="status">
+        <span><span class="shimmer-text-mask"><span class="shimmer-text-content"></span></span></span>
+      </div>
+      <div data-testid="mcp-app-pane-error"></div>
+      <div data-testid="mcp-app-view-error"></div>
+    </section>
+    <div class="shimmer-text-content" id="unrelated">Loading</div>`);
+  const loading = document.querySelector('[data-testid="mcp-app-pane-loading"] .shimmer-text-content');
+  const paneError = document.querySelector('[data-testid="mcp-app-pane-error"]');
+  const viewError = document.querySelector('[data-testid="mcp-app-view-error"]');
+  loading.append('Loading ', 'Settings');
+  paneError.append('Could not load ', 'Open', ': ', 'Download');
+  viewError.append('Could not load the app view: ', 'Settings');
+  translate(document.body);
+  assert.deepEqual([...loading.childNodes].map(node => node.nodeValue), ['正在加载 ', 'Settings']);
+  assert.deepEqual([...paneError.childNodes].map(node => node.nodeValue), ['无法加载 ', 'Open', ': ', 'Download']);
+  assert.deepEqual([...viewError.childNodes].map(node => node.nodeValue), ['无法加载应用视图： ', 'Settings']);
+  assert.equal(document.querySelector('#unrelated').textContent, '加载中');
+  translate(document.body);
+  assert.equal(paneError.lastChild.nodeValue, 'Download');
+});
+
 test('VS Code shortcut descriptions preserve scheme values and the command prefix', async t => {
   const { document } = await fixture(t, `
     <div role="radiogroup" aria-label="Keybinding Scheme">

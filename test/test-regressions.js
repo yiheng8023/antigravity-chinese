@@ -40,6 +40,12 @@ test('reviewed component inventory catches omitted descriptions and changed upst
   const missingRemote = { ...dictionary, exact: { ...dictionary.exact } };
   delete missingRemote.exact['Insert into main conversation'];
   assert.ok(checkInventory(missingRemote, remoteInventory).errors.some(e => e.includes('Insert into main conversation')));
+  const currentInventory = require('./fixtures/app-2.34.0-ui.json');
+  const current = checkInventory(dictionary, currentInventory);
+  assert.equal(current.ok, true, current.errors.join('\n'));
+  const missingCardAction = { ...dictionary, exact: { ...dictionary.exact } };
+  delete missingCardAction.exact['Deny with note'];
+  assert.ok(checkInventory(missingCardAction, currentInventory).errors.some(e => e.includes('Deny with note')));
 });
 
 function extension(dir, version = '1.9.0', suffix = '') {

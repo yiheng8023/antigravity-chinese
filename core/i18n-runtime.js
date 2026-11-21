@@ -244,6 +244,10 @@
     'transcript-line-text': 1,
     'voice-transcript-summary-lead': 1,
     'voice-transcript-summary-point': 1,
+    'image-strip-tile': 1,
+    'image-strip-viewer-caption': 1,
+    'image-strip-viewer-thumbnail': 1,
+    'model-selector-orchestrator-model': 1,
     'webview-device-chooser-option': 1,
     'plugin-detail-footer-author': 1,
     'plugin-detail-footer-version': 1,
@@ -255,6 +259,28 @@
     'markdown': 1,
     'markdown-body': 1,
     'markdown-content': 1
+  };
+  var INLINE_REQUEST_UI_TEST_IDS = {
+    'inline-card-add-note': 1,
+    'inline-card-expiry': 1,
+    'inline-card-in-chat': 1,
+    'inline-card-next': 1,
+    'inline-card-retry': 1,
+    'inline-card-skip': 1,
+    'inline-card-submit': 1,
+    'inline-permission-add-note': 1,
+    'inline-permission-allow': 1,
+    'inline-permission-badge': 1,
+    'inline-permission-deny': 1,
+    'inline-permission-deny-note': 1,
+    'inline-permission-in-chat': 1,
+    'inline-permission-unsandboxed-warning': 1,
+    'permission-target-editor': 1
+  };
+  var MCP_APP_STATUS_LABELS = {
+    'mcp-app-pane-loading': ['Loading', '正在加载'],
+    'mcp-app-pane-error': ['Could not load', '无法加载'],
+    'mcp-app-view-error': ['Could not load the app view:', '无法加载应用视图：']
   };
 
   function isModelSelectorBoundary(elem) {
@@ -375,9 +401,42 @@
     if (testId === 'agent-message' || testId === 'agent-response') return 'message';
     if (testId === 'conversation-row-sidebar') return 'conversation';
     if (testId === 'side-question-question' || testId === 'side-question-answer') return 'side-question';
+    if ((testId === 'inline-card' && el.hasAttribute('data-inline-card-key')) ||
+        (testId === 'inline-permission-card' && el.hasAttribute('data-permission-action'))) return 'inline-request';
+    if (Array.isArray(MCP_APP_STATUS_LABELS[testId])) return 'mcp-app-status';
     var role = el.getAttribute('role');
     if (role === 'tree' || role === 'treeitem') return 'tree';
     return null;
+  }
+
+  function getMcpAppStatusLabel(el) {
+    var label = MCP_APP_STATUS_LABELS[el?.getAttribute('data-testid')];
+    if (Array.isArray(label)) return label;
+    if (el?.classList?.contains('shimmer-text-content') && el.closest('[data-testid="mcp-app-pane-loading"]')) {
+      return MCP_APP_STATUS_LABELS['mcp-app-pane-loading'];
+    }
+    return null;
+  }
+
+  function isInlineRequestUi(el, card) {
+    var marker = el.closest('[data-testid]');
+    if (marker && marker !== card && card.contains(marker) &&
+        INLINE_REQUEST_UI_TEST_IDS[marker.getAttribute('data-testid')] === 1) return true;
+    if (card.getAttribute('data-testid') === 'inline-permission-card') {
+      return el.matches('[role="radiogroup"], [data-testid="permission-download-details"] > dt');
+    }
+
+    // The pending title, details, options and answered summary are supplied by
+    // the agent or the user. Only the renderer's fixed controls and status text translate.
+    var state = card.getAttribute('data-inline-card-state');
+    if (state === 'superseded') return el.parentElement === card && el.tagName === 'SPAN';
+    if (state === 'expired') return marker === card;
+    if (state === 'answered') return el.parentElement === card && el.classList.contains('text-muted-foreground');
+    if (el.tagName === 'BUTTON' && el.hasAttribute('aria-label') &&
+        el.parentElement?.classList.contains('shrink-0') && el.parentElement.classList.contains('gap-0.5')) return true;
+    return el.matches('div.text-xs.text-muted-foreground[class~="px-0.5"]') ||
+      (el.tagName === 'SPAN' && el.classList.contains('rounded-full') &&
+        el.classList.contains('text-primary') && !!el.closest('[role="radio"], [role="checkbox"]'));
   }
 
   function isMessageUiControl(el) {
@@ -400,6 +459,10 @@
 
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
+    if (text.endsWith(' left') && el?.closest('[data-testid="inline-card-expiry"]')) {
+      var remaining = text.match(/^(\d+)([ms]) left$/);
+      if (remaining) return '剩余 ' + remaining[1] + (remaining[2] === 'm' ? ' 分钟' : ' 秒');
+    }
     if (text === 'Welcome to Antigravity!' && el?.tagName === 'DIV' && el.classList.contains('entrance-title')) return '欢迎使用 Antigravity！';
     if (text === 'SSH Host' && el?.closest('[data-testid="project-selector-ssh-host-trigger"]')) return 'SSH 主机';
     if (text === 'commands.' && el?.firstElementChild?.tagName === 'CODE' &&
@@ -474,6 +537,7 @@
     var inToolbar = false;
     var inLink = false;
     var preserveContent = false;
+    var explicitMessageUi = false;
     while (current) {
       var facts = getElementFacts(current);
       if (facts.protected || (scanContext && scanContext.modes.get(current) === 0)) {
@@ -481,7 +545,12 @@
         return 0;
       }
       var kind = facts.kind;
-      if (kind) {
+      if (kind === 'inline-request') {
+        explicitMessageUi = isInlineRequestUi(el, current);
+        if (!explicitMessageUi) preserveContent = true;
+      } else if (kind === 'mcp-app-status') {
+        explicitMessageUi = true;
+      } else if (kind && (kind !== 'message' || !explicitMessageUi)) {
         // A sidebar navigation link carries the conversation name, even inside wrappers.
         if (kind === 'conversation' && inLink) return 0;
         if (!control) {
@@ -496,7 +565,7 @@
             (control.tagName !== 'BUTTON' && !inToolbar))) {
           preserveContent = true;
         }
-      } else if (!preserveContent) {
+      } else if (!kind && !preserveContent) {
         if (!control) {
           if (facts.control === undefined) facts.control = isMessageUiControl(current);
           if (facts.control) control = current;
@@ -570,6 +639,14 @@
       return;
     }
 
+    // React renders the fixed prefix, app name and diagnostic as separate
+    // nodes. Translate the first node only, even on rescans and reparenting.
+    var mcpStatus = getMcpAppStatusLabel(parent);
+    if (mcpStatus && node !== parent.firstChild) {
+      restoreLocalizedText(node);
+      return;
+    }
+
     // React emits the alias/path as a separate text node after the fixed SSH
     // prefix. Preserve it even when it matches a menu label such as "Open".
     var previous = node.previousSibling;
@@ -601,7 +678,9 @@
       return;
     }
 
-    var translated = translateUiText(trimmed, parent);
+    var translated = mcpStatus
+      ? (trimmed === mcpStatus[0] ? mcpStatus[1] : null)
+      : translateUiText(trimmed, parent);
     if (translated !== null && translated !== trimmed) {
       var leadingSpace = original.match(/^\s*/)[0];
       var trailingSpace = original.match(/\s*$/)[0];

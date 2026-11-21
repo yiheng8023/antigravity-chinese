@@ -47,7 +47,11 @@ if (require.main === module) {
   try {
     if (args.length && (index !== 0 || args.length !== 2)) throw new Error('Usage: node tools/ui-inventory.js [--bundle <official-main.js>]');
     const source = index === -1 ? undefined : fs.readFileSync(path.resolve(args[1]));
-    const inventories = [require('../test/fixtures/app-2.32.1-ui.json'), require('../test/fixtures/app-2.33.0-ui.json')];
+    const inventories = [
+      require('../test/fixtures/app-2.32.1-ui.json'),
+      require('../test/fixtures/app-2.33.0-ui.json'),
+      require('../test/fixtures/app-2.34.0-ui.json'),
+    ];
     const hash = source && crypto.createHash('sha256').update(source).digest('hex');
     const selected = hash ? inventories.filter(i => i.source.sha256 === hash) : inventories;
     if (!selected.length) throw new Error('Upstream changed: extract and review a component inventory for SHA-256 ' + hash);
