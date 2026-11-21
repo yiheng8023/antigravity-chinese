@@ -204,6 +204,7 @@
   var doc = root ? (root.document || (typeof document !== 'undefined' ? document : null)) : null;
 
   var I18N_DATA = (root && root.__AGY_I18N_DATA__) || { exact: {}, patterns: [] };
+  var officialPluginDescriptions = I18N_DATA.officialPluginDescriptions;
   var defaultEngine = createI18nEngine(I18N_DATA);
   var exactDict = defaultEngine.exactDict;
   var patterns = defaultEngine.patterns;
@@ -611,12 +612,28 @@
   var textEdits = new WeakMap();
   var attributeEdits = new WeakMap();
 
+  function translateOfficialPluginDescription(el, node) {
+    if (!officialPluginDescriptions || el?.tagName !== 'DIV' || !el.classList.contains('line-clamp-2') ||
+        el.firstChild !== node || node.nextSibling) return null;
+    var edit = textEdits.get(node);
+    var source = edit?.localized === node.nodeValue ? edit.source : node.nodeValue;
+    if (!Object.hasOwn(officialPluginDescriptions, source) || !el.matches('div.text-sm.text-muted-foreground.line-clamp-2.mt-1') ||
+        !el.closest('[data-testid="project-customizations-content"] [data-testid="workspace-customizations-view"]') ||
+        getElementTranslationMode(el.parentElement) !== 2) return null;
+
+    var request = new root.CustomEvent('agy-localization-check-official-plugin-description', {
+      detail: source,
+      cancelable: true
+    });
+    return el.dispatchEvent(request) ? null : officialPluginDescriptions[source].translation;
+  }
+
   // Retain the source of a DOM write while this runtime still owns the displayed value.
-  function writeLocalizedText(node, value) {
+  function writeLocalizedText(node, value, officialPluginDescription) {
     if (node.nodeValue !== value) {
       var previous = textEdits.get(node);
       var source = previous && previous.localized === node.nodeValue ? previous.source : node.nodeValue;
-      textEdits.set(node, { source: source, localized: value });
+      textEdits.set(node, { source: source, localized: value, officialPluginDescription: officialPluginDescription });
       node.nodeValue = value;
     }
     node._agyOriginal = value;
@@ -658,7 +675,14 @@
   function translateTextNode(node, parentMode) {
     if (!node || node.nodeType !== 3) return;
     var parent = node.parentElement || node.parentNode;
-    if (parent && ((parentMode === undefined ? getElementTranslationMode(parent) : parentMode) !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
+    var mode = parentMode === undefined ? getElementTranslationMode(parent) : parentMode;
+    if (parent && (mode !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
+      var translatedDescription = mode === 0 ? translateOfficialPluginDescription(parent, node) : null;
+      if (translatedDescription) writeLocalizedText(node, translatedDescription, true);
+      else restoreLocalizedText(node);
+      return;
+    }
+    if (officialPluginDescriptions && textEdits.get(node)?.officialPluginDescription) {
       restoreLocalizedText(node);
       return;
     }
@@ -746,6 +770,9 @@
       if (work) {
         restoreLocalizedAttributes(el);
         appendChildren(el, work);
+      } else if (el.firstChild?.nodeType === 3 && !el.firstChild.nextSibling) {
+        restoreLocalizedAttributes(el);
+        translateTextNode(el.firstChild, translationMode);
       } else restoreProtectedSubtree(el);
       return;
     }

@@ -1,0 +1,43 @@
+{
+  "Reliable automation, in-depth debugging, and performance analysis in Chrome using Chrome DevTools and Puppeteer": {
+    "plugin": "chrome-devtools-plugin",
+    "translation": "在 Chrome 中使用 Chrome DevTools 和 Puppeteer 进行可靠的自动化、深度调试与性能分析"
+  },
+  "Check availability, schedule events, and RSVP.": {
+    "plugin": "gcalendar",
+    "translation": "查看忙闲状态、安排活动并回复邀请（RSVP）。"
+  },
+  "Read, draft, and edit docs.": {
+    "plugin": "gdocs",
+    "translation": "读取、起草和编辑文档。"
+  },
+  "Search, upload, download, and share files.": {
+    "plugin": "gdrive",
+    "translation": "搜索、上传、下载和共享文件。"
+  },
+  "Build applications and shell workflows with the Gemini Interactions API, Decisions API, Live API, and Gemini API CLI, including text, image, video, and speech generation, managed agents, and real-time multimodal streaming.": {
+    "plugin": "gemini-api",
+    "translation": "使用 Gemini Interactions API、Decisions API、Live API 和 Gemini API CLI 构建应用及 Shell 工作流，支持文本、图像、视频和语音生成、托管智能体与实时多模态流式传输。"
+  },
+  "Using the Google Antigravity Python SDK to build AI agents": {
+    "plugin": "google-antigravity-sdk",
+    "translation": "使用 Google Antigravity Python SDK 构建 AI 智能体"
+  },
+  "Read, write, and format spreadsheets.": {
+    "plugin": "gsheets",
+    "translation": "读取、写入和格式化电子表格。"
+  },
+  "Read, edit, and export presentations.": {
+    "plugin": "gslides",
+    "translation": "读取、编辑和导出演示文稿。"
+  },
+  "Keep your coding agent up to date with the latest web best practices.": {
+    "plugin": "modern-web-guidance-plugin",
+    "translation": "让您的编码智能体紧跟最新的 Web 最佳实践。"
+  },
+  "Unlock the power of agent swarms.": {
+    "plugin": "swarm",
+    "builtin": true,
+    "translation": "发挥多智能体协作的优势。"
+  }
+}

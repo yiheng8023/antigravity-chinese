@@ -15,7 +15,10 @@ async function fixture(t) {
   const frames = [];
   window.requestAnimationFrame = cb => frames.push(cb);
   window.setInterval = () => 0;
-  window.__AGY_I18N_DATA__ = dictionary;
+  window.__AGY_I18N_DATA__ = {
+    ...dictionary,
+    officialPluginDescriptions: require('../dict/scoped/official-plugin-descriptions.json')
+  };
   window.eval(runtime);
   await turn();
   async function frame() {

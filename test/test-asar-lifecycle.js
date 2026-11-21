@@ -106,6 +106,8 @@ try {
   asar.uncache(asarPath);
   const firstPreload = asar.extractFile(asarPath, path.join('dist', 'preload.js')).toString();
   const firstMain = asar.extractFile(asarPath, path.join('dist', 'main.js')).toString();
+  assert(firstPreload.includes('__AGY_I18N_DATA__.officialPluginDescriptions') && firstPreload.includes('发挥多智能体协作的优势。'),
+    '桌面 preload 包含独立的官方插件介绍词库');
   assert(firstMain.includes('// --- Antigravity Chinese Swarm Frame Start ---'),
     '桌面主进程包含限定 Swarm 来源的独立面板加载器');
   assert(firstMain.includes('WSL 发行版“\${WSL_DISTRO}”已不再安装。'),

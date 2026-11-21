@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.57** targets **Antigravity App 2.34.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.58** targets **Antigravity App 2.34.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This release localizes the terminal Select All shortcut and project deletion setting in Antigravity App 2.34.0. Project and automation names in deletion notices retain their original text. See the [2.34.0 maintenance record](docs/maintenance/antigravity-2.34.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
+This release localizes verified official plugin descriptions in project and unassigned conversation settings in Antigravity App 2.34.0. Plugin names, custom content and unverified descriptions retain their original text. See the [2.34.0 maintenance record](docs/maintenance/antigravity-2.34.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window.
 

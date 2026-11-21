@@ -6,6 +6,8 @@ const { JSDOM } = require('jsdom');
 
 const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirname, '../core/i18n-runtime.js'), 'utf8');
 const dictionary = require('../dict/zh-CN.json');
+const officialPluginDescriptions = require('../dict/scoped/official-plugin-descriptions.json');
+const { installOfficialPluginDescriptionSourceCheck } = require('../core/official-plugin-description-source');
 
 test('2.34 inline requests translate renderer controls while retaining request and answer payloads', async t => {
   const { document, translate } = await fixture(t, `
@@ -255,11 +257,13 @@ async function fixture(t, html, options = {}) {
   const dom = new JSDOM('<!doctype html><body>' + html + '</body>', {
     runScripts: 'outside-only',
     pretendToBeVisual: true,
-    url: options.url
+    url: options.url || (options.pluginDescriptions ? 'https://127.0.0.1:1500/' : undefined)
   });
   t.after(() => dom.window.close());
   const { window } = dom;
-  window.__AGY_I18N_DATA__ = dictionary;
+  window.__AGY_I18N_DATA__ = options.pluginDescriptions ? { ...dictionary, officialPluginDescriptions } : dictionary;
+  options.beforeStart?.(window.document);
+  if (options.pluginDescriptions) window.eval(`(${installOfficialPluginDescriptionSourceCheck})(${JSON.stringify(officialPluginDescriptions)})`);
   window.eval(runtime);
   await settle(window);
   return { window, document: window.document, translate: window.__AGY_TRANSLATE_EL__ };
@@ -942,6 +946,130 @@ for (const scope of ['project', 'unassigned']) {
     assert.deepEqual([...document.querySelectorAll('h3')].map(el => el.textContent), ['技能库', '规则库', '插件', '自定义智能体']);
   });
 }
+
+function pluginDescriptionFiber(el, name, provenance, rootState = {}) {
+  const source = el.textContent;
+  const plugin = {
+    $typeName: 'exa.language_server_pb.Plugin',
+    name,
+    description: source,
+    path: '/fixture/plugins/' + name,
+    isGlobal: true,
+    isBuiltin: false,
+    ...provenance
+  };
+  const root = { tag: 3, stateNode: rootState };
+  if (!rootState.current) rootState.current = root;
+  let parent = root;
+  for (let i = 0; i < 150; i++) parent = { return: parent };
+  const owner = { key: name, memoizedProps: { plugin }, return: parent };
+  const row = {
+    memoizedProps: { description: source, path: plugin.path, deleteTitle: 'Delete plugin' },
+    return: owner
+  };
+  const fiber = { stateNode: el, memoizedProps: { children: source }, return: { return: { return: row } } };
+  return { fiber, owner, root, rootState };
+}
+
+const docsPluginOrigin = {
+  installedFrom: {
+    marketplace: 'antigravity-plugins-official',
+    id: 'antigravity-plugins-official/plugin/gdocs'
+  }
+};
+
+test('project and unassigned settings localize verified official descriptions and preserve identical custom copy', async t => {
+  const text = 'Read, draft, and edit docs.';
+  const swarmText = 'Unlock the power of agent swarms.';
+  const row = (id, name, description) => `
+    <article>
+      <span class="font-medium truncate" data-tooltip-id="${id}">${name}</span>
+      <div class="text-sm text-muted-foreground line-clamp-2 mt-1" data-case="${id}" title="Settings">${description}</div>
+      <button>Copy Path</button>
+    </article>`;
+  const view = tag => `
+    <section id="${tag}" data-testid="project-customizations-content">
+      <div data-testid="workspace-customizations-view">
+        ${row('docs', 'Google Docs', text)}
+        ${row('local-docs', 'Google Docs', text)}
+        ${row('other-origin', 'Google Docs', text)}
+        ${row('swarm', 'Swarm', swarmText)}
+        ${row('local-swarm', 'Swarm', swarmText)}
+        ${row('edited', 'Google Docs', 'Settings')}
+        ${row('guidance', 'Modern Web Guidance', 'Keep your coding agent up to date with the latest web best practices.')}
+      </div>
+    </section>`;
+  const { document } = await fixture(t, view('project') + view('unassigned') + `
+    <div data-testid="user-input-step">${view('quoted')}</div>`, {
+    pluginDescriptions: true,
+    beforeStart(doc) {
+      for (const el of doc.querySelectorAll('[data-case]')) {
+        const kind = el.getAttribute('data-case');
+        const swarm = kind.endsWith('swarm');
+        const name = swarm ? 'swarm' : kind === 'guidance' ? 'modern-web-guidance-plugin' : 'gdocs';
+        let provenance = {};
+        if (kind === 'swarm') provenance = { isBuiltin: true };
+        if (kind === 'docs' || kind === 'edited') provenance = docsPluginOrigin;
+        if (kind === 'other-origin') provenance = { installedFrom: { ...docsPluginOrigin.installedFrom, id: 'antigravity-plugins-official/plugin/other' } };
+        if (kind === 'guidance') provenance = { installedFrom: { ...docsPluginOrigin.installedFrom, id: 'antigravity-plugins-official/plugin/modern-web-guidance-plugin' } };
+        el.__reactFiber$fixture = pluginDescriptionFiber(el, name, provenance).fiber;
+      }
+    }
+  });
+  for (const id of ['project', 'unassigned']) {
+    const view = document.querySelector('#' + id);
+    const get = kind => view.querySelector('[data-case="' + kind + '"]');
+    assert.equal(get('docs').textContent, '读取、起草和编辑文档。');
+    assert.equal(get('docs').title, 'Settings');
+    assert.equal(get('local-docs').textContent, text);
+    assert.equal(get('other-origin').textContent, text);
+    assert.equal(get('swarm').textContent, '发挥多智能体协作的优势。');
+    assert.equal(get('local-swarm').textContent, swarmText);
+    assert.equal(get('edited').textContent, 'Settings');
+    assert.equal(get('guidance').textContent, '让您的编码智能体紧跟最新的 Web 最佳实践。');
+    assert.equal(view.querySelector('[data-tooltip-id="guidance"]').textContent, 'Modern Web Guidance');
+    assert.equal(view.querySelector('[data-tooltip-id="docs"]').textContent, 'Google Docs');
+    assert.equal(view.querySelector('button').textContent, '复制路径');
+  }
+  assert.equal(document.querySelector('#quoted [data-case="docs"]').textContent, text);
+});
+
+test('official description translation follows the committed renderer and restores when moved into user content', async t => {
+  const source = 'Read, draft, and edit docs.';
+  let official, local;
+  const { document, translate } = await fixture(t, `
+    <section data-testid="project-customizations-content"><div data-testid="workspace-customizations-view">
+      <div id="description" class="text-sm text-muted-foreground line-clamp-2 mt-1">${source}</div>
+    </div></section>
+    <div data-testid="user-input-step"></div>`, {
+    pluginDescriptions: true,
+    beforeStart(doc) {
+      const el = doc.querySelector('#description');
+      official = pluginDescriptionFiber(el, 'gdocs', docsPluginOrigin);
+      local = pluginDescriptionFiber(el, 'gdocs', {}, official.rootState);
+      official.fiber.alternate = local.fiber;
+      local.fiber.alternate = official.fiber;
+      el.__reactFiber$fixture = official.fiber;
+    }
+  });
+  const el = document.querySelector('#description');
+  assert.equal(el.textContent, '读取、起草和编辑文档。');
+  official.rootState.current = local.root;
+  translate(el.firstChild);
+  assert.equal(el.textContent, source);
+  official.rootState.current = official.root;
+  translate(el);
+  assert.equal(el.textContent, '读取、起草和编辑文档。');
+  local.owner.return = official.root;
+  translate(el);
+  assert.equal(el.textContent, source);
+  local.owner.return = local.root;
+  translate(el);
+  assert.equal(el.textContent, '读取、起草和编辑文档。');
+  document.querySelector('[data-testid="user-input-step"]').append(el);
+  translate(el);
+  assert.equal(el.textContent, source);
+});
 
 test('customization cards and details preserve metadata while actions translate', async t => {
   const { document } = await fixture(t, `

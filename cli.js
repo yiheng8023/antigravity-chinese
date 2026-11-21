@@ -12,6 +12,7 @@ const crypto = require('crypto');
 const { execSync } = require('child_process');
 const { getUnpackArgs, verifyUnpackedOutput } = require('./core/asar-unpack');
 const { patchSwarmFrames } = require('./core/swarm-frame-patch');
+const { installOfficialPluginDescriptionSourceCheck } = require('./core/official-plugin-description-source');
 
 const PROJECT_ROOT = __dirname;
 const DICT_PATH = path.join(PROJECT_ROOT, 'dict', 'zh-CN.json');
@@ -211,13 +212,19 @@ function ensureAsarTool() {
 function getBundleScript() {
   const dictContent = fs.readFileSync(DICT_PATH, 'utf-8');
   const runtimeContent = fs.readFileSync(RUNTIME_PATH, 'utf-8');
+  const pluginDescriptions = fs.readFileSync(path.join(PROJECT_ROOT, 'dict/scoped/official-plugin-descriptions.json'), 'utf-8');
+  const checkPluginSource = `(${installOfficialPluginDescriptionSourceCheck})(${pluginDescriptions.trim()});`;
 
   return `
 // --- Antigravity Chinese Localization Injection Start ---
 (function() {
   try {
     window.__AGY_I18N_DATA__ = ${dictContent.trim()};
+    window.__AGY_I18N_DATA__.officialPluginDescriptions = ${pluginDescriptions.trim()};
     ${runtimeContent}
+    if (window.top === window) {
+      require('electron').webFrame.executeJavaScript(${JSON.stringify(checkPluginSource)}).catch(() => {});
+    }
   } catch(e) {
     console.error('[AGY-i18n] Runtime Injection Error:', e);
   }
