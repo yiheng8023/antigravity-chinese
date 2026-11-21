@@ -612,20 +612,40 @@
   var textEdits = new WeakMap();
   var attributeEdits = new WeakMap();
 
-  function translateOfficialPluginDescription(el, node) {
-    if (!officialPluginDescriptions || el?.tagName !== 'DIV' || !el.classList.contains('line-clamp-2') ||
-        el.firstChild !== node || node.nextSibling) return null;
-    var edit = textEdits.get(node);
-    var source = edit?.localized === node.nodeValue ? edit.source : node.nodeValue;
-    if (!Object.hasOwn(officialPluginDescriptions, source) || !el.matches('div.text-sm.text-muted-foreground.line-clamp-2.mt-1') ||
-        !el.closest('[data-testid="project-customizations-content"] [data-testid="workspace-customizations-view"]') ||
-        getElementTranslationMode(el.parentElement) !== 2) return null;
+  function translateOfficialPluginDescription(el) {
+    if (!officialPluginDescriptions || !el?.classList) return false;
+    var searchHighlight = 'span.font-semibold.text-foreground';
+    if (el.tagName === 'SPAN' && el.classList.contains('font-semibold') && el.matches(searchHighlight)) el = el.parentElement;
+    if (!el?.classList.contains('text-muted-foreground') ||
+        !el.matches('div.text-sm.text-muted-foreground.line-clamp-2.mt-1, div.text-sm.text-muted-foreground.truncate, p.text-muted-foreground.leading-relaxed')) return false;
 
-    var request = new root.CustomEvent('agy-localization-check-official-plugin-description', {
-      detail: source,
-      cancelable: true
-    });
-    return el.dispatchEvent(request) ? null : officialPluginDescriptions[source].translation;
+    // Search can split a card's description into text and matching spans.
+    // Read the full source and keep the nodes React owns in place.
+    var texts = [];
+    var source = '';
+    var primary = null;
+    var hasTranslation = false;
+    for (var child = el.firstChild; child; child = child.nextSibling) {
+      var text = child.nodeType === 3 ? child : child.matches?.(searchHighlight) ? child.firstChild : null;
+      if (!text || text.nodeType !== 3 || (text !== child && text.nextSibling)) return false;
+      var edit = textEdits.get(text);
+      source += edit?.localized === text.nodeValue ? edit.source : text.nodeValue;
+      hasTranslation = hasTranslation || !!edit?.officialPluginDescription;
+      if (!primary && text === child) primary = text;
+      texts.push(text);
+    }
+    var entry = Object.hasOwn(officialPluginDescriptions, source) && officialPluginDescriptions[source];
+    if (entry && getElementTranslationMode(el.parentElement) === 2 && !el.dispatchEvent(new root.CustomEvent(
+      'agy-localization-check-official-plugin-description', {detail: source, cancelable: true}
+    ))) {
+      primary = primary || texts[0];
+      for (var i = 0; i < texts.length; i++) writeLocalizedText(texts[i], texts[i] === primary ? entry.translation : '', true);
+      return true;
+    }
+    if (hasTranslation) {
+      for (var j = 0; j < texts.length; j++) restoreLocalizedText(texts[j]);
+    }
+    return false;
   }
 
   // Retain the source of a DOM write while this runtime still owns the displayed value.
@@ -677,9 +697,7 @@
     var parent = node.parentElement || node.parentNode;
     var mode = parentMode === undefined ? getElementTranslationMode(parent) : parentMode;
     if (parent && (mode !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
-      var translatedDescription = mode === 0 ? translateOfficialPluginDescription(parent, node) : null;
-      if (translatedDescription) writeLocalizedText(node, translatedDescription, true);
-      else restoreLocalizedText(node);
+      if (mode !== 0 || !translateOfficialPluginDescription(parent)) restoreLocalizedText(node);
       return;
     }
     if (officialPluginDescriptions && textEdits.get(node)?.officialPluginDescription) {
@@ -767,12 +785,11 @@
     if (scanId && el._agyScanId === scanId) return;
     var translationMode = getElementTranslationMode(el);
     if (translationMode === 0) {
-      if (work) {
+      if (translateOfficialPluginDescription(el)) {
+        restoreLocalizedAttributes(el);
+      } else if (work) {
         restoreLocalizedAttributes(el);
         appendChildren(el, work);
-      } else if (el.firstChild?.nodeType === 3 && !el.firstChild.nextSibling) {
-        restoreLocalizedAttributes(el);
-        translateTextNode(el.firstChild, translationMode);
       } else restoreProtectedSubtree(el);
       return;
     }

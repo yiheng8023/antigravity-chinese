@@ -1071,6 +1071,107 @@ test('official description translation follows the committed renderer and restor
   assert.equal(el.textContent, source);
 });
 
+test('marketplace, installed cards, and detail headers share the official copy and preserve local lookalikes', async t => {
+  const english = 'Read, draft, and edit docs.';
+  const chinese = '读取、起草和编辑文档。';
+  const summary = 'Unlock the power of agent swarms.';
+  const card = (id, name, text) => `
+    <article data-testid="customization-card" data-card-name="${name}">
+      <div class="font-medium text-foreground truncate"><a>${name}</a></div>
+      <div class="text-sm text-muted-foreground truncate" id="${id}">${text}</div>
+    </article>`;
+  const detail = (id, name) => `
+    <section data-testid="plugin-detail">
+      <div>
+        <h1 class="text-xl font-medium truncate">${name}</h1>
+        <p id="${id}" class="text-muted-foreground leading-relaxed">${english}</p>
+      </div>
+      <section class="prose"><p>${english}</p></section>
+    </section>`;
+  const { document, translate } = await fixture(t, `
+    <div data-testid="customizations-marketplace">
+      ${card('market', 'Google Docs', english)}
+      ${card('other-market', 'Google Docs', english)}
+      ${card('skill', 'Google Docs', english)}
+    </div>
+    <div data-testid="customizations-installed"><div data-testid="customizations-installed-plugins">
+      ${card('installed', 'Google Docs', english)}
+      ${card('copy', 'Google Docs', english)}
+      ${card('built-in', 'Swarm', 'Unlock the power of agent <span class="font-semibold text-foreground">swarm</span>s.')}
+    </div></div>
+    ${detail('detail', 'Google Docs')}
+    ${detail('preview', 'Google Docs')}
+    ${detail('local-detail', 'Google Docs')}
+    ${detail('edited-detail', 'Google Docs')}`, {
+    pluginDescriptions: true,
+    beforeStart(doc) {
+      const makeRoot = () => {
+        const root = { tag: 3 };
+        root.stateNode = { current: root };
+        return root;
+      };
+      const canonical = docsPluginOrigin.installedFrom;
+      const official = {
+        $typeName: 'exa.language_server_pb.Plugin', name: 'gdocs', displayName: 'Google Docs',
+        path: '/official/gdocs', description: english, isGlobal: true, isBuiltin: false,
+        ...docsPluginOrigin
+      };
+      const local = { ...official, path: '/local/gdocs', installedFrom: undefined };
+      const swarm = {
+        $typeName: 'exa.language_server_pb.Plugin', name: 'swarm', displayName: 'Swarm',
+        path: '/builtin/plugins/swarm', description: summary, isGlobal: true, isBuiltin: true
+      };
+      const catalogEntry = { ...canonical, description: english, kind: {case: 'plugin'} };
+      const marketRoute = '/customizations/marketplaces/$marketplace/plugins/$pluginId';
+      for (const [id, plugin, to, search] of [
+        ['market', official, marketRoute, canonical],
+        ['other-market', official, marketRoute, {...canonical, marketplace: 'local'}],
+        ['skill', official, '/customizations/marketplaces/$marketplace/skills/$skillId', canonical],
+        ['installed', official], ['copy', local], ['built-in', swarm]
+      ]) {
+        const el = doc.getElementById(id);
+        const root = makeRoot();
+        const owner = {
+          key: plugin.path,
+          memoizedProps: { name: plugin.displayName, description: plugin.description, to, search },
+          return: { memoizedProps: {plugins: [official, local, swarm]}, return: root }
+        };
+        el.__reactFiber$fixture = {
+          stateNode: el, memoizedProps: {children: {props: {text: plugin.description}}},
+          return: {stateNode: el.parentElement, return: owner}
+        };
+      }
+      for (const [id, installedPlugin] of [
+        ['detail', official], ['preview', undefined], ['local-detail', local],
+        ['edited-detail', {...official, description: 'Settings'}]
+      ]) {
+        const el = doc.getElementById(id);
+        const header = {
+          memoizedProps: {description: english}, return: makeRoot(),
+          sibling: {memoizedProps: { installedPlugin, catalogEntry, pluginPreview: undefined }}
+        };
+        el.__reactFiber$fixture = {stateNode: el, memoizedProps: {children: english}, return: {return: header}};
+      }
+    }
+  });
+  const text = id => document.getElementById(id).textContent;
+  for (const id of ['market', 'installed', 'detail', 'preview']) assert.equal(text(id), chinese);
+  for (const id of ['other-market', 'skill', 'copy', 'local-detail', 'edited-detail']) assert.equal(text(id), english);
+  const builtIn = document.getElementById('built-in');
+  assert.equal(builtIn.textContent, '发挥多智能体协作的优势。');
+  const highlight = builtIn.querySelector('span.font-semibold');
+  assert.ok(highlight);
+  const list = builtIn.__reactFiber$fixture.return.return.return;
+  list.memoizedProps.plugins[2].isBuiltin = false;
+  translate(highlight.firstChild);
+  assert.equal(builtIn.textContent, summary);
+  assert.equal(highlight.textContent, 'swarm');
+  for (const el of document.querySelectorAll('h1, .font-medium.text-foreground.truncate')) {
+    assert.ok(['Google Docs', 'Swarm'].includes(el.textContent));
+  }
+  for (const el of document.querySelectorAll('.prose p')) assert.equal(el.textContent, english);
+});
+
 test('customization cards and details preserve metadata while actions translate', async t => {
   const { document } = await fixture(t, `
     <article data-testid="customization-card" data-card-name="Settings">
