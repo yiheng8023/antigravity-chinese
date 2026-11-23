@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.60** targets **Antigravity App 2.34.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.61** targets **Antigravity App 2.34.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
 
-This version fills gaps in settings and Marketplace UI copy. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.34.0 maintenance record](docs/maintenance/antigravity-2.34.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
+This version uses consistent Chinese labels for the Auto and Turbo permission presets. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.34.0 maintenance record](docs/maintenance/antigravity-2.34.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window.
 
@@ -130,6 +130,7 @@ Heartfelt thanks to all developers who contribute code, report bugs, and improve
 - Thanks to **a705876883-arch** for proposing a fix for unintended translation of user content and supplying reproduction and regression cases. [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6)
 - Thanks to **[fansID512](https://github.com/fansID512)** for detailed environment information, reproduction steps and comparison observations that helped diagnose settings stutter. [Issue #8](https://github.com/yiheng8023/antigravity-chinese/issues/8)
 - Thanks to **[MizuIro-H](https://github.com/MizuIro-H)** for reproducing the portable Linux detection problem on Bazzite, proposing a fix, and verifying installation. [Issue #9](https://github.com/yiheng8023/antigravity-chinese/issues/9)
+- Thanks to **[tangyixiao](https://github.com/tangyixiao)** for reporting ambiguous permission preset labels, contributing a fix and regression tests, and verifying the global settings UI. [PR #11](https://github.com/yiheng8023/antigravity-chinese/pull/11)
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/graphs/contributors">
