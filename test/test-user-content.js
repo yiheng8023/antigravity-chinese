@@ -9,6 +9,78 @@ const dictionary = require('../dict/zh-CN.json');
 const officialPluginDescriptions = require('../dict/scoped/official-plugin-descriptions.json');
 const { installOfficialPluginDescriptionSourceCheck } = require('../core/official-plugin-description-source');
 
+test('2.34 conversation permission presets translate labels and accessible names without changing values or authored text', async t => {
+  const { document, window } = await fixture(t, `
+    <button data-testid="permissions-selector-trigger" aria-label="Agent permissions preset selector, current: Auto"><span>Auto</span></button>
+    <div data-testid="permissions-menu">
+      <div role="menuitem" data-testid="permissions-preset-option-auto"><span class="truncate">Auto</span></div>
+      <div role="menuitem" data-testid="permissions-preset-option-turbo"><span class="truncate"><span><span class="truncate">Turbo</span>
+        <span data-testid="permissions-default-tag">Default</span></span></span></div>
+      <div role="menuitem" data-testid="permissions-use-global-settings"><span class="truncate">Use Global Settings</span>
+        <span class="truncate text-muted-foreground">Turbo</span></div>
+    </div>
+    <div id="other"><span>Auto</span><span>Turbo</span></div>
+    <section data-testid="user-message-content"><span>Auto</span><span>Turbo</span></section>`);
+  const trigger = document.querySelector('button');
+  const menus = document.querySelector('[data-testid="permissions-menu"]');
+  assert.equal(trigger.textContent, '自动审查');
+  assert.equal(trigger.getAttribute('aria-label'), '智能体权限预设选择器，当前：自动审查');
+  assert.equal(menus.querySelector('[data-testid="permissions-preset-option-auto"] .truncate').textContent, '自动审查');
+  assert.equal(menus.querySelector('[data-testid="permissions-preset-option-turbo"] .truncate .truncate').textContent, '完全权限');
+  assert.equal(menus.querySelector('[data-testid="permissions-use-global-settings"] .text-muted-foreground').textContent, '完全权限');
+  assert.deepEqual([...document.querySelectorAll('#other span')].map(el => el.textContent), ['Auto', '极速']);
+  assert.deepEqual([...document.querySelectorAll('section span')].map(el => el.textContent), ['Auto', 'Turbo']);
+
+  trigger.firstChild.textContent = 'Turbo';
+  trigger.setAttribute('aria-label', 'Agent permissions preset selector, current: Turbo');
+  await settle(window);
+  assert.equal(trigger.textContent, '完全权限');
+  assert.equal(trigger.getAttribute('aria-label'), '智能体权限预设选择器，当前：完全权限');
+  trigger.setAttribute('aria-disabled', 'true');
+  trigger.setAttribute('aria-label', 'Agent permissions preset: Turbo, Example policy');
+  await settle(window);
+  assert.equal(trigger.getAttribute('aria-label'), '智能体权限预设：完全权限，Example policy');
+  document.querySelector('section').append(trigger);
+  await settle(window);
+  assert.equal(trigger.textContent, 'Turbo');
+  assert.equal(trigger.getAttribute('aria-label'), 'Agent permissions preset: Turbo, Example policy');
+});
+
+test('2.34 settings permission rows and portaled options distinguish presets from other selects', async t => {
+  const row = (id, name, description, value) => `
+    <span id="dropdown-label-${id}">${name}</span><span id="dropdown-description-${id}">${description}</span>
+    <button class="agy-select-trigger" aria-labelledby="dropdown-label-${id} dropdown-value-${id}" aria-describedby="dropdown-description-${id}">
+      <span id="dropdown-value-${id}" class="truncate">${value}</span></button>`;
+  const option = (label, description) => `<div role="option" class="agy-overlay-item"><div>
+    <div class="truncate">${label}</div><span class="text-muted-foreground">${description}</span></div></div>`;
+  const { document, window } = await fixture(t,
+    row('project', 'Permission preset', 'Controls the actions the agent can take.', 'Auto') +
+    row('local', 'This computer', 'Controls the actions the agent can take.', 'Turbo') +
+    row('remote', 'Remote', 'Controls permissions for remote conversations.', 'Turbo') +
+    row('model', 'Remote', 'Select a model.', 'Auto') + `
+    <select aria-labelledby="dropdown-label-local" aria-describedby="dropdown-description-local">
+      <option value="Auto">Auto</option><option value="Turbo">Turbo</option></select>
+    <div data-select-popup></div>`);
+  const value = id => document.getElementById('dropdown-value-' + id);
+  assert.deepEqual(['project', 'local', 'remote', 'model'].map(id => value(id).textContent),
+    ['自动审查', '完全权限', '完全权限', 'Auto']);
+  assert.deepEqual([...document.querySelector('select').options].map(el => [el.value, el.textContent]),
+    [['Auto', '自动审查'], ['Turbo', '完全权限']]);
+
+  const popup = document.querySelector('[data-select-popup]');
+  popup.innerHTML = option('Auto', 'Automatically decide if commands run.') +
+    option('Turbo (disabled by admin)', 'Run all commands without restrictions.') +
+    option('Turbo', 'Run all commands without restrictions.') + option('Turbo', 'Video playback speed.');
+  await settle(window);
+  const labels = [...popup.querySelectorAll('.truncate')];
+  assert.deepEqual(labels.map(el => el.textContent), ['自动审查', '完全权限（管理员已禁用）', '完全权限', '极速']);
+  // Reuse text nodes between the two selects after both descriptions have been localized.
+  labels[2].appendChild(labels[3].firstChild);
+  labels[3].appendChild(labels[2].firstChild);
+  await settle(window);
+  assert.deepEqual(labels.slice(2).map(el => el.textContent), ['完全权限', '极速']);
+});
+
 test('2.34 inline requests translate renderer controls while retaining request and answer payloads', async t => {
   const { document, translate } = await fixture(t, `
     <section data-testid="agent-response">

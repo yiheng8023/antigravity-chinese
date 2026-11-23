@@ -493,6 +493,58 @@
     return null;
   }
 
+  var presetLabels = { Auto: '自动审查', Turbo: '完全权限' };
+  var presetDescriptions = { Auto: 'Automatically decide if commands run.', Turbo: 'Run all commands without restrictions.' };
+
+  function isPermissionSettingsSelect(control, valueId) {
+    var ids = (control.getAttribute('aria-labelledby') || '').split(' ');
+    if (!ids[0].startsWith('dropdown-label-') ||
+        (valueId ? ids.length !== 2 || ids[1] !== valueId : ids.length !== 1)) return false;
+    var descriptionId = ids[0].replace('dropdown-label-', 'dropdown-description-');
+    if (control.getAttribute('aria-describedby') !== descriptionId) return false;
+    var label = doc.getElementById(ids[0])?.textContent;
+    var description = doc.getElementById(descriptionId)?.textContent;
+    if (!label || !description) return false;
+    var expected;
+    if (label === 'Permission preset' || label === exactDict['Permission preset'] ||
+        label === 'This computer' || label === exactDict['This computer']) expected = 'Controls the actions the agent can take.';
+    else if (label === 'Remote' || label === exactDict.Remote) expected = 'Controls permissions for remote conversations.';
+    return !!expected && (description.startsWith(expected) || (!!exactDict[expected] && description.startsWith(exactDict[expected])));
+  }
+
+  function isPermissionPresetLabel(el, preset) {
+    if (!el?.matches) return false;
+    if (el.matches('button[data-testid="permissions-selector-trigger"] > span')) return true;
+    if (el.matches('span.truncate') && (el.closest('[data-testid="permissions-preset-option-' + preset.toLowerCase() + '"]') &&
+        !el.closest('[data-testid="permissions-default-tag"]') ||
+        el.matches('[data-testid="permissions-use-global-settings"] span.text-muted-foreground'))) return true;
+    if (el.matches('button.agy-select-trigger > span.truncate[id^="dropdown-value-"]')) {
+      return isPermissionSettingsSelect(el.parentElement, el.id);
+    }
+    if (el.matches('select[aria-labelledby] > option[value]') && el.value === preset) {
+      return isPermissionSettingsSelect(el.parentElement);
+    }
+    // Settings popups live in a portal. The adjacent preset description identifies
+    // the option even after the runtime has translated that sibling.
+    if (el.matches('[data-select-popup] [role="option"].agy-overlay-item .truncate')) {
+      var subtitle = el.nextElementSibling;
+      var expected = presetDescriptions[preset];
+      return subtitle?.matches('span.text-muted-foreground') &&
+        (subtitle.textContent === expected || subtitle.textContent === exactDict[expected]);
+    }
+    return false;
+  }
+
+  function translatePresetAccessibility(value, el) {
+    if (!el.matches('button[data-testid="permissions-selector-trigger"]')) return null;
+    var current = value.match(/^Agent permissions preset selector, current: (Auto|Turbo)$/);
+    if (current) return '智能体权限预设选择器，当前：' + presetLabels[current[1]];
+    var locked = value.match(/^Agent permissions preset: (Auto|Turbo), ([\s\S]+)$/);
+    if (locked) return '智能体权限预设：' + presetLabels[locked[1]] + '，' +
+      (Object.hasOwn(exactDict, locked[2]) ? exactDict[locked[2]] : locked[2]);
+    return null;
+  }
+
   function translateFeaturedAttribute(value, attr, el) {
     var name = el.getAttribute('data-member-name');
     if (name && el.getAttribute('data-testid') === 'featured-carousel-member-tile') {
@@ -795,6 +847,20 @@
     var original = node.nodeValue;
     if (!original) return;
 
+    // These values can move between a permission picker and another select.
+    // Re-evaluate the renderer's source even if the visible value is cached.
+    var edit = textEdits.get(node);
+    var source = edit?.localized === original ? edit.source : original;
+    if (!mcpStatus && (source === 'Auto' || source === 'Turbo' ||
+        source === 'Auto (disabled by admin)' || source === 'Turbo (disabled by admin)')) {
+      var preset = source.split(' ')[0];
+      var label = isPermissionPresetLabel(parent, preset)
+        ? presetLabels[preset] + (source !== preset ? '（管理员已禁用）' : '')
+        : translateSingleUnit(source) ?? source;
+      writeLocalizedText(node, label);
+      return;
+    }
+
     // 如果节点已标记原始文本且未变化，直接 O(1) 瞬时退出
     if (node._agyOriginal === original) return;
 
@@ -888,7 +954,8 @@
           var markKey = MARK_ATTR + '_' + attr;
           if (el[markKey] === val) continue;
 
-          var trans = translateMarketplaceCategory(val, el) ?? translateFeaturedAttribute(val, attr, el) ?? translateSingleUnit(val);
+          var trans = (attr === 'aria-label' && val.startsWith('Agent permissions preset') ? translatePresetAccessibility(val, el) : null) ??
+            translateMarketplaceCategory(val, el) ?? translateFeaturedAttribute(val, attr, el) ?? translateSingleUnit(val);
           if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
               el.closest('[data-testid^="shortcut-row-"]')) {
             var shortcutAction = translateSingleUnit(val.slice('Reset '.length, -' to default'.length));
