@@ -81,6 +81,46 @@ test('2.34 settings permission rows and portaled options distinguish presets fro
   assert.deepEqual(labels.slice(2).map(el => el.textContent), ['完全权限', '极速']);
 });
 
+test('permission labels track late or removed descriptions and preserve generic text spacing', async t => {
+  const { document, window } = await fixture(t, `
+    <div data-select-popup><div role="option" class="agy-overlay-item"><div>
+      <div class="truncate" id="popup-value">Turbo</div>
+    </div></div></div>
+    <div><div class="flex-1" id="setting-labels"><div>
+      <span id="dropdown-label-1">Permission preset</span>
+    </div></div><div class="shrink-0">
+      <button class="agy-select-trigger" aria-labelledby="dropdown-label-1 dropdown-value-1" aria-describedby="dropdown-description-1">
+        <span class="truncate" id="dropdown-value-1">Auto</span>
+      </button>
+    </div></div>
+    <span id="ordinary"><b>Playback X</b>Turbo</span>
+    <p id="hint">Auto needs the terminal sandbox, which isn't available on this host.</p>`);
+  const popup = document.getElementById('popup-value');
+  const value = document.getElementById('dropdown-value-1');
+  assert.equal(popup.textContent, '极速');
+  assert.equal(value.textContent, 'Auto');
+  assert.equal(document.getElementById('ordinary').textContent, 'Playback X 极速');
+  assert.equal(document.getElementById('hint').textContent, '「自动审查」需要终端沙箱，但此主机不支持终端沙箱。');
+
+  const subtitle = document.createElement('span');
+  subtitle.className = 'text-muted-foreground';
+  subtitle.textContent = 'Run all commands without restrictions.';
+  popup.after(subtitle);
+  const description = document.createElement('span');
+  description.id = 'dropdown-description-1';
+  description.textContent = 'Controls the actions the agent can take.';
+  document.getElementById('setting-labels').appendChild(description);
+  await settle(window);
+  assert.equal(popup.textContent, '完全权限');
+  assert.equal(value.textContent, '自动审查');
+
+  subtitle.firstChild.nodeValue = 'Video playback speed.';
+  description.remove();
+  await settle(window);
+  assert.equal(popup.textContent, '极速');
+  assert.equal(value.textContent, 'Auto');
+});
+
 test('2.34 inline requests translate renderer controls while retaining request and answer payloads', async t => {
   const { document, translate } = await fixture(t, `
     <section data-testid="agent-response">

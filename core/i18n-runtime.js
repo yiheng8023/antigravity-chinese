@@ -493,8 +493,12 @@
     return null;
   }
 
-  var presetLabels = { Auto: '自动审查', Turbo: '完全权限' };
-  var presetDescriptions = { Auto: 'Automatically decide if commands run.', Turbo: 'Run all commands without restrictions.' };
+  var permissionPresets = {
+    Auto: { label: '自动审查', description: 'Automatically decide if commands run.' },
+    Turbo: { label: '完全权限', description: 'Run all commands without restrictions.' }
+  };
+  var adminDisabledSuffix = ' (disabled by admin)';
+  var permissionOptionSelector = '[data-select-popup] [role="option"].agy-overlay-item';
 
   function isPermissionSettingsSelect(control, valueId) {
     var ids = (control.getAttribute('aria-labelledby') || '').split(' ');
@@ -526,9 +530,9 @@
     }
     // Settings popups live in a portal. The adjacent preset description identifies
     // the option even after the runtime has translated that sibling.
-    if (el.matches('[data-select-popup] [role="option"].agy-overlay-item .truncate')) {
+    if (el.classList.contains('truncate') && el.parentElement?.parentElement?.matches(permissionOptionSelector)) {
       var subtitle = el.nextElementSibling;
-      var expected = presetDescriptions[preset];
+      var expected = permissionPresets[preset].description;
       return subtitle?.matches('span.text-muted-foreground') &&
         (subtitle.textContent === expected || subtitle.textContent === exactDict[expected]);
     }
@@ -537,10 +541,12 @@
 
   function translatePresetAccessibility(value, el) {
     if (!el.matches('button[data-testid="permissions-selector-trigger"]')) return null;
-    var current = value.match(/^Agent permissions preset selector, current: (Auto|Turbo)$/);
-    if (current) return '智能体权限预设选择器，当前：' + presetLabels[current[1]];
-    var locked = value.match(/^Agent permissions preset: (Auto|Turbo), ([\s\S]+)$/);
-    if (locked) return '智能体权限预设：' + presetLabels[locked[1]] + '，' +
+    var current = value.match(/^Agent permissions preset selector, current: (.+)$/);
+    if (current && Object.hasOwn(permissionPresets, current[1])) {
+      return '智能体权限预设选择器，当前：' + permissionPresets[current[1]].label;
+    }
+    var locked = value.match(/^Agent permissions preset: ([^,]+), ([\s\S]+)$/);
+    if (locked && Object.hasOwn(permissionPresets, locked[1])) return '智能体权限预设：' + permissionPresets[locked[1]].label + '，' +
       (Object.hasOwn(exactDict, locked[2]) ? exactDict[locked[2]] : locked[2]);
     return null;
   }
@@ -724,7 +730,7 @@
       if (!text || text.nodeType !== 3 || (text !== child && text.nextSibling)) return false;
       var edit = textEdits.get(text);
       source += edit?.localized === text.nodeValue ? edit.source : text.nodeValue;
-      hasTranslation = hasTranslation || !!edit?.officialPluginDescription;
+      hasTranslation = hasTranslation || edit?.scope === 'official-plugin-description';
       if (!primary && text === child) primary = text;
       texts.push(text);
     }
@@ -733,7 +739,9 @@
       'agy-localization-check-official-plugin-description', {detail: source, cancelable: true}
     ))) {
       primary = primary || texts[0];
-      for (var i = 0; i < texts.length; i++) writeLocalizedText(texts[i], texts[i] === primary ? entry.translation : '', true);
+      for (var i = 0; i < texts.length; i++) {
+        writeLocalizedText(texts[i], texts[i] === primary ? entry.translation : '', 'official-plugin-description');
+      }
       var title = el.getAttribute('title');
       var edit = attributeEdits.get(el)?.title;
       if (featured && (title === source || (title === edit?.localized && edit.source === source))) {
@@ -749,11 +757,11 @@
   }
 
   // Retain the source of a DOM write while this runtime still owns the displayed value.
-  function writeLocalizedText(node, value, officialPluginDescription) {
+  function writeLocalizedText(node, value, scope) {
     if (node.nodeValue !== value) {
       var previous = textEdits.get(node);
       var source = previous && previous.localized === node.nodeValue ? previous.source : node.nodeValue;
-      textEdits.set(node, { source: source, localized: value, officialPluginDescription: officialPluginDescription });
+      textEdits.set(node, { source: source, localized: value, scope: scope });
       node.nodeValue = value;
     }
     node._agyOriginal = value;
@@ -818,7 +826,8 @@
       if (mode !== 0 || !translateOfficialPluginDescription(parent)) restoreLocalizedText(node);
       return;
     }
-    if (officialPluginDescriptions && textEdits.get(node)?.officialPluginDescription) {
+    var edit = textEdits.get(node);
+    if (edit?.scope === 'official-plugin-description') {
       restoreLocalizedText(node);
       return;
     }
@@ -849,16 +858,16 @@
 
     // These values can move between a permission picker and another select.
     // Re-evaluate the renderer's source even if the visible value is cached.
-    var edit = textEdits.get(node);
     var source = edit?.localized === original ? edit.source : original;
-    if (!mcpStatus && (source === 'Auto' || source === 'Turbo' ||
-        source === 'Auto (disabled by admin)' || source === 'Turbo (disabled by admin)')) {
-      var preset = source.split(' ')[0];
-      var label = isPermissionPresetLabel(parent, preset)
-        ? presetLabels[preset] + (source !== preset ? '（管理员已禁用）' : '')
-        : translateSingleUnit(source) ?? source;
-      writeLocalizedText(node, label);
+    var disabledPreset = source.endsWith(adminDisabledSuffix);
+    var preset = disabledPreset ? source.slice(0, -adminDisabledSuffix.length) : source;
+    if (!mcpStatus && Object.hasOwn(permissionPresets, preset) && isPermissionPresetLabel(parent, preset)) {
+      writeLocalizedText(node, permissionPresets[preset].label + (disabledPreset ? '（管理员已禁用）' : ''), 'permission-preset');
       return;
+    }
+    if (edit?.scope === 'permission-preset') {
+      restoreLocalizedText(node);
+      original = node.nodeValue;
     }
 
     // 如果节点已标记原始文本且未变化，直接 O(1) 瞬时退出
@@ -1167,6 +1176,42 @@
     }
   }
 
+  function enqueuePermissionPresetDependents(el) {
+    if (el?.tagName !== 'SPAN' && el?.tagName !== 'DIV') return;
+    var optionBody = el.tagName === 'SPAN' && el.classList.contains('text-muted-foreground') ? el.parentElement : el;
+    var optionLabel = optionBody?.firstElementChild;
+    var option = optionBody?.parentElement;
+    if (optionLabel?.classList.contains('truncate') && option?.classList.contains('agy-overlay-item') &&
+        option.matches(permissionOptionSelector)) {
+      enqueueNode(optionLabel);
+    }
+
+    // Settings labels and descriptions share a column next to the select.
+    var column;
+    var field = el;
+    for (var depth = 0; field && depth < 3; field = field.parentElement, depth++) {
+      if (field.tagName !== 'SPAN') continue;
+      if (field.id.startsWith('dropdown-label-')) {
+        column = field.parentElement?.parentElement;
+        break;
+      }
+      if (field.id.startsWith('dropdown-description-')) {
+        column = field.parentElement;
+        break;
+      }
+    }
+    if (!column && el.classList.contains('flex-1')) {
+      field = el.querySelector(':scope > div > span[id^="dropdown-label-"]');
+      if (field) column = el;
+    }
+    if (column?.classList.contains('flex-1')) {
+      var labelId = field.id.replace(/^dropdown-description-/, 'dropdown-label-');
+      column.nextElementSibling?.querySelectorAll('button.agy-select-trigger[aria-labelledby], select[aria-labelledby]').forEach(function (select) {
+        if (select.getAttribute('aria-labelledby').split(' ')[0] === labelId) enqueueNode(select);
+      });
+    }
+  }
+
   function recordMutations(mutations) {
     // A SPA route can reuse an unchanged breadcrumb node with a different role.
     if (doc.location.pathname !== observedDocumentPath) {
@@ -1177,6 +1222,7 @@
     for (var i = 0; i < mutations.length; i++) {
       var mutation = mutations[i];
       if (mutation.type === 'childList') {
+        enqueuePermissionPresetDependents(mutation.target);
         var added = mutation.addedNodes;
         for (var j = 0; j < added.length; j++) {
           var child = added[j];
@@ -1186,6 +1232,7 @@
           enqueueNode(child);
         }
       } else if (mutation.type === 'characterData') {
+        enqueuePermissionPresetDependents(mutation.target.parentElement);
         // Writes made while observing belong to the renderer, even when the value is unchanged.
         textEdits.delete(mutation.target);
         mutation.target._agyOriginal = undefined;
