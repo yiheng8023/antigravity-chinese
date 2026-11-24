@@ -3,9 +3,19 @@
     "version": "Antigravity App 2.35.0",
     "platform": "Windows x64",
     "sha256": "f039eca519f153aeac9a0f1d10abc7afd8ff4b8009ef78d684669a3c7955f54d",
-    "scope": "Reviewed changed desktop settings labels, the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details and artifact find controls. Scoped templates and identifiers have DOM regressions."
+    "scope": "Reviewed changed desktop settings labels, appearance presets, the automation form, the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details and artifact find controls. Scoped templates and identifiers have DOM regressions."
   },
   "ui": [
+    "Required",
+    "Trigger",
+    "Instructions",
+    "Uses your local files and tools. Schedules only.",
+    "What should the agent do on each run?",
+    "What should the agent do on each run? For example: summarize new bugs assigned to me and anything that changed overnight.",
+    "Where it runs",
+    "System UI",
+    "Legacy Dark",
+    "Legacy Light",
     "Prevent sleep",
     "Keep in menu bar",
     "Device name",
@@ -65,6 +75,19 @@
     "Blocked"
   ],
   "preserve": [
+    {
+      "text": "at",
+      "kind": "composed",
+      "reason": "Localize the standalone connector only within the automation schedule editor."
+    },
+    { "text": "Inter", "kind": "technical", "reason": "Preserve the font family as named upstream." },
+    { "text": "Google Sans", "kind": "technical", "reason": "Preserve the font family as named upstream." },
+    { "text": "Gruvbox Material", "kind": "technical", "reason": "Preserve the named theme preset as named upstream." },
+    { "text": "One Dark Pro", "kind": "technical", "reason": "Preserve the named theme preset as named upstream." },
+    { "text": "Tokyo Night", "kind": "technical", "reason": "Preserve the named theme preset as named upstream." },
+    { "text": "Solarized Dark", "kind": "technical", "reason": "Preserve the named theme preset as named upstream." },
+    { "text": "One Light", "kind": "technical", "reason": "Preserve the named theme preset as named upstream." },
+    { "text": "Solarized Light", "kind": "technical", "reason": "Preserve the named theme preset as named upstream." },
     {
       "text": "Your plan",
       "kind": "composed",

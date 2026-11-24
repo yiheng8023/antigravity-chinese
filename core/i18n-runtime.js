@@ -582,6 +582,8 @@
 
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
+    if (text === 'at' && el?.matches('span.text-muted-foreground.select-none') &&
+        el.closest('[data-testid="automation-schedule-editor"]')) return '于';
     var queuedStatus = translateQueuedStatus(text, testId);
     if (queuedStatus) return queuedStatus;
     if ((text === 'Your plan' || text === 'Your plan:' || text.startsWith('Your plan: ')) &&

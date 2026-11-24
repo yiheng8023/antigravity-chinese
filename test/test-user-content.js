@@ -9,6 +9,47 @@ const dictionary = require('../dict/zh-CN.json');
 const officialPluginDescriptions = require('../dict/scoped/official-plugin-descriptions.json');
 const { installOfficialPluginDescriptionSourceCheck } = require('../core/official-plugin-description-source');
 
+test('2.35 automation form translates display text and preserves the draft and option names', async t => {
+  const placeholder = 'What should the agent do on each run? For example: summarize new bugs assigned to me and anything that changed overnight.';
+  const { document } = await fixture(t, `
+    <main data-testid="new-sidecar-modal" data-kind="local">
+      <input data-testid="new-sidecar-name" placeholder="Untitled" value="Instructions">
+      <span data-testid="new-sidecar-title-required"><span aria-hidden="true"></span>Required</span>
+      <span id="summary">Uses your local files and tools. Schedules only.</span>
+      <h2 id="trigger">Trigger</h2>
+      <div data-testid="automation-schedule-editor">
+        <span class="text-muted-foreground select-none" id="at">at</span>
+        <button data-testid="schedule-time" value="9:0">9:00 AM</button>
+      </div>
+      <h2 id="instructions">Instructions</h2>
+      <textarea data-testid="new-sidecar-prompt" placeholder="${placeholder}">Required</textarea>
+    </main>
+    <span class="text-muted-foreground select-none" id="outside">at</span>
+    <div data-select-popup role="listbox">
+      <div role="option" data-value="system">System UI</div>
+      <div role="option" data-value="inter">Inter</div>
+      <div role="option" data-value="google-sans">Google Sans</div>
+      <div role="option" data-value="Legacy Dark">Legacy Dark</div>
+      <div role="option" data-value="Legacy Light">Legacy Light</div>
+      <div role="option" data-value="Solarized Dark">Solarized Dark</div>
+    </div>`);
+  const text = selector => document.querySelector(selector).textContent;
+  assert.equal(text('[data-testid="new-sidecar-title-required"]'), '必填');
+  assert.equal(text('#summary'), '使用本机文件和工具，仅支持定时运行。');
+  assert.equal(text('#trigger'), '触发条件');
+  assert.equal(text('#at'), '于');
+  assert.equal(text('#outside'), 'at');
+  assert.equal(text('#instructions'), '执行指令');
+  assert.equal(document.querySelector('input').value, 'Instructions');
+  assert.equal(document.querySelector('textarea').value, 'Required');
+  assert.match(document.querySelector('textarea').placeholder, /^智能体每次运行时应做什么？/);
+  assert.equal(document.querySelector('[data-testid="schedule-time"]').value, '9:0');
+  assert.deepEqual([...document.querySelectorAll('[role="option"]')].map(el => [el.dataset.value, el.textContent]), [
+    ['system', '系统界面字体'], ['inter', 'Inter'], ['google-sans', 'Google Sans'],
+    ['Legacy Dark', '旧版深色'], ['Legacy Light', '旧版浅色'], ['Solarized Dark', 'Solarized Dark']
+  ]);
+});
+
 test('2.35 sentence case setting titles and split plan labels localize without changing user text', async t => {
   const cases = [
     ['Prevent sleep', '阻止系统休眠'],
