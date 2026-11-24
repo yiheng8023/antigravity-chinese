@@ -61,6 +61,11 @@
     "marketplace": "antigravity-plugins-partners",
     "translation": "在 Cloudflare Workers、存储和 AI 服务上构建、部署并管理应用。通过同一个 MCP 服务器使用平台技能和 Cloudflare API。"
   },
+  "CodeRabbit is the governance and control layer for agentic software development helping developers trust AI written code.": {
+    "plugin": "coderabbit",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "CodeRabbit 为智能体参与的软件开发提供治理和管控，帮助开发者建立对 AI 所写代码的信心。"
+  },
   "AI-powered code review, review-comment autofix, and repository configuration, powered by CodeRabbit.": {
     "plugin": "coderabbit",
     "marketplace": "antigravity-plugins-partners",
@@ -231,6 +236,11 @@
     "plugin": "leapwork-play",
     "marketplace": "antigravity-plugins-partners",
     "translation": "在 Antigravity 中创建、运行并调试 Leapwork Play 测试和运行列表，构建智能体，并将工作交给 Play 的 AI 流程。"
+  },
+  "Salaries, jobs & career advice. Levels.fyi is your career companion to ensure you get paid fairly and find jobs you'll love.": {
+    "plugin": "levels-fyi",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "薪资、职位与职业建议。Levels.fyi 帮助您争取公平薪酬，找到心仪的工作。"
   },
   "Real salaries and company levels from Levels.fyi: check if an offer is fair, compare offers, find jobs with pay shown and add your own salary.": {
     "plugin": "levels-fyi",
@@ -435,6 +445,11 @@
     "plugin": "wordpress",
     "marketplace": "antigravity-plugins-partners",
     "translation": "构建、发布和管理 WordPress.com 与连接 Jetpack 的网站。支持起草文章、编辑区块、查看流量、审核评论和管理插件。"
+  },
+  "Automate workflows across 10,000+ apps. Run one-off actions or build automations for YouTube, Instagram, Gmail, Facebook Pages, LinkedIn, Slack, Pinterest.": {
+    "plugin": "zapier",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "在 1 万款以上的应用之间实现工作流自动化。可为 YouTube、Instagram、Gmail、Facebook 公共主页、LinkedIn、Slack 和 Pinterest 执行单次操作或创建自动化流程。"
   },
   "Connect 9,000+ apps to your AI workflow. Discover, enable, and execute Zapier actions and workflows directly from your client.": {
     "plugin": "zapier",
