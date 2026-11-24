@@ -418,7 +418,26 @@
   "Agent permissions preset selector, current: Request Review": "智能体权限预设选择器，当前：请求审查",
   "Agent permissions preset selector, current: Default": "智能体权限预设选择器，当前：默认",
   "Agent permissions preset selector, current: Turbo": "智能体权限预设选择器，当前：极速",
-  "Agent permissions preset selector, current: Autonomous": "智能体权限预设选择器，当前：自主模式"
+  "Agent permissions preset selector, current: Autonomous": "智能体权限预设选择器，当前：自主模式",
+  "Plugin permissions": "插件权限",
+  "Changes plugins can make without asking.": "插件无需确认即可执行的操作。",
+  "MCP tools": "MCP 工具",
+  "Unsandboxed commands": "沙箱外命令",
+  "Read files": "读取文件",
+  "Write files": "写入文件",
+  "Browser actions": "浏览器操作",
+  "Browser downloads": "浏览器下载",
+  "Admin escalation": "管理员提权",
+  "Waiting for approval to grant administrator access": "正在等待授予管理员权限的审批",
+  "No longer active": "已失效",
+  "Answered in chat": "已在对话中回复",
+  "Dismissed": "已忽略",
+  "Type your own answer": "输入您自己的回答",
+  "Revoke all": "全部撤销",
+  "Check that the microphone is unmuted and the right input device is selected.": "请确认麦克风未静音，且已选择正确的输入设备。",
+  "Microphone access is blocked by your operating system. Grant microphone permission in System Settings and try again.": "操作系统已阻止麦克风访问权限。请在系统设置中授予麦克风权限后重试。",
+  "Microphone blocked": "麦克风已被阻止",
+  "1. Accessibility": "1. 辅助功能",
+  "2. Screen Recording": "2. 屏幕录制",
+  "Failed to start screen recording": "启动屏幕录制失败"
 }
-
-

@@ -481,14 +481,34 @@
       (el.classList.contains('tabular-nums') && !!el.closest('[data-testid="conversation-row-sidebar"]'));
   }
 
+  var MARKETPLACE_CATEGORIES = {
+    'Science': '科研',
+    'Research': '科研与调研',
+    'research': '科研与调研',
+    'Productivity': '效率与协作',
+    'Observability': '可观测性',
+    'Design': '设计与创意',
+    'Identity and Access Management': '身份与访问管理',
+    'Cloud': '云服务',
+    'Marketing': '营销与增长',
+    'Databases': '数据库',
+    'Developer Tools': '开发者工具',
+    'Security': '安全'
+  };
+
   function translateMarketplaceCategory(text, el) {
-    if (text === 'Science' && el && (el.closest('[data-testid="marketplace-category-option-science"], [data-testid="marketplace-category-chip"]') ||
-        (el.matches('section[aria-label], section[aria-label] > div > h2') && el.closest('[data-testid="customizations-marketplace"]')))) {
-      return '科研';
+    if (!el || !el.closest || !el.matches) return null;
+    if (Object.prototype.hasOwnProperty.call(MARKETPLACE_CATEGORIES, text) &&
+        (el.closest('[data-testid^="marketplace-category-"]') ||
+          (el.matches('section[aria-label], section[aria-label] > div > h2') && el.closest('[data-testid="customizations-marketplace"]')))) {
+      return MARKETPLACE_CATEGORIES[text];
     }
-    if (el?.tagName === 'BUTTON' && (text === 'See more in Science' || text === 'See less in Science') &&
-        el.closest('[data-testid="customizations-marketplace"] section[aria-label]')) {
-      return text === 'See more in Science' ? '在科研中查看更多' : '在科研中收起';
+    if (el.tagName === 'BUTTON' && el.closest('[data-testid="customizations-marketplace"] section[aria-label]')) {
+      var m = text.match(/^See (more|less) in (.+)$/);
+      if (m && Object.prototype.hasOwnProperty.call(MARKETPLACE_CATEGORIES, m[2])) {
+        var catZh = MARKETPLACE_CATEGORIES[m[2]];
+        return m[1] === 'more' ? '在' + catZh + '中查看更多' : '在' + catZh + '中收起';
+      }
     }
     return null;
   }
@@ -988,6 +1008,49 @@
     }
 
     // 遍历子节点
+    // 斜杠/技能菜单项描述在搜索过滤时会被 <LJ> 高亮组件拆成多个 <span> 子节点；
+    // 保持 React 子节点原位，仅通过 textEdits 改写文本叶子节点，确保搜索与选中功能完全不受影响。
+    if (translateOwnContent &&
+        ((el.getAttribute('data-testid') === 'menu-option-description' &&
+          el.getAttribute('dir') !== 'rtl' && el.closest && el.closest('[data-mention-menu]')) ||
+         (el.getAttribute('data-testid') === 'hover-card-description' &&
+          el.closest && el.closest('[data-mention-menu]')))) {
+      if (el.children && el.children.length > 0) {
+        var menuTextNodes = [];
+        var menuWalker = doc.createTreeWalker(el, root.NodeFilter.SHOW_TEXT);
+        var mt = menuWalker.nextNode();
+        while (mt) {
+          menuTextNodes.push(mt);
+          mt = menuWalker.nextNode();
+        }
+        if (menuTextNodes.length > 1) {
+          var menuSource = '';
+          var hadMenuEdit = false;
+          for (var mti = 0; mti < menuTextNodes.length; mti++) {
+            var mtn = menuTextNodes[mti];
+            var mEdit = textEdits.get(mtn);
+            if (mEdit && mEdit.scope === 'menu-description') hadMenuEdit = true;
+            menuSource += (mEdit && mEdit.localized === mtn.nodeValue) ? mEdit.source : mtn.nodeValue;
+          }
+          var menuNormalized = normalizeWhitespace(menuSource);
+          var menuTrans = menuNormalized ? translateUiText(menuNormalized, el) : null;
+          if (menuTrans && menuTrans !== menuNormalized) {
+            writeLocalizedText(menuTextNodes[0], menuTrans, 'menu-description');
+            for (var mtj = 1; mtj < menuTextNodes.length; mtj++) {
+              writeLocalizedText(menuTextNodes[mtj], '', 'menu-description');
+            }
+            return;
+          } else if (hadMenuEdit) {
+            for (var mtk = 0; mtk < menuTextNodes.length; mtk++) {
+              restoreLocalizedText(menuTextNodes[mtk]);
+            }
+          }
+          // 若整句未命中静态词典，避免局部高亮碎片被拆译成半英半中，交由实时翻译或保持整句原文
+          return;
+        }
+      }
+    }
+
     // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
     var first = el.firstChild;
     if (translateOwnContent && first && first.nextSibling) {

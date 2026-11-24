@@ -664,8 +664,8 @@
     "replacement": "$1定时器已到期"
   },
   {
-    "regex": "(\\s+)finished$",
-    "replacement": "$1已完成"
+    "regex": "^(Command|Task|Agent|Build|Step|Turn|Download|Setup|Operation|Process|Job)(\\s+)finished$",
+    "replacement": "$1$2已完成"
   },
   {
     "regex": "^Outside\\s+of\\s+Project$",
@@ -1216,7 +1216,7 @@
     "replacement": "您当前有 $1 个正在进行的会话。更新将取消这些会话，更新后您需要手动重新开始。"
   },
   {
-    "regex": "^Set up (.+)$",
+    "regex": "^Set up ((?:Git|GitHub|SSH|WSL|Docker|MCP|Remote Control|workspace|project|automation|account|hooks|tools)(?:\\b.*)?)$",
     "replacement": "设置 $1"
   },
   {
@@ -1598,5 +1598,185 @@
   {
     "regex": "^(\\d+) MCP servers? failed to start$",
     "replacement": "$1 个 MCP 服务器启动失败"
+  },
+  {
+    "regex": "^Delete cookies for (.+)$",
+    "replacement": "删除 $1 的 Cookie"
+  },
+  {
+    "regex": "^Available AI credits: (.+)$",
+    "replacement": "可用 AI 额度：$1"
+  },
+  {
+    "regex": "^When toggled on, (.+) will use your AI credits to fulfill model requests once you're out of model quota\\. \\1 will always use your model quota first before using AI credits\\.$",
+    "replacement": "开启后，当模型配额用尽时，$1 将使用您的 AI 额度来继续处理模型请求。$1 始终会优先消耗模型配额。"
+  },
+  {
+    "regex": "^When toggled on, (.+) collects usage data to help Google enhance performance and features\\.$",
+    "replacement": "开启后，$1 将收集使用数据，以帮助 Google 改进性能和功能。"
+  },
+  {
+    "regex": "^Receive product updates, tips, and promotions from Google (.+) via email\\.$",
+    "replacement": "通过电子邮件接收来自 Google $1 的产品更新、使用技巧和优惠活动。"
+  },
+  {
+    "regex": "^Manage (.+) app settings\\.$",
+    "replacement": "管理 $1 应用设置。"
+  },
+  {
+    "regex": "^Failed to load instances: (.+)$",
+    "replacement": "加载实例失败：$1"
+  },
+  {
+    "regex": "^Open (.+) skill$",
+    "replacement": "打开 $1 技能"
+  },
+  {
+    "regex": "^The browser blocked the download of (.+)$",
+    "replacement": "浏览器已阻止下载 $1"
+  },
+  {
+    "regex": "^Blocked cross-origin subframe \"([^\"]+)\"$",
+    "replacement": "已阻止跨域子框架“$1”"
+  },
+  {
+    "regex": "^Blocked navigation to \"([^\"]+)\"$",
+    "replacement": "已阻止导航至“$1”"
+  },
+  {
+    "regex": "^Blocked popup to \"([^\"]+)\"$",
+    "replacement": "已阻止弹出窗口“$1”"
+  },
+  {
+    "regex": "^Blocked external popup navigation to \"([^\"]+)\"$",
+    "replacement": "已阻止外部弹出窗口导航至“$1”"
+  },
+  {
+    "regex": "^Show (.+) in folder$",
+    "replacement": "在文件夹中显示 $1"
+  },
+  {
+    "regex": "^Remove (.+) from list$",
+    "replacement": "从列表中移除 $1"
+  },
+  {
+    "regex": "^Configure (.+)$",
+    "replacement": "配置 $1"
+  },
+  {
+    "regex": "^The (.+) MCP server requires configuration parameters before it can be started\\.$",
+    "replacement": "$1 MCP 服务器需要先填写配置参数才能启动。"
+  },
+  {
+    "regex": "^Review (.+) before installing$",
+    "replacement": "安装前审查 $1"
+  },
+  {
+    "regex": "^Install folder \"([^\"]+)\" is already in use$",
+    "replacement": "安装目录“$1”已被占用"
+  },
+  {
+    "regex": "^Account this MCP server uses: (.+)$",
+    "replacement": "此 MCP 服务器使用的账号：$1"
+  },
+  {
+    "regex": "^No apps found for \"([^\"]+)\"\\.$",
+    "replacement": "未找到与“$1”匹配的应用。"
+  },
+  {
+    "regex": "^Page (\\d+) failed to load$",
+    "replacement": "第 $1 页加载失败"
+  },
+  {
+    "regex": "^Go to page (\\d+)$",
+    "replacement": "转到第 $1 页"
+  },
+  {
+    "regex": "^Help us improve (.+)\\.$",
+    "replacement": "帮助我们改进 $1。"
+  },
+  {
+    "regex": "^Created automation \"([^\"]+)\"\\.$",
+    "replacement": "已创建自动化任务“$1”。"
+  },
+  {
+    "regex": "^Restarted \"([^\"]+)\"\\.$",
+    "replacement": "已重启“$1”。"
+  },
+  {
+    "regex": "^Deleted \"([^\"]+)\"\\.$",
+    "replacement": "已删除“$1”。"
+  },
+  {
+    "regex": "^Failed to delete recordings: (.+)$",
+    "replacement": "删除录音失败：$1"
+  },
+  {
+    "regex": "^Failed to save cloud permission settings: (.+)$",
+    "replacement": "保存云端权限设置失败：$1"
+  },
+  {
+    "regex": "^Failed to save project settings: (.+)$",
+    "replacement": "保存项目设置失败：$1"
+  },
+  {
+    "regex": "^Failed to save project permissions: (.+)$",
+    "replacement": "保存项目权限失败：$1"
+  },
+  {
+    "regex": "^Failed to update remote control setting: (.+)$",
+    "replacement": "更新远程控制设置失败：$1"
+  },
+  {
+    "regex": "^Authorization code for (.+)$",
+    "replacement": "$1 的授权码"
+  },
+  {
+    "regex": "^Label for (.+)$",
+    "replacement": "$1 的标签"
+  },
+  {
+    "regex": "^(.+) \\(Remote\\)$",
+    "replacement": "$1（远程）"
+  },
+  {
+    "regex": "^Sign in to (.+) remotely$",
+    "replacement": "远程登录 $1"
+  },
+  {
+    "regex": "^(\\d+) seconds$",
+    "replacement": "$1 秒"
+  },
+  {
+    "regex": "^(\\d+) days$",
+    "replacement": "$1 天"
+  },
+  {
+    "regex": "^Go to turn (\\d+) of (\\d+)$",
+    "replacement": "跳转到第 $1 / $2 轮"
+  },
+  {
+    "regex": "^Turn (\\d+) of (\\d+)$",
+    "replacement": "第 $1 / $2 轮"
+  },
+  {
+    "regex": "^Plan, (\\d+) of (\\d+) steps done$",
+    "replacement": "计划，已完成 $1 / $2 步"
+  },
+  {
+    "regex": "^(\\d+) additions?, (\\d+) deletions?$",
+    "replacement": "新增 $1 行，删除 $2 行"
+  },
+  {
+    "regex": "^(\\d+) lines added, (\\d+) lines removed$",
+    "replacement": "新增 $1 行，删除 $2 行"
+  },
+  {
+    "regex": "^Revoke: (.+)$",
+    "replacement": "撤销：$1"
+  },
+  {
+    "regex": "^Revoke all: (.+)$",
+    "replacement": "全部撤销：$1"
   }
 ]

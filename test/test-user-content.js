@@ -1506,3 +1506,53 @@ test('2.31 download approvals and voice cards distinguish controls from generate
   assert.equal(document.querySelector('[data-project-id]').textContent, 'Settings');
   assert.equal(document.querySelector('[data-testid="gcp-project-combobox-trigger"]').getAttribute('aria-label'), '展开或收起 Google Cloud 项目列表');
 });
+
+test('2.35 marketplace categories, browsing data modal and settings localize without leaking into user text', async t => {
+  const { document } = await fixture(t, `
+    <div data-testid="customizations-marketplace">
+      <div data-testid="marketplace-category-option-design">Design</div>
+      <div data-testid="marketplace-category-chip">Cloud</div>
+      <section aria-label="Productivity"><div><h2>Productivity</h2></div>
+        <button>See more in Productivity</button>
+      </section>
+    </div>
+    <div id="ordinary-words"><span>Design</span><span>Cloud</span></div>
+    <section data-testid="user-message-content"><p>Clear Browsing Data?</p><p>Prevent sleep</p></section>
+    <div id="settings-panel">
+      <span>Prevent sleep</span>
+      <span>Keep in menu bar</span>
+      <span>Clear Browsing Data?</span>
+    </div>`);
+  assert.equal(document.querySelector('[data-testid="marketplace-category-option-design"]').textContent, '设计与创意');
+  assert.equal(document.querySelector('[data-testid="marketplace-category-chip"]').textContent, '云服务');
+  assert.equal(document.querySelector('[data-testid="customizations-marketplace"] h2').textContent, '效率与协作');
+  assert.equal(document.querySelector('[data-testid="customizations-marketplace"] button').textContent, '在效率与协作中查看更多');
+  assert.deepEqual([...document.querySelectorAll('#ordinary-words span')].map(el => el.textContent), ['Design', 'Cloud']);
+  assert.deepEqual([...document.querySelectorAll('section[data-testid="user-message-content"] p')].map(el => el.textContent), ['Clear Browsing Data?', 'Prevent sleep']);
+  assert.deepEqual([...document.querySelectorAll('#settings-panel span')].map(el => el.textContent), ['防止休眠', '保留在菜单栏', '清除浏览数据？']);
+});
+
+test('2.35 built-in slash command descriptions translate cleanly even when search highlights split spans', async t => {
+  const { document } = await fixture(t, `
+    <div role="listbox" data-mention-menu="">
+      <div role="option">
+        <span data-testid="menu-option-label">goal</span>
+        <span data-testid="menu-option-description" dir="auto">Run until the specified goal is completely finished.</span>
+      </div>
+      <div role="option">
+        <span data-testid="menu-option-label">plan</span>
+        <span data-testid="menu-option-description" dir="auto"><span>Plan carefully before executing a </span><span class="text-primary">task</span><span>.</span></span>
+      </div>
+      <div role="option">
+        <span data-testid="menu-option-label">src/app.js</span>
+        <span data-testid="menu-option-description" dir="rtl">src/components/Header.tsx</span>
+      </div>
+    </div>`);
+  const opts = [...document.querySelectorAll('[role="option"]')];
+  assert.equal(opts[0].querySelector('[data-testid="menu-option-label"]').textContent, 'goal');
+  assert.equal(opts[0].querySelector('[data-testid="menu-option-description"]').textContent, '持续运行直到指定目标完全达成。');
+  assert.equal(opts[1].querySelector('[data-testid="menu-option-label"]').textContent, 'plan');
+  assert.equal(opts[1].querySelector('[data-testid="menu-option-description"]').textContent, '在执行任务前仔细制定计划。');
+  assert.equal(opts[1].querySelectorAll('[data-testid="menu-option-description"] span').length, 3);
+  assert.equal(opts[2].querySelector('[data-testid="menu-option-description"]').textContent, 'src/components/Header.tsx');
+});

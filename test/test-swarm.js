@@ -227,3 +227,23 @@ test('scoped dictionary has valid, unique selectors and no blank translations', 
     assert.ok(target.trim());
   }
 });
+
+test('2.35 Swarm Hive view, Mentions view, GIF export modal and Waiting/Killed statuses translate cleanly', t => {
+  const dom = domFor(t, `
+    <div id="tab-graph"><div class="segmented" role="group" aria-label="Graph view">
+      <button id="gview-hive" title="Threads as cells, with each worker where it works">Hive</button>
+      <button id="gview-mentions">Mentions</button>
+    </div>
+    <button id="graph-export-gif" title="Export graph replay as an animated GIF"><span id="graph-export-gif-label">Export GIF</span></button></div>
+    <div id="gif-modal"><img id="gif-modal-img" alt="Exported swarm graph replay"><span class="gif-modal-hint">Right-click image to save, or open in a new tab.</span><a id="gif-modal-open">Open in new tab</a><button id="gif-modal-close" aria-label="Close preview"></button></div>
+    <div id="members"><span class="o2-mstat info">Waiting</span><span class="o2-mstat bad">Killed</span></div>`);
+  run(dom);
+  const doc = dom.window.document;
+  assert.equal(doc.querySelector('#gview-hive').textContent, '蜂巢视图');
+  assert.equal(doc.querySelector('#gview-mentions').textContent, '提及视图');
+  assert.equal(doc.querySelector('#graph-export-gif-label').textContent, '导出 GIF');
+  assert.equal(doc.querySelector('#gif-modal-img').getAttribute('alt'), '导出的 Swarm 关系图回放');
+  assert.equal(doc.querySelector('#gif-modal-open').textContent, '在新标签页中打开');
+  assert.equal(doc.querySelector('#gif-modal-close').getAttribute('aria-label'), '关闭预览');
+  assert.deepEqual([...doc.querySelectorAll('#members .o2-mstat')].map(el => el.textContent), ['等待中', '已终止']);
+});

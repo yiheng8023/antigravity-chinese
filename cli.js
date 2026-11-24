@@ -24,6 +24,69 @@ const {
   restoreVsCodePatch
 } = require('./core/vscode-patch');
 
+function detectWindowsExtraAsarPaths() {
+  if (os.platform() !== 'win32') return [];
+  const discovered = [];
+  const addCandidateDir = (dirOrExe) => {
+    if (!dirOrExe || typeof dirOrExe !== 'string') return;
+    let clean = dirOrExe.trim().replace(/^["']|["']$/g, '').split(',')[0].trim();
+    if (!clean) return;
+    if (/\.exe$/i.test(clean)) clean = path.dirname(clean);
+    discovered.push(path.join(clean, 'resources', 'app.asar'));
+    discovered.push(path.join(clean, 'app.asar'));
+  };
+
+  // 1. 探测常见多盘符安装位置 (C/D/E/F)
+  for (const drive of ['C:', 'D:', 'E:', 'F:']) {
+    for (const sub of [
+      'Antigravity',
+      'antigravity',
+      path.join('Programs', 'antigravity'),
+      path.join('Program Files', 'antigravity'),
+      path.join('Program Files', 'Google Antigravity'),
+      path.join('Software', 'Antigravity')
+    ]) {
+      discovered.push(path.join(drive + path.sep, sub, 'resources', 'app.asar'));
+    }
+  }
+
+  // 2. 通过正在运行的进程路径 / Windows 注册表 / 开始菜单及桌面快捷方式精确定位
+  try {
+    const psCmd = [
+      "$paths = New-Object System.Collections.Generic.List[string];",
+      "Get-Process -Name 'Antigravity' -ErrorAction SilentlyContinue | ForEach-Object { if ($_.Path) { $paths.Add($_.Path) } };",
+      "foreach ($reg in @('HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*','HKLM:\\Software\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*','HKLM:\\Software\\WOW6432Node\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\*')) {",
+      "  Get-ItemProperty $reg -ErrorAction SilentlyContinue | Where-Object { $_.DisplayName -like '*Antigravity*' } | ForEach-Object {",
+      "    if ($_.InstallLocation) { $paths.Add($_.InstallLocation) }",
+      "    if ($_.DisplayIcon) { $paths.Add($_.DisplayIcon) }",
+      "  }",
+      "};",
+      "$lnkDirs = @([Environment]::GetFolderPath('Desktop'), [Environment]::GetFolderPath('Programs'), [Environment]::GetFolderPath('CommonPrograms'));",
+      "$ws = New-Object -ComObject WScript.Shell -ErrorAction SilentlyContinue;",
+      "if ($ws) {",
+      "  foreach ($d in $lnkDirs) {",
+      "    if ($d -and (Test-Path $d)) {",
+      "      Get-ChildItem -Path $d -Filter '*Antigravity*.lnk' -Recurse -ErrorAction SilentlyContinue | ForEach-Object {",
+      "        try { $t = $ws.CreateShortcut($_.FullName).TargetPath; if ($t) { $paths.Add($t) } } catch {}",
+      "      }",
+      "    }",
+      "  }",
+      "};",
+      "$paths | Select-Object -Unique"
+    ].join(' ');
+    const out = execSync(`powershell -NoProfile -NonInteractive -Command "${psCmd.replace(/"/g, '\\"')}"`, {
+      encoding: 'utf8',
+      timeout: 3500,
+      stdio: ['ignore', 'pipe', 'ignore']
+    });
+    for (const line of out.split(/\r?\n/)) {
+      addCandidateDir(line);
+    }
+  } catch (_) {}
+
+  return Array.from(new Set(discovered));
+}
+
 // Platform paths
 function getCandidateAsarPaths(platform = os.platform(), homedir = os.homedir()) {
 
@@ -85,7 +148,9 @@ function tryRecoverSwappedAsar(targetAsarPath) {
 
 function findAsarPath(customPath) {
   if (customPath) {
-    const resolved = path.resolve(customPath);
+    let cleanCustom = customPath.trim().replace(/^["']|["']$/g, '');
+    if (/\.exe$/i.test(cleanCustom)) cleanCustom = path.dirname(cleanCustom);
+    const resolved = path.resolve(cleanCustom);
     const isDirectory = fs.existsSync(resolved) && fs.statSync(resolved).isDirectory();
     const candidates = isDirectory ? [
       path.join(resolved, 'resources', 'app.asar'),
@@ -106,6 +171,14 @@ function findAsarPath(customPath) {
     tryRecoverSwappedAsar(p);
     if (fs.existsSync(p) && fs.statSync(p, { throwIfNoEntry: false })?.isFile()) {
       return p;
+    }
+  }
+  if (os.platform() === 'win32') {
+    for (const p of detectWindowsExtraAsarPaths()) {
+      tryRecoverSwappedAsar(p);
+      if (fs.existsSync(p) && fs.statSync(p, { throwIfNoEntry: false })?.isFile()) {
+        return p;
+      }
     }
   }
   return null;
@@ -449,6 +522,7 @@ function patchMainFile(mainFilePath) {
   content = content.replace(/buttons:\s*\[\s*['"]Cancel['"]\s*,\s*['"]Quit['"]\s*\]/g, "buttons: ['取消', '退出']");
   content = content.replace(/['"]Binary not found['"]/g, "'未找到二进制文件'");
   content = content.replace(/['"]Startup failed['"]/g, "'启动失败'");
+  content = content.replace(/['"]WSL setup failed['"]/g, "'WSL 配置失败'");
 
   // 3. macOS dock 菜单支持
   content = content.replace(/label:\s*['"]New Window['"]/g, "label: '新建窗口'");
@@ -497,6 +571,84 @@ function patchTrayFile(trayFilePath) {
   }
 
   fs.writeFileSync(trayFilePath, content, 'utf-8');
+}
+
+function patchDisconnectedPageFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf-8');
+  const replacements = [
+    { from: "reconnect: 'Reconnect'", to: "reconnect: '重新连接'" },
+    { from: "stop: 'Stop Server'", to: "stop: '停止服务器'" },
+    { from: "close: 'Close'", to: "close: '关闭'" },
+    { from: "'Restarting…'", to: "'正在重启…'" },
+    { from: "'Reconnecting…'", to: "'正在重连…'" },
+    { from: "'Disconnected'", to: "'连接已断开'" },
+    { from: '`Restarting the Antigravity server on ${host}…`', to: '`正在 ${host} 上重启 Antigravity 服务器…`' },
+    { from: '`Reconnecting to ${host}…`', to: '`正在重新连接到 ${host}…`' },
+    { from: '`Disconnected from ${host}`', to: '`已断开与 ${host} 的连接`' },
+    { from: "'This window opens it again once it has started.'", to: "'服务器启动完成后，此窗口将自动重新打开。'" },
+    { from: '`Its server on ${host} stopped, and its agents with it.`', to: '`${host} 上的服务器已停止，相关智能体也已随之停止。`' },
+    { from: '`Agents keep running on ${host}.`', to: '`智能体仍在 ${host} 上继续运行。`' },
+    { from: '`Its agents on ${host} stopped with it.`', to: '`其位于 ${host} 上的智能体也已随之停止。`' },
+    { from: '`Agents keep running on ${host} unless its server stopped.`', to: '`除非服务器停止，否则智能体仍会在 ${host} 上继续运行。`' }
+  ];
+  for (const r of replacements) content = content.split(r.from).join(r.to);
+  fs.writeFileSync(filePath, content, 'utf-8');
+}
+
+function patchWebviewPopupSecurityFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf-8');
+  const replacements = [
+    { from: "insecure: 'Not secure'", to: "insecure: '不安全'" },
+    { from: "dangerous: '⚠ Not secure'", to: "dangerous: '⚠ 不安全'" },
+    { from: "'Your connection to this site is not secure'", to: "'您与此网站之间的连接不安全'" },
+    { from: "'You should not enter any sensitive information on this site (for ' +\n        'example, passwords or credit cards), because it could be stolen by ' +\n        'attackers.'", to: "'请勿在此网站上输入任何敏感信息（例如密码或信用卡号），因为攻击者可能会窃取这些信息。'" },
+    { from: "'Connection is secure'", to: "'连接是安全的'" },
+    { from: "'Your information (for example, passwords or credit card numbers) is ' +\n            'private when it is sent to this site.'", to: "'您发送给此网站的信息（例如密码或信用卡号）处于私密保护状态。'" },
+    { from: "'Connection security information is not available for this page'", to: "'此页面暂无连接安全信息'" },
+    { from: ": 'unknown'", to: ": '未知'" },
+    { from: "'Certificate is valid'", to: "'证书有效'" },
+    { from: "'Certificate details'", to: "'证书详情'" },
+    { from: "`Error: ${state.certificateError}`", to: "`错误：${state.certificateError}`" },
+    { from: "`Issued to: ${certificate.subjectName}`", to: "`颁发给：${certificate.subjectName}`" },
+    { from: "`Issued by: ${certificate.issuer}`", to: "`颁发者：${certificate.issuer}`" },
+    { from: "`Valid from: ${formatDate(certificate.validFromMs)}`", to: "`有效期自：${formatDate(certificate.validFromMs)}`" },
+    { from: "`Valid until: ${formatDate(certificate.validToMs)}`", to: "`有效期至：${formatDate(certificate.validToMs)}`" },
+    { from: "`Protocol: ${certificate.protocol}`", to: "`协议：${certificate.protocol}`" },
+    { from: "(state.url || 'This page')", to: "(state.url || '此页面')" },
+    { from: "label: 'Connection info…'", to: "label: '连接信息…'" },
+    { from: "title: 'Connection info'", to: "title: '连接信息'" },
+    { from: "buttons: ['OK']", to: "buttons: ['确定']" }
+  ];
+  for (const r of replacements) content = content.split(r.from).join(r.to);
+  fs.writeFileSync(filePath, content, 'utf-8');
+}
+
+function patchDeviceChooserFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf-8');
+  const replacements = [
+    { from: "hid: 'HID device'", to: "hid: 'HID 设备'" },
+    { from: "usb: 'USB device'", to: "usb: 'USB 设备'" },
+    { from: "serial: 'serial port'", to: "serial: '串口'" },
+    { from: "'Unknown device'", to: "'未知设备'" }
+  ];
+  for (const r of replacements) content = content.split(r.from).join(r.to);
+  fs.writeFileSync(filePath, content, 'utf-8');
+}
+
+function patchSignInCallbackFile(filePath) {
+  if (!fs.existsSync(filePath)) return;
+  let content = fs.readFileSync(filePath, 'utf-8');
+  const replacements = [
+    { from: "page('You have successfully authenticated.', 'You can close this tab and return to Antigravity.')", to: "page('您已成功完成身份验证。', '现在可以关闭此标签页并返回 Antigravity。')" },
+    { from: "page(\"Sign-in didn't finish\", `Antigravity couldn't reach ${host} to finish signing in. ` +\n        'Sign in again from Antigravity.')", to: "page('登录未完成', `Antigravity 无法连接至 ${host} 以完成登录。` +\n        '请从 Antigravity 中重新发起登录。')" },
+    { from: "page(\"Sign-in didn't finish\", 'This sign-in came back from another server than the sign-in page you ' +\n        `agreed to, so Antigravity didn't pass it on to ${host}.`)", to: "page('登录未完成', '此登录响应来自与您最初确认的登录页不同的服务器，出于安全考虑，Antigravity 未将其传递给 ' +\n        `${host}。`)" },
+    { from: "page(\"Sign-in didn't finish\", `Antigravity on ${host} couldn't finish signing in (HTTP ${status}). ` +\n        'Sign in again from Antigravity.')", to: "page('登录未完成', `${host} 上的 Antigravity 无法完成登录（HTTP ${status}）。` +\n        '请从 Antigravity 中重新发起登录。')" }
+  ];
+  for (const r of replacements) content = content.split(r.from).join(r.to);
+  fs.writeFileSync(filePath, content, 'utf-8');
 }
 
 const MIN_NODE_VERSION = 18;
@@ -699,6 +851,26 @@ function install(customPath) {
   const splashPath = path.join(tempExtractDir, 'dist', 'provisionSplash.js');
   if (fs.existsSync(splashPath)) {
     patchProvisionSplashFile(splashPath);
+  }
+
+  const disconnectedPagePath = path.join(tempExtractDir, 'dist', 'remote', 'disconnectedPage.js');
+  if (fs.existsSync(disconnectedPagePath)) {
+    patchDisconnectedPageFile(disconnectedPagePath);
+  }
+
+  const popupSecurityPath = path.join(tempExtractDir, 'dist', 'webviewPopupSecurity.js');
+  if (fs.existsSync(popupSecurityPath)) {
+    patchWebviewPopupSecurityFile(popupSecurityPath);
+  }
+
+  const deviceChooserPath = path.join(tempExtractDir, 'dist', 'deviceChooser.js');
+  if (fs.existsSync(deviceChooserPath)) {
+    patchDeviceChooserFile(deviceChooserPath);
+  }
+
+  const signInCallbackPath = path.join(tempExtractDir, 'dist', 'remote', 'signInCallback.js');
+  if (fs.existsSync(signInCallbackPath)) {
+    patchSignInCallbackFile(signInCallbackPath);
   }
 
   // 4. Pack back
@@ -1144,6 +1316,19 @@ function getGlobalPluginTargetDir() {
   return path.join(homedir, '.gemini', 'config', 'plugins', 'chinese-toolkit');
 }
 
+function copyDirRecursiveSync(srcDir, destDir) {
+  fs.mkdirSync(destDir, { recursive: true });
+  for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
+    const srcEntry = path.join(srcDir, entry.name);
+    const destEntry = path.join(destDir, entry.name);
+    if (entry.isDirectory()) {
+      copyDirRecursiveSync(srcEntry, destEntry);
+    } else {
+      fs.copyFileSync(srcEntry, destEntry);
+    }
+  }
+}
+
 function installPlugin() {
   console.log('🔌 正在安装 Antigravity 社区中文智能体插件...');
   const srcPluginDir = path.join(PROJECT_ROOT, 'plugins', 'chinese-toolkit');
@@ -1163,7 +1348,7 @@ function installPlugin() {
     fs.rmSync(targetDir, { recursive: true, force: true });
   }
   
-  fs.cpSync(srcPluginDir, targetDir, { recursive: true });
+  copyDirRecursiveSync(srcPluginDir, targetDir);
   console.log(`✅ 插件已成功安装至全局目录: ${targetDir}`);
   console.log('🎉 智能体中文交互规则 (Rules) 与 本地化诊断技能 (Skills) 已就绪！\n');
 }
@@ -1177,6 +1362,171 @@ function uninstallPlugin() {
   } else {
     console.log('ℹ️ 全局插件目录中未发现该插件。\n');
   }
+}
+
+function manualInstall(customPath) {
+  console.log('================================================================');
+  console.log('  Antigravity 汉化补丁 手动安装向导');
+  console.log('================================================================\n');
+
+  const readLineSync = () => {
+    const buf = Buffer.alloc(512);
+    try {
+      const bytes = fs.readSync(0, buf, 0, buf.length, null);
+      return buf.toString('utf8', 0, bytes).trim();
+    } catch (e) {
+      return 'q';
+    }
+  };
+
+  console.log('🔍 正在自动探测本机 Antigravity 安装目录（支持 C/D/E/F 盘、注册表与快捷方式）...');
+  let asarPath = findAsarPath(customPath);
+  while (!asarPath) {
+    console.log('\n⚠️ 未在默认路径、多盘符或注册表中自动找到 Antigravity 安装目录。');
+    console.log('   请把 Antigravity 安装文件夹（或 Antigravity.exe / app.asar）拖入此窗口后按 [Enter]（输入 Q 退出）：');
+    process.stdout.write('👉 请输入或拖入路径: ');
+    const input = readLineSync().replace(/^["']|["']$/g, '');
+    if (!input || input.toLowerCase() === 'q') {
+      console.log('\nℹ️ 已取消安装。');
+      return;
+    }
+    let cleanDir = input;
+    if (/\.exe$/i.test(cleanDir)) cleanDir = path.dirname(cleanDir);
+    const resolved = path.resolve(cleanDir);
+    const tries = fs.existsSync(resolved) && fs.statSync(resolved).isDirectory()
+      ? [path.join(resolved, 'resources', 'app.asar'), path.join(resolved, 'app.asar'), path.join(resolved, 'Contents', 'Resources', 'app.asar')]
+      : [resolved];
+    asarPath = tries.find(p => fs.existsSync(p) && fs.statSync(p, { throwIfNoEntry: false })?.isFile()) || null;
+    if (asarPath) {
+      customPath = resolved;
+    } else {
+      console.log('❌ 该路径下未找到 app.asar，请确认目录是否正确。');
+    }
+  }
+  console.log(`✅ 已定位 Antigravity 客户端: ${asarPath}\n`);
+
+  const resourcesDir = path.dirname(asarPath);
+  const stagedPath = path.join(resourcesDir, 'app.asar.staged');
+
+  // 1. 循环等待用户完全退出宿主客户端（支持一键结束托盘残留进程）
+  if (isProcessRunning()) {
+    while (isProcessRunning()) {
+      console.log('⚠️ 检测到 Antigravity 客户端仍在运行（可能最小化在系统托盘）。');
+      console.log('   - 请先彻底退出 Antigravity，然后直接按 [Enter] 重新检测；');
+      console.log('   - 或者输入 Y 后按 [Enter] 由安装程序自动关闭残留进程并继续（输入 Q 取消）:');
+      process.stdout.write('👉 请选择 [Enter 重检 / Y 自动关闭 / Q 退出]: ');
+      const ans = readLineSync().toLowerCase();
+      if (ans === 'q' || ans === 'quit' || ans === 'exit') {
+        console.log('\nℹ️ 已取消安装。');
+        return;
+      }
+      if (ans === 'y' || ans === 'yes') {
+        console.log('🔄 正在关闭残留的 Antigravity 进程...');
+        try {
+          if (os.platform() === 'win32') {
+            execSync('taskkill /F /IM Antigravity.exe', { stdio: 'ignore' });
+          } else {
+            execSync('pkill -i antigravity || true', { stdio: 'ignore' });
+          }
+        } catch (_) {}
+        try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 1500); } catch (_) {}
+      }
+      console.log('');
+    }
+  }
+
+  console.log('✅ 已确认 Antigravity 客户端完全退出，开始应用更新...\n');
+
+  // 2. 优先秒级应用已预构建的 app.asar.staged；若无或失败则走完整安装
+  let appliedStaged = false;
+  if (fs.existsSync(stagedPath)) {
+    console.log('📦 检测到已预构建好的最新汉化包 (app.asar.staged)，正在原子替换...');
+    try {
+      applyStagedNow(customPath);
+      appliedStaged = true;
+    } catch (e) {
+      console.warn('⚠️ 直接应用预构建包遇到异常，转为完整重新构建安装...');
+    }
+  }
+  if (!appliedStaged) {
+    install(customPath);
+  }
+
+  // 3. 同步部署社区插件
+  installPlugin();
+
+  // 4. 自动校验 VS Code 扩展（如有）
+  const vsExtDir = findVsCodeExtensionDir(customPath);
+  if (vsExtDir) {
+    try {
+      const vsRes = installVsCodePatch(vsExtDir);
+      console.log(vsRes.success ? `✅ [VS Code 联动] ${vsRes.message}` : `⚠️ [VS Code 联动] ${vsRes.message}`);
+    } catch (vsErr) {
+      console.warn('⚠️ [VS Code 联动] 注入跳过:', vsErr.message);
+    }
+  }
+
+  // 5. 校验最终状态
+  console.log('');
+  status(customPath);
+  if (fs.existsSync(stagedPath)) {
+    console.warn('⚠️ 警告: 仍然存在未清除的 app.asar.staged，请检查文件是否被其他安全软件占用！');
+    process.exitCode = 1;
+  } else {
+    console.log('🎉 全部检验通过！最新汉化补丁与斜杠指令本地化已成功安装，现在可以重新启动 Antigravity！\n');
+  }
+}
+
+function applyStagedNow(customPath) {
+  const asarPath = findAsarPath(customPath);
+  if (!asarPath) {
+    console.error('❌ 未能找到 Antigravity 客户端路径。');
+    process.exit(1);
+  }
+  const resourcesDir = path.dirname(asarPath);
+  const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
+  const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
+  const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+
+  if (!fs.existsSync(stagedAsar)) {
+    console.log('ℹ️ 未发现待应用的 app.asar.staged，转为执行完整安装...');
+    install(customPath);
+    return;
+  }
+
+  if (!customPath && isProcessRunning()) {
+    console.error('❌ 检测到 Antigravity.exe 仍在运行（可能驻留在系统托盘），请先完全退出后再试。');
+    process.exit(2);
+  }
+
+  let swapped = false;
+  let lastErr = null;
+  for (let attempt = 0; attempt < 8; attempt++) {
+    try {
+      if (!swapped && fs.existsSync(asarPath)) {
+        if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
+        fs.renameSync(asarPath, swapOldAsar);
+        swapped = true;
+      }
+      fs.renameSync(stagedAsar, asarPath);
+      if (fs.existsSync(swapOldAsar)) {
+        try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
+      }
+      const newFp = getAsarFingerprint(asarPath);
+      fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newFp, timestamp: Date.now() }, null, 2), 'utf8');
+      console.log('🎉 已成功将预构建汉化包 (app.asar.staged) 原子应用至客户端！');
+      return;
+    } catch (err) {
+      lastErr = err;
+      if (attempt < 7) {
+        try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 300); } catch (_) {}
+      } else if (swapped && !fs.existsSync(asarPath) && fs.existsSync(swapOldAsar)) {
+        try { fs.renameSync(swapOldAsar, asarPath); } catch (_) {}
+      }
+    }
+  }
+  console.error('❌ 应用 app.asar.staged 失败:', lastErr ? lastErr.message : '文件被占用');
+  process.exit(1);
 }
 
 function applyStagedWhenUnlocked(customPath) {
@@ -1272,8 +1622,15 @@ if (require.main === module) {
       }
       break;
     }
+    case 'manual-install':
+      manualInstall(customPath);
+      break;
     case 'apply-staged':
-      applyStagedWhenUnlocked(customPath);
+      if (args.includes('--now')) {
+        applyStagedNow(customPath);
+      } else {
+        applyStagedWhenUnlocked(customPath);
+      }
       break;
     case 'install-plugin':
     case 'plugin:install':
@@ -1408,6 +1765,10 @@ module.exports = {
   patchTrayFile,
   patchWslFile,
   patchProvisionSplashFile,
+  patchDisconnectedPageFile,
+  patchWebviewPopupSecurityFile,
+  patchDeviceChooserFile,
+  patchSignInCallbackFile,
   patchIpcHandlersFile,
   confirmCloseClient,
   closeAntigravitySafely,

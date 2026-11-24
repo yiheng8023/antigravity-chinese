@@ -461,5 +461,34 @@
     "plugin": "zohobooks-antigravity",
     "marketplace": "antigravity-plugins-partners",
     "translation": "通过 Antigravity 使用 Zoho Books，处理发票、账单、银行业务、会计分录、项目、商品、税务、自定义和自动化。"
+  },
+  "Build applications and shell workflows with the Gemini Interactions API, Decisions API, Live API, Genie 4 interactive worlds, and Gemini API CLI, including text, image, video, speech, and music generation, managed agents, and real-time multimodal streaming.": {
+    "plugin": "gemini-api",
+    "translation": "使用 Gemini Interactions API、Decisions API、Live API、Genie 4 交互世界和 Gemini API CLI 构建应用及 Shell 工作流，支持文本、图像、视频、语音与音乐生成、托管智能体与实时多模态流式传输。"
+  },
+  "CodeRabbit is the governance and control layer for agentic software development helping developers trust AI written code.": {
+    "plugin": "coderabbit",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "CodeRabbit 是面向智能体软件开发的治理与控制层，帮助开发者放心地使用 AI 编写的代码。"
+  },
+  "Research U.S. case law, statutes, regulations, and court rules. Find authorities, check quotations against opinions, and see how later courts cite a case.": {
+    "plugin": "descrybe-legal-engine",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "检索美国判例法、成文法、法规与法院规则。查找权威依据、对照判决意见核查引文，并查看后续法院对案件的引用情况。"
+  },
+  "Generate images and V4 videos with Kling AI. Supports multimodal references, reusable subjects, motion control, and task tracking through secure OAuth.": {
+    "plugin": "kling-ai",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "使用可灵 AI (Kling AI) 生成图像与 V4 视频。支持多模态参考、可复用主体、运动控制，并通过安全的 OAuth 进行任务追踪。"
+  },
+  "Salaries, jobs & career advice. Levels.fyi is your career companion to ensure you get paid fairly and find jobs you'll love.": {
+    "plugin": "levels-fyi",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "薪酬数据、职位与职业建议。Levels.fyi 是您的职业伙伴，助您获得公平报酬并找到理想工作。"
+  },
+  "Automate workflows across 10,000+ apps. Run one-off actions or build automations for YouTube, Instagram, Gmail, Facebook Pages, LinkedIn, Slack, Pinterest.": {
+    "plugin": "zapier",
+    "marketplace": "antigravity-plugins-partners",
+    "translation": "跨 10,000 多款应用实现工作流自动化。可为 YouTube、Instagram、Gmail、Facebook Pages、LinkedIn、Slack、Pinterest 运行单次操作或构建自动化流程。"
   }
 }
