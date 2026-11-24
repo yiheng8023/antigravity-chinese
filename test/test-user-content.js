@@ -152,6 +152,18 @@ test('2.34 conversation permission presets translate labels and accessible names
 });
 
 test('2.34 settings permission rows and portaled options distinguish presets from other selects', async t => {
+  const frames = [];
+  const turn = () => new Promise(resolve => setImmediate(resolve));
+  async function drainTranslation(window) {
+    // Let the mutation observer schedule work before stepping through the frames.
+    await turn();
+    for (let i = 0; frames.length && i < 100; i++) {
+      for (const callback of frames.splice(0)) callback(window.performance.now());
+      await turn();
+    }
+    assert.equal(frames.length, 0, 'permission menu translation should finish within 100 frames');
+  }
+
   const row = (id, name, description, value) => `
     <span id="dropdown-label-${id}">${name}</span><span id="dropdown-description-${id}">${description}</span>
     <button class="agy-select-trigger" aria-labelledby="dropdown-label-${id} dropdown-value-${id}" aria-describedby="dropdown-description-${id}">
@@ -165,7 +177,13 @@ test('2.34 settings permission rows and portaled options distinguish presets fro
     row('model', 'Remote', 'Select a model.', 'Auto') + `
     <select aria-labelledby="dropdown-label-local" aria-describedby="dropdown-description-local">
       <option value="Auto">Auto</option><option value="Turbo">Turbo</option></select>
-    <div data-select-popup></div>`);
+    <div data-select-popup></div>`, {
+    beforeStart(doc) {
+      doc.defaultView.requestAnimationFrame = callback => frames.push(callback);
+      doc.defaultView.setInterval = () => 0;
+    },
+    waitForInitialTranslation: drainTranslation
+  });
   const value = id => document.getElementById('dropdown-value-' + id);
   assert.deepEqual(['project', 'local', 'remote', 'model'].map(id => value(id).textContent),
     ['自动审查', '完全权限', '完全权限', 'Auto']);
@@ -176,13 +194,13 @@ test('2.34 settings permission rows and portaled options distinguish presets fro
   popup.innerHTML = option('Auto', 'Automatically decide if commands run.') +
     option('Turbo (disabled by admin)', 'Run all commands without restrictions.') +
     option('Turbo', 'Run all commands without restrictions.') + option('Turbo', 'Video playback speed.');
-  await settle(window);
+  await drainTranslation(window);
   const labels = [...popup.querySelectorAll('.truncate')];
   assert.deepEqual(labels.map(el => el.textContent), ['自动审查', '完全权限（管理员已禁用）', '完全权限', '极速']);
   // Reuse text nodes between the two selects after both descriptions have been localized.
   labels[2].appendChild(labels[3].firstChild);
   labels[3].appendChild(labels[2].firstChild);
-  await settle(window);
+  await drainTranslation(window);
   assert.deepEqual(labels.slice(2).map(el => el.textContent), ['完全权限', '极速']);
 });
 
@@ -482,7 +500,7 @@ async function fixture(t, html, options = {}) {
   options.beforeStart?.(window.document);
   if (options.pluginDescriptions) window.eval(`(${installOfficialPluginDescriptionSourceCheck})(${JSON.stringify(officialPluginDescriptions)})`);
   window.eval(runtime);
-  await settle(window);
+  await (options.waitForInitialTranslation || settle)(window);
   return { window, document: window.document, translate: window.__AGY_TRANSLATE_EL__ };
 }
 
