@@ -1259,6 +1259,40 @@ test('project and unassigned settings localize verified official descriptions an
   assert.equal(document.querySelector('#quoted [data-case="docs"]').textContent, text);
 });
 
+test('reviewed partner summaries cover both catalog revisions without translating local copies', async t => {
+  const plugins = ['coderabbit', 'levels-fyi', 'zapier'];
+  const rows = [];
+  for (const plugin of plugins) {
+    const variants = Object.entries(officialPluginDescriptions).filter(([, entry]) => entry.plugin === plugin);
+    assert.ok(variants.length >= 2, plugin);
+    for (const [source, entry] of variants) {
+      const marketplace = 'antigravity-plugins-partners';
+      const installedFrom = { marketplace, id: marketplace + '/plugin/' + plugin };
+      rows.push({ plugin, source, expected: entry.translation, provenance: { installedFrom } });
+      rows.push({ plugin, source, expected: source, provenance: {} });
+    }
+  }
+  const markup = rows.map((_, i) => `<article>
+    <span class="font-medium truncate"></span>
+    <div class="text-sm text-muted-foreground line-clamp-2 mt-1" data-row="${i}"></div>
+    <button>Copy Path</button></article>`).join('');
+  const { document } = await fixture(t, `<section data-testid="project-customizations-content">
+    <div data-testid="workspace-customizations-view">${markup}</div></section>`, {
+    pluginDescriptions: true,
+    beforeStart(doc) {
+      for (const el of doc.querySelectorAll('[data-row]')) {
+        const { plugin, source, provenance } = rows[Number(el.dataset.row)];
+        el.textContent = source;
+        el.previousElementSibling.textContent = plugin;
+        el.__reactFiber$fixture = pluginDescriptionFiber(el, plugin, provenance).fiber;
+      }
+    }
+  });
+  for (const el of document.querySelectorAll('[data-row]')) {
+    assert.equal(el.textContent, rows[Number(el.dataset.row)].expected);
+  }
+});
+
 test('official description translation follows the committed renderer and restores when moved into user content', async t => {
   const source = 'Read, draft, and edit docs.';
   let official, local;

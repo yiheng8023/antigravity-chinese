@@ -70,6 +70,16 @@
 
 插件目录可独立于客户端更新。短介绍仅在目录来源、插件 ID 和完整原文均匹配时使用共享译文。新增或改写的介绍先显示完整原文，维护时按确认的变更和用户反馈补齐。含变量或易产生歧义的第三方说明、命令与技能说明、插件名和用户自定义内容保留原文。
 
+校对时先处理词库已有、原文发生改写的短介绍，再按使用需求处理新条目。优先参考发布方提供的同义中文说明，用领域词汇表核实陌生术语，逐项对照功能范围、数字和权限措辞。拿不准的条目整条显示原文，其他条目可以单独合入。用户端继续在本地查表。长篇 README 可通过插件作者已有的中文文档阅读。[方案讨论与目录试跑](https://github.com/yiheng8023/antigravity-chinese/issues/15)
+
+维护时从公开插件目录记录提取目录名、插件 ID 和完整英文短介绍，保存为 UTF-8 JSON。例如：
+
+```json
+{"rows":[{"marketplace":"antigravity-plugins-official","plugin":"gdocs","description":"Read, draft, and edit docs."}]}
+```
+
+运行 `node tools/compare-plugin-catalog.js snapshot.json` 即可离线比对。官方目录和合作伙伴目录分别使用 `antigravity-plugins-official` 和 `antigravity-plugins-partners`。同一插件在多个入口出现时按目录和 ID 合并，原文不同的记录进入 `conflicting` 待核实。优先校对 `rewritten`，再看 `unlisted`。报告的分母仅含快照实际覆盖的插件，采样时应记录客户端版本、日期与分页范围。
+
 ## 📝 提交 Pull Request
 
 1. 创建特性分支：

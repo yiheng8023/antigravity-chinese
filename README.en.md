@@ -15,9 +15,9 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.62** targets **Antigravity App 2.35.0 / VS Code extension 1.13.0**. This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin.
+Source version **v3.3.63** targets **Antigravity App 2.35.0 / VS Code extension 1.13.0**. This release updates the Chinese catalog summaries for CodeRabbit, Levels.fyi, and Zapier and documents recovery from a macOS desktop update signature failure.
 
-This version localizes the 2.35.0 environment picker, model and permission lock notices, queued messages, and text direction controls. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.35.0 maintenance record](docs/maintenance/antigravity-2.35.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
+This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.35.0 maintenance record](docs/maintenance/antigravity-2.35.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 
 VS Code extension updates overwrite the local patch. After an extension update, rerun `node cli.js install:vscode` and reload the VS Code window.
 
@@ -127,28 +127,17 @@ Please verify the payee name shown on the checkout page before confirming paymen
 
 ## 👥 Contributors
 
-Heartfelt thanks to all developers who contribute code, report bugs, and improve translations and documentation!
+Thank you to everyone who helps maintain, test, and improve the localization. GitHub counts commit authors on the default branch. We also recognize reports, reproduction steps, and design proposals here.
 
-- Thanks to **a705876883-arch** for proposing a fix for unintended translation of user content and supplying reproduction and regression cases. [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6)
-- Thanks to **[fansID512](https://github.com/fansID512)** for detailed environment information, reproduction steps and comparison observations that helped diagnose settings stutter. [Issue #8](https://github.com/yiheng8023/antigravity-chinese/issues/8)
-- Thanks to **[MizuIro-H](https://github.com/MizuIro-H)** for reproducing the portable Linux detection problem on Bazzite, proposing a fix, and verifying installation. [Issue #9](https://github.com/yiheng8023/antigravity-chinese/issues/9)
-- Thanks to **[tangyixiao](https://github.com/tangyixiao)** for reporting ambiguous permission preset labels, contributing a fix and regression tests, and verifying the global settings UI. [PR #11](https://github.com/yiheng8023/antigravity-chinese/pull/11)
-- Thanks to **[Qiinn-71](https://github.com/Qiinn-71)** for comparing three installation states on Apple Silicon and tracing the macOS update failure to signature verification. [Issue #12](https://github.com/yiheng8023/antigravity-chinese/issues/12)
-- Thanks to **[mitang-ai](https://github.com/mitang-ai)** for proposing and testing Swarm UI and slash-command search highlight changes, and for sharing a plugin detail translation proposal. [PR #14](https://github.com/yiheng8023/antigravity-chinese/pull/14) · [Issue #15](https://github.com/yiheng8023/antigravity-chinese/issues/15)
-
-<p align="center">
-  <a href="https://github.com/yiheng8023/antigravity-chinese/graphs/contributors">
-    <img src="https://contrib.rocks/image?repo=yiheng8023/antigravity-chinese" alt="Contributors" />
-  </a>
-  <a href="https://github.com/fansID512">
-    <img src="https://avatars.githubusercontent.com/u/103017881?v=4" width="64" height="64" alt="fansID512 - bug reproduction and performance diagnosis" title="fansID512: bug reproduction and performance diagnosis" />
-  </a>
-  <a href="https://github.com/MizuIro-H">
-    <img src="https://avatars.githubusercontent.com/u/123630455?v=4" width="64" height="64" alt="MizuIro-H - portable Linux reproduction and fix proposal" title="MizuIro-H - portable Linux reproduction and fix proposal" />
-  </a>
-  <a href="https://github.com/Qiinn-71"><img src="https://avatars.githubusercontent.com/u/262174075?v=4" width="64" height="64" alt="Qiinn-71 - macOS update signature diagnosis" /></a>
-  <a href="https://github.com/mitang-ai"><img src="https://avatars.githubusercontent.com/u/275678971?v=4" width="64" height="64" alt="mitang-ai - desktop localization and plugin translation proposal" /></a>
-</p>
+| Contributor | Contribution |
+| --- | --- |
+| <a href="https://github.com/yiheng8023"><img src="https://avatars.githubusercontent.com/u/127850894?s=64&v=4" width="32" height="32" alt="" /> yiheng8023</a> | Maintains the localization, reviews changes, and publishes releases. |
+| <a href="https://github.com/a705876883-arch"><img src="https://avatars.githubusercontent.com/u/250879823?s=64&v=4" width="32" height="32" alt="" /> a705876883-arch</a> | Proposed a fix for unintended translation of user content and supplied reproduction and regression cases. [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6) |
+| <a href="https://github.com/fansID512"><img src="https://avatars.githubusercontent.com/u/103017881?s=64&v=4" width="32" height="32" alt="" /> fansID512</a> | Provided detailed environment information, reproduction steps and comparison observations that helped diagnose settings stutter. [Issue #8](https://github.com/yiheng8023/antigravity-chinese/issues/8) |
+| <a href="https://github.com/MizuIro-H"><img src="https://avatars.githubusercontent.com/u/123630455?s=64&v=4" width="32" height="32" alt="" /> MizuIro-H</a> | Reproduced the portable Linux detection problem on Bazzite, proposed a fix, and verified installation. [Issue #9](https://github.com/yiheng8023/antigravity-chinese/issues/9) |
+| <a href="https://github.com/tangyixiao"><img src="https://avatars.githubusercontent.com/u/115929632?s=64&v=4" width="32" height="32" alt="" /> tangyixiao</a> | Reported ambiguous permission preset labels, contributed a fix and regression tests, and verified the global settings UI. [PR #11](https://github.com/yiheng8023/antigravity-chinese/pull/11) |
+| <a href="https://github.com/Qiinn-71"><img src="https://avatars.githubusercontent.com/u/262174075?s=64&v=4" width="32" height="32" alt="" /> Qiinn-71</a> | Compared three installation states on Apple Silicon and traced the macOS update failure to signature verification. [Issue #12](https://github.com/yiheng8023/antigravity-chinese/issues/12) |
+| <a href="https://github.com/mitang-ai"><img src="https://avatars.githubusercontent.com/u/275678971?s=64&v=4" width="32" height="32" alt="" /> mitang-ai</a> | Proposed and tested Swarm UI and slash-command search highlight changes, and shared a plugin detail translation proposal. [PR #14](https://github.com/yiheng8023/antigravity-chinese/pull/14) · [Issue #15](https://github.com/yiheng8023/antigravity-chinese/issues/15) |
 
 ---
 

@@ -19,6 +19,33 @@ function tempDir(t) {
   return dir;
 }
 
+test('public catalog comparison groups by source and plugin and flags conflicting copy', () => {
+  const { comparePluginCatalog } = require('../tools/compare-plugin-catalog');
+  const official = 'antigravity-plugins-official';
+  const partners = 'antigravity-plugins-partners';
+  const entries = {
+    'Old summary': { plugin: 'demo', translation: '旧介绍' },
+    'Updated summary': { plugin: 'demo', translation: '新介绍' },
+    'Built-in summary': { plugin: 'internal', builtin: true, translation: '内置' }
+  };
+  const row = (plugin, description, marketplace = official) => ({ plugin, description, marketplace });
+  for (const source of ['Old summary', 'Updated summary']) {
+    assert.equal(comparePluginCatalog([row('demo', source), row('demo', source)], entries).matched, 1);
+  }
+  const result = comparePluginCatalog([
+    row('demo', 'New copy'), row('demo', 'Updated summary', partners),
+    row('internal', 'Built-in summary'), row('ambiguous', 'B'), row('ambiguous', 'A')
+  ], entries);
+  assert.equal(result.observed, 4);
+  assert.equal(result.matched, 0);
+  assert.deepEqual(result.rewritten, [{ id: official + '/plugin/demo', description: 'New copy',
+    previous: { 'Old summary': '旧介绍', 'Updated summary': '新介绍' } }]);
+  assert.deepEqual(result.unlisted.map(entry => entry.id), [official + '/plugin/internal', partners + '/plugin/demo']);
+  assert.deepEqual(result.conflicting, [{ id: official + '/plugin/ambiguous', descriptions: ['A', 'B'] }]);
+  assert.throws(() => comparePluginCatalog([]));
+  assert.throws(() => comparePluginCatalog([row('demo', 'Updated summary', 'custom')]));
+});
+
 test('reviewed component inventory catches omitted descriptions and changed upstream sources', () => {
   const { checkInventory } = require('../tools/ui-inventory');
   const inventory = require('./fixtures/app-2.32.1-ui.json');
