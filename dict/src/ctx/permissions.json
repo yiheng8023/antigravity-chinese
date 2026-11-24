@@ -57,6 +57,8 @@
   "Agent can scroll on browser pages to access more content.": "智能体可在浏览器页面上滚动以访问更多内容。",
   "Agent never asks for review. This maximizes the autonomy of the Agent, but also has the highest risk of the Agent operating over unsafe or injected Artifact content.": "智能体从不请求审查。这最大化了智能体的自主性，但智能体在不安全或注入的产物内容上操作的风险最高。",
   "Agent permissions preset selector": "智能体权限预设选择器",
+  "Permissions cannot be changed while the agent is running": "智能体运行期间无法更改权限",
+  "Remote Permissions": "远程权限",
   "Agent security mode": "智能体安全模式",
   "Agent settings and permissions for conversations outside of projects.": "项目外会话的智能体设置与权限。",
   "Agent will always ask to review in strict mode.": "在严格模式下，智能体将始终请求审查确认。",

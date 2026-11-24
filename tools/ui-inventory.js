@@ -51,6 +51,7 @@ if (require.main === module) {
       require('../test/fixtures/app-2.32.1-ui.json'),
       require('../test/fixtures/app-2.33.0-ui.json'),
       require('../test/fixtures/app-2.34.0-ui.json'),
+      require('../test/fixtures/app-2.35.0-ui.json'),
     ];
     const hash = source && crypto.createHash('sha256').update(source).digest('hex');
     const selected = hash ? inventories.filter(i => i.source.sha256 === hash) : inventories;

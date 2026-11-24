@@ -9,6 +9,29 @@ const dictionary = require('../dict/zh-CN.json');
 const officialPluginDescriptions = require('../dict/scoped/official-plugin-descriptions.json');
 const { installOfficialPluginDescriptionSourceCheck } = require('../core/official-plugin-description-source');
 
+test('2.35 queued status and locked permission labels translate without changing task names', async t => {
+  const { document, window } = await fixture(t, `
+    <button data-testid="permissions-selector-trigger" aria-disabled="true"
+      aria-label="Agent permissions preset: Default, Permissions cannot be changed while the agent is running"><span>Default</span></button>
+    <div role="region" aria-label="Queued messages"><span data-testid="queued-messages-status" title="Waiting on Settings">Waiting on Settings</span></div>
+    <div class="prose"><span title="Waiting on Settings">Waiting on Settings</span></div>
+    <div role="status">Message queued. Sends after background work finishes. Actions available: Send Now, Edit, Delete.</div>`);
+  const trigger = document.querySelector('button');
+  assert.equal(trigger.getAttribute('aria-label'), '智能体权限预设：默认，智能体运行期间无法更改权限');
+  const status = document.querySelector('[data-testid="queued-messages-status"]');
+  assert.equal(status.textContent, '正在等待 Settings');
+  assert.equal(status.title, '正在等待 Settings');
+  assert.equal(document.querySelector('.prose span').textContent, 'Waiting on Settings');
+  assert.equal(document.querySelector('.prose span').title, 'Waiting on Settings');
+  assert.equal(document.querySelector('[role="status"]').textContent, '消息已排队，后台工作完成后发送。可立即发送、编辑或删除。');
+
+  status.textContent = 'Waiting on Default and Local';
+  status.title = status.textContent;
+  await settle(window);
+  assert.equal(status.textContent, '正在等待 Default and Local');
+  assert.equal(status.title, '正在等待 Default and Local');
+});
+
 test('2.34 conversation permission presets translate labels and accessible names without changing values or authored text', async t => {
   const { document, window } = await fixture(t, `
     <button data-testid="permissions-selector-trigger" aria-label="Agent permissions preset selector, current: Auto"><span>Auto</span></button>

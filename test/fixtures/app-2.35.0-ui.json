@@ -1,0 +1,60 @@
+{
+  "source": {
+    "version": "Antigravity App 2.35.0",
+    "platform": "Windows x64",
+    "sha256": "f039eca519f153aeac9a0f1d10abc7afd8ff4b8009ef78d684669a3c7955f54d",
+    "scope": "Reviewed the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details and artifact find controls. Scoped templates and identifiers have DOM regressions."
+  },
+  "ui": [
+    "Permissions cannot be changed while the agent is running",
+    "Model cannot be changed while the agent is running",
+    "Remote Permissions",
+    "Local Permissions",
+    "Permission preset",
+    "Environment",
+    "Select Environment",
+    "This Computer",
+    "Connect to SSH Host…",
+    "Search Projects…",
+    "Search Workspaces…",
+    "Search Repositories…",
+    "Search Remote…",
+    "Clone from Remote",
+    "Clone locally",
+    "Clone from This Computer",
+    "Clone did not return a valid folder path.",
+    "Switch to default text direction",
+    "Switch to RTL text direction",
+    "This side question isn't available in this conversation.",
+    "Queued messages",
+    "Queued Messages",
+    "Sends after agent finishes working",
+    "Sends after agent finishes working.",
+    "Sends after background work finishes.",
+    "Agent finished. Queued messages send after background work finishes.",
+    "Queued message deleted",
+    "Send Now",
+    "Collapse queued messages",
+    "Expand queued messages",
+    "Archive Conversation",
+    "Added",
+    "Blocked"
+  ],
+  "preserve": [
+    {
+      "text": "SSH Host",
+      "kind": "composed",
+      "reason": "Localize the host menu control by its test identifier and preserve actual host aliases."
+    },
+    {
+      "text": "Search Hosts…",
+      "kind": "composed",
+      "reason": "Localize only the official host search placeholder."
+    },
+    {
+      "text": "CitC Clone",
+      "kind": "technical",
+      "reason": "Internal product terminology."
+    }
+  ]
+}
