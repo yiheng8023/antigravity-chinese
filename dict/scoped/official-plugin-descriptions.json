@@ -143,6 +143,10 @@
     "plugin": "gemini-api",
     "translation": "使用 Gemini Interactions API、Decisions API、Live API 和 Gemini API CLI 构建应用及 Shell 工作流，支持文本、图像、视频和语音生成、托管智能体与实时多模态流式传输。"
   },
+  "Build applications and shell workflows with the Gemini Interactions API, Decisions API, Live API, Genie 4 interactive worlds, and Gemini API CLI, including text, image, video, speech, and music generation, managed agents, and real-time multimodal streaming.": {
+    "plugin": "gemini-api",
+    "translation": "使用 Gemini Interactions API、Decisions API、Live API、Genie 4 交互世界和 Gemini API CLI 构建应用及 Shell 工作流，支持文本、图像、视频、语音和音乐生成、托管智能体与实时多模态流式传输。"
+  },
   "AlphaGenome and major genetics databases to analyze DNA variants, gene regulation, and links between genes and disease.": {
     "plugin": "genomics",
     "translation": "通过 AlphaGenome 和主要遗传学数据库分析 DNA 变异、基因调控以及基因与疾病的关联。"

@@ -9,6 +9,47 @@ const dictionary = require('../dict/zh-CN.json');
 const officialPluginDescriptions = require('../dict/scoped/official-plugin-descriptions.json');
 const { installOfficialPluginDescriptionSourceCheck } = require('../core/official-plugin-description-source');
 
+test('2.35 sentence case setting titles and split plan labels localize without changing user text', async t => {
+  const cases = [
+    ['Prevent sleep', '阻止系统休眠'],
+    ['Keep in menu bar', '保持在菜单栏/托盘'],
+    ['Device name', '设备名称'],
+    ['Notification settings', '通知设置'],
+    ['Conversation steps', '对话步骤'],
+    ['Font size', '字体大小'],
+    ['Conversation width', '对话面板宽度'],
+    ['Screen reader mode', '屏幕阅读器模式'],
+    ['Enable notifications for agent', '启用智能体系统通知'],
+    ['Enable sounds for agent', '启用智能体提示音'],
+    ['Enable AI credit overages', '启用超额 AI 积分计费'],
+    ['Open links in', '链接打开方式'],
+    ['Download location', '下载位置'],
+    ['Browsing history', '浏览历史'],
+    ['Browser actuation rules', '浏览器操作执行规则'],
+    ['Enable telemetry', '启用遥测诊断'],
+    ['Marketing emails', '营销与产品动态邮件']
+  ];
+  const { document } = await fixture(t, `
+    <div class="settings-modal-container">
+      ${cases.map(([source]) => `<div class="font-medium setting-label">${source}</div>`).join('')}
+      <div id="plan-account" class="font-medium">Your plan: Google AI Pro</div>
+      <div id="plan-models" class="font-medium">Your plan: <!-- -->Enterprise Custom</div>
+      <div id="plan-unknown" class="font-medium">Your plan</div>
+      <div class="prose" id="quoted">Font size</div>
+    </div>
+    <div role="menuitem"><div id="environment">Runs on this machine</div></div>
+    <div id="outside" class="font-medium">Your plan: Google AI Pro</div>
+    <div data-testid="user-input-step">Prevent sleep</div>`);
+  assert.deepEqual([...document.querySelectorAll('.setting-label')].map(el => el.textContent), cases.map(([, expected]) => expected));
+  assert.equal(document.querySelector('#plan-account').textContent, '当前方案：Google AI Pro');
+  assert.match(document.querySelector('#plan-models').textContent, /^当前方案： *Enterprise Custom$/);
+  assert.equal(document.querySelector('#plan-unknown').textContent, '当前方案');
+  assert.equal(document.querySelector('#environment').textContent, '在此电脑上运行');
+  assert.equal(document.querySelector('#quoted').textContent, 'Font size');
+  assert.equal(document.querySelector('#outside').textContent, 'Your plan: Google AI Pro');
+  assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Prevent sleep');
+});
+
 test('2.35 queued status and locked permission labels translate without changing task names', async t => {
   const { document, window } = await fixture(t, `
     <button data-testid="permissions-selector-trigger" aria-disabled="true"
@@ -1116,6 +1157,7 @@ const docsPluginOrigin = {
 test('project and unassigned settings localize verified official descriptions and preserve identical custom copy', async t => {
   const text = 'Read, draft, and edit docs.';
   const swarmText = 'Unlock the power of agent swarms.';
+  const geminiText = "Build applications and shell workflows with the Gemini Interactions API, Decisions API, Live API, Genie 4 interactive worlds, and Gemini API CLI, including text, image, video, speech, and music generation, managed agents, and real-time multimodal streaming.";
   const row = (id, name, description) => `
     <article>
       <span class="font-medium truncate" data-tooltip-id="${id}">${name}</span>
@@ -1128,6 +1170,8 @@ test('project and unassigned settings localize verified official descriptions an
         ${row('docs', 'Google Docs', text)}
         ${row('local-docs', 'Google Docs', text)}
         ${row('other-origin', 'Google Docs', text)}
+        ${row('gemini', 'Gemini API', geminiText)}
+        ${row('local-gemini', 'Gemini API', geminiText)}
         ${row('swarm', 'Swarm', swarmText)}
         ${row('local-swarm', 'Swarm', swarmText)}
         ${row('edited', 'Google Docs', 'Settings')}
@@ -1141,11 +1185,13 @@ test('project and unassigned settings localize verified official descriptions an
       for (const el of doc.querySelectorAll('[data-case]')) {
         const kind = el.getAttribute('data-case');
         const swarm = kind.endsWith('swarm');
-        const name = swarm ? 'swarm' : kind === 'guidance' ? 'modern-web-guidance-plugin' : 'gdocs';
+        const gemini = kind.endsWith('gemini');
+        const name = swarm ? 'swarm' : gemini ? 'gemini-api' : kind === 'guidance' ? 'modern-web-guidance-plugin' : 'gdocs';
         let provenance = {};
         if (kind === 'swarm') provenance = { isBuiltin: true };
         if (kind === 'docs' || kind === 'edited') provenance = docsPluginOrigin;
         if (kind === 'other-origin') provenance = { installedFrom: { ...docsPluginOrigin.installedFrom, id: 'antigravity-plugins-official/plugin/other' } };
+        if (kind === 'gemini') provenance = { installedFrom: { ...docsPluginOrigin.installedFrom, id: 'antigravity-plugins-official/plugin/gemini-api' } };
         if (kind === 'guidance') provenance = { installedFrom: { ...docsPluginOrigin.installedFrom, id: 'antigravity-plugins-official/plugin/modern-web-guidance-plugin' } };
         el.__reactFiber$fixture = pluginDescriptionFiber(el, name, provenance).fiber;
       }
@@ -1158,12 +1204,15 @@ test('project and unassigned settings localize verified official descriptions an
     assert.equal(get('docs').title, 'Settings');
     assert.equal(get('local-docs').textContent, text);
     assert.equal(get('other-origin').textContent, text);
+    assert.equal(get('gemini').textContent, officialPluginDescriptions[geminiText].translation);
+    assert.equal(get('local-gemini').textContent, geminiText);
     assert.equal(get('swarm').textContent, '发挥多智能体协作的优势。');
     assert.equal(get('local-swarm').textContent, swarmText);
     assert.equal(get('edited').textContent, 'Settings');
     assert.equal(get('guidance').textContent, '让您的编码智能体紧跟最新的 Web 最佳实践。');
     assert.equal(view.querySelector('[data-tooltip-id="guidance"]').textContent, 'Modern Web Guidance');
     assert.equal(view.querySelector('[data-tooltip-id="docs"]').textContent, 'Google Docs');
+    assert.equal(view.querySelector('[data-tooltip-id="gemini"]').textContent, 'Gemini API');
     assert.equal(view.querySelector('button').textContent, '复制路径');
   }
   assert.equal(document.querySelector('#quoted [data-case="docs"]').textContent, text);

@@ -584,6 +584,10 @@
     var testId = el && el.getAttribute('data-testid');
     var queuedStatus = translateQueuedStatus(text, testId);
     if (queuedStatus) return queuedStatus;
+    if ((text === 'Your plan' || text === 'Your plan:' || text.startsWith('Your plan: ')) &&
+        el?.classList.contains('font-medium') && el.closest('.settings-modal-container')) {
+      return text === 'Your plan' ? '当前方案' : '当前方案：' + text.slice('Your plan:'.length).trimStart();
+    }
     if (text.endsWith(' left') && el?.closest('[data-testid="inline-card-expiry"]')) {
       var remaining = text.match(/^(\d+)([ms]) left$/);
       if (remaining) return '剩余 ' + remaining[1] + (remaining[2] === 'm' ? ' 分钟' : ' 秒');

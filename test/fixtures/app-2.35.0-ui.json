@@ -3,9 +3,33 @@
     "version": "Antigravity App 2.35.0",
     "platform": "Windows x64",
     "sha256": "f039eca519f153aeac9a0f1d10abc7afd8ff4b8009ef78d684669a3c7955f54d",
-    "scope": "Reviewed the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details and artifact find controls. Scoped templates and identifiers have DOM regressions."
+    "scope": "Reviewed changed desktop settings labels, the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details and artifact find controls. Scoped templates and identifiers have DOM regressions."
   },
   "ui": [
+    "Prevent sleep",
+    "Keep in menu bar",
+    "Device name",
+    "Notification settings",
+    "Conversation steps",
+    "Font size",
+    "Conversation width",
+    "Screen reader mode",
+    "Enable notifications for agent",
+    "Enable sounds for agent",
+    "Enable AI credit overages",
+    "Open links in",
+    "Download location",
+    "Browsing history",
+    "Browser actuation rules",
+    "Enable telemetry",
+    "Marketing emails",
+    "Custom context menus",
+    "Terminal placement",
+    "Markdown artifact width",
+    "Browser JavaScript execution policy",
+    "Automatic check for updates",
+    "Runs on this machine",
+    "Runs in a cloud environment",
     "Permissions cannot be changed while the agent is running",
     "Model cannot be changed while the agent is running",
     "Remote Permissions",
@@ -41,6 +65,11 @@
     "Blocked"
   ],
   "preserve": [
+    {
+      "text": "Your plan",
+      "kind": "composed",
+      "reason": "Localize the settings label and its split or dynamic prefix in the renderer while preserving plan names."
+    },
     {
       "text": "SSH Host",
       "kind": "composed",

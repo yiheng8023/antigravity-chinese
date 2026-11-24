@@ -1,4 +1,6 @@
 {
+  "Runs on this machine": "在此电脑上运行",
+  "Runs in a cloud environment": "在云端环境中运行",
   ", or": "，或",
   ", or ": "，或 ",
   "? This removes it from your config directory.": "吗？这将从您的配置目录中将其移除。",
