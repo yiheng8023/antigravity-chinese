@@ -44,6 +44,8 @@ node cli.js install
 
 `install` detects the desktop app and VS Code extension and handles installed components. Windows users can run `install.bat`; macOS/Linux users can run `bash install.sh`. These wrapper scripts also install the optional community plugin.
 
+**macOS desktop updates.** The localization installer applies a local ad-hoc signature to the app. An Apple Silicon user updating from 2.33.1 to 2.34.0 reported that the update downloaded but failed signature verification during installation. If this happens, save your work, quit the app and reinstall the complete Antigravity App from the official DMG. Launch it and confirm the version before applying a compatible localization patch. Restoring `app.asar` alone cannot restore Google's signature for the whole app. [Official download](https://antigravity.google/download) · [Reproduction in #12](https://github.com/yiheng8023/antigravity-chinese/issues/12)
+
 ```bash
 node cli.js status
 node cli.js install:vscode
@@ -131,6 +133,8 @@ Heartfelt thanks to all developers who contribute code, report bugs, and improve
 - Thanks to **[fansID512](https://github.com/fansID512)** for detailed environment information, reproduction steps and comparison observations that helped diagnose settings stutter. [Issue #8](https://github.com/yiheng8023/antigravity-chinese/issues/8)
 - Thanks to **[MizuIro-H](https://github.com/MizuIro-H)** for reproducing the portable Linux detection problem on Bazzite, proposing a fix, and verifying installation. [Issue #9](https://github.com/yiheng8023/antigravity-chinese/issues/9)
 - Thanks to **[tangyixiao](https://github.com/tangyixiao)** for reporting ambiguous permission preset labels, contributing a fix and regression tests, and verifying the global settings UI. [PR #11](https://github.com/yiheng8023/antigravity-chinese/pull/11)
+- Thanks to **[Qiinn-71](https://github.com/Qiinn-71)** for comparing three installation states on Apple Silicon and tracing the macOS update failure to signature verification. [Issue #12](https://github.com/yiheng8023/antigravity-chinese/issues/12)
+- Thanks to **[mitang-ai](https://github.com/mitang-ai)** for proposing and testing Swarm UI and slash-command search highlight changes, and for sharing a plugin detail translation proposal. [PR #14](https://github.com/yiheng8023/antigravity-chinese/pull/14) · [Issue #15](https://github.com/yiheng8023/antigravity-chinese/issues/15)
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/graphs/contributors">
@@ -142,6 +146,8 @@ Heartfelt thanks to all developers who contribute code, report bugs, and improve
   <a href="https://github.com/MizuIro-H">
     <img src="https://avatars.githubusercontent.com/u/123630455?v=4" width="64" height="64" alt="MizuIro-H - portable Linux reproduction and fix proposal" title="MizuIro-H - portable Linux reproduction and fix proposal" />
   </a>
+  <a href="https://github.com/Qiinn-71"><img src="https://avatars.githubusercontent.com/u/262174075?v=4" width="64" height="64" alt="Qiinn-71 - macOS update signature diagnosis" /></a>
+  <a href="https://github.com/mitang-ai"><img src="https://avatars.githubusercontent.com/u/275678971?v=4" width="64" height="64" alt="mitang-ai - desktop localization and plugin translation proposal" /></a>
 </p>
 
 ---
