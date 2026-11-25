@@ -239,6 +239,7 @@
     'user-input-step': 1,
     'user-message-content': 1,
     'planner-response-text': 1,
+    'side-question-tab-header-name': 1,
     'breadcrumb-segment': 1,
     'live-user-turn': 1,
     'live-agent-turn': 1,
@@ -296,10 +297,10 @@
         return true;
       }
     }
-    if (elem.hasAttribute && elem.hasAttribute('data-effort')) {
-      return true;
-    }
-    return false;
+    return elem.hasAttribute('data-effort') ||
+      // The grouped row renders the effort label and model badge as siblings.
+      (elem.classList.contains('agy-overlay-item') &&
+        elem.firstElementChild?.firstElementChild?.getAttribute('data-testid') === 'model-selector-effort-group');
   }
 
   function isCustomizationContent(el) {
@@ -580,8 +581,14 @@
     return null;
   }
 
+  function isSideQuestionDraftTitle(el) {
+    return el?.getAttribute('data-testid') === 'side-question-tab-header-title' ||
+      !!el?.closest('button[data-tab-id="side_question__draft"]');
+  }
+
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
+    if (text === 'New Side Question' && isSideQuestionDraftTitle(el)) return '新建旁路提问';
     if (text === 'at' && el?.matches('span.text-muted-foreground.select-none') &&
         el.closest('[data-testid="automation-schedule-editor"]')) return '于';
     var queuedStatus = translateQueuedStatus(text, testId);
@@ -985,7 +992,13 @@
           var trans = (attr === 'aria-label' && val.startsWith('Agent permissions preset') ? translatePresetAccessibility(val, el) : null) ??
             (attr === 'title' && val.startsWith('Waiting on ') ? translateQueuedStatus(val, el.getAttribute('data-testid')) : null) ??
             translateMarketplaceCategory(val, el) ?? translateFeaturedAttribute(val, attr, el) ?? translateSingleUnit(val);
-          if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
+          if (attr === 'title' && val === 'New Side Question' && isSideQuestionDraftTitle(el)) {
+            trans = '新建旁路提问';
+          } else if (attr === 'aria-label' && val.endsWith('. View site information') &&
+              el.getAttribute('data-testid') === 'url-security-indicator') {
+            var siteInfoLabel = translateSingleUnit('View site information');
+            if (siteInfoLabel) trans = val.slice(0, -'. View site information'.length) + '。' + siteInfoLabel;
+          } else if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
               el.closest('[data-testid^="shortcut-row-"]')) {
             var shortcutAction = translateSingleUnit(val.slice('Reset '.length, -' to default'.length));
             if (shortcutAction) trans = '将' + shortcutAction + '恢复为默认设置';

@@ -488,6 +488,64 @@ function settle(window) {
   return new Promise(resolve => window.setTimeout(resolve, 40));
 }
 
+test('2.35 browser toolbar and tab menu localize fixed text and preserve security summaries', async t => {
+  const { document } = await fixture(t, `
+    <button data-testid="webview-url-bar-inspect-button" title="Inspect element to comment" aria-label="Inspect element to comment"></button>
+    <button data-testid="webview-url-bar-screenshot" title="Add screenshot to conversation" aria-label="Add screenshot to conversation"></button>
+    <button data-testid="url-security-indicator" title="View site information" aria-label="example.test. View site information"></button>
+    <div role="menu">
+      <button data-testid="close-other-tabs"><span class="truncate">Close Other Tabs</span></button>
+      <button data-testid="close-tabs-to-the-left"><span class="truncate">Close Tabs to the Left</span></button>
+      <button data-testid="close-tabs-to-the-right"><span class="truncate">Close Tabs to the Right</span></button>
+    </div>
+    <p data-testid="user-input-step">Add screenshot to conversation</p>`);
+  const get = id => document.querySelector('[data-testid="' + id + '"]');
+  assert.equal(get('webview-url-bar-inspect-button').title, '检查元素并添加评论');
+  assert.equal(get('webview-url-bar-screenshot').getAttribute('aria-label'), '将截图添加到会话');
+  assert.equal(get('url-security-indicator').title, '查看网站信息');
+  assert.equal(get('url-security-indicator').getAttribute('aria-label'), 'example.test。查看网站信息');
+  assert.deepEqual([...document.querySelectorAll('[role="menu"] .truncate')].map(el => el.textContent),
+    ['关闭其他标签页', '关闭左侧标签页', '关闭右侧标签页']);
+  assert.equal(get('user-input-step').textContent, 'Add screenshot to conversation');
+});
+
+test('2.35 side question drafts translate without rewriting submitted titles or model badges', async t => {
+  const { document, window } = await fixture(t, `
+    <button id="draft-tab" data-tab-id="side_question__draft" title="New Side Question">
+      <div class="whitespace-nowrap" title="New Side Question">New Side Question</div>
+    </button>
+    <button id="named-tab" data-tab-id="side_question__conversation" title="New Side Question">
+      <div class="whitespace-nowrap" title="New Side Question">New Side Question</div>
+    </button>
+    <span id="draft-header" data-testid="side-question-tab-header-title" title="New Side Question">New Side Question</span>
+    <span data-testid="side-question-tab-header-title">
+      <span data-testid="side-question-tab-header-prefix">Side Question: </span>
+      <span id="name" data-testid="side-question-tab-header-name">Settings</span>
+    </span>
+    <div data-testid="side-question-tab-empty"><span>Ask a side question without interrupting the main conversation</span></div>
+    <div data-testid="model-selector-panel">
+      <button class="agy-overlay-item"><span class="flex min-w-0 flex-1 items-center gap-1.5 truncate">
+        <span data-testid="model-selector-effort-group">Gemini 4 Hydrogen</span>
+        <span>High</span>
+        <div class="bg-secondary opacity-70 flex items-center gap-1 rounded-full px-1.5 text-sm"><span id="model-tag">New</span></div>
+      </span></button>
+    </div>
+    <button id="action">New</button>`);
+  const get = id => document.getElementById(id);
+  assert.equal(get('draft-tab').textContent.trim(), '新建旁路提问');
+  assert.equal(get('draft-tab').title, '新建旁路提问');
+  assert.equal(get('draft-header').textContent, '新建旁路提问');
+  assert.equal(get('named-tab').textContent.trim(), 'New Side Question');
+  assert.equal(get('named-tab').title, 'New Side Question');
+  assert.equal(get('name').textContent, 'Settings');
+  assert.equal(document.querySelector('[data-testid="side-question-tab-empty"] span').textContent, '发起旁路提问，不打断主会话');
+  assert.equal(get('model-tag').textContent, 'New');
+  assert.equal(get('action').textContent, '新建');
+  get('model-tag').textContent = 'New';
+  await settle(window);
+  assert.equal(get('model-tag').textContent, 'New');
+});
+
 async function fixture(t, html, options = {}) {
   const dom = new JSDOM('<!doctype html><body>' + html + '</body>', {
     runScripts: 'outside-only',
