@@ -1,0 +1,85 @@
+{
+  "source": {
+    "version": "Antigravity App 2.35.2",
+    "platform": "Windows x64",
+    "sha256": "494f0599aa61a7fa97eea7d5d7ab6cd14ddf05866a0bfb0c709a2d75ddfcb58c",
+    "scope": "Model selector notes, site information, downloads, and the browser context menu. DOM tests cover the composed model and site labels, conversation summaries and user-message timestamps."
+  },
+  "ui": [
+    "Applies to /btw and messages sent after this turn",
+    "Applies to messages sent after this turn",
+    "Connection is secure",
+    "Not secure",
+    "Your connection to this site is not secure",
+    "Your connection to this site is not fully secure",
+    "Connection security information is not available for this page",
+    "Your information (for example, passwords or credit card numbers) is private when it is sent to this site.",
+    "You should not enter any sensitive information on this site (for example, passwords or credit cards), because it could be stolen by attackers.",
+    "Attackers might be able to see the images you're looking at on this site and trick you by modifying them.",
+    "You're viewing a blank page",
+    "You're viewing a local or shared file",
+    "Certificate is valid",
+    "Certificate is not valid",
+    "Certificate details",
+    "Issued to",
+    "Issued by",
+    "Valid until",
+    "Protocol",
+    "The certificate has expired or is not yet valid.",
+    "The certificate is not issued by a trusted authority.",
+    "The certificate is not valid for this site.",
+    "The certificate has been revoked.",
+    "This site cannot provide a secure connection.",
+    "This site uses an unsupported TLS protocol or cipher suite.",
+    "No recent downloads",
+    "Close downloads",
+    "Interrupted",
+    "Show in folder",
+    "Cancel download",
+    "Remove from list",
+    "Open in external browser",
+    "Open in External Browser"
+  ],
+  "preserve": [
+    {
+      "text": "model-selector-trigger",
+      "kind": "technical",
+      "reason": "Use the selector as the accessibility translation boundary."
+    },
+    {
+      "text": "data-model-label",
+      "kind": "technical",
+      "reason": "Read the unmodified model label from the trigger to preserve it verbatim."
+    },
+    {
+      "text": "Clearing cookies and site data for ",
+      "kind": "composed",
+      "reason": "Translate the fragments surrounding the original hostname in the site information panel."
+    },
+    {
+      "text": "data-security-level",
+      "kind": "technical",
+      "reason": "Leave the browser's security state unchanged."
+    },
+    {
+      "text": "data-download-state",
+      "kind": "technical",
+      "reason": "Use the status text for localization and leave the download state unchanged."
+    },
+    {
+      "text": "worked-for-collapsible",
+      "kind": "technical",
+      "reason": "Scope the elapsed time translation to the renderer's work summary."
+    },
+    {
+      "text": "tool-group-collapsible",
+      "kind": "technical",
+      "reason": "Scope the composed action summary to the renderer's tool group."
+    },
+    {
+      "text": "user-message-actions",
+      "kind": "technical",
+      "reason": "Distinguish the rendered timestamp from user-authored text."
+    }
+  ]
+}

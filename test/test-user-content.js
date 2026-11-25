@@ -114,6 +114,44 @@ test('2.35 queued status and locked permission labels translate without changing
   assert.equal(status.title, '正在等待 Default and Local');
 });
 
+test('2.35.2 model selector notes translate while preserving model labels and authored content', async t => {
+  const { document, window } = await fixture(t, `
+    <button id="main-model" data-testid="model-selector-trigger" data-model-label="Gemini 4 Hydrogen High"
+      aria-label="Select model, current: Gemini 4 Hydrogen High. Applies to /btw and messages sent after this turn">
+      <span>Gemini 4 Hydrogen High</span>
+    </button>
+    <button id="side-model" data-testid="model-selector-trigger" data-model-label="Settings. Preview"
+      aria-label="Select model, current: Settings. Preview. Applies to messages sent after this turn">
+      <span>Settings. Preview</span>
+    </button>
+    <div role="tooltip"><div class="opacity-70">Applies to /btw and messages sent after this turn</div></div>
+    <div class="prose">
+      <span>Applies to messages sent after this turn</span>
+      <button id="outside" aria-label="Select model, current: Settings"></button>
+    </div>`);
+  const main = document.querySelector('#main-model');
+  const side = document.querySelector('#side-model');
+  assert.equal(main.getAttribute('aria-label'), '选择模型，当前：Gemini 4 Hydrogen High。适用于 /btw 旁路提问和本轮结束后发送的消息');
+  assert.equal(side.getAttribute('aria-label'), '选择模型，当前：Settings. Preview。适用于本轮结束后发送的消息');
+  assert.equal(side.firstElementChild.textContent, 'Settings. Preview');
+  assert.equal(document.querySelector('[role="tooltip"]').textContent, '适用于 /btw 旁路提问和本轮结束后发送的消息');
+  assert.equal(document.querySelector('#outside').getAttribute('aria-label'), 'Select model, current: Settings');
+
+  main.setAttribute('aria-label', 'Select model, current: Gemini 4 Hydrogen High');
+  await settle(window);
+  assert.equal(main.getAttribute('aria-label'), '选择模型，当前：Gemini 4 Hydrogen High');
+
+  main.dataset.modelLabel = 'New';
+  await settle(window);
+  assert.equal(main.getAttribute('aria-label'), 'Select model, current: Gemini 4 Hydrogen High');
+
+  const prose = document.querySelector('.prose');
+  prose.append(side);
+  await settle(window);
+  assert.equal(side.getAttribute('aria-label'), 'Select model, current: Settings. Preview. Applies to messages sent after this turn');
+  assert.equal(prose.querySelector('span').textContent, 'Applies to messages sent after this turn');
+});
+
 test('2.34 conversation permission presets translate labels and accessible names without changing values or authored text', async t => {
   const { document, window } = await fixture(t, `
     <button data-testid="permissions-selector-trigger" aria-label="Agent permissions preset selector, current: Auto"><span>Auto</span></button>
@@ -644,6 +682,109 @@ test('side-question chrome translates without rewriting the question, answer or 
   assert.equal(document.querySelector('[data-testid="side-question-panel"] > button').textContent, '旁路提问');
   assert.equal(document.querySelector('.selection-quote-popup button').textContent, '提问 /btw');
   assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Ask /btw');
+});
+
+test('2.35.2 work and tool summaries preserve the collapse state and quoted text', async t => {
+  const { window, document } = await fixture(t, `
+    <div data-testid="agent-response"><div data-step-list>
+      <button data-testid="worked-for-collapsible" aria-expanded="false"><span>Worked for 1m</span></button>
+      <button data-testid="tool-group-collapsible" aria-expanded="false"
+        aria-label="Explored file, ran commands, edited files">
+        <span title="Explored file, ran commands, edited files">Explored file, ran commands, edited files</span>
+      </button>
+      <div class="prose"><button><span>Worked for 1m</span></button><span>Explored file, ran commands, edited files</span></div>
+    </div></div>`);
+  const work = document.querySelector('[data-testid="worked-for-collapsible"]');
+  const tools = document.querySelector('[data-testid="tool-group-collapsible"]');
+  const summary = tools.firstElementChild;
+  assert.equal(work.textContent, '已运行 1 分钟');
+  assert.equal(summary.textContent, '已浏览文件、已运行命令、已编辑文件');
+  assert.equal(summary.title, summary.textContent);
+  assert.equal(tools.getAttribute('aria-label'), summary.textContent);
+  assert.equal(work.getAttribute('aria-expanded'), 'false');
+  assert.equal(tools.getAttribute('aria-expanded'), 'false');
+  assert.equal(document.querySelector('.prose button').textContent, 'Worked for 1m');
+  assert.equal(document.querySelector('.prose > span').textContent, 'Explored file, ran commands, edited files');
+  tools.setAttribute('aria-expanded', 'true');
+  tools.setAttribute('aria-label', 'Explored example.md');
+  summary.textContent = summary.title = 'Explored example.md';
+  await settle(window);
+  assert.equal(tools.getAttribute('aria-expanded'), 'true');
+  assert.equal(summary.textContent, 'Explored example.md');
+  assert.equal(summary.title, summary.textContent);
+  assert.equal(tools.getAttribute('aria-label'), summary.textContent);
+});
+
+test('2.35.2 browser popovers translate status, preserving host, certificate and file data', async t => {
+  const { window, document, translate } = await fixture(t, `
+    <button data-testid="url-security-indicator" data-security-level="secure"
+      aria-label="Connection is secure. View site information"> </button>
+    <div data-testid="url-security-popover">
+      <span data-testid="url-security-host">Settings</span>
+      <span data-testid="url-security-summary">Connection is secure</span>
+      <span>Your information (for example, passwords or credit card numbers) is private when it is sent to this site.</span>
+      <span id="certificate-label">Certificate is valid</span>
+      <dl data-testid="url-security-certificate"><dt>Issued to</dt><dd>Settings</dd><dt>Issued by</dt><dd>Open</dd>
+      <dt>Valid until</dt><dd>Unknown</dd><dt>Protocol</dt><dd>TLS 1.3</dd></dl>
+      <span id="warning" class="text-secondary-foreground leading-relaxed"></span>
+      <span id="failed" class="text-error">Could not clear site data for example.test.</span>
+      <span id="cert-error" class="text-error">The certificate was rejected (NET::ERR_CERT_INVALID).</span>
+    </div>
+    <div data-testid="webview-downloads-empty">No recent downloads</div>
+    <div data-testid="webview-download-item" data-download-state="interrupted">
+      <button title="Settings" aria-label="Open Settings" data-testid="webview-download-open">
+        <span data-testid="webview-download-filename">Settings</span></button>
+      <button title="Show in folder" aria-label="Show Settings in folder" data-testid="webview-download-show-in-folder"></button>
+      <span data-testid="webview-download-status">Interrupted</span>
+    </div>
+    <div class="prose"><span>Connection is secure</span></div>`);
+  const warning = document.querySelector('#warning');
+  warning.append('Clearing cookies and site data for ', 'Settings', ' may sign you out of this site.');
+  translate(warning);
+  const indicator = document.querySelector('[data-testid="url-security-indicator"]');
+  assert.equal(indicator.getAttribute('aria-label'), '连接安全。查看网站信息');
+  assert.equal(indicator.dataset.securityLevel, 'secure');
+  assert.equal(document.querySelector('[data-testid="url-security-summary"]').textContent, '连接安全');
+  assert.equal(document.querySelector('#certificate-label').textContent, '证书有效');
+  assert.equal(document.querySelector('#cert-error').textContent, '证书已被拒绝（NET::ERR_CERT_INVALID）。');
+  assert.equal(document.querySelector('[data-testid="url-security-host"]').textContent, 'Settings');
+  assert.deepEqual([...document.querySelectorAll('dd')].map(el => el.textContent), ['Settings', 'Open', '未知', 'TLS 1.3']);
+  assert.deepEqual([...document.querySelectorAll('dt')].map(el => el.textContent), ['颁发给', '颁发者', '有效期至', '协议']);
+  assert.equal(warning.textContent, '清除 Settings 的 Cookie 和网站数据后，你可能需要重新登录该网站。');
+  assert.equal(warning.childNodes[1].nodeValue, 'Settings');
+  warning.childNodes[1].nodeValue = 'Local';
+  await settle(window);
+  assert.equal(warning.textContent, '清除 Local 的 Cookie 和网站数据后，你可能需要重新登录该网站。');
+  assert.equal(document.querySelector('#failed').textContent, '无法清除 example.test 的网站数据。');
+  assert.equal(document.querySelector('[data-testid="webview-downloads-empty"]').textContent, '暂无最近的下载');
+  assert.equal(document.querySelector('[data-testid="webview-download-status"]').textContent, '已中断');
+  assert.equal(document.querySelector('[data-testid="webview-download-item"]').dataset.downloadState, 'interrupted');
+  const file = document.querySelector('[data-testid="webview-download-open"]');
+  assert.equal(file.title, 'Settings');
+  assert.equal(file.textContent.trim(), 'Settings');
+  assert.equal(file.getAttribute('aria-label'), '打开 Settings');
+  assert.equal(document.querySelector('[data-testid="webview-download-show-in-folder"]').getAttribute('aria-label'), '在文件夹中显示 Settings');
+  assert.equal(document.querySelector('.prose span').textContent, 'Connection is secure');
+});
+
+test('2.35.2 user-message clock localizes without changing the same text in the message', async t => {
+  const { window, document } = await fixture(t, `
+    <div data-testid="user-input-step">
+      <div data-testid="user-message-content"><span>31m ago</span></div>
+      <div data-testid="user-message-actions" data-no-scroll-jump>
+        <span id="clock" data-screenshot-volatile="true" data-tooltip-id="timestamp-1" class="whitespace-nowrap">31m ago</span>
+      </div>
+    </div>`);
+  const clock = document.querySelector('#clock');
+  const message = document.querySelector('[data-testid="user-message-content"]');
+  assert.equal(clock.textContent, '31分钟前');
+  assert.equal(message.textContent, '31m ago');
+  clock.firstChild.nodeValue = 'about 1h ago';
+  await settle(window);
+  assert.equal(clock.textContent, '约 1小时前');
+  message.append(clock);
+  await settle(window);
+  assert.equal(clock.textContent, 'about 1h ago');
 });
 
 test('relative clocks translate only UI timestamps, including updates and reparenting', async t => {
