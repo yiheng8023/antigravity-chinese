@@ -23,6 +23,62 @@ function domFor(t, extra = '', markers = true) {
 function run(dom) { dom.window.eval('(' + runtime + ')(' + JSON.stringify(data) + ')'); }
 function settle(dom) { return new Promise(resolve => dom.window.setTimeout(resolve, 0)); }
 
+test('Swarm graph modes, GIF preview and member statuses translate only the built-in UI', async t => {
+  const dom = domFor(t, `
+    <div id="tab-graph">
+      <div class="segmented" role="group" aria-label="Graph view">
+        <button id="gview-hive" data-gview="hive" aria-pressed="true" title="Threads as cells, with each worker where it works">Hive</button>
+        <button id="gview-mentions" data-gview="mentions" aria-pressed="false" title="Who @mentions whom">Mentions</button>
+      </div>
+      <button id="graph-export-gif" title="Export graph replay as an animated GIF"><span id="graph-export-gif-label">Export GIF</span></button>
+    </div>
+    <div id="gif-modal" role="dialog">
+      <img id="gif-modal-img" data-testid="swarm-gif-modal-img" alt="Exported swarm graph replay" src="blob:preview">
+      <span class="gif-modal-hint">Right-click image to save, or open in a new tab.</span>
+      <a id="gif-modal-open" href="blob:preview">Open in new tab</a>
+      <button id="gif-modal-close" aria-label="Close preview" title="Close"></button>
+    </div>
+    <div id="members">
+      <span class="o2-mauth">Waiting</span>
+      <span class="o2-mstat info" title="Waiting: turn ended, asleep on the board until a post wakes it">Waiting</span>
+      <span class="o2-mstat bad" title="Killed: removed from the swarm">Killed</span>
+    </div>
+    <div class="msg-body"><img id="attached-image" alt="Exported swarm graph replay"><p>Export GIF</p></div>`);
+  run(dom);
+  const find = selector => dom.window.document.querySelector(selector);
+  assert.equal(find('.segmented').getAttribute('aria-label'), '关系图视图');
+  assert.equal(find('#gview-hive').textContent, '蜂巢视图');
+  assert.equal(find('#gview-hive').getAttribute('aria-pressed'), 'true');
+  assert.equal(find('#gview-mentions').textContent, '提及视图');
+  assert.equal(find('#gview-mentions').dataset.gview, 'mentions');
+  assert.equal(find('#graph-export-gif').title, '将关系图回放导出为 GIF 动图');
+  const label = find('#graph-export-gif-label');
+  assert.equal(label.textContent, '导出 GIF');
+  const preview = find('#gif-modal-img');
+  assert.equal(preview.alt, '导出的 Swarm 关系图回放');
+  assert.equal(preview.getAttribute('src'), 'blob:preview');
+  assert.equal(find('#gif-modal-open').textContent, '在新标签页中打开');
+  assert.equal(find('#gif-modal-open').getAttribute('href'), 'blob:preview');
+  assert.equal(find('#gif-modal-close').getAttribute('aria-label'), '关闭预览');
+  assert.equal(find('.gif-modal-hint').textContent, '右键图片即可保存，或在新标签页中打开。');
+  assert.equal(find('.o2-mstat.info').textContent, '等待中');
+  assert.equal(find('.o2-mstat.info').title, '等待中：本轮已结束，收到新消息后唤醒');
+  assert.equal(find('.o2-mstat.bad').textContent, '已终止');
+  assert.equal(find('.o2-mstat.bad').title, '已终止：已从 Swarm 移除');
+  assert.equal(find('.o2-mauth').textContent, 'Waiting');
+  assert.equal(find('#attached-image').alt, 'Exported swarm graph replay');
+  assert.equal(find('.msg-body p').textContent, 'Export GIF');
+
+  find('#graph-export-gif').disabled = true;
+  label.textContent = 'Exporting…';
+  await settle(dom);
+  assert.equal(label.textContent, '正在导出…');
+  assert.equal(find('#graph-export-gif').disabled, true);
+  find('.msg-body').append(preview);
+  await settle(dom);
+  assert.equal(preview.alt, 'Exported swarm graph replay');
+});
+
 test('Swarm screenshot empty state translates while the command and identifiers stay intact', t => {
   const dom = domFor(t);
   run(dom);

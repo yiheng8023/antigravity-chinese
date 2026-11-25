@@ -20,11 +20,15 @@
     "#members .o2-mstat.bad", "#ov-plain [data-testid='swarm-onboarding'] .o2-onb-h",
     "#ov-plain [data-testid='swarm-onboarding'] .o2-onb-steps b",
     "#ov-plain [data-testid='swarm-onboarding'] .o2-onb-steps div > span",
-    "#ov-plain [data-testid='swarm-onboarding'] .o2-onb-wait > span"
+    "#ov-plain [data-testid='swarm-onboarding'] .o2-onb-wait > span",
+    "#tab-graph #gview-hive", "#tab-graph #gview-mentions", "#tab-graph #graph-export-gif-label",
+    "#gif-modal .gif-modal-hint", "#gif-modal #gif-modal-open"
   ],
   "attributeSelectors": ["#feed > article.msg > .msg-head .msg-author",
     "#ov-plain .o2-rswipe", "#ov-plain .o2-rscrub", "#ov-plain .o2-crew", "#ov-plain .o2-m.all",
-    ".o2-tvh > .o2-tvx", ".o2-tvstage > .o2-tvnav", ".o2-tvstrip[role='listbox']"],
+    ".o2-tvh > .o2-tvx", ".o2-tvstage > .o2-tvnav", ".o2-tvstrip[role='listbox']",
+    "#tab-graph .segmented[role='group']", "#tab-graph #graph-export-gif",
+    "#gif-modal #gif-modal-close", "#gif-modal img#gif-modal-img[data-testid='swarm-gif-modal-img']"],
   "exact": {
     ".": "。",
     "Looking for this conversation's swarm…": "正在查找此会话的 Swarm…",
@@ -150,6 +154,21 @@
     "Each takes a task, and they run in parallel.": "每位执行者负责一项任务，并行开展工作。",
     "One board": "一个共享看板",
     "Updates land here. You step in only when asked.": "进展会汇集到这里。需要您参与时才会请您介入。",
-    "Waiting for the first update": "等待首次更新"
+    "Waiting for the first update": "等待首次更新",
+    "Graph view": "关系图视图",
+    "Hive": "蜂巢视图",
+    "Mentions": "提及视图",
+    "Threads as cells, with each worker where it works": "将线程显示为蜂巢单元，呈现每位执行者的工作位置",
+    "Export graph replay as an animated GIF": "将关系图回放导出为 GIF 动图",
+    "Export GIF": "导出 GIF",
+    "Exporting…": "正在导出…",
+    "Close preview": "关闭预览",
+    "Exported swarm graph replay": "导出的 Swarm 关系图回放",
+    "Right-click image to save, or open in a new tab.": "右键图片即可保存，或在新标签页中打开。",
+    "Open in new tab": "在新标签页中打开",
+    "Waiting": "等待中",
+    "Killed": "已终止",
+    "Waiting: turn ended, asleep on the board until a post wakes it": "等待中：本轮已结束，收到新消息后唤醒",
+    "Killed: removed from the swarm": "已终止：已从 Swarm 移除"
   }
 }

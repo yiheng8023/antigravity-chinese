@@ -8,7 +8,7 @@ function localizeSwarm(data) {
       !doc.querySelector('[data-testid="swarm-tabs"]')) return;
   window.__AGY_SWARM_I18N__ = true;
   const exact = data.exact;
-  const attrs = ['title', 'aria-label', 'placeholder'];
+  const attrs = ['title', 'aria-label', 'placeholder', 'alt'];
   const selectors = data.selectors.join(',');
   const attributeSelectors = data.attributeSelectors.join(',');
   const allSelectors = selectors + ',' + attributeSelectors;
