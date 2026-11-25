@@ -229,6 +229,7 @@ const trayTests = [
   { name: 'menu.js WSL 连接与返回本地菜单项已汉化', pass: patchedMenu.includes("label: '连接到 WSL'") && patchedMenu.includes("label: '在本地重新打开'") },
   { name: 'ipcHandlers.js WSL 文件系统弹窗已汉化', pass: patchedIpc.includes("message: '文件夹位于 Windows 文件系统上'") },
   { name: 'ipcHandlers.js 原生右键上下文菜单拦截与词典映射已注入', pass: patchedIpc.includes('__AGY_CONTEXT_MENU_MAP__') && patchedIpc.includes("label: __agyTranslateContextLabel__(item.label ?? '')") },
+  { name: 'ipcHandlers.js 原生菜单和浏览器工具栏的外部打开操作共用译文', pass: patchedIpc.includes('"Open in External Browser":"在外部浏览器中打开"') && patchedIpc.includes('"Open in external browser":"在外部浏览器中打开"') },
   { name: 'ipcHandlers.js 原生右键二级子菜单映射包含会话名称与拆分方向', pass: patchedIpc.includes('"Conversation Name":"会话名称"') && patchedIpc.includes('"Split Right":"向右拆分"') && patchedIpc.includes('"Replace With New":"替换为新会话"') },
   { name: 'wsl.js 性能警告与错误提示已汉化', pass: patchedWsl.includes("此文件夹位于 Windows 文件系统上") && patchedWsl.includes("此位置无法在 WSL 中打开：") },
   { name: 'wsl.js 下载与安装回调状态已汉化', pass: patchedWsl.includes("正在下载 Antigravity 二进制组件…") && patchedWsl.includes("正在安装至 ${distro}…") },

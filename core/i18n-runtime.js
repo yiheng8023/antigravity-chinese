@@ -251,6 +251,9 @@
     'image-strip-viewer-thumbnail': 1,
     'model-selector-orchestrator-model': 1,
     'webview-device-chooser-option': 1,
+    'webview-download-filename': 1,
+    'url-security-host': 1,
+    'url-security-origin': 1,
     'plugin-detail-footer-author': 1,
     'plugin-detail-footer-version': 1,
     'plugin-hook-list': 1,
@@ -387,6 +390,11 @@
     if (el.tagName === 'STRONG' && !el.previousElementSibling && isProjectDeletionDescription(el.parentElement)) return true;
     if (el.tagName === 'DD' && el.parentElement &&
         el.parentElement.getAttribute('data-testid') === 'permission-download-details') return true;
+    if (el.tagName === 'DD' && el.parentElement?.getAttribute('data-testid') === 'url-security-certificate') {
+      var field = el.previousElementSibling?.firstChild;
+      return readOriginalText(field) !== 'Valid until';
+    }
+    if (el.matches('span.text-secondary-foreground.break-all') && el.closest('[data-testid="url-security-popover"]')) return true;
     if (testId && testId.indexOf('gcp-project-combobox-option-') === 0 &&
         el.hasAttribute('data-project-id')) return true;
     if (el.tagName === 'NAV' && el.getAttribute('aria-label') === 'File path breadcrumbs') return true;
@@ -480,6 +488,88 @@
     if (!el || el.nodeType !== 1 || el.tagName !== 'SPAN' || !el.hasAttribute('data-screenshot-volatile')) return false;
     return (el.hasAttribute('data-tooltip-id') && el.classList.contains('whitespace-nowrap')) ||
       (el.classList.contains('tabular-nums') && !!el.closest('[data-testid="conversation-row-sidebar"]'));
+  }
+
+  function isUserMessageClock(el) {
+    return isTimestampUi(el) && el.getAttribute('data-tooltip-id')?.startsWith('timestamp-') &&
+      el.parentElement?.matches('[data-testid="user-message-actions"][data-no-scroll-jump]') &&
+      el.closest('[data-testid="user-input-step"], [data-testid="user-message-content"], [data-markdown-root], .prose')
+        ?.getAttribute('data-testid') === 'user-input-step';
+  }
+
+  function translateRelativeClock(text) {
+    var clock = text.match(/^(?:(about|over|almost|less than) )?(\d+)(mo|m|h|d|w|y)( ago)?$/);
+    if (clock) return ({about: '约 ', over: '超过 ', almost: '将近 ', 'less than': '不到 '}[clock[1]] || '') +
+      clock[2] + ({mo: '个月', m: '分钟', h: '小时', d: '天', w: '周', y: '年'}[clock[3]]) + (clock[4] ? '前' : '');
+    return text === 'now' || text === 'just now' ? '刚刚' : null;
+  }
+
+  function isWorkSummaryUi(el) {
+    var testId = el.getAttribute('data-testid');
+    return testId === 'worked-for-collapsible' || testId === 'tool-group-collapsible' ||
+      testId === 'progress-updates-collapsible';
+  }
+
+  var TOOL_SUMMARY_ACTIONS = { explored: '已浏览', ran: '已运行', edited: '已编辑' };
+  var TOOL_SUMMARY_OBJECTS = { file: '文件', files: '文件', artifact: '产物', artifacts: '产物', command: '命令', commands: '命令' };
+
+  function isToolSummary(text, el) {
+    return /^(Explored|Ran|Edited)(?: |$)/.test(text) && !!el?.closest('button[data-testid="tool-group-collapsible"]');
+  }
+
+  function translateToolSummary(text) {
+    var parts = text.split(', ');
+    var translated = [];
+    for (var i = 0; i < parts.length; i++) {
+      var part = parts[i].match(/^(explored|edited)(?: (files?|artifacts?))?$|^(ran) (commands?)$/i);
+      if (!part) return null;
+      translated.push(TOOL_SUMMARY_ACTIONS[(part[1] || part[3]).toLowerCase()] +
+        (TOOL_SUMMARY_OBJECTS[(part[2] || part[4] || '').toLowerCase()] || ''));
+    }
+    return translated.join('、');
+  }
+
+  var SITE_DATA_MESSAGES = [
+    ['Clearing cookies and site data for ', ' may sign you out of this site.', '清除 ', ' 的 Cookie 和网站数据后，你可能需要重新登录该网站。'],
+    ['Site data cleared for ', '.', '已清除 ', ' 的网站数据。'],
+    ['Could not clear site data for ', '.', '无法清除 ', ' 的网站数据。']
+  ];
+
+  function isSiteDataMessage(el) {
+    return el?.matches('span.leading-relaxed, span.text-error, [data-testid="url-security-site-data-cleared"]') &&
+      !!el.closest('[data-testid="url-security-popover"]');
+  }
+
+  function translateSiteDataMessage(text, el) {
+    if (!/^(Clearing cookies and site data|Site data cleared|Could not clear site data) for /.test(text) ||
+        !isSiteDataMessage(el)) return null;
+    for (var i = 0; i < SITE_DATA_MESSAGES.length; i++) {
+      var [prefix, suffix, localizedPrefix, localizedSuffix] = SITE_DATA_MESSAGES[i];
+      if (text.startsWith(prefix) && text.endsWith(suffix)) {
+        var host = text.slice(prefix.length, -suffix.length);
+        if (/^\S+$/.test(host)) return localizedPrefix + host + localizedSuffix;
+      }
+    }
+    return null;
+  }
+
+  var DOWNLOAD_ACTION_LABELS = {
+    'webview-download-open': ['Open ', '', '打开 '],
+    'webview-download-show-in-folder': ['Show ', ' in folder', '在文件夹中显示 '],
+    'webview-download-cancel': ['Cancel ', '', '取消下载 '],
+    'webview-download-remove': ['Remove ', ' from list', '从列表中移除 ']
+  };
+
+  function translateDownloadAccessibility(value, el) {
+    var testId = el.getAttribute('data-testid');
+    var action = Object.hasOwn(DOWNLOAD_ACTION_LABELS, testId) && DOWNLOAD_ACTION_LABELS[testId];
+    var progress = !action && el.getAttribute('role') === 'progressbar';
+    if (!action && !progress) return null;
+    var filename = el.closest('[data-testid="webview-download-item"]')
+      ?.querySelector('[data-testid="webview-download-filename"]')?.textContent;
+    if (!filename) return null;
+    if (progress) return value === filename + ' download progress' ? filename + ' 的下载进度' : null;
+    return value === action[0] + filename + action[1] ? action[2] + filename : null;
   }
 
   function translateMarketplaceCategory(text, el) {
@@ -593,6 +683,19 @@
         el.closest('[data-testid="automation-schedule-editor"]')) return '于';
     var queuedStatus = translateQueuedStatus(text, testId);
     if (queuedStatus) return queuedStatus;
+    if (isToolSummary(text, el)) return translateToolSummary(text);
+    if (text.includes(' · ') && el?.closest('button[data-testid="progress-updates-collapsible"]')) {
+      var progress = text.match(/^(Worked for .+) · (\d+) updates?$/);
+      var elapsed = progress && translateSingleUnit(progress[1]);
+      if (elapsed) return elapsed + ' · ' + progress[2] + ' 条更新';
+    }
+    var siteData = translateSiteDataMessage(text, el);
+    if (siteData) return siteData;
+    if (text.startsWith('The certificate was rejected (') && el?.matches('span.text-error') &&
+        el.closest('[data-testid="url-security-popover"]')) {
+      var certificateError = text.match(/^The certificate was rejected \(([^()]+)\)\.$/);
+      if (certificateError) return '证书已被拒绝（' + certificateError[1] + '）。';
+    }
     if ((text === 'Your plan' || text === 'Your plan:' || text.startsWith('Your plan: ')) &&
         el?.classList.contains('font-medium') && el.closest('.settings-modal-container')) {
       return text === 'Your plan' ? '当前方案' : '当前方案：' + text.slice('Your plan:'.length).trimStart();
@@ -648,10 +751,8 @@
     }
     // Compact relative times belong to UI clocks, never arbitrary message text.
     if (isTimestampUi(el)) {
-      var clock = text.match(/^(?:(about|over|almost|less than) )?(\d+)(mo|m|h|d|w|y)( ago)?$/);
-      if (clock) return ({about: '约 ', over: '超过 ', almost: '将近 ', 'less than': '不到 '}[clock[1]] || '') +
-        clock[2] + ({mo: '个月', m: '分钟', h: '小时', d: '天', w: '周', y: '年'}[clock[3]]) + (clock[4] ? '前' : '');
-      if (text === 'now' || text === 'just now') return '刚刚';
+      var clock = translateRelativeClock(text);
+      if (clock) return clock;
     }
     return translateMarketplaceCategory(text, el) ?? translateSingleUnit(text);
   }
@@ -708,7 +809,7 @@
           preserveContent = true;
         } else if (kind === 'message' && !inToolbar && control.parentElement !== current &&
             control.getAttribute('data-testid') !== 'plan-command-fyi-alert' && !isTimestampUi(control) &&
-            !isChangedFilesCardUi(control)) {
+            !isChangedFilesCardUi(control) && !isWorkSummaryUi(control)) {
           // Unmarked legacy bodies can contain buttons. A nested button alone is not UI chrome.
           preserveContent = true;
         } else if (kind === 'tree' && (control.hasAttribute('data-uri') ||
@@ -801,6 +902,33 @@
     node._agyOriginal = undefined;
   }
 
+  function readOriginalText(node) {
+    if (!node || node.nodeType !== 3) return null;
+    var edit = textEdits.get(node);
+    return edit && edit.localized === node.nodeValue ? edit.source : node.nodeValue;
+  }
+
+  function translateSiteDataFragments(el) {
+    if (el?.childNodes.length !== 3 || !isSiteDataMessage(el)) return false;
+    var [prefix, host, suffix] = el.childNodes;
+    var message = SITE_DATA_MESSAGES.find(function (parts) {
+      return readOriginalText(prefix) === parts[0] && readOriginalText(suffix) === parts[1];
+    });
+    if (!message || !/^\S+$/.test(readOriginalText(host) || '')) return false;
+    writeLocalizedText(prefix, message[2], 'site-data');
+    restoreLocalizedText(host);
+    writeLocalizedText(suffix, message[3], 'site-data');
+    return true;
+  }
+
+  function translateUserMessageClock(node) {
+    if (!isUserMessageClock(node.parentElement)) return false;
+    var translated = translateRelativeClock(readOriginalText(node).trim());
+    if (!translated) return false;
+    writeLocalizedText(node, translated);
+    return true;
+  }
+
   function restoreLocalizedAttributes(el) {
     var edits = attributeEdits.get(el);
     if (!edits) return;
@@ -835,10 +963,31 @@
     var walker = doc.createTreeWalker(el, root.NodeFilter.SHOW_ELEMENT | root.NodeFilter.SHOW_TEXT);
     var node = walker.nextNode();
     while (node) {
-      if (node.nodeType === 3) restoreLocalizedText(node);
+      if (node.nodeType === 3) {
+        if (!translateUserMessageClock(node)) restoreLocalizedText(node);
+      }
       else restoreLocalizedAttributes(node);
       node = walker.nextNode();
     }
+  }
+
+  function getLocalizedModelSelectorLabel(el) {
+    if (el.getAttribute('data-testid') !== 'model-selector-trigger' ||
+        getElementTranslationMode(el.parentElement) !== 2) return null;
+    var model = el.getAttribute('data-model-label');
+    if (!model) return null;
+    var current = el.getAttribute('aria-label');
+    var edit = attributeEdits.get(el)?.['aria-label'];
+    var source = edit && edit.localized === current ? edit.source : current;
+    var prefix = 'Select model, current: ' + model;
+    var localized = '选择模型，当前：' + model;
+    if (source === prefix) return localized;
+    if (!source?.startsWith(prefix + '. ')) return null;
+    var note = source.slice(prefix.length + 2);
+    if (note !== 'Applies to /btw and messages sent after this turn' &&
+        note !== 'Applies to messages sent after this turn') return null;
+    var translatedNote = translateSingleUnit(note);
+    return translatedNote ? localized + '。' + translatedNote : null;
   }
 
   // 扫描轮次 ID，同一轮全量扫描中元素只处理一次
@@ -849,10 +998,15 @@
     var parent = node.parentElement || node.parentNode;
     var mode = parentMode === undefined ? getElementTranslationMode(parent) : parentMode;
     if (parent && (mode !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
-      if (mode !== 0 || !translateOfficialPluginDescription(parent)) restoreLocalizedText(node);
+      if (mode !== 0 || (!translateUserMessageClock(node) && !translateOfficialPluginDescription(parent))) restoreLocalizedText(node);
       return;
     }
+    if (translateSiteDataFragments(parent)) return;
     var edit = textEdits.get(node);
+    if (edit?.scope === 'site-data') {
+      restoreLocalizedText(node);
+      edit = undefined;
+    }
     if (edit?.scope === 'official-plugin-description') {
       restoreLocalizedText(node);
       return;
@@ -953,10 +1107,12 @@
     var translationMode = getElementTranslationMode(el);
     if (translationMode === 0) {
       if (translateOfficialPluginDescription(el)) return;
+      var modelSelectorLabel = getLocalizedModelSelectorLabel(el);
       if (work) {
-        restoreLocalizedAttributes(el);
+        if (!modelSelectorLabel) restoreLocalizedAttributes(el);
         appendChildren(el, work);
       } else restoreProtectedSubtree(el);
+      if (modelSelectorLabel) writeLocalizedAttribute(el, 'aria-label', modelSelectorLabel);
       return;
     }
     var translateOwnContent = translationMode === 2;
@@ -994,10 +1150,20 @@
             translateMarketplaceCategory(val, el) ?? translateFeaturedAttribute(val, attr, el) ?? translateSingleUnit(val);
           if (attr === 'title' && val === 'New Side Question' && isSideQuestionDraftTitle(el)) {
             trans = '新建旁路提问';
+          } else if ((attr === 'title' || attr === 'aria-label') && isToolSummary(val, el)) {
+            trans = translateToolSummary(val);
+          } else if (attr === 'aria-label' && el.getAttribute('data-testid') === 'progress-updates-collapsible') {
+            trans = translateUiText(val, el);
+          } else if (attr === 'title' && el.getAttribute('data-testid') === 'webview-download-open') {
+            trans = val;
+          } else if (attr === 'aria-label' && (/^webview-download-/.test(el.getAttribute('data-testid') || '') ||
+              val.endsWith(' download progress'))) {
+            trans = translateDownloadAccessibility(val, el) ?? trans;
           } else if (attr === 'aria-label' && val.endsWith('. View site information') &&
               el.getAttribute('data-testid') === 'url-security-indicator') {
             var siteInfoLabel = translateSingleUnit('View site information');
-            if (siteInfoLabel) trans = val.slice(0, -'. View site information'.length) + '。' + siteInfoLabel;
+            var status = val.slice(0, -'. View site information'.length);
+            if (siteInfoLabel) trans = (Object.hasOwn(exactDict, status) ? exactDict[status] : status) + '。' + siteInfoLabel;
           } else if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
               el.closest('[data-testid^="shortcut-row-"]')) {
             var shortcutAction = translateSingleUnit(val.slice('Reset '.length, -' to default'.length));
@@ -1022,6 +1188,7 @@
 
     // 遍历子节点
     // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
+    if (translateOwnContent && translateSiteDataFragments(el)) return;
     var first = el.firstChild;
     if (translateOwnContent && first && first.nextSibling) {
       var allText = true;
@@ -1090,7 +1257,7 @@
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: TRANSLATABLE_ATTRS
+        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label')
       });
       observing = true;
     }
