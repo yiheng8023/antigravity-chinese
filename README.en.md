@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.63** targets **Antigravity App 2.35.0 / VS Code extension 1.13.0**. This release updates the Chinese catalog summaries for CodeRabbit, Levels.fyi, and Zapier and documents recovery from a macOS desktop update signature failure.
+Source version **v3.3.64** targets **Antigravity App 2.35.1 / VS Code extension 1.13.0**. This release adds Chinese text for the built-in browser and side question drafts and preserves the upstream model badge `New`.
 
 This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.35.0 maintenance record](docs/maintenance/antigravity-2.35.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 
@@ -25,13 +25,13 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows x64 2.35.0 install, reinstall, restore and unpacked file verification. See the portable installation record for the Linux x64 2.33.0 lifecycle. |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows x64 2.35.1 install, reinstall, restore, unpacked file verification, and acceptance of the updated UI. See the portable installation record for the Linux x64 2.33.0 lifecycle. |
 | VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | See the [1.13.0 maintenance record](docs/maintenance/antigravity-2.33.1.md) for Windows installation, restoration and UI checks. |
 | Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
 | Antigravity CLI | Preserves upstream behavior | CLI binaries and terminal UI are unchanged |
 
-Desktop 2.35.0 verification on an installed product covers Windows x64. Gradually rolled-out features depend on account availability. Static checks and candidate-string matches do not measure whole-product translation coverage.
+Desktop 2.35.1 verification on an installed product covers Windows x64. Gradually rolled-out features depend on account availability. Static checks and candidate-string matches do not measure whole-product translation coverage.
 
 ## Installation and use
 

@@ -3,7 +3,7 @@
     "version": "Antigravity App 2.35.0",
     "platform": "Windows x64",
     "sha256": "f039eca519f153aeac9a0f1d10abc7afd8ff4b8009ef78d684669a3c7955f54d",
-    "scope": "Reviewed changed desktop settings labels, appearance presets, the automation form, the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details and artifact find controls. Scoped templates and identifiers have DOM regressions."
+    "scope": "Reviewed changed desktop settings labels, appearance presets, the automation form, the environment and project chooser, model and permission lock banners, queued-message controls, file direction toggle, sidebar archive, plugin details, artifact find controls, browser buttons and tab menu, and the side question draft. Scoped templates and identifiers have DOM regressions."
   },
   "ui": [
     "Required",
@@ -72,7 +72,15 @@
     "Expand queued messages",
     "Archive Conversation",
     "Added",
-    "Blocked"
+    "Blocked",
+    "Inspect element to comment",
+    "Exit inspect element mode (Esc)",
+    "Add screenshot to conversation",
+    "View site information",
+    "Close Other Tabs",
+    "Close Tabs to the Left",
+    "Close Tabs to the Right",
+    "Ask a side question without interrupting the main conversation"
   ],
   "preserve": [
     {
@@ -102,6 +110,16 @@
       "text": "Search Hosts…",
       "kind": "composed",
       "reason": "Localize only the official host search placeholder."
+    },
+    {
+      "text": "New",
+      "kind": "composed",
+      "reason": "Preserve temporary model badges in grouped model rows while translating the fixed New action elsewhere."
+    },
+    {
+      "text": "New Side Question",
+      "kind": "composed",
+      "reason": "Localize the default draft title in the side panel header and tab while preserving authored titles."
     },
     {
       "text": "CitC Clone",
