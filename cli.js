@@ -13,6 +13,7 @@ const { execSync } = require('child_process');
 const { getUnpackArgs, verifyUnpackedOutput } = require('./core/asar-unpack');
 const { patchSwarmFrames } = require('./core/swarm-frame-patch');
 const { installOfficialPluginDescriptionSourceCheck } = require('./core/official-plugin-description-source');
+const { installBuiltinSlashDescriptionSourceCheck } = require('./core/builtin-slash-command-source');
 
 const PROJECT_ROOT = __dirname;
 const DICT_PATH = path.join(PROJECT_ROOT, 'dict', 'zh-CN.json');
@@ -213,7 +214,9 @@ function getBundleScript() {
   const dictContent = fs.readFileSync(DICT_PATH, 'utf-8');
   const runtimeContent = fs.readFileSync(RUNTIME_PATH, 'utf-8');
   const pluginDescriptions = fs.readFileSync(path.join(PROJECT_ROOT, 'dict/scoped/official-plugin-descriptions.json'), 'utf-8');
+  const slashDescriptions = fs.readFileSync(path.join(PROJECT_ROOT, 'dict/scoped/builtin-slash-descriptions.json'), 'utf-8');
   const checkPluginSource = `(${installOfficialPluginDescriptionSourceCheck})(${pluginDescriptions.trim()});`;
+  const checkSlashSource = `(${installBuiltinSlashDescriptionSourceCheck})(${slashDescriptions.trim()});`;
 
   return `
 // --- Antigravity Chinese Localization Injection Start ---
@@ -221,9 +224,10 @@ function getBundleScript() {
   try {
     window.__AGY_I18N_DATA__ = ${dictContent.trim()};
     window.__AGY_I18N_DATA__.officialPluginDescriptions = ${pluginDescriptions.trim()};
+    window.__AGY_I18N_DATA__.builtinSlashDescriptions = ${slashDescriptions.trim()};
     ${runtimeContent}
     if (window.top === window) {
-      require('electron').webFrame.executeJavaScript(${JSON.stringify(checkPluginSource)}).catch(() => {});
+      require('electron').webFrame.executeJavaScript(${JSON.stringify(checkPluginSource + '\n' + checkSlashSource)}).catch(() => {});
     }
   } catch(e) {
     console.error('[AGY-i18n] Runtime Injection Error:', e);

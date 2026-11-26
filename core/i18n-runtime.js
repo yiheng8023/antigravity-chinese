@@ -205,6 +205,7 @@
 
   var I18N_DATA = (root && root.__AGY_I18N_DATA__) || { exact: {}, patterns: [] };
   var officialPluginDescriptions = I18N_DATA.officialPluginDescriptions;
+  var builtinSlashDescriptions = I18N_DATA.builtinSlashDescriptions;
   var defaultEngine = createI18nEngine(I18N_DATA);
   var exactDict = defaultEngine.exactDict;
   var patterns = defaultEngine.patterns;
@@ -384,6 +385,7 @@
     if (isModelSelectorBoundary(el)) return true;
 
     var testId = el.getAttribute('data-testid');
+    if (testId === 'menu-option-description' && el.getAttribute('dir') === 'rtl') return true;
     if ((CONTENT_TEST_IDS[testId] === 1 && !isCustomizationBreadcrumb(el)) || el.hasAttribute('data-ag-localization-skip') ||
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
@@ -1092,6 +1094,66 @@
   // 扫描轮次 ID，同一轮全量扫描中元素只处理一次
   var currentScanId = 0;
 
+  function translateBuiltinSlashDescription(el) {
+    if (!builtinSlashDescriptions || !el?.getAttribute) return false;
+    if (el.getAttribute('data-testid') !== 'menu-option-description' ||
+        el.getAttribute('dir') === 'rtl' || !el.closest?.('[data-mention-menu]')) return false;
+    var row = el.parentElement;
+    var labelEl = row?.querySelector('[data-testid="menu-option-label"]');
+    if (!labelEl) return false;
+    var cmdName = '';
+    var labelWalker = doc.createTreeWalker(labelEl, root.NodeFilter.SHOW_TEXT);
+    for (var lt = labelWalker.nextNode(); lt; lt = labelWalker.nextNode()) {
+      cmdName += readOriginalText(lt) || '';
+    }
+    cmdName = cmdName.trim().replace(/^\//, '');
+    var entry = Object.hasOwn(builtinSlashDescriptions, cmdName) && builtinSlashDescriptions[cmdName];
+
+    var menuTextNodes = [];
+    var menuWalker = doc.createTreeWalker(el, root.NodeFilter.SHOW_TEXT);
+    for (var mt = menuWalker.nextNode(); mt; mt = menuWalker.nextNode()) menuTextNodes.push(mt);
+    if (!menuTextNodes.length) return false;
+
+    var menuSource = '';
+    var hadEdit = false;
+    for (var i = 0; i < menuTextNodes.length; i++) {
+      var mtn = menuTextNodes[i];
+      var mEdit = textEdits.get(mtn);
+      if (mEdit?.scope === 'builtin-slash-description') hadEdit = true;
+      menuSource += mEdit && mEdit.localized === mtn.nodeValue ? mEdit.source : mtn.nodeValue;
+    }
+    var normalized = normalizeWhitespace(menuSource);
+    var verified = !!entry && normalized === entry.source &&
+      !el.dispatchEvent(new root.CustomEvent('agy-localization-check-builtin-slash-description', {
+        detail: { name: cmdName, source: normalized },
+        cancelable: true
+      }));
+
+    if (!verified) {
+      if (hadEdit) {
+        for (var j = 0; j < menuTextNodes.length; j++) restoreLocalizedText(menuTextNodes[j]);
+      }
+      return false;
+    }
+
+    var menuTrans = entry.translation;
+    if (menuTextNodes.length === 3) {
+      var midSrc = (textEdits.get(menuTextNodes[1])?.source ?? menuTextNodes[1].nodeValue);
+      var hitIdx = midSrc ? menuTrans.indexOf(midSrc) : -1;
+      if (hitIdx !== -1 && midSrc.trim()) {
+        writeLocalizedText(menuTextNodes[0], menuTrans.slice(0, hitIdx), 'builtin-slash-description');
+        writeLocalizedText(menuTextNodes[1], midSrc, 'builtin-slash-description');
+        writeLocalizedText(menuTextNodes[2], menuTrans.slice(hitIdx + midSrc.length), 'builtin-slash-description');
+        return true;
+      }
+    }
+    writeLocalizedText(menuTextNodes[0], menuTrans, 'builtin-slash-description');
+    for (var k = 1; k < menuTextNodes.length; k++) {
+      writeLocalizedText(menuTextNodes[k], '', 'builtin-slash-description');
+    }
+    return true;
+  }
+
   function translateTextNode(node, parentMode) {
     if (!node || node.nodeType !== 3) return;
     if (translateSideQuestionOriginText(node)) return;
@@ -1109,6 +1171,10 @@
     }
     if (edit?.scope === 'official-plugin-description') {
       restoreLocalizedText(node);
+      return;
+    }
+    if (edit?.scope === 'builtin-slash-description') {
+      if (!translateBuiltinSlashDescription(parent)) restoreLocalizedText(node);
       return;
     }
 
@@ -1295,6 +1361,7 @@
     }
 
     // 遍历子节点
+    if (translateOwnContent && translateBuiltinSlashDescription(el)) return;
     // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
     if (translateOwnContent && translateSiteDataFragments(el)) return;
     var first = el.firstChild;
@@ -1531,6 +1598,13 @@
       var mutation = mutations[i];
       if (mutation.type === 'childList') {
         enqueuePermissionPresetDependents(mutation.target);
+        var menuDescTarget = mutation.target && mutation.target.closest
+          ? mutation.target.closest('[data-testid="menu-option-description"]:not([dir="rtl"])')
+          : null;
+        if (menuDescTarget) {
+          menuDescTarget._agyScanId = 0;
+          enqueueNode(menuDescTarget);
+        }
         var added = mutation.addedNodes;
         for (var j = 0; j < added.length; j++) {
           var child = added[j];
@@ -1544,7 +1618,15 @@
         // Writes made while observing belong to the renderer, even when the value is unchanged.
         textEdits.delete(mutation.target);
         mutation.target._agyOriginal = undefined;
-        enqueueNode(mutation.target);
+        var menuCharParent = mutation.target.parentElement && mutation.target.parentElement.closest
+          ? mutation.target.parentElement.closest('[data-testid="menu-option-description"]:not([dir="rtl"])')
+          : null;
+        if (menuCharParent) {
+          menuCharParent._agyScanId = 0;
+          enqueueNode(menuCharParent);
+        } else {
+          enqueueNode(mutation.target);
+        }
       } else if (mutation.type === 'attributes') {
         if (mutation.attributeName === 'class' && !isFloatingComposerPreview(mutation.target)) continue;
         var edits = attributeEdits.get(mutation.target);
