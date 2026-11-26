@@ -38,7 +38,12 @@
     "Cancel download",
     "Remove from list",
     "Open in external browser",
-    "Open in External Browser"
+    "Open in External Browser",
+    "Enter a side question after /btw",
+    "Couldn't load Google Drive link title",
+    "You don't have access to this Google Drive file, so its title couldn't be added. The link was kept as-is.",
+    "Timed out fetching the Google Drive file's title. The link was kept as-is.",
+    "Couldn't fetch the Google Drive file's title. The link was kept as-is."
   ],
   "preserve": [
     {
