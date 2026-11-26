@@ -283,7 +283,9 @@ function patchIpcHandlersFile(ipcFilePath) {
     { from: "'Open workspaces'", to: "'打开多个工作区'" },
     { from: '"Open workspaces"', to: '"打开多个工作区"' },
     { from: "'Folder is on the Windows filesystem'", to: "'文件夹位于 Windows 文件系统上'" },
-    { from: '"Folder is on the Windows filesystem"', to: '"文件夹位于 Windows 文件系统上"' }
+    { from: '"Folder is on the Windows filesystem"', to: '"文件夹位于 Windows 文件系统上"' },
+    { from: "'Select Download Folder'", to: "'选择下载文件夹'" },
+    { from: '"Select Download Folder"', to: '"选择下载文件夹"' }
   ];
   for (const r of replacements) {
     content = content.split(r.from).join(r.to);

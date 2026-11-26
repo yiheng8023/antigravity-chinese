@@ -1870,3 +1870,23 @@ test('2.31 download approvals and voice cards distinguish controls from generate
   assert.equal(document.querySelector('[data-project-id]').textContent, 'Settings');
   assert.equal(document.querySelector('[data-testid="gcp-project-combobox-trigger"]').getAttribute('aria-label'), '展开或收起 Google Cloud 项目列表');
 });
+
+test('2.35.2 Google Drive link title warnings and /btw empty input prompt translate without touching user content', async t => {
+  const { document } = await fixture(t, `
+    <div role="alert" id="btw-hint">Enter a side question after /btw</div>
+    <div role="dialog" aria-labelledby="drive-title">
+      <h2 id="drive-title">Couldn't load Google Drive link title</h2>
+      <p id="drive-denied">You don't have access to this Google Drive file, so its title couldn't be added. The link was kept as-is.</p>
+      <p id="drive-timeout">Timed out fetching the Google Drive file's title. The link was kept as-is.</p>
+      <p id="drive-failed">Couldn't fetch the Google Drive file's title. The link was kept as-is.</p>
+    </div>
+    <div data-testid="user-input-step"><span>Enter a side question after /btw</span></div>
+    <pre><code>Couldn't load Google Drive link title</code></pre>`);
+  assert.equal(document.querySelector('#btw-hint').textContent, '请在 /btw 后输入旁路提问内容');
+  assert.equal(document.querySelector('#drive-title').textContent, '无法加载 Google Drive 链接标题');
+  assert.equal(document.querySelector('#drive-denied').textContent, '您没有权限访问此 Google Drive 文件，因此未能添加标题，链接已按原样保留。');
+  assert.equal(document.querySelector('#drive-timeout').textContent, '获取 Google Drive 文件标题超时，链接已按原样保留。');
+  assert.equal(document.querySelector('#drive-failed').textContent, '无法获取此 Google Drive 文件的标题，链接已按原样保留。');
+  assert.equal(document.querySelector('[data-testid="user-input-step"] span').textContent, 'Enter a side question after /btw');
+  assert.equal(document.querySelector('pre code').textContent, "Couldn't load Google Drive link title");
+});
