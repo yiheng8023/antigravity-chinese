@@ -725,6 +725,7 @@ function install(customPath) {
     if (fs.existsSync(tempUnpackedDir)) fs.rmSync(tempUnpackedDir, { recursive: true, force: true });
     
     // 带自动回滚的双阶段安全替换架构 (Two-Phase Staged Swap with Automatic Rollback)
+    const sourceAsarFp = getAsarFingerprint(asarPath);
     const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
     if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
 
@@ -770,8 +771,16 @@ function install(customPath) {
       const isLockedErr = lastError && (lastError.code === 'EBUSY' || lastError.code === 'EPERM');
       if (!customPath && isProtectedEnvironment() && isLockedErr && fs.existsSync(tempNewAsar)) {
         const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
+        const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
         if (fs.existsSync(stagedAsar)) fs.rmSync(stagedAsar, { force: true });
+        if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
         fs.renameSync(tempNewAsar, stagedAsar);
+        const stagedFp = getAsarFingerprint(stagedAsar);
+        fs.writeFileSync(stagedMetaPath, JSON.stringify({
+          sourceFingerprint: sourceAsarFp,
+          stagedFingerprint: stagedFp,
+          timestamp: Date.now()
+        }, null, 2), 'utf8');
         if (fs.existsSync(tempExtractDir)) fs.rmSync(tempExtractDir, { recursive: true, force: true });
 
         try {
@@ -805,8 +814,12 @@ function install(customPath) {
       try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
     }
     const residualStagedAsar = path.join(resourcesDir, 'app.asar.staged');
+    const residualStagedMeta = path.join(resourcesDir, 'app.asar.staged.meta.json');
     if (fs.existsSync(residualStagedAsar)) {
       try { fs.rmSync(residualStagedAsar, { force: true }); } catch (_) {}
+    }
+    if (fs.existsSync(residualStagedMeta)) {
+      try { fs.rmSync(residualStagedMeta, { force: true }); } catch (_) {}
     }
 
     // 写入汉化元数据指纹 (Hash/Manifest 根治架构)
@@ -861,6 +874,7 @@ function restore(customPath) {
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
   const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
   const stagedPath = path.join(resourcesDir, 'app.asar.staged');
+  const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
 
   if (!fs.existsSync(backupPath)) {
     console.error(`❌ 未找到安全备份文件: ${backupPath}，无法自动还原。`);
@@ -896,6 +910,7 @@ function restore(customPath) {
     if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
+    if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
     console.log('\n✅ 客户端版本安全保护完成，当前官方全新原生版本已完整保留！\n');
     return;
   }
@@ -907,6 +922,7 @@ function restore(customPath) {
     if (fs.existsSync(backupFpPath)) fs.rmSync(backupFpPath, { force: true });
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
+    if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
     console.log('✅ 已清理污染的历史备份，完整保留当前官方原生客户端。\n');
     return;
   }
@@ -944,6 +960,7 @@ function restore(customPath) {
     // 清除元数据与可能残留的预注入包
     if (fs.existsSync(metaPath)) fs.rmSync(metaPath, { force: true });
     if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
+    if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
 
     console.log('\n✅ ==============================================');
     console.log('✅ 已成功还原为官方原生英文版本！');
@@ -1181,13 +1198,96 @@ function uninstallPlugin() {
   }
 }
 
+/**
+ * 安全应用预构建的 app.asar.staged：
+ * 1. 先核验来源指纹与当前磁盘 app.asar 指纹一致，且 staged 自身指纹未被篡改；
+ *    若官方已升级（stale）则清理过期预注入包并保留新版 app.asar。
+ * 2. 交换或写入元数据失败时自动回滚至原 app.asar。
+ */
+function commitStagedSwap(asarPath, options = {}) {
+  const resourcesDir = path.dirname(asarPath);
+  const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
+  const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
+  const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
+  const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
+  const maxAttempts = typeof options.maxAttempts === 'number' ? options.maxAttempts : 10;
+  const retryDelayMs = typeof options.retryDelayMs === 'number' ? options.retryDelayMs : 150;
+
+  if (!fs.existsSync(stagedAsar)) return { status: 'missing' };
+
+  let stagedMeta = null;
+  try {
+    if (fs.existsSync(stagedMetaPath)) {
+      stagedMeta = JSON.parse(fs.readFileSync(stagedMetaPath, 'utf8'));
+    }
+  } catch (_) {}
+
+  const currentFp = fs.existsSync(asarPath) ? getAsarFingerprint(asarPath) : null;
+  const stagedFp = getAsarFingerprint(stagedAsar);
+  const validProvenance = !!(
+    stagedMeta &&
+    stagedMeta.sourceFingerprint &&
+    stagedMeta.stagedFingerprint &&
+    currentFp === stagedMeta.sourceFingerprint &&
+    stagedFp === stagedMeta.stagedFingerprint
+  );
+
+  if (!validProvenance) {
+    try { fs.rmSync(stagedAsar, { force: true }); } catch (_) {}
+    try { if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true }); } catch (_) {}
+    return { status: 'stale' };
+  }
+
+  let swappedOld = false;
+  let swappedStaged = false;
+  let lastErr = null;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    try {
+      if (!swappedOld && fs.existsSync(asarPath)) {
+        if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
+        fs.renameSync(asarPath, swapOldAsar);
+        swappedOld = true;
+      }
+      if (!swappedStaged) {
+        fs.renameSync(stagedAsar, asarPath);
+        swappedStaged = true;
+      }
+      if (typeof options.onBeforeWriteMeta === 'function') {
+        options.onBeforeWriteMeta(asarPath);
+      }
+      const newFp = getAsarFingerprint(asarPath);
+      fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newFp, timestamp: Date.now() }, null, 2), 'utf8');
+      if (fs.existsSync(swapOldAsar)) {
+        try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
+      }
+      if (fs.existsSync(stagedMetaPath)) {
+        try { fs.rmSync(stagedMetaPath, { force: true }); } catch (_) {}
+      }
+      return { status: 'applied' };
+    } catch (err) {
+      lastErr = err;
+      if (attempt < maxAttempts - 1) {
+        if (retryDelayMs > 0) {
+          try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, retryDelayMs); } catch (_) {}
+        }
+      } else {
+        if (swappedStaged && fs.existsSync(asarPath) && !fs.existsSync(stagedAsar)) {
+          try { fs.renameSync(asarPath, stagedAsar); swappedStaged = false; } catch (_) {}
+        }
+        if (swappedOld && !fs.existsSync(asarPath) && fs.existsSync(swapOldAsar)) {
+          try { fs.renameSync(swapOldAsar, asarPath); swappedOld = false; } catch (_) {}
+        }
+      }
+    }
+  }
+  return { status: 'error', error: lastErr };
+}
+
 function applyStagedWhenUnlocked(customPath) {
   const asarPath = findAsarPath(customPath);
   if (!asarPath) process.exit(0);
   const resourcesDir = path.dirname(asarPath);
   const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
-  const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
-  const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
 
   let ticks = 0;
   const maxTicks = 144000; // 最多静默守候 12 小时 (300ms * 144000)
@@ -1199,29 +1299,7 @@ function applyStagedWhenUnlocked(customPath) {
     }
     if (!isProcessRunning()) {
       clearInterval(timer);
-      let swapped = false;
-      for (let attempt = 0; attempt < 10; attempt++) {
-        try {
-          if (!swapped && fs.existsSync(asarPath)) {
-            if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
-            fs.renameSync(asarPath, swapOldAsar);
-            swapped = true;
-          }
-          fs.renameSync(stagedAsar, asarPath);
-          if (fs.existsSync(swapOldAsar)) {
-            try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
-          }
-          const newFp = getAsarFingerprint(asarPath);
-          fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newFp, timestamp: Date.now() }, null, 2), 'utf8');
-          break;
-        } catch (err) {
-          if (attempt < 9) {
-            try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 150); } catch (_) {}
-          } else if (swapped && !fs.existsSync(asarPath) && fs.existsSync(swapOldAsar)) {
-            try { fs.renameSync(swapOldAsar, asarPath); } catch (_) {}
-          }
-        }
-      }
+      commitStagedSwap(asarPath);
       process.exit(0);
     }
   }, 300);
@@ -1404,6 +1482,7 @@ module.exports = {
   tryRecoverSwappedAsar,
   isAsarPatched,
   getAsarFingerprint,
+  commitStagedSwap,
   runPreflightCheck,
   patchMenuFile,
   patchMainFile,

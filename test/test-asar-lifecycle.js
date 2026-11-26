@@ -265,6 +265,57 @@ contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
   assert(fs.existsSync(pluginMarker) && fs.readFileSync(pluginMarker, 'utf8') === pluginManifest,
     '指定 --path 的还原保持全局插件文件不变');
 
+  // 10. 【Staged 来源指纹防降级 & 写失败原子回滚】
+  console.log('\n📦 【阶段 7】验证 staged 来源指纹防降级与写元数据异常原子回滚...');
+  const { commitStagedSwap } = require('../cli');
+  const oldAsarForStaged = path.join(resourcesDir, 'app.asar.old-fixture');
+  fs.copyFileSync(asarPath, oldAsarForStaged);
+  const oldFp = getAsarFingerprint(oldAsarForStaged);
+
+  const origPreloadE = `"use strict";
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('api', { version: 'E_OFFICIAL_LATEST' });
+`;
+  fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadE, 'utf-8');
+  execSync(`${asarCli} pack "${mockSrcDir}" "${asarPath}"`, { stdio: 'ignore' });
+  const fpE = getAsarFingerprint(asarPath);
+  assert(oldFp !== fpE, '旧版与官方新版 E 指纹不同');
+
+  const stagedPath = path.join(resourcesDir, 'app.asar.staged');
+  const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
+
+  // 7a. 旧版预构建的 staged 面对官方升级后的新版 E，必须被判为 stale 且不覆盖 E
+  fs.copyFileSync(oldAsarForStaged, stagedPath);
+  fs.writeFileSync(stagedMetaPath, JSON.stringify({
+    sourceFingerprint: oldFp,
+    stagedFingerprint: getAsarFingerprint(stagedPath),
+    timestamp: Date.now()
+  }, null, 2), 'utf8');
+  fs.rmSync(oldAsarForStaged, { force: true });
+
+  const staleRes = commitStagedSwap(asarPath, { maxAttempts: 1, retryDelayMs: 0 });
+  assert(staleRes.status === 'stale', 'staged 与官方新版 E 指纹不匹配时返回 stale');
+  assert(!fs.existsSync(stagedPath) && !fs.existsSync(stagedMetaPath), '过期 staged 及元数据必须自动清理');
+  assert(getAsarFingerprint(asarPath) === fpE, '过期 staged 绝不覆盖官方新版 E');
+
+  // 7b. 来源指纹匹配的 staged 在写入元数据抛出异常时，必须自动原子回滚保留原包且不丢失 staged
+  fs.copyFileSync(asarPath, stagedPath);
+  fs.writeFileSync(stagedMetaPath, JSON.stringify({
+    sourceFingerprint: fpE,
+    stagedFingerprint: getAsarFingerprint(stagedPath),
+    timestamp: Date.now()
+  }, null, 2), 'utf8');
+  const errRes = commitStagedSwap(asarPath, {
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    onBeforeWriteMeta() { throw new Error('MOCK_DISK_WRITE_ERROR'); }
+  });
+  assert(errRes.status === 'error', '写元数据异常时返回 error 状态');
+  assert(getAsarFingerprint(asarPath) === fpE, '写入元数据异常时必须自动回滚保留原版 E');
+  assert(fs.existsSync(stagedPath), '失败回滚后 staged 保持完整不丢失');
+  if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
+  if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
+
 } finally {
   // 清理测试临时目录
   if (fs.existsSync(testDir)) {
