@@ -89,3 +89,8 @@
 
 - 核对本机 Windows x64 2.35.2 的语言服务器内嵌 Swarm 资源，确认蜂巢视图、提及视图、GIF 导出及预览中有可独立识别的固定控件，成员等待与终止说明来自渲染器的状态标签。原版 Swarm `index.html` 的 SHA-256 为 `212e8efc0472ae91537c919fb503490c7bcd4a9e18a28dad80602f7a9cfd72fb`。感谢 mitang-ai 提供这些控件的译文和回归用例。[PR #14](https://github.com/yiheng8023/antigravity-chinese/pull/14)
 - 沿用独立 Swarm 面板的词库和加载范围。回归覆盖标签、读屏文案、导出中状态、节点移动后的原文恢复，以及成员名、消息正文、图片地址和控件状态的保留。全套测试通过。用 2.35.2 安装副本提取实际注入的脚本，在原版 Swarm HTML 上核对导出与预览标签，并验证原包还原和 377 个外置文件。本轮界面验证范围为原版资源与模拟 DOM。
+
+### Google Drive 提示、旁路提问与下载目录
+
+- 2026-11-27 复核官方 2.35.2 日志，确认该版本修复了会话运行期间无法为 `/btw` 或后续消息切换模型的问题。本次补译对应的是使用 `/btw` 却未输入问题时的提示，以及 Google Drive 链接标题加载失败时的四条文案。五条前端文案均列入同一份 Windows x64 源码清单。[官方更新日志](https://antigravity.google/docs/changelog?tab=hub) · [文案清单](../../test/fixtures/app-2.35.2-ui.json)
+- 下载目录选择框标题来自桌面主进程的 `ipcHandlers.js`。Windows x64 2.35.2 官方包副本验证了标题替换、安装、重复安装和还原。还原包与原包的 SHA-256 一致，377 个外置文件通过核验。本地全套回归和前端源码清单审计通过，界面显示待实机确认。感谢 mitang-ai 提供这几处译文和回归用例。[PR #26](https://github.com/yiheng8023/antigravity-chinese/pull/26)
