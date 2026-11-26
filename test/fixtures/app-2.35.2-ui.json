@@ -3,7 +3,7 @@
     "version": "Antigravity App 2.35.2",
     "platform": "Windows x64",
     "sha256": "494f0599aa61a7fa97eea7d5d7ab6cd14ddf05866a0bfb0c709a2d75ddfcb58c",
-    "scope": "Model selector notes, site information, downloads, and the browser context menu. DOM tests cover the composed model and site labels, conversation summaries and user-message timestamps."
+    "scope": "Model selector notes, site information, downloads, the browser context menu, Google Drive link title warnings, and the prompt shown when /btw is used without a question. DOM tests cover the composed model and site labels, conversation summaries and user-message timestamps."
   },
   "ui": [
     "Applies to /btw and messages sent after this turn",
