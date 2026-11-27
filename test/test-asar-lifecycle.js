@@ -474,6 +474,158 @@ contextBridge.exposeInMainWorld('api', { version: 'RACE_B_UNPACKED_IDENTICAL' })
   assert(brokenStagedChildRes.status === 1, '子进程执行 applyStagedOnce 遇错误时以退出码 1 结束');
   assert(getAsarFingerprint(asarPath) === fpRaceA && fs.readFileSync(formalMetaPath, 'utf8') === priorFormalMeta, '子进程失败后仍保持原包与旧元数据完整');
 
+  // 7f. 两次改名间隙官方新版 B 到达：直装（含第二次改名抛 EBUSY）与 staged（含元数据提交失败）均不得覆盖或删除 B
+  // 7f-1: 直装在第一次改名 (A -> swap-old) 后、第二次改名前官方写入 B，必须中止并完整保留 B
+  fs.rmSync(stagedPath, { force: true });
+  fs.rmSync(stagedMetaPath, { force: true });
+  fs.copyFileSync(raceAAsar, asarPath);
+  const directBetweenRenames = install(testDir, {
+    returnStatus: true,
+    throwOnConflict: true,
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    onBeforePlacePatched() {
+      fs.copyFileSync(raceBAsar, asarPath);
+    }
+  });
+  assert(directBetweenRenames.status === 'aborted_upstream_update', '直装两次改名间隙到达官方新版 B 必须中止');
+  assert(getAsarFingerprint(asarPath) === fpRaceB, '直装两次改名间隙到达 B 后正式路径必须完整保留 B');
+  assert(!fs.existsSync(swapOldPath7) && !fs.existsSync(path.join(resourcesDir, 'app.asar.new')) && !fs.existsSync(stagedPath), '直装间隙遇 B 中止后不残留 swap-old / app.asar.new / staged');
+
+  // 7f-2: 直装在第二次改名期间官方写入 B 并触发 EBUSY，回滚绝不能删掉正式路径的 B 或把 A 放回
+  fs.copyFileSync(raceAAsar, asarPath);
+  const directBetweenEbusy = install(testDir, {
+    returnStatus: true,
+    throwOnConflict: true,
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    fsOps: {
+      writeFileSync: fs.writeFileSync.bind(fs),
+      renameSync(from, to) {
+        if (to === asarPath && from.endsWith('app.asar.new')) {
+          fs.copyFileSync(raceBAsar, asarPath);
+          const e = new Error('MOCK_EBUSY_WITH_UPSTREAM_B'); e.code = 'EBUSY'; throw e;
+        }
+        return fs.renameSync(from, to);
+      }
+    }
+  });
+  assert(directBetweenEbusy.status === 'aborted_upstream_update', '直装第二次改名返回 EBUSY 且新版 B 已在位时必须中止');
+  assert(getAsarFingerprint(asarPath) === fpRaceB, '直装 EBUSY 回滚绝不能删除新版 B 或放回 A');
+  assert(!fs.existsSync(swapOldPath7) && !fs.existsSync(path.join(resourcesDir, 'app.asar.new')), '直装保护 B 后清理属于旧包的暂存文件');
+
+  // 7f-3: staged 在两次改名之间官方写入 B 并抛 EBUSY，必须保留 B 且判 stale
+  fs.copyFileSync(raceAAsar, asarPath);
+  fs.copyFileSync(patchedDummyAsar, stagedPath);
+  fs.writeFileSync(stagedMetaPath, JSON.stringify({
+    sourceFingerprint: fpRaceA,
+    stagedFingerprint: fpPatchedDummy,
+    timestamp: Date.now()
+  }, null, 2), 'utf8');
+  const stagedBetweenEbusy = commitStagedSwap(asarPath, {
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    fsOps: {
+      writeFileSync: fs.writeFileSync.bind(fs),
+      renameSync(from, to) {
+        if (from === stagedPath && to === asarPath) {
+          fs.copyFileSync(raceBAsar, asarPath);
+          const e = new Error('MOCK_STAGED_EBUSY_WITH_B'); e.code = 'EBUSY'; throw e;
+        }
+        return fs.renameSync(from, to);
+      }
+    }
+  });
+  assert(stagedBetweenEbusy.status === 'stale', 'staged 两次改名间隙到达 B 且遇 EBUSY 时应判 stale');
+  assert(getAsarFingerprint(asarPath) === fpRaceB && !fs.existsSync(stagedPath) && !fs.existsSync(swapOldPath7), 'staged 间隙遇 B 必须保留 B 并清理过期 staged 与 swap-old');
+
+  // 7f-4: staged 置入补丁后、写元数据失败同时官方写入全新 C 覆盖正式路径，回滚不得移走 C 降级为 A
+  const raceCAsar = path.join(resourcesDir, 'app.asar.raceC');
+  fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), '"use strict";\n// RACE_C_LATEST\n', 'utf-8');
+  execSync(`${asarCli} pack "${mockSrcDir}" "${raceCAsar}"`, { stdio: 'ignore' });
+  const fpRaceC = getAsarFingerprint(raceCAsar);
+  fs.copyFileSync(raceAAsar, asarPath);
+  fs.copyFileSync(patchedDummyAsar, stagedPath);
+  fs.writeFileSync(stagedMetaPath, JSON.stringify({
+    sourceFingerprint: fpRaceA,
+    stagedFingerprint: fpPatchedDummy,
+    timestamp: Date.now()
+  }, null, 2), 'utf8');
+  fs.writeFileSync(formalMetaPath, priorFormalMeta, 'utf8');
+  const stagedMetaRaceC = commitStagedSwap(asarPath, {
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    fsOps: {
+      renameSync: fs.renameSync.bind(fs),
+      writeFileSync() {
+        fs.copyFileSync(raceCAsar, asarPath);
+        const e = new Error('MOCK_ENOSPC_WITH_RACE_C'); e.code = 'ENOSPC'; throw e;
+      }
+    }
+  });
+  assert(stagedMetaRaceC.status === 'stale', 'staged 元数据失败同时外部写入 C 时必须判 stale 保护 C');
+  assert(getAsarFingerprint(asarPath) === fpRaceC && !fs.existsSync(swapOldPath7), 'staged 元数据故障回滚绝不移走非己所有的官方新版 C');
+  assert(fs.readFileSync(formalMetaPath, 'utf8') === priorFormalMeta, '旧正式元数据完好保留');
+  fs.rmSync(raceCAsar, { force: true });
+
+  // 7g. 直装元数据 ENOSPC 原子提交：ASAR 与元数据一起回滚，不留混合状态，逐文件核对
+  fs.copyFileSync(raceAAsar, asarPath);
+  fs.writeFileSync(formalMetaPath, priorFormalMeta, 'utf8');
+  const bakBeforeDirectEnospc = fs.readFileSync(backupPath);
+  const directEnospcRes = install(testDir, {
+    returnStatus: true,
+    throwOnConflict: true,
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    fsOps: {
+      renameSync: fs.renameSync.bind(fs),
+      writeFileSync(target, content, enc) {
+        fs.writeFileSync(target, String(content).slice(0, 10), enc);
+        const e = new Error('MOCK_DIRECT_META_ENOSPC'); e.code = 'ENOSPC'; throw e;
+      }
+    }
+  });
+  assert(directEnospcRes.status === 'error' && directEnospcRes.rollbackErrors.length === 0, '直装元数据 ENOSPC 返回 error 且两步 ASAR 回滚干净');
+  assert(getAsarFingerprint(asarPath) === fpRaceA, '直装元数据 ENOSPC 后正式路径已完整回滚回原包 A（无混合态）');
+  assert(fs.readFileSync(formalMetaPath, 'utf8') === priorFormalMeta, '直装元数据 ENOSPC 后旧正式元数据逐字完好');
+  assert(!fs.existsSync(swapOldPath7) && !fs.existsSync(path.join(resourcesDir, 'app.asar.new')), '直装回滚完成后不残留 swap-old 与 app.asar.new');
+  assert(fs.readFileSync(backupPath).equals(bakBeforeDirectEnospc), '直装 ENOSPC 故障后 .bak 保持原样');
+
+  // 7h. >30 MiB 大包隔离快照重复安装回归：补丁标记位于前 30 MiB 之外时，重复安装绝不能覆盖 .bak，且能 100% 还原官方原包
+  const largeDir = path.join(testDir, 'large_asar_fixture');
+  const largeResDir = path.join(largeDir, 'resources');
+  const largeSrcDir = path.join(largeDir, 'src');
+  const largeAsarPath = path.join(largeResDir, 'app.asar');
+  const largeBakPath = path.join(largeResDir, 'app.asar.bak');
+  const largeMetaPath = path.join(largeResDir, '.antigravity_chinese_meta.json');
+  fs.mkdirSync(path.join(largeSrcDir, 'dist'), { recursive: true });
+  fs.mkdirSync(largeResDir, { recursive: true });
+  // 写入 31 MiB 填充文件（字典序排在 dist/ 之前，将 dist/preload.js 推到 >31 MiB 物理偏移处）
+  fs.writeFileSync(path.join(largeSrcDir, 'aaa_padding_31mb.bin'), Buffer.alloc(31 * 1024 * 1024, 0x41));
+  fs.writeFileSync(path.join(largeSrcDir, 'dist', 'preload.js'), origPreloadA, 'utf-8');
+  execSync(`${asarCli} pack "${largeSrcDir}" "${largeAsarPath}"`, { stdio: 'ignore' });
+  const largeOrigFp = getAsarFingerprint(largeAsarPath);
+
+  install(largeDir, { throwOnConflict: true });
+  assert(fs.existsSync(largeBakPath) && getAsarFingerprint(largeBakPath) === largeOrigFp, '大包首次安装正确保存原始官方 .bak');
+  const patchedLargeBuf = fs.readFileSync(largeAsarPath);
+  const sigPos = patchedLargeBuf.indexOf(Buffer.from('Antigravity Chinese Localization Injection'));
+  assert(sigPos > 30 * 1024 * 1024, `大包补丁标记确实位于前 30 MiB 之外 (offset=${sigPos})`);
+
+  // 二次重复安装（携带正式元数据）：快照必须通过正式元数据与大包索引准确识别已打补丁，绝不覆盖 .bak
+  install(largeDir, { throwOnConflict: true });
+  assert(getAsarFingerprint(largeBakPath) === largeOrigFp, '大包重复安装（含正式元数据）绝不覆盖官方原版 .bak');
+
+  // 删除正式元数据后再次重复安装：大包索引提取 dist/preload.js 仍精准识别已打补丁，绝不覆盖 .bak
+  if (fs.existsSync(largeMetaPath)) fs.rmSync(largeMetaPath, { force: true });
+  install(largeDir, { throwOnConflict: true });
+  assert(getAsarFingerprint(largeBakPath) === largeOrigFp, '大包缺失正式元数据重复安装仍精准识别已打补丁，绝不覆盖 .bak');
+
+  // 还原并验证与原始 >31 MiB 官方大包指纹 100% 一致
+  execSync(`node "${cliPath}" restore --path "${largeDir}"`, { stdio: 'ignore' });
+  assert(!isAsarPatched(largeAsarPath) && getAsarFingerprint(largeAsarPath) === largeOrigFp, '大包重复安装后执行 restore 100% 还原为官方原版');
+  fs.rmSync(largeDir, { recursive: true, force: true });
+
   for (const cleanup of [stagedPath, stagedMetaPath, formalMetaPath, raceAAsar, raceBAsar, patchedDummyAsar, swapOldPath7]) {
     if (fs.existsSync(cleanup)) fs.rmSync(cleanup, { force: true });
   }
