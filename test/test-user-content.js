@@ -869,12 +869,12 @@ test('builtin slash command descriptions follow verified SYSTEM provenance, prot
   assert.equal(pluginDesc.textContent, planSrc);
   assert.equal(rtlDesc.textContent, 'Before');
 
-  // 1. 输入搜索词：描述被拆分成 3 个高亮 <span>，观察器重算整行并保留高亮关键词位置
+  // 1. 输入搜索词：无法映射英文高亮词（如 task）时保留带高亮原文不清空高亮文本；可精确保留英文关键词（如 Boost）时重排译文
   planDesc.innerHTML = '<span>Plan carefully before executing a </span><span class="hl">task</span><span>.</span>';
   boostDesc.innerHTML = '<span>Invoke the </span><span class="hl">Boost</span><span> multi-agent orchestrator for complex tasks.</span>';
   await settle(window);
-  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
-  assert.equal(planDesc.querySelectorAll('span').length, 3);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.querySelector('span.hl').textContent, 'task');
   assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
   assert.equal(boostDesc.querySelector('span.hl').textContent, 'Boost');
 
@@ -885,11 +885,20 @@ test('builtin slash command descriptions follow verified SYSTEM provenance, prot
   assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
   assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
 
-  // 3. 若节点被复用为同名自定义技能（recipe），立即还原回原文
+  // 3. 单独切换 dir="rtl"（保留原说明节点及内容不变）时，立即恢复原文；切回 dir="auto" 后重新翻译
+  planDesc.setAttribute('dir', 'rtl');
+  await settle(window);
+  assert.equal(planDesc.textContent, planSrc);
+  planDesc.setAttribute('dir', 'auto');
+  await settle(window);
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+
+  // 4. 菜单复用同一说明节点及文本节点本身不变、仅替换标签与 Fiber 来源为自定义技能（recipe）时，立即还原回原文
+  const planDescTextNode = planDesc.firstChild;
   document.querySelector('#opt-plan [data-testid="menu-option-label"]').textContent = 'my-skill';
   planRowFiber.memoizedProps.item = makeRecipeSkill('my-skill', planSrc);
-  planDesc.textContent = planSrc;
   await settle(window);
+  assert.equal(planDesc.firstChild, planDescTextNode);
   assert.equal(planDesc.textContent, planSrc);
   assert.equal(rtlDesc.textContent, 'Before');
 });

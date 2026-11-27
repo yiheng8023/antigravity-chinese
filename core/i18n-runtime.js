@@ -1137,20 +1137,24 @@
     }
 
     var menuTrans = entry.translation;
-    if (menuTextNodes.length === 3) {
-      var midSrc = (textEdits.get(menuTextNodes[1])?.source ?? menuTextNodes[1].nodeValue);
-      var hitIdx = midSrc ? menuTrans.indexOf(midSrc) : -1;
-      if (hitIdx !== -1 && midSrc.trim()) {
-        writeLocalizedText(menuTextNodes[0], menuTrans.slice(0, hitIdx), 'builtin-slash-description');
-        writeLocalizedText(menuTextNodes[1], midSrc, 'builtin-slash-description');
-        writeLocalizedText(menuTextNodes[2], menuTrans.slice(hitIdx + midSrc.length), 'builtin-slash-description');
-        return true;
+    if (menuTextNodes.length > 1) {
+      if (menuTextNodes.length === 3) {
+        var midSrc = (textEdits.get(menuTextNodes[1])?.source ?? menuTextNodes[1].nodeValue);
+        var hitIdx = midSrc && midSrc.trim() ? menuTrans.indexOf(midSrc) : -1;
+        if (hitIdx !== -1) {
+          writeLocalizedText(menuTextNodes[0], menuTrans.slice(0, hitIdx), 'builtin-slash-description');
+          writeLocalizedText(menuTextNodes[1], midSrc, 'builtin-slash-description');
+          writeLocalizedText(menuTextNodes[2], menuTrans.slice(hitIdx + midSrc.length), 'builtin-slash-description');
+          return true;
+        }
       }
+      // 无法将搜索高亮片段可靠映射到译文时，保留带高亮的原文，清空搜索恢复单文本节点后再译回中文
+      if (hadEdit) {
+        for (var h = 0; h < menuTextNodes.length; h++) restoreLocalizedText(menuTextNodes[h]);
+      }
+      return true;
     }
     writeLocalizedText(menuTextNodes[0], menuTrans, 'builtin-slash-description');
-    for (var k = 1; k < menuTextNodes.length; k++) {
-      writeLocalizedText(menuTextNodes[k], '', 'builtin-slash-description');
-    }
     return true;
   }
 
@@ -1432,7 +1436,7 @@
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class')
+        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class', 'dir')
       });
       observing = true;
     }
@@ -1587,6 +1591,25 @@
     }
   }
 
+  function enqueueMenuOptionDependents(target) {
+    var el = target && target.nodeType === 3 ? target.parentElement : target;
+    if (!el || !el.closest) return;
+    var menuDesc = el.closest('[data-testid="menu-option-description"]');
+    if (menuDesc) {
+      menuDesc._agyScanId = 0;
+      enqueueNode(menuDesc);
+      return;
+    }
+    var optRow = el.closest('[data-mention-menu] [role="option"]');
+    if (optRow && (el.closest('[data-testid="menu-option-label"]') || el === optRow)) {
+      var siblingDesc = optRow.querySelector('[data-testid="menu-option-description"]');
+      if (siblingDesc) {
+        siblingDesc._agyScanId = 0;
+        enqueueNode(siblingDesc);
+      }
+    }
+  }
+
   function recordMutations(mutations) {
     // A SPA route can reuse an unchanged breadcrumb node with a different role.
     if (doc.location.pathname !== observedDocumentPath) {
@@ -1598,13 +1621,7 @@
       var mutation = mutations[i];
       if (mutation.type === 'childList') {
         enqueuePermissionPresetDependents(mutation.target);
-        var menuDescTarget = mutation.target && mutation.target.closest
-          ? mutation.target.closest('[data-testid="menu-option-description"]:not([dir="rtl"])')
-          : null;
-        if (menuDescTarget) {
-          menuDescTarget._agyScanId = 0;
-          enqueueNode(menuDescTarget);
-        }
+        enqueueMenuOptionDependents(mutation.target);
         var added = mutation.addedNodes;
         for (var j = 0; j < added.length; j++) {
           var child = added[j];
@@ -1618,12 +1635,11 @@
         // Writes made while observing belong to the renderer, even when the value is unchanged.
         textEdits.delete(mutation.target);
         mutation.target._agyOriginal = undefined;
-        var menuCharParent = mutation.target.parentElement && mutation.target.parentElement.closest
-          ? mutation.target.parentElement.closest('[data-testid="menu-option-description"]:not([dir="rtl"])')
-          : null;
-        if (menuCharParent) {
-          menuCharParent._agyScanId = 0;
-          enqueueNode(menuCharParent);
+        var parentEl = mutation.target.parentElement;
+        if (parentEl && parentEl.closest &&
+            (parentEl.closest('[data-testid="menu-option-description"]') ||
+             parentEl.closest('[data-mention-menu] [data-testid="menu-option-label"]'))) {
+          enqueueMenuOptionDependents(parentEl);
         } else {
           enqueueNode(mutation.target);
         }
