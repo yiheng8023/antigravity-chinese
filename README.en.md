@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.65** targets **Antigravity App 2.35.2 / VS Code extension 1.13.0**. This release localizes site information, downloads, and the built-in browser context menu. It restores Chinese work durations, tool summaries, and message timestamps, and adds the model selection notices.
+Source version **v3.3.66** targets **Antigravity App 2.35.2 / VS Code extension 1.13.0**. This update localizes Free and Ultra account notices, side questions, Swarm, Google Drive messages, and the download folder dialog. It also fixes panel loading over Remote SSH and improves extension discovery on Linux.
 
 This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.35.0 maintenance record](docs/maintenance/antigravity-2.35.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 

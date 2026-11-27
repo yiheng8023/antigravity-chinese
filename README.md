@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-当前源码版本 **v3.3.65**，维护目标为 **Antigravity App 2.35.2 / VS Code 扩展 1.13.0**。本版补译内置浏览器的网站信息、下载和右键菜单，恢复会话运行耗时、工具摘要与消息时间戳的中文显示，并补齐模型选择提示。
+当前源码版本 **v3.3.66**，维护目标为 **Antigravity App 2.35.2 / VS Code 扩展 1.13.0**。本版补齐免费和 Ultra 账户提示、旁路提问、Swarm、Google Drive 与下载目录文案，并修复 Remote SSH 的面板加载及 Linux 的扩展目录探测。
 
 这是社区开源项目，提供桌面客户端与 VS Code 扩展的本地中文补丁、备份还原，以及可选的中文交互插件。Google 官方及合作伙伴目录中已核实的短介绍，在市场、精选、已安装、详情和设置中复用同一译文。插件名、发布者提供的命令与技能说明、自定义内容和未匹配的完整字段按原文显示。界面与安装验证见 [2.35.0 维护记录](docs/maintenance/antigravity-2.35.0.md)。Linux 便携路径支持见 [Linux 便携安装维护记录](docs/maintenance/linux-portable-install.md)。
 

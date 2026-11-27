@@ -13,6 +13,9 @@ async function fixture(t) {
   t.after(() => dom.window.close());
   const window = dom.window;
   const frames = [];
+  // Charge work against the frame budget independently of CI runner load.
+  let clock = 0;
+  Object.defineProperty(window.performance, 'now', { value: () => clock += 0.01 });
   window.requestAnimationFrame = cb => frames.push(cb);
   window.setInterval = () => 0;
   window.__AGY_I18N_DATA__ = {
@@ -82,9 +85,7 @@ test('one large remounted subtree is split across frames and still protects auth
 });
 
 test('a newly opened settings sidebar runs ahead of an older scan within the frame budget', async t => {
-  const { window, document, frame, drain } = await fixture(t);
-  let clock = 0;
-  Object.defineProperty(window.performance, 'now', { value: () => clock += 0.01 });
+  const { document, frame, drain } = await fixture(t);
   const background = document.createElement('div');
   background.innerHTML = '<span>Settings</span>'.repeat(1200);
   document.body.appendChild(background);

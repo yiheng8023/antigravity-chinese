@@ -91,6 +91,77 @@ test('2.35 sentence case setting titles and split plan labels localize without c
   assert.equal(document.querySelector('[data-testid="user-input-step"]').textContent, 'Prevent sleep');
 });
 
+test('2.35.2 localizes the shared free-tier quota notice only in its UI', async t => {
+  const source = 'Free users and Google AI Plus users receive the minimum base limits on Antigravity. You can upgrade to Google AI Pro or above to receive higher rate limits.';
+  const translated = '免费用户和 Google AI Plus 用户适用 Antigravity 的最低基础额度。升级至 Google AI Pro 或更高档位可提高请求速率上限。';
+  const changed = source.replace('Google AI Plus', 'another plan');
+  const { document } = await fixture(t, `
+    <div class="settings-modal-container">
+      <div id="plan" class="font-medium">Your plan: Antigravity Starter Quota</div>
+      <span id="account-notice" class="text-sm text-muted-foreground whitespace-pre-wrap">${source}</span>
+    </div>
+    <div data-testid="model-selector-panel">
+      <div class="sticky bottom-0"><div class="text-secondary-foreground">
+        <span id="menu-notice">${source}</span>
+        <span id="changed">${changed}</span>
+        <a href="https://example.com/plans">View plans</a>
+      </div></div>
+    </div>
+    <div id="ordinary"><span>${source}</span></div>
+    <div data-testid="user-input-step">${source}</div>`);
+  const text = selector => document.querySelector(selector).textContent;
+  assert.equal(text('#account-notice'), translated);
+  assert.equal(text('#menu-notice'), translated);
+  assert.equal(text('#plan'), '当前方案：Antigravity Starter Quota');
+  assert.equal(text('#changed'), changed);
+  assert.equal(text('#ordinary'), source);
+  assert.equal(text('[data-testid="user-input-step"]'), source);
+  assert.equal(document.querySelector('[data-testid="model-selector-panel"] a').getAttribute('href'), 'https://example.com/plans');
+});
+
+test('2.35.2 localizes Ultra settings without changing the plan, credits balance or account controls', async t => {
+  const notice = 'You can upgrade to a higher Google AI Ultra plan to receive the highest rate limits.';
+  const description = 'Permanently delete your remote conversations, projects, scheduled tasks, connected plugins and settings. Data in the desktop app and your Google account are not affected.';
+  const { document, window } = await fixture(t, `
+    <div class="settings-modal-container">
+      <span class="font-medium">Your plan: Google AI Ultra</span>
+      <span id="account-notice" class="text-sm text-muted-foreground whitespace-pre-wrap">${notice}</span>
+      <div><div><div><span id="balance">Available AI credits: 1,250.50</span></div></div>
+        <div class="shrink-0"><a href="https://antigravity.google/g1-credits?example">Get More AI Credits</a></div>
+      </div>
+      <div data-testid="orchestrator-mode">
+        <span>Model selection</span>
+        <span>Default uses server-managed routing and Orchestrator quota. Custom pins specific models for orchestration and execution.</span>
+        <div role="radiogroup" aria-label="Orchestrator model selection">
+          <button role="radio" aria-checked="true" data-value="default">Default</button>
+          <button role="radio" aria-checked="false" data-value="custom">Custom</button>
+        </div>
+      </div>
+      <div id="remote-data">
+        <span>Delete all Remote Agents data</span><span>${description}</span>
+        <button data-testid="delete-all-user-data-button" disabled>Delete All Data</button>
+      </div>
+    </div>
+    <div id="outside">${notice}</div>`);
+  const get = id => document.getElementById(id);
+  assert.equal(document.querySelector('.font-medium').textContent, '当前方案：Google AI Ultra');
+  assert.equal(get('account-notice').textContent, '你可以升级至更高档位的 Google AI Ultra 方案，获得最高的请求速率上限。');
+  assert.equal(get('outside').textContent, notice);
+  assert.equal(get('balance').textContent, '可用 AI 积分：1,250.50');
+  assert.equal(document.querySelector('a').getAttribute('href'), 'https://antigravity.google/g1-credits?example');
+  assert.equal(document.querySelector('[role="radiogroup"]').getAttribute('aria-label'), '编排器模型选择');
+  assert.equal(document.querySelector('[data-value="default"]').getAttribute('aria-checked'), 'true');
+  assert.equal(document.querySelector('[data-value="custom"]').getAttribute('aria-checked'), 'false');
+  assert.equal(document.querySelector('[data-testid="orchestrator-mode"] > span').textContent, '模型选择');
+  assert.match(document.querySelector('[data-testid="orchestrator-mode"] > span:nth-child(2)').textContent, /^默认模式由服务器分配模型/);
+  assert.equal(get('remote-data').firstElementChild.textContent, '删除所有远程智能体数据');
+  assert.match(get('remote-data').children[1].textContent, /^永久删除你的远程会话/);
+  assert.equal(get('remote-data').lastElementChild.disabled, true);
+  get('balance').firstChild.data = 'Available AI credits: 950';
+  await settle(window);
+  assert.equal(get('balance').textContent, '可用 AI 积分：950');
+});
+
 test('2.35 queued status and locked permission labels translate without changing task names', async t => {
   const { document, window } = await fixture(t, `
     <button data-testid="permissions-selector-trigger" aria-disabled="true"
@@ -567,6 +638,13 @@ test('2.35 side question drafts translate without rewriting submitted titles or 
         <span>High</span>
         <div class="bg-secondary opacity-70 flex items-center gap-1 rounded-full px-1.5 text-sm"><span id="model-tag">New</span></div>
       </span></button>
+      <button data-testid="model-selector-orchestrator" data-model-label="Orchestrator">
+        <span>Orchestrator</span>
+        <span data-testid="model-selector-orchestrator-model">Gemini 4 Neon Extra High</span>
+        <div class="bg-secondary opacity-70 flex items-center gap-1 rounded-full px-1.5 text-sm"><span id="orchestrator-badge">New</span></div>
+      </button>
+      <button data-testid="orchestrator-picker-default">Default (Gemini Pro)</button>
+      <button data-testid="orchestrator-picker-row" data-model-label="Settings">Settings</button>
     </div>
     <button id="action">New</button>`);
   const get = id => document.getElementById(id);
@@ -578,10 +656,65 @@ test('2.35 side question drafts translate without rewriting submitted titles or 
   assert.equal(get('name').textContent, 'Settings');
   assert.equal(document.querySelector('[data-testid="side-question-tab-empty"] span').textContent, '发起旁路提问，不打断主会话');
   assert.equal(get('model-tag').textContent, 'New');
+  assert.equal(get('orchestrator-badge').textContent, 'New');
+  assert.equal(document.querySelector('[data-testid="model-selector-orchestrator-model"]').textContent, 'Gemini 4 Neon Extra High');
+  assert.equal(document.querySelector('[data-testid="orchestrator-picker-default"]').textContent, '默认（Gemini Pro）');
+  assert.equal(document.querySelector('[data-testid="orchestrator-picker-row"]').textContent, 'Settings');
   assert.equal(get('action').textContent, '新建');
   get('model-tag').textContent = 'New';
   await settle(window);
   assert.equal(get('model-tag').textContent, 'New');
+});
+
+test('2.35.2 active side question chrome translates with original quotes and controls', async t => {
+  const pending = 'Cannot continue as a new conversation while side question is running';
+  const { document, window } = await fixture(t, `
+    <div role="tooltip" id="promote-tip">${pending}</div>
+    <div role="tooltip" id="stop-tip">Stop Side Question</div>
+    <button data-testid="side-question-tab-promote" disabled aria-label="Continue as a new conversation"></button>
+    <button data-testid="side-question-tab-stop" aria-label="Stop side question"></button>
+    <div data-testid="side-question-tab-conversation">
+      <div data-testid="user-input-step">
+        <button class="agy-user-bubble-header" data-testid="side-question-origin" title="Started during “Settings”"
+          aria-label="Started during “Settings”. Show in main conversation">
+          <span class="shrink-0">Started during</span>
+          <span class="min-w-0 flex-1 truncate text-secondary-foreground">“Settings”</span>
+          <span class="shrink-0 font-medium text-secondary-foreground">Show</span>
+        </button>
+        <span id="user-message">Show</span>
+      </div>
+      <button data-testid="tool-group-collapsible">
+        <span>Running review</span><span data-testid="tool-group-elapsed" data-screenshot-volatile>4m 47s</span>
+      </button>
+      <li data-testid="step-plan-item" data-status="in_progress">
+        <span class="min-w-0 truncate text-base" title="Settings">Settings</span><span>In progress</span>
+      </li>
+    </div>`);
+  const button = document.querySelector('[data-testid="side-question-origin"]');
+  assert.equal(document.getElementById('promote-tip').textContent, '旁路提问运行期间无法在新会话中继续');
+  assert.equal(document.getElementById('stop-tip').textContent, '停止旁路提问');
+  assert.equal(document.querySelector('[data-testid="side-question-tab-promote"]').disabled, true);
+  assert.equal(document.querySelector('[data-testid="side-question-tab-promote"]').getAttribute('aria-label'), '在新会话中继续');
+  assert.equal(document.querySelector('[data-testid="side-question-tab-stop"]').getAttribute('aria-label'), '停止旁路提问');
+  assert.deepEqual([...button.children].map(el => el.textContent), ['发起于', '“Settings”', '查看']);
+  assert.equal(button.title, '发起于“Settings”');
+  assert.equal(button.getAttribute('aria-label'), '发起于“Settings”。在主会话中查看');
+  assert.equal(document.getElementById('user-message').textContent, 'Show');
+  assert.equal(document.querySelector('[data-testid="tool-group-collapsible"] > span').textContent, 'Running review');
+  assert.equal(document.querySelector('[data-testid="tool-group-elapsed"]').textContent, '4 分钟 47 秒');
+  const step = document.querySelector('[data-testid="step-plan-item"]');
+  assert.equal(step.dataset.status, 'in_progress');
+  assert.equal(step.firstElementChild.textContent, 'Settings');
+  assert.equal(step.firstElementChild.title, 'Settings');
+  assert.equal(step.lastElementChild.textContent, '进行中');
+  button.title = 'Started from the subagent conversation';
+  button.setAttribute('aria-label', 'Started from the subagent conversation. Show in subagent conversation');
+  button.children[0].firstChild.data = 'Started from';
+  button.children[1].firstChild.data = 'the subagent conversation';
+  await settle(window);
+  assert.deepEqual([...button.children].map(el => el.textContent), ['来源于', '子智能体会话', '查看']);
+  assert.equal(button.title, '来源于子智能体会话');
+  assert.equal(button.getAttribute('aria-label'), '来源于子智能体会话。在子智能体会话中查看');
 });
 
 async function fixture(t, html, options = {}) {
