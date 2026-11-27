@@ -4,6 +4,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const http = require('http');
+const net = require('net');
 const crypto = require('crypto');
 const zlib = require('zlib');
 const { spawnSync, execFileSync } = require('child_process');
@@ -602,6 +603,124 @@ test('the webview proxy decodes Brotli HTML before injecting the runtime', async
   assert.match(result.body, /<body>Settings<\/body>/);
   assert.match(result.body, /window.injected = true/);
   assert.equal(result.headers['content-encoding'], undefined);
+});
+
+test('Remote SSH renders the forwarded proxy URL and keeps the backend reachable', async (t) => {
+  const dir = tempDir(t);
+  extension(dir, '1.13.0');
+  const source = `
+    const v = require('vscode');
+    const wrap = value => value;
+    async function resolveServer(a, b) {
+      return {effectiveUrl:wrap(await wrap(v.env.asExternalUri(v.Uri.parse(a)))).toString().replace(/\\/$/, ""),humanReadable:b};
+    }
+    class View {
+      renderWebviewHtml(a,b,c,d) { Object.assign(a, { serverUrl: b, iframe: c }); }
+    }
+    exports.render = async raw => {
+      const {effectiveUrl} = await resolveServer(raw, 'Installed Antigravity');
+      const iframe = new URL('/panel?mode=chat#t=fixture', effectiveUrl);
+      const panel = { allowedOrigin: iframe.origin };
+      new View().renderWebviewHtml(panel, effectiveUrl, iframe.href, {});
+      return panel;
+    };
+  `;
+  const extensionPath = path.join(dir, 'extension.js');
+  fs.writeFileSync(extensionPath, source);
+  const installed = installVsCodePatch(dir);
+  assert.equal(installed.success, true, installed.message);
+  const proxy = require(path.join(dir, 'agy-i18n-proxy.js'));
+  t.after(() => proxy.stopProxy());
+  const proxyPort = await proxy.ensureProxyReady();
+  let received;
+  let upgraded;
+  let receivedFrame;
+  const backendServer = wsServer((socket, frame) => {
+    receivedFrame = frame;
+    socket.write(Buffer.from([0x81, 2, 0x6f, 0x6b]));
+  });
+  backendServer.prependListener('upgrade', request => { upgraded = request; });
+  backendServer.on('request', (req, res) => {
+    received = req;
+    res.writeHead(200, {
+      'content-type': 'text/html',
+      'location': 'http://127.0.0.1:' + backendPort + '/ready'
+    });
+    res.end('<html><head></head><body>Settings</body></html>');
+  });
+  const backendPort = await listen(t, backendServer);
+  const clientPort = await listen(t, net.createServer(socket => {
+    const upstream = net.connect(proxyPort, '127.0.0.1');
+    socket.on('error', () => upstream.destroy());
+    socket.on('close', () => upstream.destroy());
+    upstream.on('error', () => socket.destroy());
+    socket.pipe(upstream).pipe(socket);
+  }));
+  const backend = 'http://127.0.0.1:' + backendPort;
+  const forwarded = 'http://127.0.0.1:' + clientPort;
+  const original = 'http://127.0.0.1:42117';
+  let failProxyForward = false;
+  const vscode = {
+    Uri: { parse: url => new URL(url) },
+    ExtensionKind: { UI: 1, Workspace: 2 },
+    extensions: { getExtension: id => id === 'google.google-antigravity' ? { extensionKind: 2 } : undefined },
+    env: {
+      remoteName: 'ssh-remote',
+      async asExternalUri(uri) {
+        if (uri.origin === backend) return new URL(original);
+        assert.equal(uri.port, String(proxyPort));
+        if (failProxyForward) throw new Error('forwarding unavailable');
+        return new URL(forwarded);
+      }
+    }
+  };
+  const mod = { exports: {} };
+  new Function('require', 'module', 'exports', fs.readFileSync(extensionPath, 'utf8'))(
+    name => name === 'vscode' ? vscode : proxy, mod, mod.exports);
+  const panel = await mod.exports.render(backend);
+  assert.equal(panel.iframe, forwarded + '/panel?mode=chat#t=fixture');
+  assert.equal(panel.serverUrl, forwarded);
+  assert.equal(panel.allowedOrigin, forwarded);
+  const response = await fetch(panel.iframe, { headers: { Origin: forwarded, Referer: forwarded + '/home' } });
+  assert.equal(response.status, 200);
+  assert.match(await response.text(), /AGY_I18N_DATA/);
+  assert.equal(response.headers.get('location'), forwarded + '/ready');
+  assert.equal(received.url, '/panel?mode=chat');
+  assert.equal(received.headers.origin, forwarded);
+  assert.equal(received.headers.referer, forwarded + '/home');
+  assert.equal(received.headers.host, new URL(forwarded).host);
+  const unrelated = await fetch(panel.iframe, { headers: { Origin: 'https://unrelated.example' } });
+  assert.equal(unrelated.status, 403);
+  await unrelated.text();
+
+  const sentFrame = Buffer.from([0x81, 0x81, 1, 2, 3, 4, 0x61 ^ 1]);
+  const replyFrame = await bounded(new Promise((resolve, reject) => {
+    const request = http.get(forwarded + '/socket', {
+      headers: {
+        Connection: 'Upgrade', Upgrade: 'websocket',
+        'Sec-WebSocket-Key': 'dGhlIHNhbXBsZSBub25jZQ==', 'Sec-WebSocket-Version': '13',
+        Origin: forwarded
+      }
+    }, response => {
+      response.resume();
+      reject(new Error('Remote proxy refused upgrade with HTTP ' + response.statusCode));
+    });
+    request.on('error', reject);
+    request.once('upgrade', (_, socket) => {
+      socket.on('error', reject);
+      socket.once('data', data => { socket.destroy(); resolve(data); });
+      socket.write(sentFrame);
+    });
+  }));
+  assert.deepEqual(receivedFrame, sentFrame);
+  assert.deepEqual(replyFrame, Buffer.from([0x81, 2, 0x6f, 0x6b]));
+  assert.equal(upgraded.headers.origin, forwarded);
+  assert.equal(upgraded.headers.host, new URL(forwarded).host);
+
+  failProxyForward = true;
+  const fallback = await mod.exports.render(backend);
+  assert.equal(fallback.iframe, original + '/panel?mode=chat#t=fixture');
+  assert.equal(fallback.allowedOrigin, original);
 });
 
 test('the proxy rejects unrelated browser origins before forwarding HTTP or WebSocket requests', async (t) => {

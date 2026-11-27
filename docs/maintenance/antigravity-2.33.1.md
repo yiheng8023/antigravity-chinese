@@ -18,3 +18,11 @@
 Windows 11 实机用独立配置启动已安装的桌面程序，登录页显示「欢迎使用 Antigravity！」和 Google 登录按钮。用同一台机器上的 VS Code 1.147.0 与哈希一致的 1.13.0 扩展副本检查命令面板和原生设置。命令「搜索 / 选择会话」「打开设置」及快捷键方案说明均为中文，选项仍是 `vscode`、`agy`。
 
 Webview 中的快捷键和听写文案通过上游字面量与 DOM 回归验证，实际录音、转写、账号授权和文件发送未实测。设置扫描通过现有性能回归，本轮实测未新增桌面帧时间采样。macOS 和 Linux 的验证范围为跨平台自动化。
+
+## Remote SSH 面板连接
+
+BH-0 在 Ubuntu 20.04.3 x86_64 的 Remote SSH 窗口中复现了扩展 1.13.0 安装汉化后打不开面板的问题。补丁显示已安装，后端也已就绪，失败发生在重载窗口后打开面板时。感谢 BH-0 提供实测环境、步骤和端口错配线索。[Issue #23 实测反馈](https://github.com/yiheng8023/antigravity-chinese/issues/23#issuecomment-7209393590)
+
+扩展实际运行在 SSH 工作区时，在上游签发面板启动令牌前用 VS Code 的转发地址接入汉化代理。代理监听远端回环并连接远端后端，保留浏览器转发后的来源供后端校验。无法建立代理转发或无法识别上游接入点时，沿用官方的面板地址。[VS Code 远程 Webview 文档](https://code.visualstudio.com/api/advanced-topics/remote-extensions#using-the-webview-api)
+
+回归用不同的代理端口和转发端口验证面板地址、启动令牌使用的来源、HTML 注入、WebSocket 收发以及转发失败时的回退。Windows x64 上的 1.13.0 官方扩展副本通过原版地址解析器、重复安装和还原验证，还原文件与原版字节一致。全套本地回归通过。真实 Remote SSH 窗口中的面板加载、中文显示和对话收发待复测。

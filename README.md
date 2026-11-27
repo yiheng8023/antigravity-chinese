@@ -132,12 +132,15 @@ npm run scan:drift -- "<frontend-bundle.js>" --report "<report.json>"
 | 贡献者 | 贡献 |
 | --- | --- |
 | <a href="https://github.com/yiheng8023"><img src="https://avatars.githubusercontent.com/u/127850894?s=64&v=4" width="32" height="32" alt="" /> yiheng8023</a> | 维护汉化工具与词库、评审改动并发布版本。 |
+| <a href="https://github.com/XuanChuYun"><img src="https://avatars.githubusercontent.com/u/29687766?s=64&v=4" width="32" height="32" alt="" /> XuanChuYun</a> | 提供 macOS 下 Antigravity App 与 IDE 的对照截图，帮助明确两者的汉化支持范围。 [Issue #5](https://github.com/yiheng8023/antigravity-chinese/issues/5) |
 | <a href="https://github.com/a705876883-arch"><img src="https://avatars.githubusercontent.com/u/250879823?s=64&v=4" width="32" height="32" alt="" /> a705876883-arch</a> | 提交用户内容保护修复方案，并提供误译复现与回归用例。 [PR #6](https://github.com/yiheng8023/antigravity-chinese/pull/6) |
 | <a href="https://github.com/fansID512"><img src="https://avatars.githubusercontent.com/u/103017881?s=64&v=4" width="32" height="32" alt="" /> fansID512</a> | 提供详细环境、复现步骤和对照观察，帮助定位设置页掉帧问题。 [Issue #8](https://github.com/yiheng8023/antigravity-chinese/issues/8) |
 | <a href="https://github.com/MizuIro-H"><img src="https://avatars.githubusercontent.com/u/123630455?s=64&v=4" width="32" height="32" alt="" /> MizuIro-H</a> | 在 Bazzite 上复现 Linux 解压版探测问题，提出修复方案并验证安装。 [Issue #9](https://github.com/yiheng8023/antigravity-chinese/issues/9) |
 | <a href="https://github.com/tangyixiao"><img src="https://avatars.githubusercontent.com/u/115929632?s=64&v=4" width="32" height="32" alt="" /> tangyixiao</a> | 指出权限预设译名的歧义，提交修复和回归测试，并实测全局设置。 [PR #11](https://github.com/yiheng8023/antigravity-chinese/pull/11) |
 | <a href="https://github.com/Qiinn-71"><img src="https://avatars.githubusercontent.com/u/262174075?s=64&v=4" width="32" height="32" alt="" /> Qiinn-71</a> | 在 Apple Silicon 上对照三种安装状态，定位 macOS 更新安装时的签名验证问题。 [Issue #12](https://github.com/yiheng8023/antigravity-chinese/issues/12) |
 | <a href="https://github.com/mitang-ai"><img src="https://avatars.githubusercontent.com/u/275678971?s=64&v=4" width="32" height="32" alt="" /> mitang-ai</a> | 提供 Swarm 界面及斜杠命令搜索高亮的适配与回归用例，并分享插件详情页翻译方案。 [PR #14](https://github.com/yiheng8023/antigravity-chinese/pull/14) · [Issue #15](https://github.com/yiheng8023/antigravity-chinese/issues/15) |
+| <a href="https://github.com/Kame-Lanlan"><img src="https://avatars.githubusercontent.com/u/152709450?s=64&v=4" width="32" height="32" alt="" /> Kame-Lanlan</a> | 报告 Antigravity 扩展安装在 Linux 的 `.vscode-server` 路径时的支持缺口。 [Issue #23](https://github.com/yiheng8023/antigravity-chinese/issues/23) |
+| <a href="https://github.com/BH-0"><img src="https://avatars.githubusercontent.com/u/92411549?s=64&v=4" width="32" height="32" alt="" /> BH-0</a> | 在 Ubuntu 的 Remote SSH 环境中复现面板加载失败，提供环境、重载步骤、后端就绪日志和转发端口错配的分析。 [Issue #23 实测反馈](https://github.com/yiheng8023/antigravity-chinese/issues/23#issuecomment-7209393590) |
 
 ---
 

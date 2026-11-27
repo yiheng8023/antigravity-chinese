@@ -211,6 +211,8 @@ let proxyServer = null;
 let proxyPort = 0;
 let proxyReadyPromise = null;
 let currentTargetUrl = '';
+let remoteProxyAddress = null;
+let pendingRemoteTarget = '';
 let cachedBundleContent = null;
 
 // 先校验浏览器来源，再为合法的本地 Webview 重写后端来源。
@@ -219,7 +221,7 @@ function isAllowedOrigin(origin, targetOrigin) {
   try {
     const parsed = new URL(origin);
     if (parsed.protocol === 'vscode-webview:') return true;
-    if (parsed.origin === targetOrigin) return true;
+    if (parsed.origin === targetOrigin || parsed.origin === remoteProxyAddress?.origin) return true;
     return parsed.protocol === 'http:' &&
       ['127.0.0.1', 'localhost', '[::1]'].includes(parsed.hostname) &&
       parsed.port === String(proxyPort);
@@ -262,7 +264,7 @@ function startProxy() {
     }
 
     const reqUrl = new URL(req.url, 'http://127.0.0.1');
-    const proxyOrigin = 'http://127.0.0.1:' + proxyPort;
+    const proxyOrigin = remoteProxyAddress?.origin || 'http://127.0.0.1:' + proxyPort;
     const targetOrigin = targetParsed.origin;
     const targetPort = parseInt(targetParsed.port || (targetParsed.protocol === 'https:' ? '443' : '80'), 10);
 
@@ -273,20 +275,20 @@ function startProxy() {
     }
 
     const proxyHeaders = { ...req.headers };
-    proxyHeaders.host = targetParsed.host;
+    proxyHeaders.host = remoteProxyAddress?.host || targetParsed.host;
 
     // 核心防御 1：强制目标服务器以未压缩明文返回，杜绝二进制乱码拼接与解压崩溃
     delete proxyHeaders['accept-encoding'];
 
     // 核心防御 2：重写 HTTP 请求来源与防跨域检查，彻底对齐目标后端
-    if (proxyHeaders.origin) {
+    if (proxyHeaders.origin && !remoteProxyAddress) {
       proxyHeaders.origin = targetOrigin;
     }
-    if (proxyHeaders.referer) {
+    if (proxyHeaders.referer && !remoteProxyAddress) {
       proxyHeaders.referer = proxyHeaders.referer.split(proxyOrigin).join(targetOrigin);
     }
     proxyHeaders['x-forwarded-host'] = req.headers.host || ('127.0.0.1:' + proxyPort);
-    proxyHeaders['x-forwarded-proto'] = targetParsed.protocol ? targetParsed.protocol.replace(':', '') : 'http';
+    proxyHeaders['x-forwarded-proto'] = (remoteProxyAddress?.protocol || targetParsed.protocol).slice(0, -1);
     proxyHeaders['x-forwarded-for'] = req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : '127.0.0.1';
 
     const options = {
@@ -386,7 +388,7 @@ function startProxy() {
     const targetHost = targetParsed.hostname;
 
     // 核心防御 4：完全重写并归一化 WebSocket 握手来源信息，彻底根治后端 403 Forbidden
-    const proxyOrigin = 'http://127.0.0.1:' + proxyPort;
+    const proxyOrigin = remoteProxyAddress?.origin || 'http://127.0.0.1:' + proxyPort;
     const targetOrigin = targetParsed.origin;
 
     if (!isAllowedOrigin(req.headers.origin, targetOrigin) ||
@@ -396,24 +398,24 @@ function startProxy() {
     }
 
     const targetHeaders = { ...req.headers };
-    targetHeaders.host = targetParsed.host;
+    targetHeaders.host = remoteProxyAddress?.host || targetParsed.host;
 
     // 1. 重写 Origin 为目标后端来源，防止 CSWSH (Cross-Site WebSocket Hijacking) 跨域拦截
-    if (targetHeaders.origin) {
+    if (targetHeaders.origin && !remoteProxyAddress) {
       targetHeaders.origin = targetOrigin;
     }
-    if (targetHeaders['sec-websocket-origin']) {
+    if (targetHeaders['sec-websocket-origin'] && !remoteProxyAddress) {
       targetHeaders['sec-websocket-origin'] = targetOrigin;
     }
 
     // 2. 重写 Referer 来源为目标后端来源
-    if (targetHeaders.referer) {
+    if (targetHeaders.referer && !remoteProxyAddress) {
       targetHeaders.referer = targetHeaders.referer.split(proxyOrigin).join(targetOrigin);
     }
 
     // 3. 补充标准反向代理转发凭证
     targetHeaders['x-forwarded-host'] = req.headers.host || ('127.0.0.1:' + proxyPort);
-    targetHeaders['x-forwarded-proto'] = targetParsed.protocol ? targetParsed.protocol.replace(':', '') : 'http';
+    targetHeaders['x-forwarded-proto'] = (remoteProxyAddress?.protocol || targetParsed.protocol).slice(0, -1);
     targetHeaders['x-forwarded-for'] = req.socket && req.socket.remoteAddress ? req.socket.remoteAddress : '127.0.0.1';
 
     // 4. 健壮序列化 HTTP Upgrade 请求头报文（支持单值与数组形态）
@@ -446,12 +448,17 @@ function startProxy() {
     clientSocket.on('close', () => targetSocket.destroy());
   });
 
+    const server = proxyServer;
     proxyReadyPromise = new Promise((resolve) => {
-      proxyServer.listen(0, '127.0.0.1', () => {
-        if (proxyServer && proxyServer.address()) {
-          proxyPort = proxyServer.address().port;
-        }
-        resolve(proxyPort);
+      const onError = () => {
+        if (proxyServer === server) stopProxy();
+        resolve(0);
+      };
+      server.once('error', onError);
+      server.listen(0, '127.0.0.1', () => {
+        server.removeListener('error', onError);
+        if (proxyServer === server) proxyPort = server.address()?.port || 0;
+        resolve(proxyServer === server ? proxyPort : 0);
       });
     });
   }
@@ -469,9 +476,30 @@ function ensureProxyReady() {
   return proxyReadyPromise || Promise.resolve(proxyPort);
 }
 
+async function resolveRemoteUri(vscode, backendUrl) {
+  const target = new URL(backendUrl);
+  // The managed SSH backend is reachable inside the extension host over loopback HTTP.
+  if (target.protocol !== 'http:' || !['127.0.0.1', 'localhost'].includes(target.hostname) ||
+      target.username || target.password) return null;
+  pendingRemoteTarget = target.href;
+  const port = await ensureProxyReady();
+  if (!port || pendingRemoteTarget !== target.href) return null;
+  const proxyUri = vscode.Uri.parse('http://127.0.0.1:' + port + target.pathname + target.search + target.hash);
+  const forwarded = await vscode.env.asExternalUri(proxyUri);
+  const address = new URL(forwarded.toString());
+  if (!['http:', 'https:'].includes(address.protocol) || address.username || address.password ||
+      pendingRemoteTarget !== target.href) return null;
+
+  // Publish the route before upstream builds the iframe and mints an origin-bound token.
+  currentTargetUrl = target.href;
+  remoteProxyAddress = address;
+  return forwarded;
+}
+
 function getProxiedUrls(serverUrl, fullUrlString) {
   if (!serverUrl) return { serverUrl, fullUrlString };
   currentTargetUrl = serverUrl;
+  remoteProxyAddress = null;
 
   if (!proxyServer || !proxyPort) {
     startProxy();
@@ -503,6 +531,8 @@ function getProxiedUrls(serverUrl, fullUrlString) {
 }
 
 function stopProxy() {
+  pendingRemoteTarget = '';
+  remoteProxyAddress = null;
   if (proxyServer) {
     try { proxyServer.close(); } catch (_) {}
     proxyServer = null;
@@ -517,6 +547,7 @@ module.exports = {
   startProxy,
   stopProxy,
   ensureProxyReady,
+  resolveRemoteUri,
   getProxiedUrls
 };
 `;
@@ -579,9 +610,29 @@ function buildPatchedExtensionJs(content) {
 
   const proxyRequireHeader = `// --- AGY_VSCODE_I18N_PROXY_INJECTION_START ---
 let __agyI18nProxy = null;
+let __agyI18nWebviewHost = 'local';
 try {
-  __agyI18nProxy = require('./agy-i18n-proxy.js');
+  const vscode = require('vscode');
+  if (vscode.env?.remoteName === 'ssh-remote') {
+    __agyI18nWebviewHost = 'upstream';
+    const kind = vscode.extensions.getExtension('google.google-antigravity')?.extensionKind;
+    if (kind === vscode.ExtensionKind.Workspace) __agyI18nWebviewHost = 'ssh';
+    else if (kind === vscode.ExtensionKind.UI) __agyI18nWebviewHost = 'local';
+  }
 } catch (_) {}
+if (__agyI18nWebviewHost === 'local') {
+  try { __agyI18nProxy = require('./agy-i18n-proxy.js'); } catch (_) {}
+}
+async function __agyI18nResolveServerUri(vscode, backendUrl) {
+  if (__agyI18nWebviewHost === 'ssh') {
+    try {
+      __agyI18nProxy ||= require('./agy-i18n-proxy.js');
+      const forwarded = await __agyI18nProxy.resolveRemoteUri(vscode, backendUrl);
+      if (forwarded) return forwarded;
+    } catch (_) {}
+  }
+  return vscode.env.asExternalUri(vscode.Uri.parse(backendUrl));
+}
 // --- AGY_VSCODE_I18N_PROXY_INJECTION_END ---
 `;
 
@@ -606,7 +657,7 @@ function __agyI18nMessage(host, method, message, ...items) {
 
   const interceptionCode = `${matchedSignature}\n` +
 `        // --- AGY_VSCODE_I18N_INTERCEPT_START ---
-        try {
+        if (__agyI18nWebviewHost === 'local') try {
           if (!__agyI18nProxy) {
             __agyI18nProxy = require('./agy-i18n-proxy.js');
           }
@@ -619,7 +670,12 @@ function __agyI18nMessage(host, method, message, ...items) {
         // --- AGY_VSCODE_I18N_INTERCEPT_END ---
 `;
 
-  const body = content.replace(matchedSignature, interceptionCode);
+  let body = content.replace(matchedSignature, interceptionCode);
+  // Match only the resolver that returns the effective server URL for the Webview.
+  const serverResolver = /(\beffectiveUrl\s*:\s*[$\w]+\(\s*await\s+[$\w]+\(\s*)([$\w]+)\.env\.asExternalUri\(\s*\2\.Uri\.parse\(\s*([$\w]+)\s*\)\s*\)(?=\s*\)\s*\)\.toString\(\))/g;
+  if ([...body.matchAll(serverResolver)].length === 1) {
+    body = body.replace(serverResolver, '$1__agyI18nResolveServerUri($2, $3)');
+  }
   content = proxyRequireHeader + nativeMessageHeader + body;
 
   // 保留原模块的 strict 指令语义。
