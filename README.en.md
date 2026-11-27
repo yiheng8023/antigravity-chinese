@@ -1,4 +1,4 @@
-# Google Antigravity Chinese Localization
+# Community Chinese Localization for Google Antigravity
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&amp;label=CI&amp;logo=github" alt="CI status"></a>
@@ -27,7 +27,7 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 | --- | --- | --- |
 | Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows x64 2.36.0 frontend review, UI regression tests, and package testing on a copy. See the portable installation record for the Linux x64 2.33.0 lifecycle. |
 | VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | See the [1.13.0 maintenance record](docs/maintenance/antigravity-2.33.1.md) for Windows installation, restoration and UI checks. |
-| Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
+| Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional, maintained by the antigravity-chinese community |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
 | Antigravity CLI | Preserves upstream behavior | CLI binaries and terminal UI are unchanged |
 

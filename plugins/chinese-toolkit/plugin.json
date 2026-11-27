@@ -1,6 +1,11 @@
 {
   "name": "antigravity-chinese-toolkit",
-  "description": "Antigravity 社区中文插件：中文交互规则与本地化维护诊断 (Community Chinese Localization & Diagnostics Plugin)",
+  "displayName": "社区中文汉化工具",
+  "description": "由独立社区项目 antigravity-chinese 维护，提供中文交互规则与本地化诊断技能。",
   "version": "3.3.67",
-  "author": "Antigravity Open Source Community"
+  "author": {
+    "name": "antigravity-chinese 社区",
+    "url": "https://github.com/yiheng8023/antigravity-chinese"
+  },
+  "repository": "https://github.com/yiheng8023/antigravity-chinese"
 }

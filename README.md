@@ -1,4 +1,4 @@
-# Google Antigravity 中文本地化工具
+# Antigravity 社区中文本地化工具
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&amp;label=CI&amp;logo=github" alt="CI 状态"></a>
@@ -27,7 +27,7 @@ VS Code 扩展更新会覆盖本地汉化。更新扩展后请重新执行 `node
 | --- | --- | --- |
 | Antigravity App | ASAR preload、原生菜单和弹窗文本补丁；版本备份与还原 | Windows x64 2.36.0 的原版前端核对、界面回归和安装副本验证。Linux x64 2.33.0 的安装验证见便携安装记录 |
 | VS Code 扩展 | 清单、原生菜单和通知翻译、Webview 本地代理、独立备份/还原 | Windows 1.13.0 安装、重复安装、还原与界面检查见 [1.13.0 维护记录](docs/maintenance/antigravity-2.33.1.md) |
-| 社区中文插件 | 中文交互规则与维护诊断技能 | 可选安装；不代表 Google 官方插件 |
+| 社区中文插件 | 中文交互规则与维护诊断技能 | 由 antigravity-chinese 社区维护，可选安装 |
 | 独立 IDE、其他 IDE 扩展 | 尚无专用汉化安装器 | 不声明已适配 |
 | Antigravity CLI | 保留官方原生行为 | 不修改 CLI 二进制或终端界面 |
 

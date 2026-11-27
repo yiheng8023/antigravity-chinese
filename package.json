@@ -50,7 +50,7 @@
     "gemini",
     "ai-agent"
   ],
-  "author": "Antigravity Open Source Community",
+  "author": "antigravity-chinese 社区",
   "license": "MIT",
   "devDependencies": {
     "@electron/asar": "3.2.14",
