@@ -278,11 +278,14 @@ assert(translate('toString') === null && translate('constructor') === null, 'Obj
 
 
 
-console.log('\n--- 5. 验证 Antigravity 官方插件套件完整性 ---');
+console.log('\n--- 5. 验证社区中文插件完整性 ---');
 const pluginJsonPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'plugin.json');
 assert(fs.existsSync(pluginJsonPath), '插件清单 plugins/chinese-toolkit/plugin.json 存在');
 const pluginData = JSON.parse(fs.readFileSync(pluginJsonPath, 'utf-8'));
 assert(pluginData.name === 'antigravity-chinese-toolkit', '插件名称规范对齐 antigravity-chinese-toolkit');
+assert(pluginData.displayName === '社区中文汉化工具', '插件显示名称明确为社区项目');
+assert(pluginData.author?.name === 'antigravity-chinese 社区' &&
+  pluginData.author.url === pluginData.repository, '插件作者与项目来源一致');
 
 const rulesPath = path.join(__dirname, '..', 'plugins', 'chinese-toolkit', 'rules', 'chinese-interaction-rules.md');
 assert(fs.existsSync(rulesPath), '插件规则 rules/chinese-interaction-rules.md 存在且非空');

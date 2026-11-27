@@ -1,4 +1,4 @@
-# Google Antigravity Chinese Localization
+# Community Chinese Localization for Google Antigravity
 
 <p align="center">
   <a href="https://github.com/yiheng8023/antigravity-chinese/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/yiheng8023/antigravity-chinese/ci.yml?branch=main&amp;label=CI&amp;logo=github" alt="CI status"></a>
@@ -15,7 +15,7 @@
   <a href="README.md">简体中文</a> | <a href="README.en.md">English</a>
 </p>
 
-Source version **v3.3.66** targets **Antigravity App 2.35.2 / VS Code extension 1.13.0**. This update localizes Free and Ultra account notices, side questions, Swarm, Google Drive messages, and the download folder dialog. It also fixes panel loading over Remote SSH and improves extension discovery on Linux.
+Source version **v3.3.67** targets **Antigravity App 2.36.0 / VS Code extension 1.13.0**. This update localizes the floating composer, app menu, organization plugin policy notices, and cloud automation authorization prompts.
 
 This community project provides local Chinese patches, backup and restore for the desktop app and VS Code extension, plus an optional Chinese interaction plugin. Verified summaries from the Google and partner catalogs use the same translation in Featured, Marketplace, Installed, plugin details, and settings. Plugin names, publisher-authored command and skill instructions, custom content, and unmatched fields retain their original text. See the [2.35.0 maintenance record](docs/maintenance/antigravity-2.35.0.md) for UI and installation coverage and the [Linux portable installation record](docs/maintenance/linux-portable-install.md) for portable path support.
 
@@ -25,13 +25,13 @@ VS Code extension updates overwrite the local patch. After an extension update, 
 
 | Surface | Implementation | Verified scope |
 | --- | --- | --- |
-| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows x64 2.35.2 install, reinstall, restore, unpacked file verification, and checks on selected screens. See the portable installation record for the Linux x64 2.33.0 lifecycle. |
+| Antigravity App | ASAR preload, native menu/dialog text, versioned backup and restore | Windows x64 2.36.0 frontend review, UI regression tests, and package testing on a copy. See the portable installation record for the Linux x64 2.33.0 lifecycle. |
 | VS Code extension | Manifest, native menu and notification translation, local Webview proxy, separate backup/restore | See the [1.13.0 maintenance record](docs/maintenance/antigravity-2.33.1.md) for Windows installation, restoration and UI checks. |
-| Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional; not a Google official plugin |
+| Community Chinese plugin | Chinese interaction rules and maintenance diagnostics | Optional, maintained by the antigravity-chinese community |
 | Standalone IDE and other IDE extensions | No dedicated localization installer | No adaptation claim |
 | Antigravity CLI | Preserves upstream behavior | CLI binaries and terminal UI are unchanged |
 
-Desktop 2.35.2 verification on an installed product covers Windows x64. Gradually rolled-out features depend on account availability. Static checks and candidate-string matches do not measure whole-product translation coverage.
+See the [2.36.0 maintenance record](docs/maintenance/antigravity-2.36.0.md) for verification details. Gradually rolled-out features depend on account availability.
 
 ## Installation and use
 

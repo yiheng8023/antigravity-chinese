@@ -1,0 +1,75 @@
+{
+  "source": {
+    "version": "Antigravity App 2.36.0",
+    "platform": "Windows x64",
+    "sha256": "8308222d320d1fc27088a886e94e10ff5866ac0ecffd3a4cef07c3c2837eeb55",
+    "scope": "Floating composer, app logo submenus, customization policy and installed plugins, cloud automation authorization and organization prepaid balance. DOM fixtures cover composed text, draft ownership and account option names."
+  },
+  "ui": [
+    "Ask anything",
+    "Conversation input",
+    "Subagent needs approval",
+    "Question waiting",
+    "Unread message",
+    "Application Menu",
+    "Plugins are unavailable until your organization's policy loads.",
+    "Plugins are disabled by your organization.",
+    "The plugin marketplace is disabled by your organization.",
+    "Connect an account so the agent can run automations.",
+    "Refreshing credentials...",
+    "Account connection was not completed.",
+    "Failed to refresh credentials",
+    "Refreshed credentials for all automations.",
+    "Cloud automation credentials expired — re-authorize to resume scheduled runs.",
+    "Cloud automation credentials expire soon — renew to keep runs going.",
+    "Cloud automation",
+    "Cloud trigger",
+    "Organization prepaid wallet is empty",
+    "Your organization has run out of Antigravity funds. Prompt generation is paused until your administrator adds funds.",
+    "Record Audio",
+    "Canceling",
+    "Compacting",
+    "Working",
+    "Action required",
+    "File",
+    "Zoom",
+    "Zoom In",
+    "Zoom Out",
+    "Reset Zoom",
+    "See more",
+    "See more in Plugins",
+    "Dismiss error"
+  ],
+  "preserve": [
+    {
+      "text": "aux-pane-floating-composer-trigger",
+      "kind": "technical",
+      "reason": "Use the live draft preview boundary instead of translating authored text."
+    },
+    {
+      "text": "aux-pane-floating-composer-status",
+      "kind": "technical",
+      "reason": "Scope composed status and accessibility translations to this button."
+    },
+    {
+      "text": "aux-pane-floating-composer-comment-badge",
+      "kind": "technical",
+      "reason": "Keep the original comment count and translate its suffix."
+    },
+    {
+      "text": "aux-pane-floating-composer-attachment-badge",
+      "kind": "technical",
+      "reason": "Keep the original attachment count and translate its suffix."
+    },
+    {
+      "text": "remote-automation-oauth-consent-callout",
+      "kind": "technical",
+      "reason": "Translate the prompt without translating the option names put into it."
+    },
+    {
+      "text": "prepaidBalanceExhausted",
+      "kind": "technical",
+      "reason": "Keep the organization funding condition and warning behavior intact."
+    }
+  ]
+}
