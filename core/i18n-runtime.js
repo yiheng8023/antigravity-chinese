@@ -294,8 +294,10 @@
     if (testId) {
       if (testId === 'model-selector-trigger' ||
           testId === 'model-selector-item' ||
+          testId === 'model-selector-orchestrator' ||
           testId === 'model-selector-effort-option' ||
           testId === 'model-selector-effort-group' ||
+          testId === 'orchestrator-picker-row' ||
           testId === 'model-selector-list') {
         return true;
       }
@@ -385,6 +387,7 @@
     if ((CONTENT_TEST_IDS[testId] === 1 && !isCustomizationBreadcrumb(el)) || el.hasAttribute('data-ag-localization-skip') ||
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
+    if (el.matches('[data-testid="step-plan-item"] > span.min-w-0.truncate[title]')) return true;
     if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
     // The first emphasized value in the deletion notice is a project or automation name.
     if (el.tagName === 'STRONG' && !el.previousElementSibling && isProjectDeletionDescription(el.parentElement)) return true;
@@ -483,6 +486,20 @@
     return el.getAttribute('data-testid') === 'side-question-insert-to-main' ||
       el.matches('[data-testid="side-question-question"] > span.shrink-0, [data-testid="side-question-answer"] > span.opacity-70.animate-pulse');
   }
+
+  function getSideQuestionOrigin(el) {
+    var button = el?.tagName === 'BUTTON' ? el : el?.parentElement;
+    return button?.matches('button.agy-user-bubble-header[data-testid="side-question-origin"]') &&
+      button.closest('[data-testid="side-question-tab-conversation"]') ? button : null;
+  }
+
+  var SIDE_QUESTION_ORIGIN_LABELS = {
+    'Started during': '发起于',
+    'Started from': '来源于',
+    'the main conversation': '主会话',
+    'the subagent conversation': '子智能体会话',
+    'Show': '查看'
+  };
 
   function isTimestampUi(el) {
     if (!el || el.nodeType !== 1 || el.tagName !== 'SPAN' || !el.hasAttribute('data-screenshot-volatile')) return false;
@@ -684,6 +701,11 @@
     var queuedStatus = translateQueuedStatus(text, testId);
     if (queuedStatus) return queuedStatus;
     if (isToolSummary(text, el)) return translateToolSummary(text);
+    if (testId === 'tool-group-elapsed' && el.closest('button[data-testid="tool-group-collapsible"]')) {
+      var time = text.match(/^(?:(\d+)h )?(?:(\d+)m )?(\d+)s$/);
+      if (time) return [time[1] && time[1] + ' 小时', time[2] && time[2] + ' 分钟', time[3] + ' 秒']
+        .filter(Boolean).join(' ');
+    }
     if (text.includes(' · ') && el?.closest('button[data-testid="progress-updates-collapsible"]')) {
       var progress = text.match(/^(Worked for .+) · (\d+) updates?$/);
       var elapsed = progress && translateSingleUnit(progress[1]);
@@ -699,6 +721,22 @@
     if ((text === 'Your plan' || text === 'Your plan:' || text.startsWith('Your plan: ')) &&
         el?.classList.contains('font-medium') && el.closest('.settings-modal-container')) {
       return text === 'Your plan' ? '当前方案' : '当前方案：' + text.slice('Your plan:'.length).trimStart();
+    }
+    if ((text.startsWith('Free users and ') || text.startsWith('You can upgrade to a higher Google AI Ultra ')) &&
+        el?.matches('.settings-modal-container span.text-sm.text-muted-foreground.whitespace-pre-wrap, ' +
+          '[data-testid="model-selector-panel"] .sticky .text-secondary-foreground > span')) {
+      if (text === 'Free users and Google AI Plus users receive the minimum base limits on Antigravity. You can upgrade to Google AI Pro or above to receive higher rate limits.') {
+        return '免费用户和 Google AI Plus 用户适用 Antigravity 的最低基础额度。升级至 Google AI Pro 或更高档位可提高请求速率上限。';
+      }
+      if (text === 'You can upgrade to a higher Google AI Ultra plan to receive the highest rate limits.') {
+        return '你可以升级至更高档位的 Google AI Ultra 方案，获得最高的请求速率上限。';
+      }
+    }
+    if (text.startsWith('Available AI credits: ') && el?.tagName === 'SPAN' &&
+        el.closest('.settings-modal-container') &&
+        el.parentElement?.parentElement?.parentElement?.querySelector(':scope > .shrink-0 a[href^="https://antigravity.google/g1-credits"]')) {
+      var balance = text.match(/^Available AI credits: ([\d.,\s]+)$/);
+      if (balance) return '可用 AI 积分：' + balance[1];
     }
     if (text.endsWith(' left') && el?.closest('[data-testid="inline-card-expiry"]')) {
       var remaining = text.match(/^(\d+)([ms]) left$/);
@@ -929,6 +967,32 @@
     return true;
   }
 
+  // The origin button lives inside the protected user bubble. Translate its
+  // fixed labels separately and preserve the original message it quotes.
+  function translateSideQuestionOriginText(node) {
+    var el = node.parentElement;
+    if (el?.tagName !== 'SPAN' || !getSideQuestionOrigin(el)) return false;
+    var label = readOriginalText(node);
+    if (Object.hasOwn(SIDE_QUESTION_ORIGIN_LABELS, label)) writeLocalizedText(node, SIDE_QUESTION_ORIGIN_LABELS[label]);
+    else restoreLocalizedText(node);
+    return true;
+  }
+
+  function translateSideQuestionOriginAttributes(el) {
+    if (getSideQuestionOrigin(el) !== el) return false;
+    for (var attr of ['title', 'aria-label']) {
+      var current = el.getAttribute(attr);
+      var edit = attributeEdits.get(el)?.[attr];
+      var label = edit?.localized === current ? edit.source : current;
+      var parts = label?.match(/^(Started during|Started from) (“[\s\S]*”|the (?:main|subagent) conversation)(?:\. Show in (main conversation|subagent conversation))?$/);
+      if (!parts) continue;
+      var origin = SIDE_QUESTION_ORIGIN_LABELS[parts[2]] || parts[2];
+      var action = parts[3] ? '。在' + SIDE_QUESTION_ORIGIN_LABELS['the ' + parts[3]] + '中查看' : '';
+      writeLocalizedAttribute(el, attr, SIDE_QUESTION_ORIGIN_LABELS[parts[1]] + origin + action);
+    }
+    return true;
+  }
+
   function restoreLocalizedAttributes(el) {
     var edits = attributeEdits.get(el);
     if (!edits) return;
@@ -959,14 +1023,14 @@
   }
 
   function restoreProtectedSubtree(el) {
-    restoreLocalizedAttributes(el);
+    if (!translateSideQuestionOriginAttributes(el)) restoreLocalizedAttributes(el);
     var walker = doc.createTreeWalker(el, root.NodeFilter.SHOW_ELEMENT | root.NodeFilter.SHOW_TEXT);
     var node = walker.nextNode();
     while (node) {
       if (node.nodeType === 3) {
-        if (!translateUserMessageClock(node)) restoreLocalizedText(node);
+        if (!translateUserMessageClock(node) && !translateSideQuestionOriginText(node)) restoreLocalizedText(node);
       }
-      else restoreLocalizedAttributes(node);
+      else if (!translateSideQuestionOriginAttributes(node)) restoreLocalizedAttributes(node);
       node = walker.nextNode();
     }
   }
@@ -995,6 +1059,7 @@
 
   function translateTextNode(node, parentMode) {
     if (!node || node.nodeType !== 3) return;
+    if (translateSideQuestionOriginText(node)) return;
     var parent = node.parentElement || node.parentNode;
     var mode = parentMode === undefined ? getElementTranslationMode(parent) : parentMode;
     if (parent && (mode !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
@@ -1109,14 +1174,15 @@
       if (translateOfficialPluginDescription(el)) return;
       var modelSelectorLabel = getLocalizedModelSelectorLabel(el);
       if (work) {
-        if (!modelSelectorLabel) restoreLocalizedAttributes(el);
+        if (!modelSelectorLabel && !translateSideQuestionOriginAttributes(el)) restoreLocalizedAttributes(el);
         appendChildren(el, work);
       } else restoreProtectedSubtree(el);
       if (modelSelectorLabel) writeLocalizedAttribute(el, 'aria-label', modelSelectorLabel);
       return;
     }
     var translateOwnContent = translationMode === 2;
-    if (!translateOwnContent || attributeEdits.get(el)?.title?.officialPluginDescription) restoreLocalizedAttributes(el);
+    var sideQuestionOrigin = translateSideQuestionOriginAttributes(el);
+    if ((!translateOwnContent && !sideQuestionOrigin) || attributeEdits.get(el)?.title?.officialPluginDescription) restoreLocalizedAttributes(el);
 
     // 同一轮扫描中，已处理的元素跳过
     if (scanId) el._agyScanId = scanId;

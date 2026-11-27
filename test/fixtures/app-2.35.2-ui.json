@@ -3,7 +3,7 @@
     "version": "Antigravity App 2.35.2",
     "platform": "Windows x64",
     "sha256": "494f0599aa61a7fa97eea7d5d7ab6cd14ddf05866a0bfb0c709a2d75ddfcb58c",
-    "scope": "Model selector notes, site information, downloads, the browser context menu, Google Drive link title warnings, and the prompt shown when /btw is used without a question. DOM tests cover the composed model and site labels, conversation summaries and user-message timestamps."
+    "scope": "Model selector and Orchestrator settings, site information, downloads, browser context menu, Google Drive link title warnings, side question controls, remote data settings and plan checklist states. DOM tests cover composed labels, account-supplied notices, conversation summaries and clocks."
   },
   "ui": [
     "Applies to /btw and messages sent after this turn",
@@ -43,7 +43,26 @@
     "Couldn't load Google Drive link title",
     "You don't have access to this Google Drive file, so its title couldn't be added. The link was kept as-is.",
     "Timed out fetching the Google Drive file's title. The link was kept as-is.",
-    "Couldn't fetch the Google Drive file's title. The link was kept as-is."
+    "Couldn't fetch the Google Drive file's title. The link was kept as-is.",
+    "Model selection",
+    "Default uses server-managed routing and Orchestrator quota. Custom pins specific models for orchestration and execution.",
+    "Orchestrator model selection",
+    "Default (Gemini Pro)",
+    "Offloads routine steps to a faster executor. Same quality, fewer tokens used.",
+    "Get More AI Credits",
+    "Stop Side Question",
+    "Stop side question",
+    "Delete Side Question",
+    "Delete side question",
+    "Continue as a New Conversation",
+    "Continue as a new conversation",
+    "Cannot continue as a new conversation while side question is running",
+    "Cannot continue a subagent's side question as a new conversation",
+    "Cannot continue as a new conversation during Battle Mode — end the battle first",
+    "Delete all Remote Agents data",
+    "Permanently delete your remote conversations, projects, scheduled tasks, connected plugins and settings. Data in the desktop app and your Google account are not affected.",
+    "Not started",
+    "In progress"
   ],
   "preserve": [
     {
@@ -85,6 +104,41 @@
       "text": "user-message-actions",
       "kind": "technical",
       "reason": "Distinguish the rendered timestamp from user-authored text."
+    },
+    {
+      "text": "model-selector-orchestrator",
+      "kind": "technical",
+      "reason": "Protect the Orchestrator model name and upstream badge text."
+    },
+    {
+      "text": "orchestrator-picker-row",
+      "kind": "technical",
+      "reason": "Protect backend-supplied model names in the submenu."
+    },
+    {
+      "text": "side-question-origin",
+      "kind": "technical",
+      "reason": "Scope origin-button localization inside the user bubble."
+    },
+    {
+      "text": "Started during",
+      "kind": "composed",
+      "reason": "Translate the prefix and preserve the quoted parent message."
+    },
+    {
+      "text": "Started from",
+      "kind": "composed",
+      "reason": "Translate the prefix and preserve the quoted parent message."
+    },
+    {
+      "text": "tool-group-elapsed",
+      "kind": "technical",
+      "reason": "Identify the running timer without rewriting the tool summary."
+    },
+    {
+      "text": "step-plan-item",
+      "kind": "technical",
+      "reason": "Protect generated plan titles and translate the status label only."
     }
   ]
 }
