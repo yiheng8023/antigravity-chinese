@@ -74,6 +74,12 @@ test('reviewed component inventory catches omitted descriptions and changed upst
   const missingCardAction = { ...dictionary, exact: { ...dictionary.exact } };
   delete missingCardAction.exact['Deny with note'];
   assert.ok(checkInventory(missingCardAction, currentInventory).errors.some(e => e.includes('Deny with note')));
+  const v236Inventory = require('./fixtures/app-2.36.0-ui.json');
+  const v236 = checkInventory(dictionary, v236Inventory);
+  assert.equal(v236.ok, true, v236.errors.join('\n'));
+  const missingWallet = { ...dictionary, exact: { ...dictionary.exact } };
+  delete missingWallet.exact['Organization prepaid wallet is empty'];
+  assert.ok(checkInventory(missingWallet, v236Inventory).errors.some(e => e.includes('Organization prepaid wallet is empty')));
 });
 
 function extension(dir, version = '1.9.0', suffix = '') {

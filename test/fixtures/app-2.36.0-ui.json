@@ -1,0 +1,131 @@
+{
+  "source": {
+    "version": "Antigravity App 2.36.0",
+    "platform": "Windows x64",
+    "sha256": "8308222d320d1fc27088a886e94e10ff5866ac0ecffd3a4cef07c3c2837eeb55",
+    "scope": "Maximized side-panel floating composer pill and status shelf, Windows/Linux application logo menu (File and Zoom submenus), organization prepaid wallet and remote capacity error cards, admin-disabled plugin/marketplace controls, installed plugin/bundle pagination, remote plugin configuration, cloud automation OAuth notices, and shortcut-managed annotations. DOM tests cover user draft protection, split badge counts, composed aria-labels, and dynamic diagnostic preservation."
+  },
+  "ui": [
+    "Subagent needs approval",
+    "Question waiting",
+    "Action required",
+    "Canceling",
+    "Compacting",
+    "Working",
+    "Thinking",
+    "Unread message",
+    "Record Audio",
+    "Conversation input",
+    "Organization prepaid wallet is empty",
+    "Your organization has run out of Antigravity funds. Prompt generation is paused until your administrator adds funds.",
+    "Remote agents are busy",
+    "Daily environment time used",
+    "Too many environments running",
+    "Plan upgrade required",
+    "Daily conversation limit reached",
+    "Conversation limit reached",
+    "Not started",
+    "In progress",
+    "Done",
+    "Skipped",
+    "Failed",
+    "Application Menu",
+    "File",
+    "New Conversation",
+    "Create Project",
+    "Open Command Palette",
+    "Zoom",
+    "Zoom In",
+    "Zoom Out",
+    "Reset Zoom",
+    "Check for Updates",
+    "Plugins are unavailable until your organization's policy loads.",
+    "Plugins are disabled by your organization.",
+    "The plugin marketplace is disabled by your organization.",
+    "Create a Plugin with the Agent",
+    "Create plugin",
+    "See more",
+    "See less",
+    "Dismiss error",
+    "Blocked",
+    "Setup required",
+    "Sign in required",
+    "MCP error",
+    "No plugins available.",
+    "Browse the Marketplace",
+    "Find skills, agents, and more in the Marketplace.",
+    "Couldn't load plugin configuration.",
+    "Configuration saved.",
+    "Add your API key or configuration to use this plugin.",
+    "Saved securely. Secret values are hidden after saving.",
+    "Cloud automation",
+    "Cloud trigger",
+    "Cloud automation credentials expired — re-authorize to resume scheduled runs.",
+    "Cloud automation credentials expire soon — renew to keep runs going.",
+    "Refreshed credentials for all automations.",
+    "Account connection was not completed.",
+    "Failed to refresh credentials",
+    "Connect an account so the agent can run automations.",
+    "Refreshing credentials...",
+    "Prompt to run when triggered...",
+    "Execution Identity",
+    "Update Available",
+    "Updating…",
+    "Thinking effort",
+    "Controls how much time and quota the model spends reasoning before responding. Higher effort improves accuracy on hard problems, at the cost of slower responses and higher quota use.",
+    "managed by application menu",
+    "reserved for sidebar switching"
+  ],
+  "preserve": [
+    {
+      "text": "aux-pane-floating-composer-trigger",
+      "kind": "technical",
+      "reason": "Scope placeholder translation to opacity-60 and protect saved user drafts in opacity-90."
+    },
+    {
+      "text": "Ask anything",
+      "kind": "composed",
+      "reason": "Only translate the empty placeholder inside aux-pane-floating-composer-trigger so user drafts or prose remain untouched."
+    },
+    {
+      "text": "aux-pane-floating-composer-status",
+      "kind": "technical",
+      "reason": "Scope restore-split-view aria-label composition to the floating status button while preserving dynamic tool labels."
+    },
+    {
+      "text": "aux-pane-floating-composer-comment-badge",
+      "kind": "technical",
+      "reason": "Translate split comment count suffixes in place without merging React count nodes or affecting global 'Comment' labels."
+    },
+    {
+      "text": "aux-pane-floating-composer-attachment-badge",
+      "kind": "technical",
+      "reason": "Translate split attachment count suffixes in place without adding a global 'Attached' entry."
+    },
+    {
+      "text": "app-logo-menu",
+      "kind": "technical",
+      "reason": "Identify the desktop application logo menu containing the File and Zoom submenus."
+    },
+    {
+      "text": "plugins-create-with-prompt",
+      "kind": "technical",
+      "reason": "Scope composed disabled-reason aria-label localization to the plugin creation button."
+    },
+    {
+      "text": "marketplace-invitation",
+      "kind": "technical",
+      "reason": "Scope composed disabled-reason aria-label localization to the marketplace invitation button."
+    },
+    {
+      "text": "remote-plugin-configure",
+      "kind": "technical",
+      "reason": "Scope error-prefix and button aria-label localization while preserving plugin names and backend error details."
+    },
+    {
+      "text": "remote-automation-oauth-consent-callout",
+      "kind": "technical",
+      "reason": "Identify the cloud automation OAuth callout whose dynamic provider names are preserved."
+    }
+  ]
+}

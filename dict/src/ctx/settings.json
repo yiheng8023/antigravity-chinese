@@ -1179,5 +1179,18 @@
   "No message text": "没有消息文本",
   "Conversation turns": "会话轮次",
   "here": "此处",
-  "Failed to refresh credentials": "刷新凭据失败"
+  "Failed to refresh credentials": "刷新凭据失败",
+  "Organization prepaid wallet is empty": "组织预付余额已用尽",
+  "Your organization has run out of Antigravity funds. Prompt generation is paused until your administrator adds funds.": "您的组织已用完 Antigravity 预付余额。在管理员充值前，提示词生成已暂停。",
+  "Cloud automation": "云端自动化",
+  "Cloud trigger": "云端触发器",
+  "Cloud automation credentials expired — re-authorize to resume scheduled runs.": "云端自动化凭据已过期 — 请重新授权以恢复定时运行。",
+  "Cloud automation credentials expire soon — renew to keep runs going.": "云端自动化凭据即将过期 — 请续期以保持定时运行。",
+  "Account connection was not completed.": "账号连接未完成。",
+  "Connect an account so the agent can run automations.": "连接账号，以便智能体运行自动化任务。",
+  "Refreshing credentials...": "正在刷新凭据...",
+  "Prompt to run when triggered...": "触发时运行的提示词...",
+  "Execution Identity": "执行身份",
+  "managed by application menu": "由应用菜单管理",
+  "reserved for sidebar switching": "保留用于侧边栏切换"
 }

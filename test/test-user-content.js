@@ -2023,3 +2023,171 @@ test('2.35.2 Google Drive link title warnings and /btw empty input prompt transl
   assert.equal(document.querySelector('[data-testid="user-input-step"] span').textContent, 'Enter a side question after /btw');
   assert.equal(document.querySelector('pre code').textContent, "Couldn't load Google Drive link title");
 });
+
+test('2.36.0 floating composer localizes status, badges and placeholder while protecting drafts and dynamic tool labels', async t => {
+  const { document, translate } = await fixture(t, `
+    <div data-testid="aux-pane-floating-composer" data-mode="collapsed">
+      <button id="status-known" type="button" data-testid="aux-pane-floating-composer-status"
+        aria-label="Subagent needs approval — restore split view" title="Subagent needs approval">
+        <span>Subagent needs approval</span>
+      </button>
+      <button id="status-retry" type="button" data-testid="aux-pane-floating-composer-status"
+        aria-label="Model unavailable, retrying in 8s (attempt 2/5) — restore split view"
+        title="Model unavailable, retrying in 8s (attempt 2/5)">
+        <span>Model unavailable, retrying in 8s (attempt 2/5)</span>
+      </button>
+      <button id="status-tool" type="button" data-testid="aux-pane-floating-composer-status"
+        aria-label="Running npm test — restore split view" title="Running npm test">
+        <span>Running npm test</span>
+      </button>
+      <button id="trigger-empty" type="button" data-testid="aux-pane-floating-composer-trigger">
+        <span id="placeholder" class="min-w-0 truncate opacity-60">Ask anything</span>
+        <span data-testid="aux-pane-floating-composer-comment-badge" data-count="1">
+          <span id="comment-single"></span>
+        </span>
+      </button>
+      <button id="trigger-draft" type="button" data-testid="aux-pane-floating-composer-trigger">
+        <span id="draft-settings" class="min-w-0 truncate opacity-90">Settings</span>
+      </button>
+      <button id="trigger-draft-same" type="button" data-testid="aux-pane-floating-composer-trigger">
+        <span id="draft-ask" class="min-w-0 truncate opacity-90">Ask anything</span>
+      </button>
+      <button id="trigger-both" type="button" data-testid="aux-pane-floating-composer-trigger">
+        <span data-testid="aux-pane-floating-composer-comment-badge" data-count="2">
+          <span id="comment-both">2<span class="sr-only"> Comments</span></span>
+        </span>
+        <span data-testid="aux-pane-floating-composer-attachment-badge" data-count="3">
+          <span id="attach-both">3<span class="sr-only"> Attached</span></span>
+        </span>
+      </button>
+      <button id="trigger-attach-only" type="button" data-testid="aux-pane-floating-composer-trigger">
+        <span data-testid="aux-pane-floating-composer-attachment-badge" data-count="1">
+          <span id="attach-single"></span>
+        </span>
+      </button>
+    </div>
+    <div data-testid="aux-pane-floating-composer" data-mode="expanded" role="region" aria-label="Conversation input"></div>
+    <p id="outside-ask">Ask anything</p>
+    <span id="outside-attached">Attached</span>
+    <button id="outside-status" aria-label="Working — restore split view">Working</button>`);
+
+  // Simulate React split text nodes for comment & attachment badges
+  const commentSingle = document.querySelector('#comment-single');
+  const countNode = document.createTextNode('1');
+  const suffixNode = document.createTextNode(' Comment');
+  commentSingle.append(countNode, suffixNode);
+
+  const attachSingle = document.querySelector('#attach-single');
+  const attachCount = document.createTextNode('1');
+  const attachSuffix = document.createTextNode(' Attached');
+  attachSingle.append(attachCount, attachSuffix);
+  translate(document.body);
+
+  assert.equal(document.querySelector('#status-known span').textContent, '子智能体需要审批');
+  assert.equal(document.querySelector('#status-known').getAttribute('title'), '子智能体需要审批');
+  assert.equal(document.querySelector('#status-known').getAttribute('aria-label'), '子智能体需要审批 — 恢复分栏视图');
+
+  assert.equal(document.querySelector('#status-retry span').textContent, '模型暂不可用，8 秒后重试（第 2/5 次）');
+  assert.equal(document.querySelector('#status-retry').getAttribute('aria-label'), '模型暂不可用，8 秒后重试（第 2/5 次） — 恢复分栏视图');
+
+  assert.equal(document.querySelector('#status-tool span').textContent, 'Running npm test');
+  assert.equal(document.querySelector('#status-tool').getAttribute('title'), 'Running npm test');
+  assert.equal(document.querySelector('#status-tool').getAttribute('aria-label'), 'Running npm test — 恢复分栏视图');
+
+  assert.equal(document.querySelector('#placeholder').textContent, '输入任何问题');
+  assert.equal(document.querySelector('#draft-settings').textContent, 'Settings');
+  assert.equal(document.querySelector('#draft-ask').textContent, 'Ask anything');
+  assert.equal(commentSingle.textContent, '1 条评论');
+  assert.equal(attachSingle.textContent, '1 个附件');
+  assert.equal(document.querySelector('#comment-both').textContent, '2 条评论');
+  assert.equal(document.querySelector('#attach-both').textContent, '3 个附件');
+
+  // React updates count & plural suffix in place without losing the localized suffix
+  countNode.nodeValue = '2';
+  suffixNode.nodeValue = ' Comments';
+  translate(commentSingle);
+  assert.equal(commentSingle.textContent, '2 条评论');
+
+  // Switching the reused span from placeholder (opacity-60) to saved draft (opacity-90) restores source text
+  const placeholderEl = document.querySelector('#placeholder');
+  placeholderEl.classList.remove('opacity-60');
+  placeholderEl.classList.add('opacity-90');
+  translate(placeholderEl);
+  assert.equal(placeholderEl.textContent, 'Ask anything');
+
+  assert.equal(document.querySelector('[data-mode="expanded"]').getAttribute('aria-label'), '对话输入');
+  // Negative boundary checks outside floating composer
+  assert.equal(document.querySelector('#outside-ask').textContent, 'Ask anything');
+  assert.equal(document.querySelector('#outside-attached').textContent, 'Attached');
+  assert.equal(document.querySelector('#outside-status').getAttribute('aria-label'), 'Working — restore split view');
+});
+
+test('2.36.0 wallet, remote capacity, app menu, admin plugin policies and cloud OAuth localize with strict boundaries', async t => {
+  const { document } = await fixture(t, `
+    <button id="app-menu" aria-label="Application Menu" data-testid="app-logo-menu-trigger"></button>
+    <div id="wallet-card">
+      <h3>Organization prepaid wallet is empty</h3>
+      <p>Your organization has run out of Antigravity funds. Prompt generation is paused until your administrator adds funds.</p>
+    </div>
+    <div id="capacity-cards">
+      <h4>Remote agents are busy</h4>
+      <h4>Daily environment time used</h4>
+      <h4>Too many environments running</h4>
+      <h4>Plan upgrade required</h4>
+      <h4>Daily conversation limit reached</h4>
+      <h4>Conversation limit reached</h4>
+    </div>
+    <button id="create-disabled" data-testid="plugins-create-with-prompt"
+      aria-label="Create plugin, Plugins are disabled by your organization.">Create</button>
+    <button id="market-disabled" data-testid="marketplace-invitation"
+      aria-label='Search for "foo, bar" in the Marketplace, The plugin marketplace is disabled by your organization.'>Browse the Marketplace</button>
+    <button id="see-bundles" aria-label="See 2 more bundles">See 2 more</button>
+    <div data-testid="remote-plugin-configure">
+      <span id="cfg-err-raw">Couldn't load plugin configuration: ETIMEDOUT 10.0.0.1</span>
+      <span id="cfg-saved">Configuration saved.</span>
+      <button id="cfg-retry" aria-label="Retry loading GitHub MCP configuration">Try again</button>
+      <button id="cfg-open" aria-label="Configure GitHub MCP">Configure</button>
+    </div>
+    <div data-testid="remote-automation-oauth-consent-callout">
+      <span id="oauth-specific">Connect an account for Gmail, Calendar so the agent can run automations.</span>
+      <span id="oauth-generic">Connect an account so the agent can run automations.</span>
+      <button id="oauth-btn">Refreshing credentials...</button>
+    </div>
+    <div id="cloud-expired">Cloud automation credentials expired — re-authorize to resume scheduled runs.</div>
+    <span id="shortcut-menu">managed by application menu</span>
+    <span id="shortcut-sidebar">reserved for sidebar switching</span>
+    <div data-testid="user-input-step">
+      <span id="user-wallet">Organization prepaid wallet is empty</span>
+      <span id="user-cfg-err">Couldn't load plugin configuration: Settings</span>
+    </div>
+    <button id="outside-cfg" aria-label="Configure GitHub MCP">Settings</button>`);
+
+  assert.equal(document.querySelector('#app-menu').getAttribute('aria-label'), '应用菜单');
+  assert.equal(document.querySelector('#wallet-card h3').textContent, '组织预付余额已用尽');
+  assert.equal(document.querySelector('#wallet-card p').textContent, '您的组织已用完 Antigravity 预付余额。在管理员充值前，提示词生成已暂停。');
+  assert.deepEqual([...document.querySelectorAll('#capacity-cards h4')].map(el => el.textContent), [
+    '远程智能体正忙',
+    '今日环境使用时长已用尽',
+    '运行中的环境数量过多',
+    '需要升级方案',
+    '已达到每日会话上限',
+    '已达到会话数量上限'
+  ]);
+  assert.equal(document.querySelector('#create-disabled').getAttribute('aria-label'), '创建插件，您的组织已禁用插件。');
+  assert.equal(document.querySelector('#market-disabled').getAttribute('aria-label'), '在扩展市场中搜索“foo, bar”，您的组织已禁用插件市场。');
+  assert.equal(document.querySelector('#see-bundles').getAttribute('aria-label'), '再查看 2 个组合包');
+  assert.equal(document.querySelector('#cfg-err-raw').textContent, '无法加载插件配置：ETIMEDOUT 10.0.0.1');
+  assert.equal(document.querySelector('#cfg-saved').textContent, '配置已保存。');
+  assert.equal(document.querySelector('#cfg-retry').getAttribute('aria-label'), '重试加载 GitHub MCP 配置');
+  assert.equal(document.querySelector('#cfg-open').getAttribute('aria-label'), '配置 GitHub MCP');
+  assert.equal(document.querySelector('#oauth-specific').textContent, '为 Gmail, Calendar 连接账号，以便智能体运行自动化任务。');
+  assert.equal(document.querySelector('#oauth-generic').textContent, '连接账号，以便智能体运行自动化任务。');
+  assert.equal(document.querySelector('#oauth-btn').textContent, '正在刷新凭据...');
+  assert.equal(document.querySelector('#cloud-expired').textContent, '云端自动化凭据已过期 — 请重新授权以恢复定时运行。');
+  assert.equal(document.querySelector('#shortcut-menu').textContent, '由应用菜单管理');
+  assert.equal(document.querySelector('#shortcut-sidebar').textContent, '保留用于侧边栏切换');
+  // Negative boundary checks
+  assert.equal(document.querySelector('#user-wallet').textContent, 'Organization prepaid wallet is empty');
+  assert.equal(document.querySelector('#user-cfg-err').textContent, "Couldn't load plugin configuration: Settings");
+  assert.equal(document.querySelector('#outside-cfg').getAttribute('aria-label'), 'Configure GitHub MCP');
+});

@@ -49,5 +49,11 @@
   "Deleting setup routine": "正在删除环境初始化脚本",
   "Canceled deletion of setup routine": "已取消删除环境初始化脚本",
   "Deleted setup routine": "已删除环境初始化脚本",
-  "Open in settings": "在设置中打开"
+  "Open in settings": "在设置中打开",
+  "Remote agents are busy": "远程智能体正忙",
+  "Daily environment time used": "今日环境使用时长已用尽",
+  "Too many environments running": "运行中的环境数量过多",
+  "Plan upgrade required": "需要升级方案",
+  "Daily conversation limit reached": "已达到每日会话上限",
+  "Conversation limit reached": "已达到会话数量上限"
 }

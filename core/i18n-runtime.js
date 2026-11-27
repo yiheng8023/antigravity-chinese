@@ -388,6 +388,10 @@
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
     if (el.matches('[data-testid="step-plan-item"] > span.min-w-0.truncate[title]')) return true;
+    // The collapsed floating composer trigger reuses one span for the placeholder
+    // (opacity-60) and the user's saved draft preview (opacity-90). Protect drafts.
+    if (el.tagName === 'SPAN' && el.classList.contains('opacity-90') &&
+        el.parentElement?.getAttribute('data-testid') === 'aux-pane-floating-composer-trigger') return true;
     if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
     // The first emphasized value in the deletion notice is a project or automation name.
     if (el.tagName === 'STRONG' && !el.previousElementSibling && isProjectDeletionDescription(el.parentElement)) return true;
@@ -696,6 +700,16 @@
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
     if (text === 'New Side Question' && isSideQuestionDraftTitle(el)) return '新建旁路提问';
+    if (text === 'Ask anything' && el?.tagName === 'SPAN' && el.classList.contains('opacity-60') &&
+        el.parentElement?.getAttribute('data-testid') === 'aux-pane-floating-composer-trigger') return '输入任何问题';
+    if ((text === 'Comment' || text === 'Comments') &&
+        el?.closest('[data-testid="aux-pane-floating-composer-comment-badge"]')) return '条评论';
+    if (text === 'Attached' &&
+        el?.closest('[data-testid="aux-pane-floating-composer-attachment-badge"]')) return '个附件';
+    if (text.startsWith("Couldn't load plugin configuration: ") &&
+        el?.closest('[data-testid="remote-plugin-configure"]')) {
+      return '无法加载插件配置：' + text.slice("Couldn't load plugin configuration: ".length);
+    }
     if (text === 'at' && el?.matches('span.text-muted-foreground.select-none') &&
         el.closest('[data-testid="automation-schedule-editor"]')) return '于';
     var queuedStatus = translateQueuedStatus(text, testId);
@@ -1230,6 +1244,26 @@
             var siteInfoLabel = translateSingleUnit('View site information');
             var status = val.slice(0, -'. View site information'.length);
             if (siteInfoLabel) trans = (Object.hasOwn(exactDict, status) ? exactDict[status] : status) + '。' + siteInfoLabel;
+          } else if (attr === 'aria-label' && val.endsWith(' \u2014 restore split view') &&
+              el.getAttribute('data-testid') === 'aux-pane-floating-composer-status') {
+            var statusLabel = val.slice(0, -' \u2014 restore split view'.length);
+            var localizedStatus = translateSingleUnit(statusLabel) || statusLabel;
+            trans = localizedStatus + ' — 恢复分栏视图';
+          } else if (attr === 'aria-label' && val.includes(', ') &&
+              (el.getAttribute('data-testid') === 'plugins-create-with-prompt' ||
+               el.getAttribute('data-testid') === 'marketplace-invitation')) {
+            var reasonSep = val.lastIndexOf(', ');
+            var actionText = translateSingleUnit(val.slice(0, reasonSep));
+            var reasonText = translateSingleUnit(val.slice(reasonSep + 2));
+            if (actionText && reasonText) trans = actionText + '，' + reasonText;
+          } else if (attr === 'aria-label' &&
+              ((val.startsWith('Retry loading ') && val.endsWith(' configuration')) || val.startsWith('Configure ')) &&
+              el.closest('[data-testid="remote-plugin-configure"]')) {
+            if (val.startsWith('Retry loading ')) {
+              trans = '重试加载 ' + val.slice('Retry loading '.length, -' configuration'.length) + ' 配置';
+            } else {
+              trans = '配置 ' + val.slice('Configure '.length);
+            }
           } else if (attr === 'aria-label' && val.startsWith('Reset ') && val.endsWith(' to default') &&
               el.closest('[data-testid^="shortcut-row-"]')) {
             var shortcutAction = translateSingleUnit(val.slice('Reset '.length, -' to default'.length));
@@ -1256,7 +1290,10 @@
     // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
     if (translateOwnContent && translateSiteDataFragments(el)) return;
     var first = el.firstChild;
-    if (translateOwnContent && first && first.nextSibling) {
+    var parentTestId = el.parentElement?.getAttribute('data-testid');
+    var skipTextCombine = parentTestId === 'aux-pane-floating-composer-comment-badge' ||
+      parentTestId === 'aux-pane-floating-composer-attachment-badge';
+    if (translateOwnContent && !skipTextCombine && first && first.nextSibling) {
       var allText = true;
       var cur = first;
       while (cur) {

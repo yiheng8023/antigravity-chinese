@@ -1,6 +1,6 @@
 {
   "version": "3.3.66",
-  "buildTime": "2026-11-27T14:25:15.132Z",
+  "buildTime": "2026-11-27T18:19:39.530Z",
   "exact": {
     "Runs on this machine": "在此电脑上运行",
     "Runs in a cloud environment": "在云端环境中运行",
@@ -2583,6 +2583,12 @@
     "Search tabs, files, extensions, subagents, artifacts, command": "搜索标签页、文件、扩展、子智能体、产物、命令",
     "Includes Global Permissions when working in this project.": "在此项目中工作时包含全局权限。",
     "Includes Global Permissions when working in this project": "在此项目中工作时包含全局权限",
+    "Application Menu": "应用菜单",
+    "Subagent needs approval": "子智能体需要审批",
+    "Question waiting": "有问题待回复",
+    "Unread message": "未读消息",
+    "Conversation input": "对话输入",
+    "Model unavailable, retrying": "模型暂不可用，正在重试",
     "Open SSH Host": "打开 SSH 主机",
     "Connect to SSH Host": "连接到 SSH 主机",
     "SSH Host…": "SSH 主机…",
@@ -2634,6 +2640,12 @@
     "Canceled deletion of setup routine": "已取消删除环境初始化脚本",
     "Deleted setup routine": "已删除环境初始化脚本",
     "Open in settings": "在设置中打开",
+    "Remote agents are busy": "远程智能体正忙",
+    "Daily environment time used": "今日环境使用时长已用尽",
+    "Too many environments running": "运行中的环境数量过多",
+    "Plan upgrade required": "需要升级方案",
+    "Daily conversation limit reached": "已达到每日会话上限",
+    "Conversation limit reached": "已达到会话数量上限",
     "Enable terminal sandbox": "启用终端沙箱",
     "Terminal command auto execution": "终端命令自动执行",
     "File writes": "文件写入",
@@ -3640,6 +3652,15 @@
     "Sign in required": "需要登录",
     "Starting": "正在启动",
     "Restart": "重启",
+    "Plugins are unavailable until your organization's policy loads.": "在组织策略加载完成前，插件暂不可用。",
+    "Plugins are disabled by your organization.": "您的组织已禁用插件。",
+    "The plugin marketplace is disabled by your organization.": "您的组织已禁用插件市场。",
+    "See more plugins": "查看更多插件",
+    "See more bundles": "查看更多组合包",
+    "Couldn't load plugin configuration.": "无法加载插件配置。",
+    "Configuration saved.": "配置已保存。",
+    "Add your API key or configuration to use this plugin.": "请添加 API 密钥或配置以使用此插件。",
+    "Saved securely. Secret values are hidden after saving.": "已安全保存。敏感值在保存后将被隐藏。",
     "Prevent sleep": "阻止系统休眠",
     "Keep in menu bar": "保持在菜单栏/托盘",
     "Device name": "设备名称",
@@ -4818,7 +4839,20 @@
     "No message text": "没有消息文本",
     "Conversation turns": "会话轮次",
     "here": "此处",
-    "Failed to refresh credentials": "刷新凭据失败"
+    "Failed to refresh credentials": "刷新凭据失败",
+    "Organization prepaid wallet is empty": "组织预付余额已用尽",
+    "Your organization has run out of Antigravity funds. Prompt generation is paused until your administrator adds funds.": "您的组织已用完 Antigravity 预付余额。在管理员充值前，提示词生成已暂停。",
+    "Cloud automation": "云端自动化",
+    "Cloud trigger": "云端触发器",
+    "Cloud automation credentials expired — re-authorize to resume scheduled runs.": "云端自动化凭据已过期 — 请重新授权以恢复定时运行。",
+    "Cloud automation credentials expire soon — renew to keep runs going.": "云端自动化凭据即将过期 — 请续期以保持定时运行。",
+    "Account connection was not completed.": "账号连接未完成。",
+    "Connect an account so the agent can run automations.": "连接账号，以便智能体运行自动化任务。",
+    "Refreshing credentials...": "正在刷新凭据...",
+    "Prompt to run when triggered...": "触发时运行的提示词...",
+    "Execution Identity": "执行身份",
+    "managed by application menu": "由应用菜单管理",
+    "reserved for sidebar switching": "保留用于侧边栏切换"
   },
   "patterns": [
     {
@@ -6420,6 +6454,26 @@
     {
       "regex": "^(\\d+) MCP servers? failed to start$",
       "replacement": "$1 个 MCP 服务器启动失败"
+    },
+    {
+      "regex": "^See (\\d+) more bundles$",
+      "replacement": "再查看 $1 个组合包"
+    },
+    {
+      "regex": "^Connect an account for (.+) so the agent can run automations\\.$",
+      "replacement": "为 $1 连接账号，以便智能体运行自动化任务。"
+    },
+    {
+      "regex": "^Model unavailable, retrying in (\\d+)s \\(attempt (\\d+)/(\\d+)\\)$",
+      "replacement": "模型暂不可用，$1 秒后重试（第 $2/$3 次）"
+    },
+    {
+      "regex": "^Model unavailable, retrying in (\\d+)s$",
+      "replacement": "模型暂不可用，$1 秒后重试"
+    },
+    {
+      "regex": "^Model unavailable, retrying \\(attempt (\\d+)/(\\d+)\\)$",
+      "replacement": "模型暂不可用，正在重试（第 $1/$2 次）"
     }
   ]
 }

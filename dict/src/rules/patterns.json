@@ -1598,5 +1598,25 @@
   {
     "regex": "^(\\d+) MCP servers? failed to start$",
     "replacement": "$1 个 MCP 服务器启动失败"
+  },
+  {
+    "regex": "^See (\\d+) more bundles$",
+    "replacement": "再查看 $1 个组合包"
+  },
+  {
+    "regex": "^Connect an account for (.+) so the agent can run automations\\.$",
+    "replacement": "为 $1 连接账号，以便智能体运行自动化任务。"
+  },
+  {
+    "regex": "^Model unavailable, retrying in (\\d+)s \\(attempt (\\d+)/(\\d+)\\)$",
+    "replacement": "模型暂不可用，$1 秒后重试（第 $2/$3 次）"
+  },
+  {
+    "regex": "^Model unavailable, retrying in (\\d+)s$",
+    "replacement": "模型暂不可用，$1 秒后重试"
+  },
+  {
+    "regex": "^Model unavailable, retrying \\(attempt (\\d+)/(\\d+)\\)$",
+    "replacement": "模型暂不可用，正在重试（第 $1/$2 次）"
   }
 ]

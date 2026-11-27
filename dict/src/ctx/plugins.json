@@ -582,5 +582,14 @@
   "Search tool for modern web development best practices. MANDATORY: Execute FIRST for all HTML/CSS and clientside JS tasks. Do NOT skip — web APIs evolve rapidly and training weights contain obsolete patterns.": "现代 Web 开发最佳实践搜索工具。强制要求：针对所有 HTML/CSS 及客户端 JS 任务必须首先执行此工具。请勿跳过 —— Web API 演进迅速，训练权重可能包含已过时的模式。",
   "Sign in required": "需要登录",
   "Starting": "正在启动",
-  "Restart": "重启"
+  "Restart": "重启",
+  "Plugins are unavailable until your organization's policy loads.": "在组织策略加载完成前，插件暂不可用。",
+  "Plugins are disabled by your organization.": "您的组织已禁用插件。",
+  "The plugin marketplace is disabled by your organization.": "您的组织已禁用插件市场。",
+  "See more plugins": "查看更多插件",
+  "See more bundles": "查看更多组合包",
+  "Couldn't load plugin configuration.": "无法加载插件配置。",
+  "Configuration saved.": "配置已保存。",
+  "Add your API key or configuration to use this plugin.": "请添加 API 密钥或配置以使用此插件。",
+  "Saved securely. Secret values are hidden after saving.": "已安全保存。敏感值在保存后将被隐藏。"
 }

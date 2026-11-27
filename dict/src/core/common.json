@@ -2584,5 +2584,11 @@
   "when working in these conversations.": "在此类会话中工作时。",
   "when working in these conversations": "在此类会话中工作时",
   "Includes Global Permissions when working in this project.": "在此项目中工作时包含全局权限。",
-  "Includes Global Permissions when working in this project": "在此项目中工作时包含全局权限"
+  "Includes Global Permissions when working in this project": "在此项目中工作时包含全局权限",
+  "Application Menu": "应用菜单",
+  "Subagent needs approval": "子智能体需要审批",
+  "Question waiting": "有问题待回复",
+  "Unread message": "未读消息",
+  "Conversation input": "对话输入",
+  "Model unavailable, retrying": "模型暂不可用，正在重试"
 }
