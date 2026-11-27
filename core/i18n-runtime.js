@@ -1094,13 +1094,38 @@
   // 扫描轮次 ID，同一轮全量扫描中元素只处理一次
   var currentScanId = 0;
 
+  function findBuiltinSlashDescriptionRoot(el) {
+    if (!el || el.nodeType !== 1 || !el.getAttribute) return null;
+    if (el.getAttribute('data-testid') === 'menu-option-description') return el;
+    var cur = el.parentElement;
+    for (var depth = 0; cur && depth < 6; depth++, cur = cur.parentElement) {
+      if (cur.getAttribute && cur.getAttribute('data-testid') === 'menu-option-description') return cur;
+    }
+    return null;
+  }
+
+  function restoreBuiltinSlashDescription(descEl) {
+    if (!descEl) return;
+    var walker = doc.createTreeWalker(descEl, root.NodeFilter.SHOW_TEXT);
+    for (var tn = walker.nextNode(); tn; tn = walker.nextNode()) {
+      if (textEdits.get(tn)?.scope === 'builtin-slash-description') restoreLocalizedText(tn);
+    }
+  }
+
   function translateBuiltinSlashDescription(el) {
-    if (!builtinSlashDescriptions || !el?.getAttribute) return false;
-    if (el.getAttribute('data-testid') !== 'menu-option-description' ||
-        el.getAttribute('dir') === 'rtl' || !el.closest?.('[data-mention-menu]')) return false;
-    var row = el.parentElement;
+    if (!builtinSlashDescriptions || !el) return false;
+    var descEl = findBuiltinSlashDescriptionRoot(el);
+    if (!descEl) return false;
+    if (descEl.getAttribute('dir') === 'rtl' || !descEl.closest?.('[data-mention-menu]')) {
+      restoreBuiltinSlashDescription(descEl);
+      return false;
+    }
+    var row = descEl.closest('[role="option"]') || descEl.parentElement;
     var labelEl = row?.querySelector('[data-testid="menu-option-label"]');
-    if (!labelEl) return false;
+    if (!labelEl) {
+      restoreBuiltinSlashDescription(descEl);
+      return false;
+    }
     var cmdName = '';
     var labelWalker = doc.createTreeWalker(labelEl, root.NodeFilter.SHOW_TEXT);
     for (var lt = labelWalker.nextNode(); lt; lt = labelWalker.nextNode()) {
@@ -1110,36 +1135,49 @@
     var entry = Object.hasOwn(builtinSlashDescriptions, cmdName) && builtinSlashDescriptions[cmdName];
 
     var menuTextNodes = [];
-    var menuWalker = doc.createTreeWalker(el, root.NodeFilter.SHOW_TEXT);
-    for (var mt = menuWalker.nextNode(); mt; mt = menuWalker.nextNode()) menuTextNodes.push(mt);
+    var hasProtectedNode = false;
+    var menuWalker = doc.createTreeWalker(descEl, root.NodeFilter.SHOW_TEXT);
+    for (var mt = menuWalker.nextNode(); mt; mt = menuWalker.nextNode()) {
+      menuTextNodes.push(mt);
+      var mParent = mt.parentElement;
+      if (!mParent || mParent.tagName === 'INPUT' || mParent.tagName === 'TEXTAREA' ||
+          getElementTranslationMode(mParent) !== 2) {
+        hasProtectedNode = true;
+      }
+    }
     if (!menuTextNodes.length) return false;
 
+    // 任一后代文本处于受保护边界（如 <code>、<pre>、contenteditable 等）时，整行不应用分段译文并还原历史译文
+    if (hasProtectedNode) {
+      restoreBuiltinSlashDescription(descEl);
+      return true;
+    }
+
     var menuSource = '';
-    var hadEdit = false;
     for (var i = 0; i < menuTextNodes.length; i++) {
       var mtn = menuTextNodes[i];
       var mEdit = textEdits.get(mtn);
-      if (mEdit?.scope === 'builtin-slash-description') hadEdit = true;
       menuSource += mEdit && mEdit.localized === mtn.nodeValue ? mEdit.source : mtn.nodeValue;
     }
     var normalized = normalizeWhitespace(menuSource);
     var verified = !!entry && normalized === entry.source &&
-      !el.dispatchEvent(new root.CustomEvent('agy-localization-check-builtin-slash-description', {
+      !descEl.dispatchEvent(new root.CustomEvent('agy-localization-check-builtin-slash-description', {
         detail: { name: cmdName, source: normalized },
         cancelable: true
       }));
 
     if (!verified) {
-      if (hadEdit) {
-        for (var j = 0; j < menuTextNodes.length; j++) restoreLocalizedText(menuTextNodes[j]);
-      }
-      return false;
+      restoreBuiltinSlashDescription(descEl);
+      return true;
     }
 
     var menuTrans = entry.translation;
     if (menuTextNodes.length > 1) {
       if (menuTextNodes.length === 3) {
-        var midSrc = (textEdits.get(menuTextNodes[1])?.source ?? menuTextNodes[1].nodeValue);
+        var midEdit = textEdits.get(menuTextNodes[1]);
+        var midSrc = (midEdit && midEdit.localized === menuTextNodes[1].nodeValue
+          ? midEdit.source
+          : menuTextNodes[1].nodeValue) || '';
         var hitIdx = midSrc && midSrc.trim() ? menuTrans.indexOf(midSrc) : -1;
         if (hitIdx !== -1) {
           writeLocalizedText(menuTextNodes[0], menuTrans.slice(0, hitIdx), 'builtin-slash-description');
@@ -1149,9 +1187,7 @@
         }
       }
       // 无法将搜索高亮片段可靠映射到译文时，保留带高亮的原文，清空搜索恢复单文本节点后再译回中文
-      if (hadEdit) {
-        for (var h = 0; h < menuTextNodes.length; h++) restoreLocalizedText(menuTextNodes[h]);
-      }
+      restoreBuiltinSlashDescription(descEl);
       return true;
     }
     writeLocalizedText(menuTextNodes[0], menuTrans, 'builtin-slash-description');
@@ -1164,6 +1200,10 @@
     var parent = node.parentElement || node.parentNode;
     var mode = parentMode === undefined ? getElementTranslationMode(parent) : parentMode;
     if (parent && (mode !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
+      if (builtinSlashDescriptions) {
+        var protectedSlash = findBuiltinSlashDescriptionRoot(parent);
+        if (protectedSlash) restoreBuiltinSlashDescription(protectedSlash);
+      }
       if (mode !== 0 || (!translateUserMessageClock(node) && !translateOfficialPluginDescription(parent))) restoreLocalizedText(node);
       return;
     }
@@ -1177,8 +1217,10 @@
       restoreLocalizedText(node);
       return;
     }
-    if (edit?.scope === 'builtin-slash-description') {
-      if (!translateBuiltinSlashDescription(parent)) restoreLocalizedText(node);
+    var slashDesc = builtinSlashDescriptions ? findBuiltinSlashDescriptionRoot(parent) : null;
+    if (edit?.scope === 'builtin-slash-description' || slashDesc) {
+      if (slashDesc) translateBuiltinSlashDescription(slashDesc);
+      else restoreLocalizedText(node);
       return;
     }
 
@@ -1277,6 +1319,8 @@
     var translationMode = getElementTranslationMode(el);
     if (translationMode === 0) {
       if (translateOfficialPluginDescription(el)) return;
+      var protectedSlashDesc = findBuiltinSlashDescriptionRoot(el);
+      if (protectedSlashDesc) restoreBuiltinSlashDescription(protectedSlashDesc);
       var modelSelectorLabel = getLocalizedModelSelectorLabel(el);
       if (work) {
         if (!modelSelectorLabel && !translateSideQuestionOriginAttributes(el)) restoreLocalizedAttributes(el);
@@ -1436,7 +1480,7 @@
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class', 'dir')
+        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class', 'dir', 'aria-selected')
       });
       observing = true;
     }
@@ -1594,18 +1638,27 @@
   function enqueueMenuOptionDependents(target) {
     var el = target && target.nodeType === 3 ? target.parentElement : target;
     if (!el || !el.closest) return;
-    var menuDesc = el.closest('[data-testid="menu-option-description"]');
+    var menuDesc = findBuiltinSlashDescriptionRoot(el) || el.closest('[data-testid="menu-option-description"]');
     if (menuDesc) {
       menuDesc._agyScanId = 0;
       enqueueNode(menuDesc);
       return;
     }
     var optRow = el.closest('[data-mention-menu] [role="option"]');
-    if (optRow && (el.closest('[data-testid="menu-option-label"]') || el === optRow)) {
+    if (optRow) {
       var siblingDesc = optRow.querySelector('[data-testid="menu-option-description"]');
       if (siblingDesc) {
         siblingDesc._agyScanId = 0;
         enqueueNode(siblingDesc);
+      }
+      return;
+    }
+    var mentionMenu = el.closest('[data-mention-menu]');
+    if (mentionMenu) {
+      var menuDescs = mentionMenu.querySelectorAll('[data-testid="menu-option-description"]');
+      for (var mi = 0; mi < menuDescs.length; mi++) {
+        menuDescs[mi]._agyScanId = 0;
+        enqueueNode(menuDescs[mi]);
       }
     }
   }
@@ -1649,6 +1702,7 @@
         if (edits) delete edits[mutation.attributeName];
         mutation.target[MARK_ATTR + '_' + mutation.attributeName] = undefined;
         enqueueNode(mutation.target);
+        enqueueMenuOptionDependents(mutation.target);
       }
     }
     if (pendingNodes.length > 0) scheduleFlush();
