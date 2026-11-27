@@ -99,14 +99,18 @@ function findVsCodeExtensionDir(customDir) {
   }
 
   const home = os.homedir();
-  const extBase = path.join(home, '.vscode', 'extensions');
-  if (!fs.existsSync(extBase)) return null;
+  const extensionRoots = [path.join(home, '.vscode', 'extensions')];
+  if (os.platform() === 'linux') {
+    extensionRoots.push(path.join(home, '.vscode-server', 'extensions'));
+  }
 
-  try {
-    const entries = fs.readdirSync(extBase);
+  for (const extBase of extensionRoots) {
+    let entries;
+    try { entries = fs.readdirSync(extBase); }
+    catch (_) { continue; }
     const matches = entries.filter((e) => e.startsWith('google.google-antigravity-'))
       .map(e => readExtension(path.join(extBase, e))).filter(Boolean);
-    if (matches.length === 0) return null;
+    if (matches.length === 0) continue;
 
     // 按版本号自然排序，选取最高版本
     matches.sort((a, b) => {
@@ -116,9 +120,8 @@ function findVsCodeExtensionDir(customDir) {
         (aPre === bPre ? 0 : aPre === undefined ? 1 : bPre === undefined ? -1 : aPre.localeCompare(bPre, 'en', { numeric: true }));
     });
     return matches[matches.length - 1].dir;
-  } catch (_) {
-    return null;
   }
+  return null;
 }
 
 /**
@@ -762,7 +765,7 @@ function installVsCodePatch(customDir) {
   if (!extDir) {
     return {
       success: false,
-      message: '未检测到 VS Code 的 Google Antigravity 扩展目录 (~/.vscode/extensions/google.google-antigravity-*)。'
+      message: '未检测到 VS Code 的 Google Antigravity 扩展目录。请检查 ~/.vscode/extensions 或 Linux 的 ~/.vscode-server/extensions，也可用 --path 指定扩展目录。'
     };
   }
 

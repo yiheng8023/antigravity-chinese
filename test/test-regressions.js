@@ -238,6 +238,45 @@ test('extension discovery selects the newest numeric version and validates ident
   assert.equal(findVsCodeExtensionDir(unrelated), null);
 });
 
+test('Linux discovers VS Code Server extensions while keeping explicit and local targets ahead', (t) => {
+  const home = tempDir(t);
+  const remoteRoot = path.join(home, '.vscode-server', 'extensions');
+  const older = path.join(remoteRoot, 'google.google-antigravity-1.9.0');
+  const newest = path.join(remoteRoot, 'google.google-antigravity-1.13.0');
+  const foreign = path.join(remoteRoot, 'google.google-antigravity-99.0.0');
+  const local = path.join(home, '.vscode', 'extensions', 'google.google-antigravity-1.10.0');
+  extension(older, '1.9.0');
+  const remote = extension(newest, '1.13.0');
+  extension(foreign, '99.0.0');
+  fs.writeFileSync(path.join(foreign, 'package.json'), '{"publisher":"other","name":"google-antigravity","version":"99.0.0"}');
+  const originalHome = os.homedir;
+  const originalPlatform = os.platform;
+  os.homedir = () => home;
+  os.platform = () => 'linux';
+  try {
+    assert.equal(findVsCodeExtensionDir(), newest);
+    assert.equal(installVsCodePatch().success, true);
+    assert.equal(JSON.parse(fs.readFileSync(path.join(newest, 'package.json'), 'utf8')).__antigravity_chinese_patched, true);
+    assert.equal(fs.existsSync(path.join(older, 'package.json.bak')), false);
+    assert.equal(fs.existsSync(path.join(foreign, 'package.json.bak')), false);
+    assert.equal(restoreVsCodePatch().success, true);
+    assert.equal(fs.readFileSync(path.join(newest, 'package.json'), 'utf8'), remote.pkg);
+    assert.equal(fs.readFileSync(path.join(newest, 'extension.js'), 'utf8'), remote.js);
+    assert.equal(findVsCodeExtensionDir(foreign), null);
+
+    os.platform = () => 'win32';
+    assert.equal(findVsCodeExtensionDir(), null);
+    assert.equal(findVsCodeExtensionDir(newest), newest);
+    os.platform = () => 'linux';
+    extension(local, '1.10.0');
+    assert.equal(findVsCodeExtensionDir(), local);
+    assert.equal(findVsCodeExtensionDir(newest), newest);
+  } finally {
+    os.homedir = originalHome;
+    os.platform = originalPlatform;
+  }
+});
+
 test('reinstall after an upstream update preserves the new manifest and executable', (t) => {
   const dir = tempDir(t);
   extension(dir);

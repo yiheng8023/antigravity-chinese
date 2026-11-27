@@ -66,6 +66,8 @@ node cli.js install --path "<installation directory or app.asar>"
 node cli.js install:vscode --path "<extension directory>"
 ```
 
+On Linux, `install:vscode`, `status:vscode`, and `restore:vscode` also check `~/.vscode-server/extensions`. If both locations contain the extension, `~/.vscode/extensions` takes precedence. To select the remote copy explicitly, run the command in the remote terminal with `--path` set to its extension directory.
+
 On Linux, the detector also looks under `~/Applications/Portable`, under `~/Applications`, and beside the toolkit checkout. It accepts `Antigravity`, `antigravity`, and the official extracted directory for the current architecture (`Antigravity-x64` or `Antigravity-arm64`). Pass `--path` to select a specific copy when several are installed.
 
 ```bash

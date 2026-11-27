@@ -66,6 +66,8 @@ node cli.js install --path "<安装目录或 app.asar>"
 node cli.js install:vscode --path "<扩展目录>"
 ```
 
+在 Linux 的 VS Code Server 环境中，`install:vscode`、`status:vscode` 和 `restore:vscode` 也会探测 `~/.vscode-server/extensions`。两处都安装了扩展时，默认选 `~/.vscode/extensions`。处理远端副本时可在远端终端用 `--path` 指定实际扩展目录。
+
 Linux 解压版支持自动探测 `~/Applications/Portable`、`~/Applications` 和汉化工具同级目录下的 `Antigravity`、`antigravity` 或对应架构的官方解压目录（`Antigravity-x64` 或 `Antigravity-arm64`）。多个安装目录共存时，传入 `--path` 指定要处理的副本。
 
 ```bash
