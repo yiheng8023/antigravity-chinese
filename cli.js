@@ -560,7 +560,18 @@ function runPreflightCheck(customPath) {
   };
 }
 
-function install(customPath) {
+function writeJsonFileAtomic(targetPath, data, fsOps = fs) {
+  const tmpPath = `${targetPath}.tmp.${process.pid}.${Date.now()}`;
+  try {
+    fsOps.writeFileSync(tmpPath, JSON.stringify(data, null, 2), 'utf8');
+    fsOps.renameSync(tmpPath, targetPath);
+  } catch (err) {
+    try { if (fs.existsSync(tmpPath)) fs.rmSync(tmpPath, { force: true }); } catch (_) {}
+    throw err;
+  }
+}
+
+function install(customPath, options = {}) {
   console.log('🔍 [1/5] 正在执行前置环境全维健康预检 (Pre-flight Checks)...');
   const preflight = runPreflightCheck(customPath);
   for (const c of preflight.checks) {
@@ -594,11 +605,44 @@ function install(customPath) {
   const backupPath = path.join(resourcesDir, 'app.asar.bak');
   const backupFpPath = path.join(resourcesDir, 'app.asar.bak.fingerprint');
   const tempExtractDir = path.join(resourcesDir, '__asar_temp_unpack__');
+  const tempSnapshotDir = path.join(resourcesDir, '__asar_source_snapshot__');
+  const tempSourceSnapshot = path.join(tempSnapshotDir, 'app.asar');
+  const tempSnapshotUnpacked = tempSourceSnapshot + '.unpacked';
 
-  // 1. Backup (严格判据：只有当当前 ASAR 确认为官方原生未打补丁时，才允许建立或更新 upstream pristine 备份)
+  const cleanupTempArtifacts = () => {
+    for (const dir of [tempExtractDir]) {
+      if (fs.existsSync(dir)) {
+        try { fs.rmSync(dir, { recursive: true, force: true }); } catch (_) {}
+      }
+    }
+    if (fs.existsSync(tempSnapshotUnpacked)) {
+      try {
+        const st = fs.lstatSync(tempSnapshotUnpacked);
+        if (st.isSymbolicLink()) fs.unlinkSync(tempSnapshotUnpacked);
+        else fs.rmSync(tempSnapshotUnpacked, { recursive: true, force: true });
+      } catch (_) {}
+    }
+    if (fs.existsSync(tempSnapshotDir)) {
+      try { fs.rmSync(tempSnapshotDir, { recursive: true, force: true }); } catch (_) {}
+    }
+  };
+
+  cleanupTempArtifacts();
+  fs.mkdirSync(tempSnapshotDir, { recursive: true });
+  fs.copyFileSync(asarPath, tempSourceSnapshot);
+  const origUnpacked = asarPath + '.unpacked';
+  if (fs.existsSync(origUnpacked)) {
+    try {
+      fs.symlinkSync(origUnpacked, tempSnapshotUnpacked, os.platform() === 'win32' ? 'junction' : 'dir');
+    } catch (_) {
+      fs.cpSync(origUnpacked, tempSnapshotUnpacked, { recursive: true });
+    }
+  }
+
+  // 1. Backup (严格判据：基于本次实际解包的原包快照校验与备份，防止解包过程中官方版本变更造成撕裂)
   console.log('📦 [2/5] 检查安全备份...');
-  const isPatched = isAsarPatched(asarPath);
-  const currentFp = getAsarFingerprint(asarPath);
+  const isPatched = isAsarPatched(tempSourceSnapshot);
+  const currentFp = getAsarFingerprint(tempSourceSnapshot);
   let prevFp = null;
   if (fs.existsSync(backupFpPath)) {
     try { prevFp = fs.readFileSync(backupFpPath, 'utf8').trim(); } catch (e) {}
@@ -608,7 +652,7 @@ function install(customPath) {
     // 当前确认为官方原生未打补丁版本：指纹变动即代表官方发版更新，立即刷新纯净基准备份
     if (!fs.existsSync(backupPath) || currentFp !== prevFp) {
       if (fs.existsSync(backupPath)) fs.rmSync(backupPath, { force: true });
-      fs.copyFileSync(asarPath, backupPath);
+      fs.copyFileSync(tempSourceSnapshot, backupPath);
       fs.writeFileSync(backupFpPath, String(currentFp), 'utf8');
       console.log(`✅ 已创建当前官方纯净版本基准备份: ${backupPath} (fingerprint ${currentFp})`);
     } else {
@@ -623,7 +667,7 @@ function install(customPath) {
     }
   }
 
-  // 2. Extract
+  // 2. Extract (严格解包同一份快照字节)
   console.log('⚙️ [3/5] 正在解构资源包 (ASAR)...');
   if (fs.existsSync(tempExtractDir)) {
     fs.rmSync(tempExtractDir, { recursive: true, force: true });
@@ -632,11 +676,16 @@ function install(customPath) {
   try {
     const asarBin = path.join(__dirname, 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
     const extractCmd = fs.existsSync(asarBin)
-      ? `"${asarBin}" extract "${asarPath}" "${tempExtractDir}"`
-      : `npx -y @electron/asar@3.2.14 extract "${asarPath}" "${tempExtractDir}"`;
+      ? `"${asarBin}" extract "${tempSourceSnapshot}" "${tempExtractDir}"`
+      : `npx -y @electron/asar@3.2.14 extract "${tempSourceSnapshot}" "${tempExtractDir}"`;
     execSync(extractCmd, { stdio: 'inherit' });
+    if (typeof options.onAfterExtract === 'function') {
+      options.onAfterExtract({ asarPath, tempExtractDir, sourceFingerprint: currentFp });
+    }
   } catch (err) {
+    cleanupTempArtifacts();
     console.error('❌ 解包 app.asar 失败:', err.message);
+    if (options.throwOnConflict) throw err;
     process.exit(1);
   }
 
@@ -714,41 +763,52 @@ function install(customPath) {
   }
 
   try {
-    const unpackArgs = getUnpackArgs(asarPath).map(arg => `"${arg}"`).join(' ');
+    const unpackArgs = getUnpackArgs(tempSourceSnapshot).map(arg => `"${arg}"`).join(' ');
     const asarBin = path.join(__dirname, 'node_modules', '.bin', os.platform() === 'win32' ? 'asar.cmd' : 'asar');
     const packCmd = fs.existsSync(asarBin)
       ? `"${asarBin}" pack "${tempExtractDir}" "${tempNewAsar}" ${unpackArgs}`
       : `npx -y @electron/asar@3.2.14 pack "${tempExtractDir}" "${tempNewAsar}" ${unpackArgs}`;
     execSync(packCmd, { stdio: 'inherit' });
-    const externalCount = verifyUnpackedOutput(asarPath, tempNewAsar);
+    const externalCount = verifyUnpackedOutput(tempSourceSnapshot, tempNewAsar);
     if (externalCount) console.log(`✅ 已验证 ${externalCount} 个外置文件的布局与原始内容保持一致`);
     if (fs.existsSync(tempUnpackedDir)) fs.rmSync(tempUnpackedDir, { recursive: true, force: true });
-    
-    // 带自动回滚的双阶段安全替换架构 (Two-Phase Staged Swap with Automatic Rollback)
-    const sourceAsarFp = getAsarFingerprint(asarPath);
+
+    // 来源指纹严格绑定到实际解包的原包快照字节；若此后发现目标 app.asar 已被官方升级覆盖，立即中止并拒绝替换/暂存
+    const sourceAsarFp = currentFp;
+    const fsOps = options.fsOps || fs;
     const swapOldAsar = path.join(resourcesDir, 'app.asar.swap-old');
     if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
 
     let replaceSuccess = false;
     let isSwapped = false;
     let lastError = null;
+    let abortedDueToUpstreamUpdate = false;
+    const maxSwapAttempts = typeof options.maxAttempts === 'number' ? options.maxAttempts : 5;
+    const swapRetryDelayMs = typeof options.retryDelayMs === 'number' ? options.retryDelayMs : 400;
 
-    for (let attempt = 0; attempt < 5; attempt++) {
+    for (let attempt = 0; attempt < maxSwapAttempts; attempt++) {
+      if (typeof options.onBeforeSwapAttempt === 'function') {
+        options.onBeforeSwapAttempt({ attempt, asarPath, sourceFingerprint: sourceAsarFp });
+      }
+      if (!isSwapped && (!fs.existsSync(asarPath) || getAsarFingerprint(asarPath) !== sourceAsarFp)) {
+        abortedDueToUpstreamUpdate = true;
+        break;
+      }
       try {
         // 阶段 1: 将原 app.asar rename 为 app.asar.swap-old（安全暂存原版，绝不直接物理删除！）
         if (!isSwapped && fs.existsSync(asarPath)) {
-          fs.renameSync(asarPath, swapOldAsar);
+          fsOps.renameSync(asarPath, swapOldAsar);
           isSwapped = true;
         }
         // 阶段 2: 将生成好的 app.asar.new rename 为 app.asar
-        fs.renameSync(tempNewAsar, asarPath);
+        fsOps.renameSync(tempNewAsar, asarPath);
         replaceSuccess = true;
         break;
       } catch (permErr) {
         lastError = permErr;
         if (permErr.code === 'EPERM' || permErr.code === 'EBUSY') {
-          if (attempt < 4) {
-            try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 400); } catch (_) {}
+          if (attempt < maxSwapAttempts - 1 && swapRetryDelayMs > 0) {
+            try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, swapRetryDelayMs); } catch (_) {}
           }
         } else {
           break;
@@ -756,56 +816,80 @@ function install(customPath) {
       }
     }
 
+    if (abortedDueToUpstreamUpdate) {
+      cleanupTempArtifacts();
+      if (fs.existsSync(tempNewAsar)) try { fs.rmSync(tempNewAsar, { force: true }); } catch (_) {}
+      console.warn('⚠️ 检测到解包/安装期间上游官方刚更新了 app.asar，已安全中止安装并完整保留新版客户端（未产生基于旧包的降级补丁）。');
+      if (options.returnStatus) return { status: 'aborted_upstream_update', sourceFingerprint: sourceAsarFp };
+      if (options.throwOnConflict) throw new Error('UPSTREAM_UPDATED_DURING_INSTALL');
+      process.exit(1);
+    }
+
     if (!replaceSuccess) {
       // 核心安全防御：两阶段替换失败，触发自动 Rollback！
       if (isSwapped && fs.existsSync(swapOldAsar)) {
         try {
           if (fs.existsSync(asarPath)) fs.rmSync(asarPath, { force: true });
-          fs.renameSync(swapOldAsar, asarPath);
+          fsOps.renameSync(swapOldAsar, asarPath);
           console.log('✅ 已成功将宿主客户端恢复至安装前完整状态，未发生文件丢失。');
         } catch (rollbackErr) {
           console.error('❌ 回滚遇到错误:', rollbackErr.message);
         }
       }
 
+      const currentDiskFp = fs.existsSync(asarPath) ? getAsarFingerprint(asarPath) : null;
+      if (currentDiskFp !== sourceAsarFp) {
+        cleanupTempArtifacts();
+        if (fs.existsSync(tempNewAsar)) try { fs.rmSync(tempNewAsar, { force: true }); } catch (_) {}
+        console.warn('⚠️ 检测到目标 app.asar 指纹已发生变更（官方可能刚完成升级），拒绝写入过时的 app.asar.staged。');
+        if (options.returnStatus) return { status: 'aborted_upstream_update', sourceFingerprint: sourceAsarFp };
+        if (options.throwOnConflict) throw new Error('UPSTREAM_UPDATED_BEFORE_STAGE');
+        process.exit(1);
+      }
+
       const isLockedErr = lastError && (lastError.code === 'EBUSY' || lastError.code === 'EPERM');
-      if (!customPath && isProtectedEnvironment() && isLockedErr && fs.existsSync(tempNewAsar)) {
+      const allowStagedFallback = options.forceStagedFallback || (!customPath && isProtectedEnvironment());
+      if (allowStagedFallback && isLockedErr && fs.existsSync(tempNewAsar)) {
         const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
         const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
         if (fs.existsSync(stagedAsar)) fs.rmSync(stagedAsar, { force: true });
         if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
         fs.renameSync(tempNewAsar, stagedAsar);
         const stagedFp = getAsarFingerprint(stagedAsar);
-        fs.writeFileSync(stagedMetaPath, JSON.stringify({
+        writeJsonFileAtomic(stagedMetaPath, {
           sourceFingerprint: sourceAsarFp,
           stagedFingerprint: stagedFp,
           timestamp: Date.now()
-        }, null, 2), 'utf8');
-        if (fs.existsSync(tempExtractDir)) fs.rmSync(tempExtractDir, { recursive: true, force: true });
+        });
+        cleanupTempArtifacts();
 
-        try {
-          const { spawn } = require('child_process');
-          const child = spawn(process.execPath, [__filename, 'apply-staged', '--path', asarPath], {
-            detached: true,
-            stdio: 'ignore',
-            windowsHide: true
-          });
-          child.unref();
-        } catch (_) {}
+        if (!options.skipSpawnApplyStaged) {
+          try {
+            const { spawn } = require('child_process');
+            const child = spawn(process.execPath, [__filename, 'apply-staged', '--path', asarPath], {
+              detached: true,
+              stdio: 'ignore',
+              windowsHide: true
+            });
+            child.unref();
+          } catch (_) {}
+        }
 
         console.log('\n✨ ==============================================');
         console.log('✨ [无损预注入就绪] 最新汉化包已预构建为: app.asar.staged');
         console.log('✨ 已挂载后台静默守候进程：当您稍后正常关闭 Antigravity 客户端时，');
         console.log('✨ 将在 0.5 秒内自动完成原子替换，下次打开即刻呈现中文界面！');
         console.log('✨ ==============================================\n');
+        if (options.returnStatus) return { status: 'staged', sourceFingerprint: sourceAsarFp, stagedFingerprint: stagedFp };
         return;
       }
 
       console.error('\n⚠️ [安全回滚触发] ASAR 替换失败，正在执行出厂原件自动回滚...');
       if (fs.existsSync(tempNewAsar)) fs.rmSync(tempNewAsar, { force: true });
-      if (fs.existsSync(tempExtractDir)) fs.rmSync(tempExtractDir, { recursive: true, force: true });
+      cleanupTempArtifacts();
       console.error('\n❌ 文件被占用或替换失败:', lastError ? lastError.message : '未知错误');
       console.error('   Antigravity 客户端可能正在运行并锁定了文件。已保持原版完整，安装中止。');
+      if (options.throwOnConflict) throw lastError || new Error('ASAR_REPLACE_FAILED');
       process.exit(1);
     }
 
@@ -822,15 +906,12 @@ function install(customPath) {
       try { fs.rmSync(residualStagedMeta, { force: true }); } catch (_) {}
     }
 
-    // 写入汉化元数据指纹 (Hash/Manifest 根治架构)
+    // 写入汉化元数据指纹 (原子写入，防止半写损坏)
     const metaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
     const newAsarFp = getAsarFingerprint(asarPath);
-    fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newAsarFp, timestamp: Date.now() }, null, 2), 'utf8');
+    writeJsonFileAtomic(metaPath, { patched: true, patchedFingerprint: newAsarFp, timestamp: Date.now() }, fsOps);
 
-    // Clean temp
-    if (fs.existsSync(tempExtractDir)) {
-      fs.rmSync(tempExtractDir, { recursive: true, force: true });
-    }
+    cleanupTempArtifacts();
 
     // macOS codesign
     if (os.platform() === 'darwin') {
@@ -858,6 +939,8 @@ function install(customPath) {
     if (fs.existsSync(tempNewAsar)) {
       fs.rmSync(tempNewAsar, { force: true });
     }
+    cleanupTempArtifacts();
+    if (options.throwOnConflict) throw err;
     process.exit(1);
   }
 }
@@ -1205,6 +1288,7 @@ function uninstallPlugin() {
  * 2. 交换或写入元数据失败时自动回滚至原 app.asar。
  */
 function commitStagedSwap(asarPath, options = {}) {
+  const fsOps = options.fsOps || fs;
   const resourcesDir = path.dirname(asarPath);
   const stagedAsar = path.join(resourcesDir, 'app.asar.staged');
   const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
@@ -1242,21 +1326,37 @@ function commitStagedSwap(asarPath, options = {}) {
   let swappedStaged = false;
   let lastErr = null;
   for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (typeof options.onBeforeSwapAttempt === 'function') {
+      options.onBeforeSwapAttempt({ attempt, asarPath, sourceFingerprint: stagedMeta.sourceFingerprint });
+    }
+    // 每次替换尝试前再次核验目标 app.asar 来源指纹，防止重试期间上游官方写入新版导致降级
+    if (!swappedOld && (!fs.existsSync(asarPath) || getAsarFingerprint(asarPath) !== stagedMeta.sourceFingerprint)) {
+      try { fs.rmSync(stagedAsar, { force: true }); } catch (_) {}
+      try { if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true }); } catch (_) {}
+      return { status: 'stale' };
+    }
+    if (swappedOld && !swappedStaged && fs.existsSync(asarPath) && getAsarFingerprint(asarPath) !== stagedMeta.sourceFingerprint) {
+      // 重试期间官方已把新包写回正式路径，保留新版并清理旧 staged
+      try { fs.rmSync(stagedAsar, { force: true }); } catch (_) {}
+      try { if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true }); } catch (_) {}
+      return { status: 'stale' };
+    }
+
     try {
       if (!swappedOld && fs.existsSync(asarPath)) {
         if (fs.existsSync(swapOldAsar)) fs.rmSync(swapOldAsar, { force: true });
-        fs.renameSync(asarPath, swapOldAsar);
+        fsOps.renameSync(asarPath, swapOldAsar);
         swappedOld = true;
       }
       if (!swappedStaged) {
-        fs.renameSync(stagedAsar, asarPath);
+        fsOps.renameSync(stagedAsar, asarPath);
         swappedStaged = true;
       }
       if (typeof options.onBeforeWriteMeta === 'function') {
         options.onBeforeWriteMeta(asarPath);
       }
       const newFp = getAsarFingerprint(asarPath);
-      fs.writeFileSync(metaPath, JSON.stringify({ patched: true, patchedFingerprint: newFp, timestamp: Date.now() }, null, 2), 'utf8');
+      writeJsonFileAtomic(metaPath, { patched: true, patchedFingerprint: newFp, timestamp: Date.now() }, fsOps);
       if (fs.existsSync(swapOldAsar)) {
         try { fs.rmSync(swapOldAsar, { force: true }); } catch (_) {}
       }
@@ -1266,21 +1366,72 @@ function commitStagedSwap(asarPath, options = {}) {
       return { status: 'applied' };
     } catch (err) {
       lastErr = err;
-      if (attempt < maxAttempts - 1) {
+      const isLockErr = err && (err.code === 'EPERM' || err.code === 'EBUSY');
+      if (isLockErr && attempt < maxAttempts - 1) {
         if (retryDelayMs > 0) {
           try { Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, retryDelayMs); } catch (_) {}
         }
-      } else {
-        if (swappedStaged && fs.existsSync(asarPath) && !fs.existsSync(stagedAsar)) {
-          try { fs.renameSync(asarPath, stagedAsar); swappedStaged = false; } catch (_) {}
-        }
-        if (swappedOld && !fs.existsSync(asarPath) && fs.existsSync(swapOldAsar)) {
-          try { fs.renameSync(swapOldAsar, asarPath); swappedOld = false; } catch (_) {}
-        }
+        continue;
       }
+      break;
     }
   }
-  return { status: 'error', error: lastErr };
+
+  // 回滚：任何重命名失败都不能被悄悄吞掉，必须完整记录到 rollbackErrors 和恢复现场信息中
+  const rollbackErrors = [];
+  if (swappedStaged && fs.existsSync(asarPath) && !fs.existsSync(stagedAsar)) {
+    try {
+      fsOps.renameSync(asarPath, stagedAsar);
+      swappedStaged = false;
+    } catch (rbErr1) {
+      rollbackErrors.push({ step: 'restore_staged', from: asarPath, to: stagedAsar, error: rbErr1 });
+    }
+  }
+  if (swappedOld && !swappedStaged && !fs.existsSync(asarPath) && fs.existsSync(swapOldAsar)) {
+    try {
+      fsOps.renameSync(swapOldAsar, asarPath);
+      swappedOld = false;
+    } catch (rbErr2) {
+      rollbackErrors.push({ step: 'restore_original', from: swapOldAsar, to: asarPath, error: rbErr2 });
+    }
+  }
+
+  const recovery = {
+    asarExists: fs.existsSync(asarPath),
+    swapOldExists: fs.existsSync(swapOldAsar),
+    stagedExists: fs.existsSync(stagedAsar),
+    stagedMetaExists: fs.existsSync(stagedMetaPath),
+    originalFileLocation: (!swappedOld && fs.existsSync(asarPath))
+      ? asarPath
+      : (fs.existsSync(swapOldAsar) ? swapOldAsar : null)
+  };
+  return {
+    status: 'error',
+    error: lastErr,
+    rollbackErrors,
+    recovery
+  };
+}
+
+function applyStagedOnce(asarPath, options = {}) {
+  const res = commitStagedSwap(asarPath, options);
+  if (res.status === 'error') {
+    const errMsg = res.error ? res.error.message : '未知错误';
+    console.error(`❌ 应用 app.asar.staged 失败: ${errMsg}`);
+    if (res.rollbackErrors && res.rollbackErrors.length > 0) {
+      for (const rb of res.rollbackErrors) {
+        console.error(`❌ 回滚步骤 [${rb.step}] (${rb.from} -> ${rb.to}) 失败: ${rb.error.message}`);
+      }
+      if (res.recovery?.originalFileLocation) {
+        console.error(`ℹ️ 原始未修改包仍完整保留在: ${res.recovery.originalFileLocation}`);
+      }
+    }
+    return { exitCode: 1, result: res };
+  }
+  if (res.status === 'stale') {
+    console.warn('ℹ️ 检测到官方客户端已更新，已作废过期 app.asar.staged 并保留当前官方包。');
+  }
+  return { exitCode: 0, result: res };
 }
 
 function applyStagedWhenUnlocked(customPath) {
@@ -1299,8 +1450,8 @@ function applyStagedWhenUnlocked(customPath) {
     }
     if (!isProcessRunning()) {
       clearInterval(timer);
-      commitStagedSwap(asarPath);
-      process.exit(0);
+      const outcome = applyStagedOnce(asarPath);
+      process.exit(outcome.exitCode);
     }
   }, 300);
 }
@@ -1482,7 +1633,9 @@ module.exports = {
   tryRecoverSwappedAsar,
   isAsarPatched,
   getAsarFingerprint,
+  install,
   commitStagedSwap,
+  applyStagedOnce,
   runPreflightCheck,
   patchMenuFile,
   patchMainFile,

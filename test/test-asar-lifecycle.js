@@ -266,8 +266,9 @@ contextBridge.exposeInMainWorld('api', { version: 'D_OFFICIAL_NEW_PRISTINE' });
     '指定 --path 的还原保持全局插件文件不变');
 
   // 10. 【Staged 来源指纹防降级 & 写失败原子回滚】
-  console.log('\n📦 【阶段 7】验证 staged 来源指纹防降级与写元数据异常原子回滚...');
-  const { commitStagedSwap } = require('../cli');
+  console.log('\n📦 【阶段 7】验证 staged 来源指纹防降级、安装竞态保护、原子元数据与回滚失败诊断...');
+  const { install, commitStagedSwap, applyStagedOnce } = require('../cli');
+  const { spawnSync } = require('child_process');
   const oldAsarForStaged = path.join(resourcesDir, 'app.asar.old-fixture');
   fs.copyFileSync(asarPath, oldAsarForStaged);
   const oldFp = getAsarFingerprint(oldAsarForStaged);
@@ -283,6 +284,7 @@ contextBridge.exposeInMainWorld('api', { version: 'E_OFFICIAL_LATEST' });
 
   const stagedPath = path.join(resourcesDir, 'app.asar.staged');
   const stagedMetaPath = path.join(resourcesDir, 'app.asar.staged.meta.json');
+  const formalMetaPath = path.join(resourcesDir, '.antigravity_chinese_meta.json');
 
   // 7a. 旧版预构建的 staged 面对官方升级后的新版 E，必须被判为 stale 且不覆盖 E
   fs.copyFileSync(oldAsarForStaged, stagedPath);
@@ -298,23 +300,183 @@ contextBridge.exposeInMainWorld('api', { version: 'E_OFFICIAL_LATEST' });
   assert(!fs.existsSync(stagedPath) && !fs.existsSync(stagedMetaPath), '过期 staged 及元数据必须自动清理');
   assert(getAsarFingerprint(asarPath) === fpE, '过期 staged 绝不覆盖官方新版 E');
 
-  // 7b. 来源指纹匹配的 staged 在写入元数据抛出异常时，必须自动原子回滚保留原包且不丢失 staged
-  fs.copyFileSync(asarPath, stagedPath);
+  // 7b. 同外置布局的 A/B 官方包：在 install 解包之后、替换或重试期间官方更新为 B，必须中止且保留 B（绝不生成绑定 B 指纹的 A staged）
+  const origPreloadRaceB = `"use strict";
+const { contextBridge, ipcRenderer } = require('electron');
+contextBridge.exposeInMainWorld('api', { version: 'RACE_B_UNPACKED_IDENTICAL' });
+`;
+  const raceAAsar = path.join(resourcesDir, 'app.asar.raceA');
+  const raceBAsar = path.join(resourcesDir, 'app.asar.raceB');
+  fs.copyFileSync(asarPath, raceAAsar); // 当前是含外置工具的 E (记作 A)
+  const fpRaceA = getAsarFingerprint(raceAAsar);
+  fs.writeFileSync(path.join(mockSrcDir, 'dist', 'preload.js'), origPreloadRaceB, 'utf-8');
+  execSync(`${asarCli} pack "${mockSrcDir}" "${raceBAsar}" --unpack-dir "{node_modules/external-tool}"`, { stdio: 'ignore' });
+  const fpRaceB = getAsarFingerprint(raceBAsar);
+  assert(fpRaceA !== fpRaceB, '同外置布局 A 与 B 指纹不同');
+
+  // Case 7b-1: 解包后遭遇官方换包为 B + 文件锁 fallback，绝不允许写出绑定 B 指纹的 A 暂存包
+  fs.copyFileSync(raceAAsar, asarPath);
+  const afterExtractAborted = install(testDir, {
+    returnStatus: true,
+    throwOnConflict: true,
+    forceStagedFallback: true,
+    skipSpawnApplyStaged: true,
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    onAfterExtract() {
+      fs.copyFileSync(raceBAsar, asarPath);
+    },
+    fsOps: {
+      renameSync() { const e = new Error('MOCK_EBUSY'); e.code = 'EBUSY'; throw e; },
+      writeFileSync: fs.writeFileSync.bind(fs)
+    }
+  });
+  assert(afterExtractAborted.status === 'aborted_upstream_update', '解包后若官方换为 B，安装必须立即中止');
+  assert(getAsarFingerprint(asarPath) === fpRaceB, '解包后官方换包为 B 必须完整保留 B');
+  assert(!fs.existsSync(stagedPath) && !fs.existsSync(stagedMetaPath), '解包后竞态中止绝不生成过时 staged');
+
+  // Case 7b-2: 在 swap 重试间隙（attempt === 1）官方换包为 B，必须立即中止并保留 B
+  fs.copyFileSync(raceAAsar, asarPath);
+  let retryHookCalls = 0;
+  const duringRetryAborted = install(testDir, {
+    returnStatus: true,
+    throwOnConflict: true,
+    forceStagedFallback: true,
+    skipSpawnApplyStaged: true,
+    maxAttempts: 2,
+    retryDelayMs: 0,
+    onBeforeSwapAttempt({ attempt }) {
+      retryHookCalls++;
+      if (attempt === 1) fs.copyFileSync(raceBAsar, asarPath);
+    },
+    fsOps: {
+      renameSync() { const e = new Error('MOCK_EBUSY'); e.code = 'EBUSY'; throw e; },
+      writeFileSync: fs.writeFileSync.bind(fs)
+    }
+  });
+  assert(retryHookCalls === 2 && duringRetryAborted.status === 'aborted_upstream_update', '替换重试期间发现官方换包为 B 必须中止');
+  assert(getAsarFingerprint(asarPath) === fpRaceB, '替换重试期间官方换包为 B 必须完整保留 B');
+  assert(!fs.existsSync(stagedPath) && !fs.existsSync(stagedMetaPath), '重试期间竞态中止绝不写入 staged');
+
+  // Case 7b-3: commitStagedSwap 重试间隙官方换包为 B，立即作废 staged 并保留 B
+  fs.copyFileSync(raceAAsar, asarPath);
+  fs.copyFileSync(raceAAsar, stagedPath);
   fs.writeFileSync(stagedMetaPath, JSON.stringify({
-    sourceFingerprint: fpE,
+    sourceFingerprint: fpRaceA,
     stagedFingerprint: getAsarFingerprint(stagedPath),
     timestamp: Date.now()
   }, null, 2), 'utf8');
-  const errRes = commitStagedSwap(asarPath, {
+  let swapAttempt = 0;
+  const swapRetryStale = commitStagedSwap(asarPath, {
+    maxAttempts: 2,
+    retryDelayMs: 0,
+    onBeforeSwapAttempt({ attempt }) {
+      swapAttempt++;
+      if (attempt === 1) fs.copyFileSync(raceBAsar, asarPath);
+    },
+    fsOps: {
+      renameSync() { const e = new Error('MOCK_EBUSY'); e.code = 'EBUSY'; throw e; },
+      writeFileSync: fs.writeFileSync.bind(fs)
+    }
+  });
+  assert(swapAttempt === 2 && swapRetryStale.status === 'stale', 'commitStagedSwap 重试期间若官方升级为 B 应判 stale');
+  assert(getAsarFingerprint(asarPath) === fpRaceB && !fs.existsSync(stagedPath), 'commitStagedSwap 重试期遇升级应保留 B 并清理过期 staged');
+
+  // 7c. 模拟 .antigravity_chinese_meta.json 写入一半抛出 ENOSPC：旧元数据必须逐字完好、ASAR 自动回滚，且后台任务返回非零退出码
+  fs.copyFileSync(raceAAsar, asarPath);
+  const patchedDummyAsar = path.join(resourcesDir, 'app.asar.patched-dummy');
+  fs.copyFileSync(raceBAsar, patchedDummyAsar); // 使用不同字节的原包 (raceA) 与补丁包 (raceB)
+  const fpPatchedDummy = getAsarFingerprint(patchedDummyAsar);
+  const priorFormalMeta = JSON.stringify({ patched: false, preservedMarker: 'INTACT_OLD_META' }, null, 2);
+  fs.writeFileSync(formalMetaPath, priorFormalMeta, 'utf8');
+  fs.copyFileSync(patchedDummyAsar, stagedPath);
+  fs.writeFileSync(stagedMetaPath, JSON.stringify({
+    sourceFingerprint: fpRaceA,
+    stagedFingerprint: fpPatchedDummy,
+    timestamp: Date.now()
+  }, null, 2), 'utf8');
+
+  const partialEnospcOutcome = applyStagedOnce(asarPath, {
     maxAttempts: 1,
     retryDelayMs: 0,
-    onBeforeWriteMeta() { throw new Error('MOCK_DISK_WRITE_ERROR'); }
+    fsOps: {
+      renameSync: fs.renameSync.bind(fs),
+      writeFileSync(target, content, enc) {
+        fs.writeFileSync(target, String(content).slice(0, 12), enc); // 模拟磁盘满前写入部分字节
+        const e = new Error('MOCK_ENOSPC');
+        e.code = 'ENOSPC';
+        throw e;
+      }
+    }
   });
-  assert(errRes.status === 'error', '写元数据异常时返回 error 状态');
-  assert(getAsarFingerprint(asarPath) === fpE, '写入元数据异常时必须自动回滚保留原版 E');
-  assert(fs.existsSync(stagedPath), '失败回滚后 staged 保持完整不丢失');
-  if (fs.existsSync(stagedPath)) fs.rmSync(stagedPath, { force: true });
-  if (fs.existsSync(stagedMetaPath)) fs.rmSync(stagedMetaPath, { force: true });
+  assert(partialEnospcOutcome.exitCode === 1 && partialEnospcOutcome.result.status === 'error', '元数据 ENOSPC 失败后后台入口必须返回非零退出码');
+  assert(partialEnospcOutcome.result.rollbackErrors.length === 0, 'ENOSPC 时两个 ASAR 重命名应干净回滚');
+  assert(getAsarFingerprint(asarPath) === fpRaceA, 'ENOSPC 回滚后正式路径必须仍是完整原包');
+  assert(fs.existsSync(stagedPath) && getAsarFingerprint(stagedPath) === fpPatchedDummy && fs.existsSync(stagedMetaPath), '回滚后 staged 及其元数据完好不丢失');
+  assert(fs.readFileSync(formalMetaPath, 'utf8') === priorFormalMeta, '部分写入 ENOSPC 后旧正式元数据必须逐字完好未被截断');
+
+  // 7d. 模拟回滚第一步（补丁移回 staged）或第二步（swap-old 移回正式路径）遇文件锁失败：必须返回不可吞的诊断错误并保留所有可恢复包
+  const backupSnapshotContent = fs.readFileSync(backupPath);
+  const swapOldPath7 = path.join(resourcesDir, 'app.asar.swap-old');
+
+  // 7d-1: 第二步回滚（swap-old -> app.asar）被锁阻塞，第一步（补丁 -> staged）已成功
+  const lockStep2Outcome = applyStagedOnce(asarPath, {
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    fsOps: {
+      writeFileSync() { const e = new Error('MOCK_ENOSPC_RB2'); e.code = 'ENOSPC'; throw e; },
+      renameSync(from, to) {
+        if (from === swapOldPath7 && to === asarPath) {
+          const e = new Error('MOCK_LOCK_RESTORE_ORIGINAL'); e.code = 'EBUSY'; throw e;
+        }
+        return fs.renameSync(from, to);
+      }
+    }
+  });
+  assert(lockStep2Outcome.exitCode === 1 && lockStep2Outcome.result.status === 'error', '第二步回滚遇锁时后台入口返回非零退出码');
+  assert(lockStep2Outcome.result.rollbackErrors.length === 1 && lockStep2Outcome.result.rollbackErrors[0].step === 'restore_original', '应明确诊断第二步回滚失败');
+  assert(!fs.existsSync(asarPath) && fs.existsSync(swapOldPath7) && getAsarFingerprint(swapOldPath7) === fpRaceA, '第二步回滚受阻时 app.asar 缺失而原包仍在 swap-old');
+  assert(fs.existsSync(stagedPath) && fs.existsSync(stagedMetaPath), '第二步回滚受阻时 staged 与其元数据仍保留');
+  assert(fs.readFileSync(backupPath).equals(backupSnapshotContent), '故障过程中 .bak 保持原样不被破坏');
+
+  // 恢复现场用于 7d-2 验证
+  fs.renameSync(swapOldPath7, asarPath);
+
+  // 7d-2: 第一步回滚（补丁 -> staged）即被文件锁阻止
+  const lockStep1Outcome = applyStagedOnce(asarPath, {
+    maxAttempts: 1,
+    retryDelayMs: 0,
+    fsOps: {
+      writeFileSync() { const e = new Error('MOCK_ENOSPC_RB1'); e.code = 'ENOSPC'; throw e; },
+      renameSync(from, to) {
+        if (from === asarPath && to === stagedPath) {
+          const e = new Error('MOCK_LOCK_RESTORE_STAGED'); e.code = 'EPERM'; throw e;
+        }
+        return fs.renameSync(from, to);
+      }
+    }
+  });
+  assert(lockStep1Outcome.exitCode === 1 && lockStep1Outcome.result.status === 'error', '第一步回滚遇锁时后台入口返回非零退出码');
+  assert(lockStep1Outcome.result.rollbackErrors.length === 1 && lockStep1Outcome.result.rollbackErrors[0].step === 'restore_staged', '应明确诊断第一步回滚失败');
+  assert(getAsarFingerprint(asarPath) === fpPatchedDummy && !fs.existsSync(stagedPath), '第一步回滚受阻时正式路径仍为补丁且 staged 不存在');
+  assert(fs.existsSync(swapOldPath7) && getAsarFingerprint(swapOldPath7) === fpRaceA, '第一步回滚受阻时原包仍在 swap-old');
+  assert(fs.readFileSync(backupPath).equals(backupSnapshotContent), '第一步回滚受阻时 .bak 保持原样');
+  assert(fs.readFileSync(formalMetaPath, 'utf8') === priorFormalMeta, '所有写失败与回滚受阻场景下旧正式元数据完整保留');
+
+  // 7e. 验证真实子进程调用 applyStagedOnce 在遇写入错误时以非零退出码退出且保留完整原包与元数据
+  fs.rmSync(asarPath, { force: true });
+  fs.renameSync(swapOldPath7, asarPath);
+  fs.copyFileSync(patchedDummyAsar, stagedPath);
+  const brokenStagedChildRes = spawnSync(process.execPath, [
+    '-e',
+    `const cli = require(${JSON.stringify(cliPath)}); const o = cli.applyStagedOnce(${JSON.stringify(asarPath)}, { maxAttempts: 1, retryDelayMs: 0, fsOps: { writeFileSync() { const e = new Error('CHILD_ENOSPC'); e.code = 'ENOSPC'; throw e; }, renameSync: require('fs').renameSync } }); process.exit(o.exitCode);`
+  ], { encoding: 'utf8' });
+  assert(brokenStagedChildRes.status === 1, '子进程执行 applyStagedOnce 遇错误时以退出码 1 结束');
+  assert(getAsarFingerprint(asarPath) === fpRaceA && fs.readFileSync(formalMetaPath, 'utf8') === priorFormalMeta, '子进程失败后仍保持原包与旧元数据完整');
+
+  for (const cleanup of [stagedPath, stagedMetaPath, formalMetaPath, raceAAsar, raceBAsar, patchedDummyAsar, swapOldPath7]) {
+    if (fs.existsSync(cleanup)) fs.rmSync(cleanup, { force: true });
+  }
 
 } finally {
   // 清理测试临时目录
