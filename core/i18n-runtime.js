@@ -387,6 +387,7 @@
     if ((CONTENT_TEST_IDS[testId] === 1 && !isCustomizationBreadcrumb(el)) || el.hasAttribute('data-ag-localization-skip') ||
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
+    if (el.classList.contains('opacity-90') && isFloatingComposerPreview(el)) return true;
     if (el.matches('[data-testid="step-plan-item"] > span.min-w-0.truncate[title]')) return true;
     if (testId === 'project-header' && el.hasAttribute('data-project-label')) return true;
     // The first emphasized value in the deletion notice is a project or automation name.
@@ -693,8 +694,42 @@
       !!el?.closest('button[data-tab-id="side_question__draft"]');
   }
 
+  function isFloatingComposerPreview(el) {
+    return el?.tagName === 'SPAN' && !!el.id &&
+      el.parentElement?.getAttribute('data-testid') === 'aux-pane-floating-composer-trigger' &&
+      el.parentElement.firstElementChild === el;
+  }
+
+  function translateFloatingComposerStatus(text, kind) {
+    if (kind === 'task' && /^\d+ tasks? running$/.test(text)) return translateSingleUnit(text);
+    switch (text) {
+      case 'Subagent needs approval':
+      case 'Question waiting':
+      case 'Action required':
+      case 'Canceling':
+      case 'Compacting':
+      case 'Working':
+      case 'Unread message':
+        return translateSingleUnit(text);
+      default:
+        return text;
+    }
+  }
+
   function translateUiText(text, el) {
     var testId = el && el.getAttribute('data-testid');
+    var floatingStatus = el?.closest('[data-testid="aux-pane-floating-composer-status"]');
+    if (floatingStatus) return translateFloatingComposerStatus(text, floatingStatus.getAttribute('data-status-kind'));
+    if (/^(?:\d+ ?)?(?:Comments?|Attached)$/.test(text) &&
+        el?.closest('[data-testid="aux-pane-floating-composer-comment-badge"], [data-testid="aux-pane-floating-composer-attachment-badge"]')) {
+      if (text === 'Comment' || text === 'Comments') return '条评论';
+      if (text === 'Attached') return '个附件';
+      return text;
+    }
+    if (text.startsWith('Connect an account for ') && el?.closest('[data-testid="remote-automation-oauth-consent-callout"]')) {
+      var consent = text.match(/^Connect an account for (.+) so the agent can run automations\.$/);
+      if (consent) return '请为 ' + consent[1] + ' 连接账号，以便智能体运行自动化任务。';
+    }
     if (text === 'New Side Question' && isSideQuestionDraftTitle(el)) return '新建旁路提问';
     if (text === 'at' && el?.matches('span.text-muted-foreground.select-none') &&
         el.closest('[data-testid="automation-schedule-editor"]')) return '于';
@@ -1220,6 +1255,13 @@
             trans = translateToolSummary(val);
           } else if (attr === 'aria-label' && el.getAttribute('data-testid') === 'progress-updates-collapsible') {
             trans = translateUiText(val, el);
+          } else if ((attr === 'title' || attr === 'aria-label') &&
+              el.getAttribute('data-testid') === 'aux-pane-floating-composer-status') {
+            var restoreSplit = ' — restore split view';
+            var statusKind = el.getAttribute('data-status-kind');
+            trans = attr === 'aria-label' && val.endsWith(restoreSplit)
+              ? translateFloatingComposerStatus(val.slice(0, -restoreSplit.length), statusKind) + '，' + translateSingleUnit('Restore split view')
+              : translateFloatingComposerStatus(val, statusKind);
           } else if (attr === 'title' && el.getAttribute('data-testid') === 'webview-download-open') {
             trans = val;
           } else if (attr === 'aria-label' && (/^webview-download-/.test(el.getAttribute('data-testid') || '') ||
@@ -1323,7 +1365,7 @@
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label')
+        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class')
       });
       observing = true;
     }
@@ -1504,6 +1546,7 @@
         mutation.target._agyOriginal = undefined;
         enqueueNode(mutation.target);
       } else if (mutation.type === 'attributes') {
+        if (mutation.attributeName === 'class' && !isFloatingComposerPreview(mutation.target)) continue;
         var edits = attributeEdits.get(mutation.target);
         if (edits) delete edits[mutation.attributeName];
         mutation.target[MARK_ATTR + '_' + mutation.attributeName] = undefined;

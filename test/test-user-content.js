@@ -717,6 +717,67 @@ test('2.35.2 active side question chrome translates with original quotes and con
   assert.equal(button.getAttribute('aria-label'), '来源于子智能体会话。在子智能体会话中查看');
 });
 
+test('2.36 floating composer translates controls and tracks draft visibility without changing drafts', async t => {
+  const { document, window } = await fixture(t, `
+    <div data-testid="aux-pane-floating-composer" aria-label="Conversation input">
+      <button data-testid="aux-pane-floating-composer-trigger" aria-labelledby="preview" aria-expanded="false">
+        <span id="preview" class="opacity-60">Ask anything</span>
+        <span data-testid="aux-pane-floating-composer-comment-badge" data-count="1"><span id="comments">1<!-- --> Comment</span></span>
+        <span data-testid="aux-pane-floating-composer-attachment-badge" data-count="2"><span id="attachments">2<span> Attached</span></span></span>
+      </button>
+      <button id="record" data-testid="aux-pane-floating-composer-mic" aria-label="Record Audio"></button>
+      <button id="status" data-testid="aux-pane-floating-composer-status" data-status-kind="task"
+        title="2 tasks running" aria-label="2 tasks running — restore split view"><span>2 tasks running</span></button>
+      <button id="working" data-testid="aux-pane-floating-composer-status" data-status-kind="working"
+        title="Settings" aria-label="Settings — restore split view"><span>Settings</span></button>
+    </div>`);
+  const get = id => document.getElementById(id);
+  assert.equal(get('preview').textContent, '问点什么');
+  assert.equal(get('preview').parentElement.getAttribute('aria-expanded'), 'false');
+  assert.equal(get('preview').parentElement.getAttribute('aria-labelledby'), 'preview');
+  assert.equal(get('record').getAttribute('aria-label'), '录制音频');
+  assert.equal(get('comments').textContent, '1 条评论');
+  assert.equal(get('attachments').textContent, '2 个附件');
+  const status = get('status');
+  assert.notEqual(status.textContent, '2 tasks running');
+  assert.equal(status.title, status.textContent);
+  assert.equal(status.getAttribute('aria-label'), status.textContent + '，恢复分栏视图');
+  assert.equal(status.dataset.statusKind, 'task');
+  assert.equal(get('working').textContent, 'Settings');
+  assert.equal(get('working').title, 'Settings');
+  assert.equal(get('working').getAttribute('aria-label'), 'Settings，恢复分栏视图');
+
+  get('preview').className = 'opacity-90';
+  get('comments').firstChild.data = '5';
+  await settle(window);
+  assert.equal(get('preview').textContent, 'Ask anything');
+  assert.equal(get('comments').textContent, '5 条评论');
+  get('preview').className = 'opacity-60';
+  await settle(window);
+  assert.equal(get('preview').textContent, '问点什么');
+});
+
+test('2.36 cloud automation authorization and organization controls preserve names and disabled state', async t => {
+  const namedConsent = 'Connect an account for Save, Google Calendar so the agent can run automations.';
+  const { document } = await fixture(t, `
+    <div data-testid="remote-automation-oauth-consent-callout">
+      <span id="consent">${namedConsent}</span>
+      <button data-testid="remote-automation-authorize-credentials" disabled>Refreshing credentials...</button>
+    </div>
+    <span id="outside">${namedConsent}</span>
+    <button disabled aria-label="Marketplace" title="The plugin marketplace is disabled by your organization.">Marketplace</button>
+    <aside role="alert">Organization prepaid wallet is empty</aside>`);
+  assert.equal(document.getElementById('consent').textContent, '请为 Save, Google Calendar 连接账号，以便智能体运行自动化任务。');
+  assert.equal(document.getElementById('outside').textContent, namedConsent);
+  const button = document.querySelector('[data-testid="remote-automation-authorize-credentials"]');
+  assert.equal(button.textContent, '正在刷新凭据…');
+  assert.equal(button.disabled, true);
+  const market = document.querySelector('[title]');
+  assert.equal(market.title, '你的组织已停用插件市场。');
+  assert.equal(market.disabled, true);
+  assert.equal(document.querySelector('[role="alert"]').textContent, '组织预付钱包余额不足');
+});
+
 async function fixture(t, html, options = {}) {
   const dom = new JSDOM('<!doctype html><body>' + html + '</body>', {
     runScripts: 'outside-only',

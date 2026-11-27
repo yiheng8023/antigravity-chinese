@@ -1,4 +1,7 @@
 {
+  "Plugins are unavailable until your organization's policy loads.": "正在加载组织策略，加载完成后才能使用插件。",
+  "Plugins are disabled by your organization.": "你的组织已停用插件。",
+  "The plugin marketplace is disabled by your organization.": "你的组织已停用插件市场。",
   "This plugin is currently stopped. Events and stdout streams will appear here once started.": "此插件已停止。启动后，此处会显示事件和标准输出。",
   "Start Plugin": "启动插件",
   "Filter plugins": "筛选插件",
