@@ -8,6 +8,8 @@ const runtime = fs.readFileSync(process.env.AGY_TEST_RUNTIME || path.join(__dirn
 const dictionary = require('../dict/zh-CN.json');
 const officialPluginDescriptions = require('../dict/scoped/official-plugin-descriptions.json');
 const { installOfficialPluginDescriptionSourceCheck } = require('../core/official-plugin-description-source');
+const builtinSlashDescriptions = require('../dict/scoped/builtin-slash-descriptions.json');
+const { installBuiltinSlashDescriptionSourceCheck } = require('../core/builtin-slash-command-source');
 
 test('2.35 automation form translates display text and preserves the draft and option names', async t => {
   const placeholder = 'What should the agent do on each run? For example: summarize new bugs assigned to me and anything that changed overnight.';
@@ -782,17 +784,223 @@ async function fixture(t, html, options = {}) {
   const dom = new JSDOM('<!doctype html><body>' + html + '</body>', {
     runScripts: 'outside-only',
     pretendToBeVisual: true,
-    url: options.url || (options.pluginDescriptions ? 'https://127.0.0.1:1500/' : undefined)
+    url: options.url || ((options.pluginDescriptions || options.builtinSlash) ? 'https://127.0.0.1:1500/' : undefined)
   });
   t.after(() => dom.window.close());
   const { window } = dom;
-  window.__AGY_I18N_DATA__ = options.pluginDescriptions ? { ...dictionary, officialPluginDescriptions } : dictionary;
+  const data = { ...dictionary };
+  if (options.pluginDescriptions) data.officialPluginDescriptions = officialPluginDescriptions;
+  if (options.builtinSlash) data.builtinSlashDescriptions = builtinSlashDescriptions;
+  window.__AGY_I18N_DATA__ = data;
   options.beforeStart?.(window.document);
   if (options.pluginDescriptions) window.eval(`(${installOfficialPluginDescriptionSourceCheck})(${JSON.stringify(officialPluginDescriptions)})`);
+  if (options.builtinSlash) window.eval(`(${installBuiltinSlashDescriptionSourceCheck})(${JSON.stringify(builtinSlashDescriptions)})`);
   window.eval(runtime);
   await (options.waitForInitialTranslation || settle)(window);
   return { window, document: window.document, translate: window.__AGY_TRANSLATE_EL__ };
 }
+
+test('builtin slash command descriptions follow verified SYSTEM provenance, protect dir=rtl paths and custom skills, and retranslate across search highlight splits', async t => {
+  function attachOptionFiber(descEl, itemObj, rootState) {
+    const state = rootState || { current: null };
+    const root = { tag: 3, stateNode: state };
+    if (!state.current) state.current = root;
+    const rowFiber = { memoizedProps: { item: itemObj }, return: root };
+    const fiber = { stateNode: descEl, return: rowFiber };
+    descEl.__reactFiber$fixture = fiber;
+    return { rowFiber, root, rootState: state, fiber };
+  }
+  const makeSystemSlash = (name, text) => ({
+    item: { scopeItem: { case: 'slashCommand', value: { info: { name, type: 1 } } } },
+    getRenderInfo: () => ({ description: { text } })
+  });
+  const makeRecipeSkill = (name, text) => ({
+    item: { scopeItem: { case: 'recipe', value: { title: name, description: text } } },
+    getRenderInfo: () => ({ description: { text } })
+  });
+  const makePluginSkill = (name, text) => ({
+    item: { scopeItem: { case: 'slashCommand', value: { info: { name, type: 2, plugin: { name: 'third-party' } } } } },
+    getRenderInfo: () => ({ description: { text } })
+  });
+
+  const planSrc = 'Plan carefully before executing a task.';
+  const boostSrc = 'Invoke the Boost multi-agent orchestrator for complex tasks.';
+  let planAttached;
+  let boostAttached;
+  let planRowFiber;
+  let boostRowFiber;
+  const { document, window, translate } = await fixture(t, `
+    <div role="listbox" data-mention-menu="">
+      <div role="option" id="opt-plan" aria-label="${planSrc}">
+        <span data-testid="menu-option-label" aria-label="plan" title="plan">plan</span>
+        <span data-testid="menu-option-description" dir="auto" aria-label="${planSrc}">${planSrc}</span>
+      </div>
+      <div role="option" id="opt-boost">
+        <span data-testid="menu-option-label">boost</span>
+        <span data-testid="menu-option-description" dir="auto">${boostSrc}</span>
+      </div>
+      <div role="option" id="opt-boost-code">
+        <span data-testid="menu-option-label">boost</span>
+        <span data-testid="menu-option-description" dir="auto"><code>Invoke the </code><span class="hl">Boost</span><span> multi-agent orchestrator for complex tasks.</span></span>
+      </div>
+      <div role="option" id="opt-custom">
+        <span data-testid="menu-option-label">my-skill</span>
+        <span data-testid="menu-option-description" dir="auto">${planSrc}</span>
+      </div>
+      <div role="option" id="opt-custom-dict-word" aria-label="Settings" title="Settings">
+        <span data-testid="menu-option-label" aria-label="Settings" title="Settings">Settings</span>
+        <span data-testid="menu-option-description" dir="auto" aria-label="Settings" title="Settings"><span aria-label="Settings">Settings</span></span>
+      </div>
+      <div role="option" id="opt-plugin">
+        <span data-testid="menu-option-label">plan</span>
+        <span data-testid="menu-option-description" dir="auto">${planSrc}</span>
+      </div>
+      <div role="option" id="opt-rtl-path">
+        <span data-testid="menu-option-label">Before</span>
+        <span data-testid="menu-option-description" dir="rtl" aria-label="Before">Before</span>
+      </div>
+    </div>`, {
+    builtinSlash: true,
+    beforeStart(doc) {
+      planAttached = attachOptionFiber(doc.querySelector('#opt-plan [data-testid="menu-option-description"]'), makeSystemSlash('plan', planSrc));
+      planRowFiber = planAttached.rowFiber;
+      boostAttached = attachOptionFiber(doc.querySelector('#opt-boost [data-testid="menu-option-description"]'), makeSystemSlash('boost', boostSrc));
+      boostRowFiber = boostAttached.rowFiber;
+      attachOptionFiber(doc.querySelector('#opt-boost-code [data-testid="menu-option-description"]'), makeSystemSlash('boost', boostSrc));
+      attachOptionFiber(doc.querySelector('#opt-custom [data-testid="menu-option-description"]'), makeRecipeSkill('my-skill', planSrc));
+      attachOptionFiber(doc.querySelector('#opt-custom-dict-word [data-testid="menu-option-description"]'), makeRecipeSkill('Settings', 'Settings'));
+      attachOptionFiber(doc.querySelector('#opt-plugin [data-testid="menu-option-description"]'), makePluginSkill('plan', planSrc));
+      attachOptionFiber(doc.querySelector('#opt-rtl-path [data-testid="menu-option-description"]'), makeRecipeSkill('Before', 'Before'));
+    }
+  });
+
+  const planOpt = document.getElementById('opt-plan');
+  const planDesc = document.querySelector('#opt-plan [data-testid="menu-option-description"]');
+  const boostDesc = document.querySelector('#opt-boost [data-testid="menu-option-description"]');
+  const boostCodeDesc = document.querySelector('#opt-boost-code [data-testid="menu-option-description"]');
+  const customDesc = document.querySelector('#opt-custom [data-testid="menu-option-description"]');
+  const customDictOpt = document.getElementById('opt-custom-dict-word');
+  const customDictLabel = customDictOpt.querySelector('[data-testid="menu-option-label"]');
+  const customDictDesc = customDictOpt.querySelector('[data-testid="menu-option-description"]');
+  const pluginDesc = document.querySelector('#opt-plugin [data-testid="menu-option-description"]');
+  const rtlDesc = document.querySelector('#opt-rtl-path [data-testid="menu-option-description"]');
+
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(planDesc.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+  assert.equal(planOpt.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+  assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
+  assert.equal(boostCodeDesc.querySelector('code').textContent, 'Invoke the ');
+  assert.equal(boostCodeDesc.textContent, boostSrc);
+  assert.equal(customDesc.textContent, planSrc);
+  // 用户技能名称、说明与所属选项行上的通用词典词 "Settings"（文本及 aria-label/title）全部按来源受保护
+  assert.equal(customDictLabel.textContent, 'Settings');
+  assert.equal(customDictLabel.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictLabel.getAttribute('title'), 'Settings');
+  assert.equal(customDictDesc.textContent, 'Settings');
+  assert.equal(customDictDesc.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictDesc.getAttribute('title'), 'Settings');
+  assert.equal(customDictDesc.querySelector('span').getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictOpt.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictOpt.getAttribute('title'), 'Settings');
+  assert.equal(pluginDesc.textContent, planSrc);
+  assert.equal(rtlDesc.textContent, 'Before');
+  assert.equal(rtlDesc.getAttribute('aria-label'), 'Before');
+
+  // 1. 输入搜索词：无法映射英文高亮词（如 task）时保留带高亮原文不清空高亮文本；可精确保留英文关键词（如 Boost）时重排译文
+  planDesc.innerHTML = '<span>Plan carefully before executing a </span><span class="hl">task</span><span>.</span>';
+  boostDesc.innerHTML = '<span>Invoke the </span><span class="hl">Boost</span><span> multi-agent orchestrator for complex tasks.</span>';
+  await settle(window);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.querySelector('span.hl').textContent, 'task');
+  assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
+  assert.equal(boostDesc.querySelector('span.hl').textContent, 'Boost');
+
+  // 2. 三个高亮片段已译为中文后，仅更新前缀节点 title 属性，整行仍保持一致中文（不出现前缀回退英文的半句译文）
+  boostDesc.firstElementChild.title = 'prefix-updated';
+  await settle(window);
+  assert.equal(boostDesc.firstElementChild.textContent, '调用 ');
+  assert.equal(boostDesc.querySelector('span.hl').textContent, 'Boost');
+  assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
+
+  // 3. DOM 与标签均不变，仅将来源从内置切换为用户条目时，局部文本重扫或属性变更均按整行还原为英文，切回内置后重新应用中文
+  boostRowFiber.memoizedProps.item = makeRecipeSkill('boost', boostSrc);
+  translate(boostDesc.querySelector('span.hl').firstChild);
+  assert.equal(boostDesc.firstElementChild.textContent, 'Invoke the ');
+  assert.equal(boostDesc.textContent, boostSrc);
+  boostRowFiber.memoizedProps.item = makeSystemSlash('boost', boostSrc);
+  boostDesc.firstElementChild.title = 'prefix-restored';
+  await settle(window);
+  assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
+
+  // 4. 已翻译的三段说明若动态插入 <code> 保护边界，整行还原且绝不改动 <code> 内文本
+  const codePrefix = document.createElement('code');
+  codePrefix.textContent = 'Invoke the ';
+  boostDesc.replaceChild(codePrefix, boostDesc.firstElementChild);
+  await settle(window);
+  assert.equal(boostDesc.querySelector('code').textContent, 'Invoke the ');
+  assert.equal(boostDesc.textContent, boostSrc);
+
+  // 5. 清空搜索词恢复单文本节点，译文继续保持正常
+  planDesc.textContent = planSrc;
+  boostDesc.textContent = boostSrc;
+  await settle(window);
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
+
+  // 6. 单独切换 dir="rtl"（保留原说明节点及内容不变）时，立即恢复原文；切回 dir="auto" 后重新翻译
+  planDesc.setAttribute('dir', 'rtl');
+  await settle(window);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  assert.equal(planOpt.getAttribute('aria-label'), planSrc);
+  planDesc.setAttribute('dir', 'auto');
+  await settle(window);
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(planDesc.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+  assert.equal(planOpt.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+
+  // 7. DOM 与标题均不变，仅在 React 提交中（0 DOM 变更、无任何手动扫描）切换 FiberRoot.current 到用户技能树，译文与 aria-label 立即完整还原；
+  // 切回内置 FiberRoot.current 后同样在 0 DOM 变更下恢复译文与 aria-label。
+  const planDescTextNode = planDesc.firstChild;
+  const userPlanRoot = { tag: 3, stateNode: planAttached.rootState };
+  const userPlanRowFiber = { memoizedProps: { item: makeRecipeSkill('plan', planSrc) }, return: userPlanRoot };
+  const userPlanFiber = { stateNode: planDesc, return: userPlanRowFiber, alternate: planAttached.fiber };
+  planAttached.fiber.alternate = userPlanFiber;
+  planAttached.rootState.current = userPlanRoot;
+  assert.equal(planDesc.firstChild, planDescTextNode);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  assert.equal(planOpt.getAttribute('aria-label'), planSrc);
+
+  // 切回内置 FiberRoot，然后不触发任何 DOM 变化、也不调 translate()，仅更新 memoizedProps.item 并等待 settle：仍立刻还原为原文
+  planAttached.rootState.current = planAttached.root;
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(planDesc.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+  planRowFiber.memoizedProps.item = makeRecipeSkill('plan', planSrc);
+  await settle(window);
+  assert.equal(planDesc.firstChild, planDescTextNode);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  assert.equal(planOpt.getAttribute('aria-label'), planSrc);
+
+  // 8. 原地改深层 scopeItem.case（无 DOM 变化、无 item 引用更换、无手动扫描）并等待 settle：兜底重验仍能还原原文；
+  // 动态修改自定义技能名称与说明上的 aria-label 为词典词 "Settings" 时也保持受保护原文
+  planRowFiber.memoizedProps.item = makeSystemSlash('plan', planSrc);
+  await settle(window);
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  planRowFiber.memoizedProps.item.item.scopeItem = { case: 'recipe', value: { title: 'plan', description: planSrc } };
+  await settle(window);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  customDictLabel.setAttribute('aria-label', 'Settings');
+  customDictDesc.setAttribute('aria-label', 'Settings');
+  customDictOpt.setAttribute('aria-label', 'Settings');
+  await settle(window);
+  assert.equal(customDictLabel.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictDesc.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictOpt.getAttribute('aria-label'), 'Settings');
+  assert.equal(rtlDesc.textContent, 'Before');
+});
 
 test('complete shortcut rows translate descriptions and toggle labels while authored copies stay intact', async t => {
   const { document } = await fixture(t, `

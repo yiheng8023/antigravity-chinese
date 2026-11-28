@@ -205,6 +205,7 @@
 
   var I18N_DATA = (root && root.__AGY_I18N_DATA__) || { exact: {}, patterns: [] };
   var officialPluginDescriptions = I18N_DATA.officialPluginDescriptions;
+  var builtinSlashDescriptions = I18N_DATA.builtinSlashDescriptions;
   var defaultEngine = createI18nEngine(I18N_DATA);
   var exactDict = defaultEngine.exactDict;
   var patterns = defaultEngine.patterns;
@@ -384,6 +385,9 @@
     if (isModelSelectorBoundary(el)) return true;
 
     var testId = el.getAttribute('data-testid');
+    if (testId === 'menu-option-label' && el.closest('[data-mention-menu]')) return true;
+    if (testId === 'menu-option-description' &&
+        (el.getAttribute('dir') === 'rtl' || el.closest('[data-mention-menu]'))) return true;
     if ((CONTENT_TEST_IDS[testId] === 1 && !isCustomizationBreadcrumb(el)) || el.hasAttribute('data-ag-localization-skip') ||
         el.hasAttribute('data-markdown-root')) return true;
     if (el.hasAttribute('data-uri') && el.hasAttribute('data-quotable-inline')) return true;
@@ -1092,10 +1096,205 @@
   // 扫描轮次 ID，同一轮全量扫描中元素只处理一次
   var currentScanId = 0;
 
+  function isMentionMenuOptionRow(el) {
+    return !!el && el.nodeType === 1 && el.getAttribute &&
+      el.getAttribute('role') === 'option' && !!el.closest?.('[data-mention-menu]');
+  }
+
+  function isProtectedSlashDescendant(el, rootDesc) {
+    for (var cur = el; cur && cur !== rootDesc; cur = cur.parentElement) {
+      if (cur.tagName === 'INPUT' || cur.tagName === 'TEXTAREA' ||
+          isProtectedBoundary(cur) || getMixedContentKind(cur)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function readAttributeSource(el, attr) {
+    var current = el.getAttribute(attr);
+    var edit = attributeEdits.get(el)?.[attr];
+    return edit && edit.localized === current ? edit.source : current;
+  }
+
+  function applyMentionScopedAttributes(targetEl, entry) {
+    if (!targetEl || !targetEl.hasAttribute) return false;
+    var wroteTranslation = false;
+    var sourceMatch = entry ? entry.source : null;
+    var transText = entry ? entry.translation : null;
+    var kept = Object.create(null);
+    var edits = attributeEdits.get(targetEl);
+
+    for (var ai = 0; ai < TRANSLATABLE_ATTRS.length; ai++) {
+      var attr = TRANSLATABLE_ATTRS[ai];
+      if (!targetEl.hasAttribute(attr)) continue;
+      var raw = readAttributeSource(targetEl, attr);
+      if (entry && raw && normalizeWhitespace(raw) === sourceMatch) {
+        writeLocalizedAttribute(targetEl, attr, transText);
+        kept[attr] = true;
+        wroteTranslation = true;
+      } else if (edits && edits[attr]) {
+        var oldEdit = edits[attr];
+        if (targetEl.getAttribute(attr) === oldEdit.localized) targetEl.setAttribute(attr, oldEdit.source);
+        targetEl[MARK_ATTR + '_' + attr] = undefined;
+        delete edits[attr];
+      }
+    }
+    if (edits && !Object.keys(edits).length) attributeEdits.delete(targetEl);
+    return wroteTranslation;
+  }
+
+  var activeBuiltinSlashDescs = typeof Set !== 'undefined' ? new Set() : null;
+
+  function findBuiltinSlashDescriptionRoot(el) {
+    if (!el || el.nodeType !== 1 || !el.getAttribute) return null;
+    if (el.getAttribute('data-testid') === 'menu-option-description') return el;
+    var cur = el.parentElement;
+    for (var depth = 0; cur && depth < 6; depth++, cur = cur.parentElement) {
+      if (cur.getAttribute && cur.getAttribute('data-testid') === 'menu-option-description') return cur;
+    }
+    return null;
+  }
+
+  function restoreBuiltinSlashDescription(descEl) {
+    if (!descEl) return;
+    var walker = doc.createTreeWalker(descEl, root.NodeFilter.SHOW_TEXT);
+    for (var tn = walker.nextNode(); tn; tn = walker.nextNode()) {
+      if (textEdits.get(tn)?.scope === 'builtin-slash-description') restoreLocalizedText(tn);
+    }
+  }
+
+  function verifyBuiltinSlashEntry(descEl) {
+    if (!builtinSlashDescriptions || !descEl) return { inMentionMenu: false, verified: false, entry: null, hasProtectedNode: false, menuTextNodes: [] };
+    var inMentionMenu = !!descEl.closest?.('[data-mention-menu]');
+    var row = descEl.closest('[role="option"]') || descEl.parentElement;
+    if (descEl.getAttribute('dir') === 'rtl' || !inMentionMenu ||
+        getElementTranslationMode(descEl.parentElement) !== 2) {
+      return { inMentionMenu: inMentionMenu, verified: false, entry: null, hasProtectedNode: false, menuTextNodes: [], row: row };
+    }
+    var labelEl = row?.querySelector('[data-testid="menu-option-label"]');
+    if (!labelEl) {
+      return { inMentionMenu: inMentionMenu, verified: false, entry: null, hasProtectedNode: false, menuTextNodes: [], row: row };
+    }
+    var cmdName = '';
+    var labelWalker = doc.createTreeWalker(labelEl, root.NodeFilter.SHOW_TEXT);
+    for (var lt = labelWalker.nextNode(); lt; lt = labelWalker.nextNode()) {
+      cmdName += readOriginalText(lt) || '';
+    }
+    cmdName = cmdName.trim().replace(/^\//, '');
+    var entry = Object.hasOwn(builtinSlashDescriptions, cmdName) && builtinSlashDescriptions[cmdName];
+
+    var menuTextNodes = [];
+    var hasProtectedNode = false;
+    var menuWalker = doc.createTreeWalker(descEl, root.NodeFilter.SHOW_TEXT);
+    for (var mt = menuWalker.nextNode(); mt; mt = menuWalker.nextNode()) {
+      menuTextNodes.push(mt);
+      var mParent = mt.parentElement;
+      if (!mParent || isProtectedSlashDescendant(mParent, descEl)) {
+        hasProtectedNode = true;
+      }
+    }
+    if (!menuTextNodes.length) {
+      return { inMentionMenu: inMentionMenu, verified: false, entry: null, hasProtectedNode: false, menuTextNodes: [], row: row };
+    }
+    if (hasProtectedNode) {
+      return { inMentionMenu: inMentionMenu, verified: false, entry: null, hasProtectedNode: true, menuTextNodes: menuTextNodes, row: row };
+    }
+
+    var menuSource = '';
+    for (var i = 0; i < menuTextNodes.length; i++) {
+      var mtn = menuTextNodes[i];
+      var mEdit = textEdits.get(mtn);
+      menuSource += mEdit && mEdit.localized === mtn.nodeValue ? mEdit.source : mtn.nodeValue;
+    }
+    var normalized = normalizeWhitespace(menuSource);
+    var verified = !descEl.dispatchEvent(new root.CustomEvent('agy-localization-check-builtin-slash-description', {
+      detail: { name: cmdName, source: normalized },
+      cancelable: true
+    })) && !!entry && normalized === entry.source;
+
+    return { inMentionMenu: inMentionMenu, verified: verified, entry: entry, hasProtectedNode: false, menuTextNodes: menuTextNodes, row: row };
+  }
+
+  function translateBuiltinSlashDescription(el) {
+    if (!builtinSlashDescriptions || !el) return false;
+    var descEl = findBuiltinSlashDescriptionRoot(el);
+    if (!descEl) return false;
+    var check = verifyBuiltinSlashEntry(descEl);
+    var row = check.row;
+    if (!check.inMentionMenu) {
+      restoreProtectedSubtree(descEl);
+      if (isMentionMenuOptionRow(row)) restoreLocalizedAttributes(row);
+      if (activeBuiltinSlashDescs) activeBuiltinSlashDescs.delete(descEl);
+      return false;
+    }
+
+    if (!check.verified || check.hasProtectedNode) {
+      restoreProtectedSubtree(descEl);
+      if (isMentionMenuOptionRow(row)) restoreLocalizedAttributes(row);
+      if (activeBuiltinSlashDescs) activeBuiltinSlashDescs.delete(descEl);
+      return true;
+    }
+
+    var entry = check.entry;
+    var menuTextNodes = check.menuTextNodes;
+    var menuTrans = entry.translation;
+    var activeTranslated = false;
+
+    if (menuTextNodes.length > 1) {
+      if (menuTextNodes.length === 3) {
+        var midEdit = textEdits.get(menuTextNodes[1]);
+        var midSrc = (midEdit && midEdit.localized === menuTextNodes[1].nodeValue
+          ? midEdit.source
+          : menuTextNodes[1].nodeValue) || '';
+        var hitIdx = midSrc && midSrc.trim() ? menuTrans.indexOf(midSrc) : -1;
+        if (hitIdx !== -1) {
+          writeLocalizedText(menuTextNodes[0], menuTrans.slice(0, hitIdx), 'builtin-slash-description');
+          writeLocalizedText(menuTextNodes[1], midSrc, 'builtin-slash-description');
+          writeLocalizedText(menuTextNodes[2], menuTrans.slice(hitIdx + midSrc.length), 'builtin-slash-description');
+          activeTranslated = true;
+        } else {
+          // 无法将搜索高亮片段可靠映射到译文时，保留带高亮的原文，清空搜索恢复单文本节点后再译回中文
+          restoreBuiltinSlashDescription(descEl);
+        }
+      } else {
+        restoreBuiltinSlashDescription(descEl);
+      }
+    } else {
+      writeLocalizedText(menuTextNodes[0], menuTrans, 'builtin-slash-description');
+      activeTranslated = true;
+    }
+
+    // 统一按条目来源处理 descEl 自身、其内部元素及所属选项行的无障碍/title 属性：
+    // 只有原值严格等于内置说明源码的属性随内置条目译为中文，其余属性与后代属性一律保护还原。
+    if (applyMentionScopedAttributes(descEl, entry)) activeTranslated = true;
+    var attrWalker = doc.createTreeWalker(descEl, root.NodeFilter.SHOW_ELEMENT);
+    for (var childEl = attrWalker.nextNode(); childEl; childEl = attrWalker.nextNode()) {
+      restoreLocalizedAttributes(childEl);
+    }
+    if (isMentionMenuOptionRow(row)) {
+      if (applyMentionScopedAttributes(row, entry)) activeTranslated = true;
+    }
+
+    if (activeBuiltinSlashDescs) {
+      if (activeTranslated) {
+        activeBuiltinSlashDescs.add(descEl);
+      } else {
+        activeBuiltinSlashDescs.delete(descEl);
+      }
+    }
+    return true;
+  }
+
   function translateTextNode(node, parentMode) {
     if (!node || node.nodeType !== 3) return;
     if (translateSideQuestionOriginText(node)) return;
     var parent = node.parentElement || node.parentNode;
+    var slashDesc = builtinSlashDescriptions ? findBuiltinSlashDescriptionRoot(parent) : null;
+    if (slashDesc) {
+      translateBuiltinSlashDescription(slashDesc);
+      return;
+    }
     var mode = parentMode === undefined ? getElementTranslationMode(parent) : parentMode;
     if (parent && (mode !== 2 || parent.tagName === 'INPUT' || parent.tagName === 'TEXTAREA')) {
       if (mode !== 0 || (!translateUserMessageClock(node) && !translateOfficialPluginDescription(parent))) restoreLocalizedText(node);
@@ -1108,6 +1307,10 @@
       edit = undefined;
     }
     if (edit?.scope === 'official-plugin-description') {
+      restoreLocalizedText(node);
+      return;
+    }
+    if (edit?.scope === 'builtin-slash-description') {
       restoreLocalizedText(node);
       return;
     }
@@ -1207,6 +1410,15 @@
     var translationMode = getElementTranslationMode(el);
     if (translationMode === 0) {
       if (translateOfficialPluginDescription(el)) return;
+      if (builtinSlashDescriptions) {
+        if (translateBuiltinSlashDescription(el)) {
+          if (scanId) el._agyScanId = scanId;
+          return;
+        }
+      } else {
+        var protectedSlashDesc = findBuiltinSlashDescriptionRoot(el);
+        if (protectedSlashDesc) restoreBuiltinSlashDescription(protectedSlashDesc);
+      }
       var modelSelectorLabel = getLocalizedModelSelectorLabel(el);
       if (work) {
         if (!modelSelectorLabel && !translateSideQuestionOriginAttributes(el)) restoreLocalizedAttributes(el);
@@ -1236,8 +1448,17 @@
       }
     }
 
+    // [data-mention-menu] [role="option"] 行自身的可翻译属性（如 aria-label）必须严格按条目来源裁决，
+    // 禁止套用通用词库将用户技能名称/说明（如 "Settings"）译为中文。
+    var skipGenericAttrs = isMentionMenuOptionRow(el);
+    if (translateOwnContent && skipGenericAttrs) {
+      var rowDescEl = el.querySelector && el.querySelector('[data-testid="menu-option-description"]');
+      var rowCheck = rowDescEl ? verifyBuiltinSlashEntry(rowDescEl) : null;
+      applyMentionScopedAttributes(el, rowCheck && rowCheck.verified && !rowCheck.hasProtectedNode ? rowCheck.entry : null);
+    }
+
     // 翻译属性
-    for (var i = 0; translateOwnContent && i < TRANSLATABLE_ATTRS.length; i++) {
+    for (var i = 0; translateOwnContent && !skipGenericAttrs && i < TRANSLATABLE_ATTRS.length; i++) {
       var attr = TRANSLATABLE_ATTRS[i];
       if (el.hasAttribute && el.hasAttribute(attr)) {
         var val = el.getAttribute(attr);
@@ -1295,6 +1516,7 @@
     }
 
     // 遍历子节点
+    if (translateOwnContent && translateBuiltinSlashDescription(el)) return;
     // 联合文本自愈：如果元素直接子节点全为纯文本节点且数量 > 1（常见于 React 碎片化模板拆分，如 "All ", e, "s run as Flash."）
     if (translateOwnContent && translateSiteDataFragments(el)) return;
     var first = el.firstChild;
@@ -1365,7 +1587,7 @@
         subtree: true,
         characterData: true,
         attributes: true,
-        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class')
+        attributeFilter: TRANSLATABLE_ATTRS.concat('data-model-label', 'class', 'dir', 'aria-selected')
       });
       observing = true;
     }
@@ -1520,6 +1742,34 @@
     }
   }
 
+  function enqueueMenuOptionDependents(target) {
+    var el = target && target.nodeType === 3 ? target.parentElement : target;
+    if (!el || !el.closest) return;
+    var menuDesc = findBuiltinSlashDescriptionRoot(el) || el.closest('[data-testid="menu-option-description"]');
+    if (menuDesc) {
+      menuDesc._agyScanId = 0;
+      enqueueNode(menuDesc);
+      return;
+    }
+    var optRow = el.closest('[data-mention-menu] [role="option"]');
+    if (optRow) {
+      var siblingDesc = optRow.querySelector('[data-testid="menu-option-description"]');
+      if (siblingDesc) {
+        siblingDesc._agyScanId = 0;
+        enqueueNode(siblingDesc);
+      }
+      return;
+    }
+    var mentionMenu = el.closest('[data-mention-menu]');
+    if (mentionMenu) {
+      var menuDescs = mentionMenu.querySelectorAll('[data-testid="menu-option-description"]');
+      for (var mi = 0; mi < menuDescs.length; mi++) {
+        menuDescs[mi]._agyScanId = 0;
+        enqueueNode(menuDescs[mi]);
+      }
+    }
+  }
+
   function recordMutations(mutations) {
     // A SPA route can reuse an unchanged breadcrumb node with a different role.
     if (doc.location.pathname !== observedDocumentPath) {
@@ -1531,6 +1781,7 @@
       var mutation = mutations[i];
       if (mutation.type === 'childList') {
         enqueuePermissionPresetDependents(mutation.target);
+        enqueueMenuOptionDependents(mutation.target);
         var added = mutation.addedNodes;
         for (var j = 0; j < added.length; j++) {
           var child = added[j];
@@ -1544,20 +1795,53 @@
         // Writes made while observing belong to the renderer, even when the value is unchanged.
         textEdits.delete(mutation.target);
         mutation.target._agyOriginal = undefined;
-        enqueueNode(mutation.target);
+        var parentEl = mutation.target.parentElement;
+        if (parentEl && parentEl.closest &&
+            (parentEl.closest('[data-testid="menu-option-description"]') ||
+             parentEl.closest('[data-mention-menu] [data-testid="menu-option-label"]'))) {
+          enqueueMenuOptionDependents(parentEl);
+        } else {
+          enqueueNode(mutation.target);
+        }
       } else if (mutation.type === 'attributes') {
         if (mutation.attributeName === 'class' && !isFloatingComposerPreview(mutation.target)) continue;
         var edits = attributeEdits.get(mutation.target);
         if (edits) delete edits[mutation.attributeName];
         mutation.target[MARK_ATTR + '_' + mutation.attributeName] = undefined;
         enqueueNode(mutation.target);
+        enqueueMenuOptionDependents(mutation.target);
       }
     }
     if (pendingNodes.length > 0) scheduleFlush();
   }
 
+  function recheckMentionMenuEntries(fromPoll) {
+    if (!builtinSlashDescriptions || !doc) return;
+    var targets = [];
+    if (activeBuiltinSlashDescs) {
+      activeBuiltinSlashDescs.forEach(function (descEl) {
+        if (!descEl.isConnected) activeBuiltinSlashDescs.delete(descEl);
+        else targets.push(descEl);
+      });
+    }
+    if (!fromPoll && doc.querySelectorAll) {
+      var openDescs = doc.querySelectorAll('[data-mention-menu] [data-testid="menu-option-description"]');
+      for (var i = 0; i < openDescs.length; i++) {
+        if (targets.indexOf(openDescs[i]) === -1) targets.push(openDescs[i]);
+      }
+    }
+    if (targets.length) safeTranslateNodes(targets);
+  }
+
   function startObserver() {
     if (!doc || !doc.documentElement) return;
+
+    // 监听主世界 React 提交信号：当 [data-mention-menu] 内条目仅在 React commit 中切换来源、DOM 未变化时，立即同步重验还原
+    if (doc.addEventListener) {
+      doc.addEventListener('agy-localization-slash-menu-recheck', function () {
+        recheckMentionMenuEntries(false);
+      });
+    }
 
     // 首次全量扫描
     safeFullScan();

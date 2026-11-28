@@ -1,0 +1,38 @@
+{
+  "goal": {
+    "source": "Run until the specified goal is completely finished.",
+    "translation": "持续运行直到指定目标完全达成。"
+  },
+  "compact": {
+    "source": "Compact the conversation now (summarize history to free up the context window).",
+    "translation": "立即压缩当前对话（摘要历史记录以释放上下文窗口）。"
+  },
+  "schedule": {
+    "source": "Run an instruction on a recurring schedule or as a one-time timer.",
+    "translation": "按周期计划或一次性定时器运行指令。"
+  },
+  "browser": {
+    "source": "Invoke a browser agent for web tasks.",
+    "translation": "调用浏览器智能体处理网页任务。"
+  },
+  "plan": {
+    "source": "Plan carefully before executing a task.",
+    "translation": "在执行任务前仔细制定计划。"
+  },
+  "grill-me": {
+    "source": "Interview me to align on a plan.",
+    "translation": "通过交互式访谈与我对齐方案细节。"
+  },
+  "teamwork": {
+    "source": "Invoke a team of agents to autonomously tackle large projects.",
+    "translation": "调用智能体团队自主协作处理大型项目。"
+  },
+  "learn": {
+    "source": "Reflect on recent successes or corrections to capture reusable skills or rules.",
+    "translation": "总结近期成功经验或纠错记录，沉淀为可复用的技能或规则。"
+  },
+  "boost": {
+    "source": "Invoke the Boost multi-agent orchestrator for complex tasks.",
+    "translation": "调用 Boost 多智能体编排器处理复杂任务。"
+  }
+}
