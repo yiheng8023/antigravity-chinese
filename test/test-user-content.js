@@ -801,12 +801,14 @@ async function fixture(t, html, options = {}) {
 }
 
 test('builtin slash command descriptions follow verified SYSTEM provenance, protect dir=rtl paths and custom skills, and retranslate across search highlight splits', async t => {
-  function attachOptionFiber(descEl, itemObj) {
-    const root = { tag: 3 };
-    root.stateNode = { current: root };
+  function attachOptionFiber(descEl, itemObj, rootState) {
+    const state = rootState || { current: null };
+    const root = { tag: 3, stateNode: state };
+    if (!state.current) state.current = root;
     const rowFiber = { memoizedProps: { item: itemObj }, return: root };
-    descEl.__reactFiber$fixture = { stateNode: descEl, return: rowFiber };
-    return rowFiber;
+    const fiber = { stateNode: descEl, return: rowFiber };
+    descEl.__reactFiber$fixture = fiber;
+    return { rowFiber, root, rootState: state, fiber };
   }
   const makeSystemSlash = (name, text) => ({
     item: { scopeItem: { case: 'slashCommand', value: { info: { name, type: 1 } } } },
@@ -823,13 +825,15 @@ test('builtin slash command descriptions follow verified SYSTEM provenance, prot
 
   const planSrc = 'Plan carefully before executing a task.';
   const boostSrc = 'Invoke the Boost multi-agent orchestrator for complex tasks.';
+  let planAttached;
+  let boostAttached;
   let planRowFiber;
   let boostRowFiber;
   const { document, window, translate } = await fixture(t, `
     <div role="listbox" data-mention-menu="">
-      <div role="option" id="opt-plan">
-        <span data-testid="menu-option-label">plan</span>
-        <span data-testid="menu-option-description" dir="auto">${planSrc}</span>
+      <div role="option" id="opt-plan" aria-label="${planSrc}">
+        <span data-testid="menu-option-label" aria-label="plan" title="plan">plan</span>
+        <span data-testid="menu-option-description" dir="auto" aria-label="${planSrc}">${planSrc}</span>
       </div>
       <div role="option" id="opt-boost">
         <span data-testid="menu-option-label">boost</span>
@@ -843,9 +847,9 @@ test('builtin slash command descriptions follow verified SYSTEM provenance, prot
         <span data-testid="menu-option-label">my-skill</span>
         <span data-testid="menu-option-description" dir="auto">${planSrc}</span>
       </div>
-      <div role="option" id="opt-custom-dict-word">
-        <span data-testid="menu-option-label">my-settings</span>
-        <span data-testid="menu-option-description" dir="auto">Settings</span>
+      <div role="option" id="opt-custom-dict-word" aria-label="Settings" title="Settings">
+        <span data-testid="menu-option-label" aria-label="Settings" title="Settings">Settings</span>
+        <span data-testid="menu-option-description" dir="auto" aria-label="Settings" title="Settings"><span aria-label="Settings">Settings</span></span>
       </div>
       <div role="option" id="opt-plugin">
         <span data-testid="menu-option-label">plan</span>
@@ -853,36 +857,54 @@ test('builtin slash command descriptions follow verified SYSTEM provenance, prot
       </div>
       <div role="option" id="opt-rtl-path">
         <span data-testid="menu-option-label">Before</span>
-        <span data-testid="menu-option-description" dir="rtl">Before</span>
+        <span data-testid="menu-option-description" dir="rtl" aria-label="Before">Before</span>
       </div>
     </div>`, {
     builtinSlash: true,
     beforeStart(doc) {
-      planRowFiber = attachOptionFiber(doc.querySelector('#opt-plan [data-testid="menu-option-description"]'), makeSystemSlash('plan', planSrc));
-      boostRowFiber = attachOptionFiber(doc.querySelector('#opt-boost [data-testid="menu-option-description"]'), makeSystemSlash('boost', boostSrc));
+      planAttached = attachOptionFiber(doc.querySelector('#opt-plan [data-testid="menu-option-description"]'), makeSystemSlash('plan', planSrc));
+      planRowFiber = planAttached.rowFiber;
+      boostAttached = attachOptionFiber(doc.querySelector('#opt-boost [data-testid="menu-option-description"]'), makeSystemSlash('boost', boostSrc));
+      boostRowFiber = boostAttached.rowFiber;
       attachOptionFiber(doc.querySelector('#opt-boost-code [data-testid="menu-option-description"]'), makeSystemSlash('boost', boostSrc));
       attachOptionFiber(doc.querySelector('#opt-custom [data-testid="menu-option-description"]'), makeRecipeSkill('my-skill', planSrc));
-      attachOptionFiber(doc.querySelector('#opt-custom-dict-word [data-testid="menu-option-description"]'), makeRecipeSkill('my-settings', 'Settings'));
+      attachOptionFiber(doc.querySelector('#opt-custom-dict-word [data-testid="menu-option-description"]'), makeRecipeSkill('Settings', 'Settings'));
       attachOptionFiber(doc.querySelector('#opt-plugin [data-testid="menu-option-description"]'), makePluginSkill('plan', planSrc));
       attachOptionFiber(doc.querySelector('#opt-rtl-path [data-testid="menu-option-description"]'), makeRecipeSkill('Before', 'Before'));
     }
   });
 
+  const planOpt = document.getElementById('opt-plan');
   const planDesc = document.querySelector('#opt-plan [data-testid="menu-option-description"]');
   const boostDesc = document.querySelector('#opt-boost [data-testid="menu-option-description"]');
   const boostCodeDesc = document.querySelector('#opt-boost-code [data-testid="menu-option-description"]');
   const customDesc = document.querySelector('#opt-custom [data-testid="menu-option-description"]');
+  const customDictOpt = document.getElementById('opt-custom-dict-word');
+  const customDictLabel = customDictOpt.querySelector('[data-testid="menu-option-label"]');
+  const customDictDesc = customDictOpt.querySelector('[data-testid="menu-option-description"]');
   const pluginDesc = document.querySelector('#opt-plugin [data-testid="menu-option-description"]');
   const rtlDesc = document.querySelector('#opt-rtl-path [data-testid="menu-option-description"]');
 
   assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(planDesc.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+  assert.equal(planOpt.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
   assert.equal(boostDesc.textContent, '调用 Boost 多智能体编排器处理复杂任务。');
   assert.equal(boostCodeDesc.querySelector('code').textContent, 'Invoke the ');
   assert.equal(boostCodeDesc.textContent, boostSrc);
   assert.equal(customDesc.textContent, planSrc);
-  assert.equal(document.querySelector('#opt-custom-dict-word [data-testid="menu-option-description"]').textContent, 'Settings');
+  // 用户技能名称、说明与所属选项行上的通用词典词 "Settings"（文本及 aria-label/title）全部按来源受保护
+  assert.equal(customDictLabel.textContent, 'Settings');
+  assert.equal(customDictLabel.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictLabel.getAttribute('title'), 'Settings');
+  assert.equal(customDictDesc.textContent, 'Settings');
+  assert.equal(customDictDesc.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictDesc.getAttribute('title'), 'Settings');
+  assert.equal(customDictDesc.querySelector('span').getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictOpt.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictOpt.getAttribute('title'), 'Settings');
   assert.equal(pluginDesc.textContent, planSrc);
   assert.equal(rtlDesc.textContent, 'Before');
+  assert.equal(rtlDesc.getAttribute('aria-label'), 'Before');
 
   // 1. 输入搜索词：无法映射英文高亮词（如 task）时保留带高亮原文不清空高亮文本；可精确保留英文关键词（如 Boost）时重排译文
   planDesc.innerHTML = '<span>Plan carefully before executing a </span><span class="hl">task</span><span>.</span>';
@@ -929,30 +951,54 @@ test('builtin slash command descriptions follow verified SYSTEM provenance, prot
   planDesc.setAttribute('dir', 'rtl');
   await settle(window);
   assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  assert.equal(planOpt.getAttribute('aria-label'), planSrc);
   planDesc.setAttribute('dir', 'auto');
   await settle(window);
   assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(planDesc.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
+  assert.equal(planOpt.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
 
-  // 7. DOM 与标题均不变，仅切换来源为同名的用户条目（如选中态变更、菜单增删兄弟项或重扫），整行立即还原回原文
+  // 7. DOM 与标题均不变，仅在 React 提交中（0 DOM 变更、无任何手动扫描）切换 FiberRoot.current 到用户技能树，译文与 aria-label 立即完整还原；
+  // 切回内置 FiberRoot.current 后同样在 0 DOM 变更下恢复译文与 aria-label。
   const planDescTextNode = planDesc.firstChild;
+  const userPlanRoot = { tag: 3, stateNode: planAttached.rootState };
+  const userPlanRowFiber = { memoizedProps: { item: makeRecipeSkill('plan', planSrc) }, return: userPlanRoot };
+  const userPlanFiber = { stateNode: planDesc, return: userPlanRowFiber, alternate: planAttached.fiber };
+  planAttached.fiber.alternate = userPlanFiber;
+  planAttached.rootState.current = userPlanRoot;
+  assert.equal(planDesc.firstChild, planDescTextNode);
+  assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  assert.equal(planOpt.getAttribute('aria-label'), planSrc);
+
+  // 切回内置 FiberRoot，然后不触发任何 DOM 变化、也不调 translate()，仅更新 memoizedProps.item 并等待 settle：仍立刻还原为原文
+  planAttached.rootState.current = planAttached.root;
+  assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
+  assert.equal(planDesc.getAttribute('aria-label'), '在执行任务前仔细制定计划。');
   planRowFiber.memoizedProps.item = makeRecipeSkill('plan', planSrc);
-  document.getElementById('opt-plan').setAttribute('aria-selected', 'true');
   await settle(window);
   assert.equal(planDesc.firstChild, planDescTextNode);
   assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  assert.equal(planOpt.getAttribute('aria-label'), planSrc);
 
-  // 切回内置来源再以列表兄弟变更触发重验，恢复译文；再复用为自定义技能（同时改标签），立即还原原文
+  // 8. 原地改深层 scopeItem.case（无 DOM 变化、无 item 引用更换、无手动扫描）并等待 settle：兜底重验仍能还原原文；
+  // 动态修改自定义技能名称与说明上的 aria-label 为词典词 "Settings" 时也保持受保护原文
   planRowFiber.memoizedProps.item = makeSystemSlash('plan', planSrc);
-  const extraOpt = document.createElement('div');
-  extraOpt.setAttribute('role', 'option');
-  document.querySelector('[data-mention-menu]').appendChild(extraOpt);
   await settle(window);
   assert.equal(planDesc.textContent, '在执行任务前仔细制定计划。');
-  document.querySelector('#opt-plan [data-testid="menu-option-label"]').textContent = 'my-skill';
-  planRowFiber.memoizedProps.item = makeRecipeSkill('my-skill', planSrc);
+  planRowFiber.memoizedProps.item.item.scopeItem = { case: 'recipe', value: { title: 'plan', description: planSrc } };
   await settle(window);
-  assert.equal(planDesc.firstChild, planDescTextNode);
   assert.equal(planDesc.textContent, planSrc);
+  assert.equal(planDesc.getAttribute('aria-label'), planSrc);
+  customDictLabel.setAttribute('aria-label', 'Settings');
+  customDictDesc.setAttribute('aria-label', 'Settings');
+  customDictOpt.setAttribute('aria-label', 'Settings');
+  await settle(window);
+  assert.equal(customDictLabel.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictDesc.getAttribute('aria-label'), 'Settings');
+  assert.equal(customDictOpt.getAttribute('aria-label'), 'Settings');
   assert.equal(rtlDesc.textContent, 'Before');
 });
 
