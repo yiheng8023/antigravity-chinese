@@ -3,13 +3,14 @@ const path = require('path');
 
 // ASAR 的两个 Chromium Pickle 依次记录头部长度与 JSON 字符串。
 // 只读取头部，保持安装器在未安装开发依赖时也可工作。
-function readEntries(archive) {
+function readAsarHeader(archive) {
   const fd = fs.openSync(archive, 'r');
   try {
+    const fileSize = fs.fstatSync(fd).size;
     const size = Buffer.alloc(8);
     if (fs.readSync(fd, size, 0, 8, 0) !== 8) throw new Error('ASAR 头部不完整');
     const length = size.readUInt32LE(4);
-    if (length < 8 || length > 16 * 1024 * 1024 || length > fs.fstatSync(fd).size - 8) {
+    if (length < 8 || length > 16 * 1024 * 1024 || length > fileSize - 8) {
       throw new Error('ASAR 头部长度无效');
     }
     const header = Buffer.alloc(length);
@@ -17,19 +18,70 @@ function readEntries(archive) {
     const jsonLength = header.readUInt32LE(4);
     if (jsonLength > length - 8) throw new Error('ASAR JSON 长度无效');
     const root = JSON.parse(header.subarray(8, 8 + jsonLength).toString('utf8'));
-    const entries = [];
-    function walk(node, parent, inherited) {
-      const unpacked = inherited || node.unpacked === true;
-      if (node.files) {
-        for (const [name, child] of Object.entries(node.files)) {
-          if (!name || name === '.' || name === '..' || /[\\/\0]/.test(name)) throw new Error('ASAR 文件名无效');
-          walk(child, parent ? parent + '/' + name : name, unpacked);
-        }
-      } else entries.push({ name: parent, unpacked });
-    }
-    walk(root, '', false);
-    return entries;
+    return { root, dataOffset: 8 + length, fileSize };
   } finally { fs.closeSync(fd); }
+}
+
+function readEntries(archive) {
+  const { root } = readAsarHeader(archive);
+  const entries = [];
+  function walk(node, parent, inherited) {
+    const unpacked = inherited || node.unpacked === true;
+    if (node.files) {
+      for (const [name, child] of Object.entries(node.files)) {
+        if (!name || name === '.' || name === '..' || /[\\/\0]/.test(name)) throw new Error('ASAR 文件名无效');
+        walk(child, parent ? parent + '/' + name : name, unpacked);
+      }
+    } else entries.push({ name: parent, unpacked });
+  }
+  walk(root, '', false);
+  return entries;
+}
+
+// 零依赖按 ASAR 头部索引定位并提取单文件内容（不受前 30 MiB 偏移截断，也不依赖 @electron/asar）
+function extractFileFromAsar(archive, relPath) {
+  const segments = String(relPath || '').replace(/\\/g, '/').split('/').filter(Boolean);
+  if (!segments.length || segments.some(s => s === '.' || s === '..')) return null;
+  let parsed;
+  try {
+    parsed = readAsarHeader(archive);
+  } catch (_) {
+    return null;
+  }
+  const { root, dataOffset, fileSize } = parsed;
+  let node = root;
+  let unpacked = false;
+  for (const seg of segments) {
+    if (!node || !node.files || !Object.hasOwn(node.files, seg)) return null;
+    node = node.files[seg];
+    if (node && node.unpacked === true) unpacked = true;
+  }
+  if (!node || node.files) return null;
+  if (unpacked) {
+    const unpackedPath = path.join(archive + '.unpacked', ...segments);
+    return fs.existsSync(unpackedPath) ? fs.readFileSync(unpackedPath) : null;
+  }
+  const offset = Number(node.offset);
+  const entrySize = Number(node.size);
+  if (!Number.isSafeInteger(offset) || offset < 0 ||
+      !Number.isSafeInteger(entrySize) || entrySize < 0 ||
+      entrySize > 64 * 1024 * 1024 ||
+      dataOffset + offset + entrySize > fileSize) {
+    return null;
+  }
+  const fd = fs.openSync(archive, 'r');
+  try {
+    const out = Buffer.alloc(entrySize);
+    let readTotal = 0;
+    while (readTotal < entrySize) {
+      const n = fs.readSync(fd, out, readTotal, entrySize - readTotal, dataOffset + offset + readTotal);
+      if (n <= 0) break;
+      readTotal += n;
+    }
+    return readTotal === entrySize ? out : null;
+  } finally {
+    fs.closeSync(fd);
+  }
 }
 
 function getUnpackArgs(archive) {
@@ -76,4 +128,4 @@ function verifyUnpackedOutput(original, output) {
   return expected.length;
 }
 
-module.exports = { readEntries, getUnpackArgs, verifyUnpackedOutput };
+module.exports = { readEntries, getUnpackArgs, verifyUnpackedOutput, extractFileFromAsar };
